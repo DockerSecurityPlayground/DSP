@@ -1,7 +1,9 @@
 function SocketService($websocket) {
   var socket;
+  
+    var wsUrl = 'ws://' + location.host;
     this.manage = function manage(jsonToSend, handlerMessage) {
-       var dataStream = $websocket('ws://localhost:8080');
+       var dataStream = $websocket(wsUrl);
         dataStream.send(jsonToSend);
         dataStream.onMessage(handlerMessage);
     };
