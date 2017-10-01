@@ -1,0 +1,10 @@
+version: '2'
+services:
+  Porte:
+    image: daindragon2/debian_networking
+    stdin_open: true
+    tty: true
+    ports:
+      - "11000:22"
+      - "12000:80"
+networks: {}

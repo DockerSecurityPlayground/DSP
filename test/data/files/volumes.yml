@@ -1,0 +1,23 @@
+version: '2'
+services:
+  LabTest:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+  NuovoContainer:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+  PeppeDipendente:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - LabTest
+      - NuovoContainer
+    links:
+      - LabTest
+      - NuovoContainer
+    volumes:
+      - /Users/gaetanoperrone/dsp/giper/lab2/t/:/t
+networks: {}

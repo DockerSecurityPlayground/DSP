@@ -1,0 +1,273 @@
+/* bootstrap 3 helpers */
+
+
+/* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+.row.content {height: 1500px}
+#network_action_plus {
+	margin: 0px;
+	position: relative;
+} 
+
+/* Set 100% height */
+.sidenav {
+height: 100%;
+}
+.horizontal-collapse {
+height: 70px;
+}
+.collassa { 
+	background-color:white ;
+	padding-bottom:10px;
+	
+
+	}
+
+.collassa.in {
+overflow-y: hidden;
+}
+
+canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right:0;
+    display: block;
+    border:1px solid #337AB7;
+    width:100%;
+    height:900px
+}
+
+/* Set black background color, white text and some padding */
+footer {
+background-color:#337AB7;
+color: white;
+font-weight: bold;
+padding: 15px;
+margin-top:10px
+}
+/* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+.sidenav {
+height: auto;
+padding: 15px;
+}
+
+
+.row.content {height: auto;} 
+}
+
+.jumbotron {
+	
+	background-color:#337AB7;
+	color:white;
+
+}
+.dark-color {
+	background-color:"#337AB7"
+
+} 
+
+.text-center {
+   text-align:center
+}
+
+.invalid-syntax { 
+	border-color:red !important
+} 
+.left_align {
+	  position: absolute;
+	    right: 20px;
+}
+.panel_content_padding {
+    	padding: 10px;
+}
+
+.center_align {
+	margin: auto;
+	width: 50%;
+
+} 
+
+/*** OPTION PANELS  ***/ 
+
+.panel_network {
+	background-color:red
+}
+
+.select_style {
+	font-style: italic;
+	background-color:white;
+}
+
+
+
+.label_style {
+	font-style:italic;
+	padding-left:10px; 
+
+}
+#nameNetwork {
+	width:240px;
+}
+/*** BOOTSTRAP OVERRIDE **/ 
+.form-color {
+
+  width:45px;
+  text-align:center;
+  /*height: 34px; */
+  height: 28px;
+  margin-right:10px;
+  margin-left:10px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: black;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+
+}
+.form-ip {
+  width:45px;
+  text-align:center;
+  /*height: 34px; */
+  height: 28px;
+  margin-right:10px;
+  margin-left:10px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-ip:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+.form-ip::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.form-ip:-ms-input-placeholder {
+  color: #999;
+}
+.form-ip::-webkit-input-placeholder {
+  color: #999;
+}
+.form-ip::-ms-expand {
+  background-color: transparent;
+  border: 0;
+}
+.form-ip[disabled],
+.form-ip[readonly],
+fieldset[disabled] .form-ip {
+  background-color: white;
+  opacity: 1;
+}
+.form-ip[disabled],
+fieldset[disabled] .form-ip {
+  cursor: not-allowed;
+}
+
+
+.form-ip-edit
+{
+	margin-left:0px;
+	font-style: italic;
+	width:50px;
+}
+
+
+
+  .network-form-inline .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    margin-left:10px;
+    margin-right:30px;
+    vertical-align: middle;
+  }
+  .network-form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  .network-form-inline .form-control-static {
+    display: inline-block;
+  }
+  .network-form-inline .input-group {
+    display: inline-table;
+    vertical-align: middle;
+  }
+  .network-form-inline .input-group .input-group-addon,
+  .network-form-inline .input-group .input-group-btn,
+  .network-form-inline .input-group .form-control {
+    width: auto;
+  }
+  .network-form-inline .input-group > .form-control {
+    width: 100%;
+  }
+  .network-form-inline .control-label {
+    margin-bottom: 0;
+    margin-right:10px;
+    vertical-align: middle;
+  }
+  .network-form-inline .radio,
+  .network-form-inline .checkbox {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  .network-form-inline .radio label,
+  .network-form-inline .checkbox label {
+    padding-left: 0;
+  }
+  .network-form-inline .radio input[type="radio"],
+  .network-form-inline .checkbox input[type="checkbox"] {
+    position: relative;
+    margin-left: 0;
+  }
+  .network-form-inline .has-feedback .form-control-feedback {
+    top: 0;
+  }
+.container-ip {
+	font-style:italic;
+	margin-left: 15px
+}
+
+.form-imagelist {
+	width:auto;
+}
+
+.form-network {
+	width:300px;
+	margin-left:20px;
+}
+
+.error-style {
+	margin: 10px 60px;
+}
+
+.table-reduced-width {
+  width:90%; !important
+}
+
+.large_div {
+  height: 1600px;
+  margin-left:25px;
+  overflow: scroll;
+}

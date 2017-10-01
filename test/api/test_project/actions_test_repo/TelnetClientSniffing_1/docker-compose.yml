@@ -1,0 +1,22 @@
+version: '2'
+services:
+  FTPServer:
+    image: 'dsp/ftp_server:latest'
+    stdin_open: true
+    tty: true
+    networks:
+      network:
+        ipv4_address: 192.168.1.2
+    cap_add:
+      - NET_ADMIN
+  anotherContainer:
+    image: 'dsp/debian_bot:latest'
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+networks:
+  network:
+    ipam:
+      config:
+        - subnet: 192.168.1.1/24

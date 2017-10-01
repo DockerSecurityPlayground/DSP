@@ -1,0 +1,10 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">Delete {{$ctrl.lab.name}} </h3>
+</div>
+<div class="modal-body" id="modal-body">
+	<p> Are you sure to delete {{$ctrl.lab.name}} ? </p>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="$ctrl.ok()">Yes</button>
+    <button class="btn btn-danger" type="button" ng-click="$ctrl.cancel()">No</button>
+</div>

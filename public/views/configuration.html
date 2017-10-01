@@ -1,0 +1,142 @@
+﻿<div id="page-wrapper">
+  <h1 class="text-center"> Configuration </h1>
+  <hr>	
+  <div id="page-inner">
+
+  <div class="row">
+    <div class="col-sm-4"> 
+    <h3> Main configuration </h3>
+    </div>
+    <div class="col-sm-8"> 
+      <form name="formConfig">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" 
+            class="form-control" 
+            ng-required="true" 
+            ng-pattern="filetypePattern"
+            name="name"
+            ng-model=config.name id="name">
+          <div class="text-muted small">Your name will be used as directory name to save your projects </div>
+        </div>
+        <div ng-show="formConfig.name.$invalid" class='alert alert-danger'> Invalid name: no space, no empty, only alphanumeric characters</div>
+
+        <div class="form-group">
+          <label for="dir">Directory projects:</label>
+          <input type="text" 
+            class="form-control" 
+            id="mainDir" 
+            name="mainDir" 
+            ng-model=config.mainDir
+            ng-required="true"
+            ng-pattern="filetypePattern" 
+            >
+          <div class="text-muted small">Main directory for DSP (path starts by homedir)</div>
+        </div>
+        <div ng-show="formConfig.mainDir.$invalid" class='alert alert-danger'> Invalid main dir: no space, no empty, only alphanumeric characters</div>
+         
+
+        <button type="submit" ng-disabled="formConfig.$invalid" ng-click="updateConfig()" class="btn btn-warning">Update</button>
+      </form>
+    </div>
+  </div>
+
+<hr>
+        <div ng-show="isReposUploading" class="alert alert-info"> Projects in upload, pls wait... </div>
+        <div ng-show="isUserRepoUpdating" class="alert alert-info">Send local changes in remote repo, pls wait... </div>
+  <div ng-show="githubError.show" class="row"> 
+    <div class="alert alert-danger text-center" ng-bind-html="githubError.message"></div> 
+  </div>
+<div class="row">
+  <div class="col-sm-4"> 
+    <h3>Labs Managment</h3>
+  </div>
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="col-sm-3 col-sm-offset-8">
+        <button class="btn btn-blue" ng-click="updateProjects()">  Update Lab Projects </button>
+        <div style='margin-top:10px' class="text-muted small">Press this to update all main Lab Projects</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <form name="githubForm"> 
+        <label for="github_project">Change your github remote project</label>
+        <input 
+               type="text" 
+               class="form-control" 
+               name="githubURL"
+               ng-required="true"
+              ng-pattern="urlPattern"
+               id="githubURL" 
+               ng-model=gitUrlToEdit
+        >
+        <div class="text-muted small">Change repository</div>
+
+    <div ng-show='isLoadingGit' class="alert alert-info"> Loading new github</div>
+
+        <button class="btn btn-warning" 
+          ng-click="openEditGithub()"
+          ng-disabled="githubForm.$invalid"
+          > Change repo </button>
+    </form>
+    </div>
+
+      <!-- <form ng-show='isRepoSynchronized'>
+        <div class="form-group" >
+          <label for="username">Username:</label>
+          <input type="text" class="form-control" ng-model="repoUsername" id="name">
+          <div class="text-muted small">Your git username</div>
+        </div>
+
+        <div class="form-group">
+          <label for="dir">Password</label>
+          <input type="password" class="form-control" id="password" ng-model="repoPassword">
+          <div class="text-muted small">Your git password</div>
+        </div>
+
+        <button type="submit" ng-click="updateRepository()" class="btn btn-success">Update git repository</button>
+      </form>
+  -->
+    
+  </div>
+</div>
+
+
+
+
+			<!-- REPO DATA MANAGMENT -->
+  <hr />                
+    <h3 class="text-center"> Data Managment </h3>	
+    <div class="text-muted text-center small">Here you can upload files you want to upload in the containers. They'll be saved in data dir of your repo  (hidden file .data) </div>
+    <p class="row">
+      <div class="col-sm-4 col-sm-offset-2"> 
+      <button ng-click="uploadFile()" class="btn btn-default">  => Upload</button>
+      </div>
+      <div class="col-sm-6 "> <div ng-click="deleteFile()" class="btn btn-default">  Delete </div>  </div>
+  </p>
+    <br>
+    <br>
+    <div ng-show="errorDelete !== ''" class="alert alert-danger text-center" > {{errorDelete}} </div>
+    <div class="row">
+      <div class="col-sm-5 tree-browser"> 
+      <js-tree 
+      tree-events="select_node:nodeSelected" 
+      tree-ajax="/api/tree/"
+      tree-core="tree_core"
+      tree-plugins="dnd"
+      >
+      </js-tree>
+    </div> 
+    <div id="treeRepo" class="col-sm-5 tree-browser">  
+      <js-tree 
+      tree-events="select_node:nodeLabSelected" 
+      tree-core="tree_core"
+      tree-plugins="dnd"
+      tree-data="scope"
+      tree-model="labTreeModel" 
+      ></js-tree>
+    </div>
+  </div>
+  </div> <!-- END ROW JS TREE -->
+<!-- /. PAGE INNER  -->
+</div>              

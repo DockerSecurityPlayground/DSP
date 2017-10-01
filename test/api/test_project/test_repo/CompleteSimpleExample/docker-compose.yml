@@ -1,0 +1,9 @@
+version: '2'
+services:
+  baseExec:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+networks: {}

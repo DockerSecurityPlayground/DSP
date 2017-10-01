@@ -1,0 +1,15 @@
+.tree-browser {
+  overflow: auto;
+}
+.file-viewer {
+  padding-left: 50px;
+  overflow: auto;
+}
+.jstree-custom-folder{
+  background-image: url('../img/folder.png') !important;
+  background-position: 0 !important;
+}
+.jstree-custom-file {
+  background-image: url('../img/file.png') !important;
+  background-position: 0 !important;
+}

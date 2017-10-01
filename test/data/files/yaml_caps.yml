@@ -1,0 +1,25 @@
+version: '2'                                                                                             
+services:                                                                                                
+  rete:                                                                                                  
+    image: dsp/debian_base:latest
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+    cap_add:
+              - NET_ADMIN
+    networks:                                                                                            
+      network:                                                                                           
+        ipv4_address: 192.168.1.4                                                                        
+  Peppnico:                                                                                              
+    image: dsp/debian_base:latest
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+    cap_add:
+              - NET_ADMIN
+    networks:                                                                                            
+      network:                                                                                           
+        ipv4_address: 192.168.1.8                                                                        
+networks:                                                                                                
+ network:                                                                                                
+   ipam:                                                                                                 
+     config:                                                                                             
+        - subnet: 192.168.1.1/24

@@ -1,0 +1,22 @@
+{
+	"framework" : "mocha+chai",
+	"src_files" : [
+		"public/assets/js/*.js", 
+		"public/app/services/*.js", 
+		"test/browser/*.js" 
+
+	], 
+	"src_files_ignore" : [
+	   "public/assets/js/angular-route-min.js",
+	   "public/assets/js/angular-ui-notification.min.js",
+	   "public/assets/js/prism.js",
+	"public/assets/js/bootstrap.min.js",
+		"public/assets/js/custom.js",
+	   "public/assets/js/testing_bot.js",
+	   "public/assets/js/bootstrap-colorpicker-module.js",
+	   "public/assets/js/bootstrap-colorpicker-module.min.js",
+	   "public/assets/js/angular-animate.js",
+	   "public/assets/js/angular-sanitize.js"
+	]	
+
+}

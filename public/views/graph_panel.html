@@ -1,0 +1,28 @@
+<div class="container-fluid"> 
+		<!-- A canvas tag is required or 
+			 Fabric.js doesn't know where to draw. -->
+
+<div class="row">
+
+
+<div class="col-sm-3">
+
+	<h4 class="text-center">Containers</h4>
+	<hr>	
+	<div class="list-group">
+    <a href="#" id="{{c.name}}" class="list-group-item" 
+	ng-class=" containerToDraw.name===c.name ? 'active' : '' " 
+	ng-click="selectContainerAction($event)" ng-repeat="(key,c) in containerListNotToDraw">{{c.name}}</a>
+	  </div>
+
+
+
+
+
+</div> <!-- End container list -->
+	<div class="col-sm-9">
+		<canvas ng-click="canvasClick()" width=1150px height=600px id="c"></canvas>
+	</div>
+
+</div>
+</div>

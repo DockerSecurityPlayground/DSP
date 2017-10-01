@@ -1,0 +1,24 @@
+version : '2' 
+services: 
+  entry_point: 
+   image: daindragon2/debian_networking
+   stdin_open: true
+   tty: true
+   networks: 
+      rete:
+        ipv4_address: 192.168.1.3
+   environment: 
+      - IP_SERVER_TELNET=192.168.1.4
+  telnet_server:
+   image: daindragon2/debian_telnet
+   stdin_open: true
+   tty: true
+   networks:
+      rete: 
+       ipv4_address: 192.168.1.4
+networks: 
+     rete:
+      ipam:
+        config:
+          - subnet: 192.168.1.1/24
+

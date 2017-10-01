@@ -1,0 +1,106 @@
+const _ = require('underscore');
+const dockerImages = require('./docker-images');
+
+function findContainerImage(allImages, selectedImage) {
+  return _.findWhere(allImages, { name: selectedImage.name });
+}
+
+function getUpdatedCommand(currentAction, imageActions) {
+  // Find updated actions
+  const updatedAction = _.findWhere(imageActions, { name: currentAction.name });
+  return updatedAction.command;
+}
+function getBackgroundMode(currentAction, imageActions) {
+  const updatedAction = _.findWhere(imageActions, { name: currentAction.name });
+  if (updatedAction.backgroundMode) return true;
+    else return false;
+}
+
+exports.getActionsSync = (clistToDraw) => {
+  const actions = [];
+  // Get the actions
+  // For each container
+  _.each(clistToDraw, (ele) => {
+    const cname = ele.name;
+    const cActions = ele.actions;
+    console.log(ele.selectedImage);
+    if (cActions) {
+      // For each action in actions of container
+      _.each(cActions, (a) => {
+        const aa = _.extend({}, a, { cname });
+        // Add to all actions
+        actions.push(aa);
+      });
+    }
+  });
+  return _.sortBy(actions, 'priority');
+};
+
+
+exports.getActions = (clistToDraw, cb) => {
+  let actionError;
+  dockerImages.getListImages((err, images) => {
+    if (err) cb(err);
+    else {
+      const actions = [];
+      // Get the actions
+      // For each container
+      _.each(clistToDraw, (ele) => {
+        const cname = ele.name;
+        const cActions = ele.actions;
+        // Get updated image
+        const updatedImage = findContainerImage(images, ele.selectedImage);
+        if (!updatedImage) {
+          cb(new Error('Container has an image that doesn\'t exists in current docker images!'));
+        }
+        else if (cActions) {
+          // For each action in actions of container
+          _.each(cActions, (a) => {
+            const aa = _.extend({}, a, { cname });
+            aa.command = getUpdatedCommand(aa, updatedImage.actions);
+            aa.backgroundMode = getBackgroundMode(aa, updatedImage.actions);
+            if (!aa.command) {
+              actionError = new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
+            }
+            // Add to all actions
+            actions.push(aa);
+          });
+        }
+      });
+      if (actionError) cb(actionError);
+      else cb(null, _.sortBy(actions, 'priority'));
+    }
+  });
+};
+function getArg(key, arg) {
+  let flag;
+   // Arg escaping
+  arg.val = arg.val.replace(/[\\$'"]/g, '\\$&');
+  // Check if is a long opt or a normal opt
+  if (key.length === 1) {
+    flag = '-';
+  }
+  else flag = '--';
+  // If isn't boolean it's a text argument
+  if (arg.type !== 'boolean') {
+    return `${flag}${key} '${arg.val}' `;
+  }
+  // Boolean argument
+  else return (arg.val === 'true') ? `${flag}${key} ` : ' ';
+}
+
+exports.getCommand = function getCommand(a) {
+  const args = a.args;
+  let strArgs = '';
+  // Concatenate arguments
+  _.each(args, (arg, key) => {
+//    log.info("key:"+key)
+//  log.info("arg:"+arg)
+    // strArgs += `${flag}${key} '${arg.val}' `;
+    strArgs += getArg(key, arg);
+  });
+
+  const command = `${a.command} ${strArgs}`;
+  // Default Interpreter
+  return `/bin/sh -c "${command} "`;
+};

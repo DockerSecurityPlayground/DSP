@@ -1,0 +1,152 @@
+﻿<div id="page-wrapper" >
+    <div 
+      id="page-inner">
+	<div class="row">
+	    <div class="col-md-12">
+	     <h1 id="lab_action">{{lab_action}}</h1>   
+		<h4 id="description_lab"></h4>
+	    </div>
+	</div>              
+	 <!-- /. ROW  -->
+	  <hr />
+	<div class=""> 
+	<form name="{{lab_action_form}}" 
+		ng-submit="ctrl.labAction()"  class="form-horizontal">
+	  <div class="row form-group">
+	    <label class="control-label col-sm-2" for="name">* Name:</label>
+	    <div class="col-sm-10">
+	      <input type="name" class="form-control" ng-model="ctrl.lab.name" id="name" >
+	    </div>
+	  </div>
+
+	    <div class="row form-group">
+	      <label class="control-label col-sm-2" for="description">Description</label>
+	<div class="col-sm-10">
+	      <textarea  class="form-control" ng-model="ctrl.lab.description" id="description"> </textarea>
+	</div>
+	</div>
+
+	    <div class="row form-group">
+	      <label class="control-label col-sm-2" for="labels">Labels</label>
+	<div class="col-sm-10">
+
+          <ui-select multiple sortable="true" ng-model="ctrl.labels" theme="bootstrap" class="form-control" title="Choose a label">
+            <ui-select-match placeholder="Select or search a label in the list...">{{$item.name}}</ui-select-match>
+            <ui-select-choices repeat="item in ctrl.labelProjects ">
+              <div class="label label-success" style="background-color:{{item.color}}" ng-bind-html="item.name "></div>
+              <small ng-bind-html="item.description "></small>
+            </ui-select-choices>
+          </ui-select>
+
+      </div>
+	</div>
+
+      <div class="row text-center" for="goal"><h3><a href="#" ng-click="ctrl.isGoalEditShowed = !ctrl.isGoalEditShowed"> Goal</a><h3></div>
+    <div class="row" ng-show='ctrl.isGoalEditShowed'>	
+      <div class="row"> 
+            <ul class="col-sm-offset-9 nav nav-tabs">
+                  <li 
+                ng-class="{'active' : !ctrl.isGoalPreviewOpen}">
+                    <a href="#"
+                      ng-click="ctrl.isGoalPreviewOpen = false  ">
+                    Edit
+                  </a>
+                </li>
+
+                  <li
+                ng-class="{'active' : ctrl.isGoalPreviewOpen}">
+                    <a href="#"
+                      ng-click="ctrl.isGoalPreviewOpen = true  "
+                      >
+                    Preview
+                  </a>
+                </li>
+              </ul> 
+          </div>	  
+        <div class="form-group">
+	    <div ng-show='!ctrl.isGoalPreviewOpen' class="col-sm-12">
+	    <textarea ui-tinymce="tinymceOptions"
+              rows="20"
+              ng-change="ctrl.updatePreviewGoal()"
+	      ng-model="ctrl.lab.goal">
+	    </textarea>
+	      <!--<input type="name" class="form-control" ng-model="ctrl.lab.goal" id="goal" > -->
+	    </div>
+	  </div>
+
+          <div ng-show='ctrl.isGoalPreviewOpen'>
+            <h4>  Preview </h4>
+            <div ng-bind-html="ctrl.previewGoal"></div> 
+            <hr>
+          </div>
+
+    </div>
+    <div class="row text-center" for="solution"><h3><a href="#" ng-click="ctrl.isSolutionEditShowed = !ctrl.isSolutionEditShowed"> Solution</a><h3></div>
+    
+        <div ng-show='ctrl.isSolutionEditShowed'
+            class="row"
+          >
+            <div class="row">
+                <ul class="col-sm-offset-9 nav nav-tabs">
+                      <li 
+                    ng-class="{'active' : !ctrl.isSolutionPreviewOpen}">
+                        <a href="#"
+                          ng-click="ctrl.isSolutionPreviewOpen = false  ">
+                        Edit
+                      </a>
+                    </li>
+
+                      <li
+                    ng-class="{'active' : ctrl.isSolutionPreviewOpen}">
+                        <a href="#"
+                          ng-click="ctrl.isSolutionPreviewOpen = true  "
+                          >
+                        Preview
+                      </a>
+                    </li>
+                  </ul> 
+              </div>	  
+    
+          <div 
+            class="row form-group" 
+            >
+          <div ng-show='!ctrl.isSolutionPreviewOpen'>
+                  <div 
+                    class="col-sm-12">
+                  <textarea ui-tinymce="tinymceOptions"
+                    ng-attr-rows="40"
+                    ng-change="ctrl.updatePreviewSolution()"
+                    ng-model="ctrl.lab.solution">
+                  </textarea>
+                  </div>
+                </div>
+                <!--
+            style="
+            height:1500px;
+            "  
+            -->
+          <p 
+            ng-show='ctrl.isSolutionPreviewOpen'
+            ng-bind-html="ctrl.previewSolution"
+            class="large_div"
+            ></p> 
+          <hr>
+      </div>
+  </div>
+	  <div class="row form-group"> 
+	      <button type="submit" style="float:right; margin-right:15px" class="{{lab_action_btn.class}}">{{lab_action_btn.text}}</button>
+	  </div>	
+
+
+	</form>	
+
+
+<!-- 	Selected labels : {{ctrl.labels}} -->
+
+ <!-- /. PAGE WRAPPER  -->
+</div>	
+
+		</div>
+	 <!-- /. ROW  -->
+
+</div>

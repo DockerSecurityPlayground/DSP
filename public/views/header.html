@@ -1,0 +1,28 @@
+﻿        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <!-- <div class="navbar-header" style:"color:red" > -->
+                <a class="navbar navbar-brand"  style="position:absolute;height:100%" href="/labs">Docker Security Playground</a> 
+            <!-- </div> -->
+   	 	<ul id="breadcrumb" > 
+
+		<li ng-repeat="value in breads.breads.array"><a href="{{value.link}}" ng-click="updateBreadCrumbs(value.link)">{{value.name}}  </a></li>
+	<!--	<li><a href="#">DockerSecurityProjects  </a></li> -->
+	<!-- <li><a href="#">HackingWeb  </a></li> -->
+	<!--	<li class="active"><a href="#" >Edit Lab  </a></li> -->
+
+		</ul>
+		<div style="color: white;
+		padding: 15px 0px 0px 50px;
+		float: right;
+		font-size: 16px;" > 
+		<ul class="nav nav-tabs nav-tabs-blue ">
+		      <li ng-class="getClass('/lab/new/')"><a href="/lab/new"> New Lab</a></li>
+		      <li ng-click="updateBreadCrumbs('/labs')" ng-class="getClass('/labs')" ><a href="/labs">Labs</a></li>
+		      <li ng-click="updateBreadCrumbs('/labels')" ng-class="getClass('/labels')"><a href="/labels">Labels</a></li>
+		      <li ng-click="updateBreadCrumbs('/configuration')" ng-class="getClass('/configuration')"><a href="/configuration"> <span class="fa fa-align-justify"> </span> </a></li>
+	
+		    </ul>
+	</div>
+        </nav>   
+
+
+

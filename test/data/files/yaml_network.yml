@@ -1,0 +1,29 @@
+version: '2'                                                                                             
+services:                                                                                                
+  Container1:                                                                                            
+    image: daindragon2/debian_networking                                                                 
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+  Container2:                                                                                            
+    image: daindragon2/debian_networking                                                                 
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+  rete:                                                                                                  
+    image: daindragon2/debian_networking                                                                 
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+    networks:                                                                                            
+      network:                                                                                           
+        ipv4_address: 192.168.1.4                                                                        
+  Peppnico:                                                                                              
+    image: daindragon2/debian_networking                                                                 
+    stdin_open: true                                                                                     
+    tty: true                                                                                            
+    networks:                                                                                            
+      network:                                                                                           
+        ipv4_address: 192.168.1.8                                                                        
+networks:                                                                                                
+ network:                                                                                                
+   ipam:                                                                                                 
+     config:                                                                                             
+        - subnet: 192.168.1.1/24 

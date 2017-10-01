@@ -1,0 +1,16 @@
+[ {"repoName":"DSP_Projects","labName":"dsp 1","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"networkTestDir","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"networkTestDir2","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"runningDelete","state":"RUNNING"},
+  {"repoName":"test_repo","labName":"newLab","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"toDelete","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"anotherNetwork","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"existentLab","state":"NO_NETWORK"},
+  {"repoName":"test_repo","labName":"toEditLab","state":"STOPPED"},
+  {"repoName":"test_repo","labName":"MITM","state":"STOPPED"},
+  {"repoName":"DSP_Projects","labName":"first","state":"STOPPED"},
+  {"repoName":"DSP_Projects","labName":"second","state":"STOPPED"},
+  {"repoName":"actions_test_repo","labName":"TelnetClientSniffing_1","state":"STOPPED"},
+  {"repoName":"actions_test_repo","labName":"ErrorSameSubnet","state":"STOPPED"},
+  {"repoName":"actions_test_repo","labName":"ErrorSamePort","state":"STOPPED"}
+]

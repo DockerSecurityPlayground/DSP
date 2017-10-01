@@ -1,0 +1,124 @@
+<div id="panel_network">
+
+
+<table id="table_network" class="table table-striped">
+				<thead>
+				<tr>
+					<th> Name  </th>
+					<th> Subnet </th>
+					<th> Color </th>
+					<th> Remove </th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="n in networkList">
+					<td> {{n.name}} </td> <td> {{n.subnet}} </td><td><input type="text" class="form-ip" style="background-color:{{n.color}}; margin-left:0" /> </td>
+					<td>   <button id="action_remove" type="button " ng-click="deleteNetwork(n.name)" class="btn btn-danger  glyphicon glyphicon-remove " /> </td>
+				</tr>
+				</tbody>
+
+</table>
+
+
+<div class="row">
+		<div class="col-sm-9">
+
+			<form class="network-form-inline" id="formnetwork" name="formnetwork" novalidate>
+			
+			  <div  class="form-group">
+			    <label class="control-label "  for="nameNetwork">  <i> Name: </i>  </label>
+
+					<!-- ng-pattern="/^[A-Za-z0-9_\s-]*$/" -->
+					<!-- NETWORK NAME  --> 
+				      <input type="text"  id="nameNetwork" class="form-control" name="nameNetwork" ng-model="n.name"  
+					ng-change="checkNetworkDuplicates($event)"
+					ng-required="true"
+					ng-class="{
+						'invalid-syntax': formnetwork.nameNetwork.$invalid
+					}"	
+				placeholder="Enter name"
+				>
+
+			  </div> <!-- end form-group --> 
+			  <div class="form-group">
+			    <label class="control-label "> <i>Subnet</i></label> 
+			 <input type="text" 
+				class="form-ip" 
+				id="subnet_one"  
+				name="subnet_one"  
+				maxlength="3"  
+				ng-pattern="/^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/"
+				ng-class="{
+					'invalid-syntax': formnetwork.subnet_one.$invalid
+				}"	
+				ng-model="subnet.first" 
+				ng-change="checkNetworkDuplicates($event)"
+				  ng-required="true"> 
+			<b class="text-center">:</b>
+			 
+			<input type="text" 
+				class="form-ip" 
+				id="subet_two"  
+				name="subnet_two" 
+				size="3" maxlength="3"  
+				ng-pattern="/^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/"
+				ng-class="{
+					'invalid-syntax': formnetwork.subnet_two.$invalid
+				}"	
+				ng-model="subnet.two"
+				ng-change="checkNetworkDuplicates($event)"
+				   ng-required="true"> 
+			 
+			<b class="text-center">:</b>
+			<input type="text" 
+				class="form-ip" 
+				id="subnet_three"	
+				name="subnet_three" 
+				size="3" maxlength="3"  
+				ng-pattern="/^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/"
+				ng-class="{
+					'invalid-syntax': formnetwork.subnet_three.$invalid
+				}"	
+				ng-change="checkNetworkDuplicates($event)"
+				ng-model="subnet.three"
+				   required> 
+			<b class="text-center">:</b>
+			<input type="text" 
+				class="form-ip" 
+				id="subnet_four"
+				name="subnet_four" 
+				size="3" maxlength="3"  
+				ng-pattern="/^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/"
+				ng-class="{
+					'invalid-syntax': formnetwork.subnet_four.$invalid
+				}"	
+				ng-change="checkNetworkDuplicates($event)"
+				ng-model="subnet.four" readonly style="margin-right:0"
+				   required> 
+			<i> /24 </i>
+
+
+		 <input colorpicker colorpicker-with-input="false" readonly class="form-color" ng-model="n.color" style="background-color:{{n.color}}" type="text" />
+			</div>	
+			  <button type="button" id="network_action_plus" ng-disabled="formnetwork.$invalid" ng-click="addNetworkElement();" class=" btn btn-default glyphicon glyphicon-plus  " > Add </button>
+			<input type="text" 
+			ng-model="n.more_validation" 
+			style="visibility:hidden" 
+			name="network_more_validation" 
+			ng-required="true" 
+			value="###"> 
+
+
+			</form>
+	</div> <!-- END FORM DIV -->
+		<div class="col-sm-3">
+		</div>
+</div>
+
+<!-- ERROR NETWORK -->
+<div class="error-style text-danger ng-model=networkErrors" 
+	ng-style="{ 'visibility' : (networkErrors.someError)? 'visible': 'hidden'}" > 
+	{{networkErrors.message}}
+</div>
+
+</div> <!-- end network -->

@@ -1,0 +1,9 @@
+{
+      "config" : {
+          "dsp_reponame" : "dsp_repo" , 
+            "name_labelfile" : "labels.json", 
+                    "static_content": "../public/",
+                      "DSPGithub": "https://github.com/giper45/testLabs.git", 
+                        "test": false
+                            }
+}

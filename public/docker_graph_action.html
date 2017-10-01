@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+  <title>Docker Action Lab </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	    <base href="/">
+		<script src="assets/js/underscore-min.js"> </script>
+		<script src="assets/js/jquery-min.js"> </script>
+
+                <link rel='stylesheet' href='assets/css/prism.css'>
+		<script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
+		<script src="assets/js/angular.min.js"></script>
+		<script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
+		<script src="assets/js/angular-animate.min.js"></script>
+		<script src="assets/js/angular-sanitize.min.js"></script>
+		<script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+		<script src="assets/js/angular-ui-notification.min.js"></script>
+
+		<link href="assets/css/bootstrap.css" rel="stylesheet">
+		<link href="assets/css/grapheditor.css" rel="stylesheet">
+		<link href="assets/css/nav_fixed.css" rel="stylesheet">
+		<script src="assets/js/fabric.min.js"></script>
+                <script src="assets/js/prism.js"></script>
+		<script src="assets/js/GraphHandler.js"></script>
+		<script src="assets/js/bootstrap-colorpicker-module.js"></script>
+		<script src="assets/js/angular-websocket.min.js"></script>
+		<!-- loadingbar -->
+		<script src="assets/js/loading-bar.js"></script>
+	        <link href='assets/css/loading-bar.css' rel='stylesheet' />
+				<!-- -->
+
+		<link rel="stylesheet" href="assets/css/font-awesome.css"/>
+		<link rel="stylesheet" href="assets/css/build.css"/>
+		<link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
+	   
+	    <!-- <script src="lib/utils.js"></script> -->
+	    <!-- angular services -->
+	   <script src="app/services/docker_service.js"> </script>
+          <script src="app/services/socket_service.js"> </script>
+	   <script src="app/services/container_manager_service.js"> </script>
+	    <!-- angular controllers -->
+	    <script src="app/controllers/graph_action_controller.js"></script>
+	
+
+<script>
+	//ANGULAR COMPONENT REGISTRATION 
+	angular.module("dockersecplayground", ['ngAnimate', 'chieffancypants.loadingBar', 'ngSanitize', 'ui.bootstrap', 'ngWebSocket', 'ui-notification', 'colorpicker.module'] )
+		.service('dockerAPIService', DockerAPIService) 
+                .service('SocketService', SocketService) 
+		.service('containerManager', dsp_ContainerManagerService)
+		.controller('actionController', DSP_GraphActionController)
+		.filter('split',function(){
+	    return function(str,length) {
+	       str = str || "";
+	       length = Math.max(1,~~length);
+	       return str.match(new RegExp(".{1,"+length+"}","g")).join("<br>");
+	    }
+	})
+		    .config(function(NotificationProvider, $locationProvider, cfpLoadingBarProvider) {
+			NotificationProvider.setOptions({
+			    delay: 2000,
+			    startTop: 20,
+			    startRight: 10,
+			    verticalSpacing: 20,
+			    horizontalSpacing: 20,
+			    positionX: 'center',
+			    positionY: 'bottom'
+			});
+
+			$locationProvider.html5Mode(true) 
+			cfpLoadingBarProvider.includeSpinner = true;
+			cfpLoadingBarProvider.includeBar = false;
+			cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
+		    });
+
+</script>
+
+
+
+</head>
+<body ng-app="dockersecplayground">
+  <!-- Start controller -->
+  <span id="appController" ng-controller="actionController">
+
+  <div class="jumbotron text-center ">
+  <h1>{{labName}}</h1>
+  <h4>{{labInfos.description}} </h4>
+  <!--    <p>Lab description</p> -->
+</div>
+<div ng-show="warningMessage !== '' " class="text-center alert alert-warning">  
+  <h4>{{warningMessage}} </h4>
+</div>
+<h2 class="text-center"> Goal </h2>
+<div style="margin-left:10px" ng-bind-html="tinymceGoal"> </div>
+
+
+
+<header>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+     <!-- end menu -->
+ <ul class="nav navbar-nav navbar-right">
+<!--
+      <li class="menu_style" > <a id="collapsedButton" href="" 
+		ng-click="editLab($event)"
+	 > 
+	<span   class="glyphicon glyphicon-pencil"> 
+		</span>  Edit
+	</a> 
+    </li>
+   -->   
+      
+      
+      <li class="menu_style" ng-class="command_buttons.load.class">
+	<a id="exitLab" href="" ng-click="exitLab($event)" >
+	 <span class="glyphicon glyphicon glyphicon-log-out"></span> Exit
+		</a></li>
+    </ul>
+  </div> <!-- end container-fluid -->
+</nav>
+
+</header>
+
+<div class="container-fluid"> 
+	
+		<!-- A canvas tag is required or 
+			 Fabric.js doesn't know where to draw. -->
+
+<div class="row">
+
+<div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
+</div>
+
+<div class="row">
+<div class="col-sm-12">  
+
+	<div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
+
+	</div>
+</div>
+</div>
+
+
+<div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
+
+<div class="row">
+
+<p class="col-sm-1 "><button class="btn btn-default" ng-click="clearLogs()">
+			Clear Logs
+			</button> 
+
+</p>
+</div>
+<div class="row">
+  <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
+		 <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+			</button> 
+
+</p>
+</div>
+ 
+</div>
+</div>
+<div class="row">
+ <!-- End container list -->
+	<div style="margin-left:20px" class="col-sm-9">
+		<canvas ng-click="canvasClick()" width=1150px height=600px id="c"></canvas>
+	</div>
+
+</div>
+
+<h3 class="text-center" > <a href="#" ng-click="showSolution = !showSolution"> Solution </a> </h3>
+<div style="margin-left:10px" 
+  class="large_div"
+  ng-show="showSolution" 
+  ng-bind-html="tinymceSolution"> </div>
+
+  <hr>
+<div ng-show="yamlfile !== ''" class="row">
+  <div class="col-sm-offset-1 col-sm-9" > 
+  <h4 class="text-center"> JSON Docker Compose </h4>
+          <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+  </div>
+</div>
+<!-- 
+<div id="loading-bar-container"> </div>
+
+<div>
+
+
+
+
+		<div class="panel panel-default">
+		  <div class="panel-heading">DEBUG</div>
+		  <div class="panel-body">
+			currentContainer: {{currentContainer}}
+			<hr>
+			networkList : {{networkList}}
+			<hr>
+			notToDraw : {{containerListNotToDraw}}
+			<hr>
+			containerToDraw:  {{containerToDraw}}
+			<hr>
+			containersToDraw : {{containerListToDraw}}
+		</div>
+		</div>
+
+</div>  <!-- End container-->
+
+
+
+
+
+
+
+</span> <!-- end controller -->
+
+
+<footer >
+  <p class="text-center">&copy; 2016 giper MIT licensed</p>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/ng-template"  id="savelab"> 
+
+</script> 
+
+<script type="text/ng-template"  id="openlab"> 
+
+</script> 
+
+</body>
+</html>
+

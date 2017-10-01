@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+  <title>DSP Installation</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="assets/js/angular.min.js"></script>
+  <script src="assets/js/angular-animate.min.js"></script>
+  <script src="assets/js/angular-sanitize.min.js"></script>
+  <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+  <script src="assets/js/angular-websocket.min.js"></script>
+  <script src="assets/js/angular-ui-notification.min.js"></script>
+
+  <link href="assets/css/bootstrap.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- CUSTOM ANGULAR COMPONENTS -->
+  <script src="app/services/ajax_service.js"> </script>
+  <script src="app/services/safe_apply_service.js"> </script>
+  <script src="app/services/regex_service.js"> </script>
+  <script src="app/services/response_server_service.js"> </script>
+  <script src="app/services/socket_service.js"> </script>
+  <script src="app/controllers/installationCtrl.js"> </script>
+
+ <base href="/">
+<script>
+	//ANGULAR COMPONENT REGISTRATION 
+	angular.module("myApp", ['ngAnimate', 'ngSanitize', 'ngWebSocket', 'ui.bootstrap', 'ui-notification'] )
+	.service('ServerResponse', dsp_server_response)
+	.service('SafeApply', SafeApply)
+	.service('RegexService', dsp_regex_service)
+        .service('SocketService', SocketService)
+	.controller('installationCtrl', dsp_InstallationCtrl) 
+	.config(function(NotificationProvider, $locationProvider) {
+		NotificationProvider.setOptions({
+		    delay: 2000,
+		    startTop: 20,
+		    startRight: 10,
+		    verticalSpacing: 20,
+		    horizontalSpacing: 20,
+		    positionX: 'center',
+		    positionY: 'bottom'
+		});
+
+		$locationProvider.html5Mode(true);
+	    });
+</script>
+
+
+</head>
+<body ng-controller="installationCtrl" ng-app="myApp">
+  
+<div class="container">
+<h1 class="text-center"> Installation </h1>
+
+		<hr>	
+
+            <div id="page-inner">
+<!--
+	<div class="row">
+		<div class="col-sm-4"> 
+			<h3>Avatar</h3>
+	    <img src="assets/img/avatar.jpeg" class="user-image img-responsive"/>
+		</div>
+		<div class="col-sm-8"> 
+		 <b> Upload your image </b>	
+		<form action="/upload" method="post" enctype="multipart/form-data">
+		<input type="file" id="avatar" accept="image/*" name="avatar"/> 
+		<br>
+		<button class="btn btn-success" id="Button1">Upload</button>
+		</form>
+	
+		</div>
+		</div>
+		<hr>
+-->
+		<div class="row">
+			<div class="col-sm-4"> 
+				<h3> Main configuration </h3>
+			</div>
+			<div class="col-sm-8"> 
+				<form name="installation" ng-click="updateConfig()">
+				  <div class="form-group">
+				    <label for="name">Name:</label>
+				    <input type="text" class="form-control" 
+						name="name"
+						ng-required='true' 
+						ng-pattern=nameRegex
+						ng-style="{'border-color':installation.name.$invalid  === true ? 'red': ''}"
+						ng-model=config.name id="name">
+					<div class="text-muted small">Your name will be used as directory name to save your projects </div>
+				  </div>
+
+<script>
+
+	//					style="border-color:red"
+</script>
+				<div class="form-group">
+				    <label for="dir">Directory projects:</label>
+				    <input type="text" class="form-control" id="dirProject" name="dirProject"
+						ng-required="true" 
+						ng-style="{'border-color':installation.dirProject.$invalid  === true ? 'red': ''}"
+						ng-model=config.mainDir
+					>
+					
+					<div class="text-muted small">Main directory for DSP (path starts by homedir)</div>
+				  </div>
+
+				 <div class="form-group">
+				    <label for="github_project">Github directory:</label>
+				    <input type="text" class="form-control" id="name" ng-model=config.githubURL>
+					<div class="text-muted small">Set your Github remote repository if you want to synchronize your projects remotely </div>
+				  </div>
+				<!-- <div class="form-group">
+				    <label for="ports">Ports to exclude</label>
+				    <input type="text" class="form-control" id="name" ng-model=config.portsToExclude>
+					<div class="text-muted small">Ports that you use in your host and want to exclude from DSP usage (ex: 80,21)</div>
+				  </div> 
+                                -->
+				  <button type="submit" ng-show="installView.showButton" ng-click="install()" class="btn btn-success">Install</button>
+				</form>
+                                <br>
+			<p ng-show="installView.showLoading"  >
+                        <label class="alert alert-info" id="notify"> Installation ... </label>
+                        <br>
+                        <label> Installation Infos: </label>
+                          <textarea class="form-control" ng-bind-html="notify" rows="5"> 
+                          </textarea> 
+                        </p>
+
+                        <!-- <p ng-show="installView.showLoading" class="alert alert-info" ng-bind-html="notify"></p> -->
+			</div>
+		</div>
+			<!-- REPO DATA MANAGMENT -->
+	<hr />                
+					
+
+			 <!--/. PAGE WRAPPER  -->
+		    </div>
+        </div>
+
+</div>
+
+</body>
+</html>
+
+

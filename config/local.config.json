@@ -1,0 +1,14 @@
+{
+          "config": {
+                    "dsp_reponame": "dsp_repo",
+                    "name_labelfile": "labels.json",
+                    "static_content": "../public/",
+                    "repos": [
+                              {
+                                        "name": "DSP_Projects",
+                                        "url": "https://github.com/giper45/DSP_Projects.git"
+                              }
+                    ],
+                    "test": false
+          }
+}

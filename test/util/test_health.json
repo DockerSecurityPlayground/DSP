@@ -1,0 +1,92 @@
+[
+    {
+        "labName": "MIO",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/MIO"
+    },
+    {
+        "labName": "MITM",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/MITM"
+    },
+    {
+        "labName": "NUOVOLAB",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/NUOVOLAB"
+    },
+    {
+        "labName": "Nuovo",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/Nuovo"
+    },
+    {
+        "labName": "Nuovomio",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/Nuovomio"
+    },
+    {
+        "labName": "TestImport",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/TestImport"
+    },
+    {
+        "labName": "t",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/t"
+    },
+    {
+        "labName": "web_server example",
+        "repoName": "DSP_Projects",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/DSP_Projects/web_server example"
+    },
+    {
+        "labName": "CompleteSimpleExample",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/CompleteSimpleExample"
+    },
+    {
+        "labName": "anotherNetwork",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/anotherNetwork"
+    },
+    {
+        "labName": "existentLab",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/existentLab"
+    },
+    {
+        "labName": "networkTestDir",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/networkTestDir"
+    },
+    {
+        "labName": "networkTestDir2",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/networkTestDir2"
+    },
+    {
+        "labName": "toEditLab",
+        "repoName": "test_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/test_repo/toEditLab"
+    },
+    {
+        "labName": "ErrorCopyFile",
+        "repoName": "wrong_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/wrong_repo/ErrorCopyFile"
+    },
+    {
+        "labName": "ErrorSamePort",
+        "repoName": "wrong_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/wrong_repo/ErrorSamePort"
+    },
+    {
+        "labName": "ErrorSameSubnet",
+        "repoName": "wrong_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/wrong_repo/ErrorSameSubnet"
+    },
+    {
+        "labName": "ErrorWrongAction",
+        "repoName": "wrong_repo",
+        "thePath": "/Users/gaetanoperrone/DSP_TESTING_INSTALLATION_DIRECTORY/wrong_repo/ErrorWrongAction"
+    }
+]

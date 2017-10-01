@@ -1,0 +1,22 @@
+version: '2'
+services:
+  NuovoContainer:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+  LabTest:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+  PeppeDipendente:
+    image: 'dsp/debian_base:latest'
+    stdin_open: true
+    tty: true
+    links:
+       - LabTest
+       - NuovoContainer
+    depends_on:
+       - LabTest
+       - NuovoContainer
+
+networks: {}

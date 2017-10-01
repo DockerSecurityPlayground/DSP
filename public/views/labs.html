@@ -1,0 +1,65 @@
+﻿
+<div id="page-wrapper" >
+<h1> LABS </h1>
+
+<div id="page-inner">
+<div class="row">
+<div class="col-sm-offset-10 col-sm-2"> 
+<a href="/lab/new" class="btn btn-success"> New Lab</a>
+</div>
+</div>
+<br>
+<form role="form">
+	
+				<div class="form-group input-group">
+				    <input type="text" class="form-control" ng-model="filterName" placeholder="Name filter">
+				    <span class="input-group-btn">
+					<div class="btn btn-default"><i class="fa fa-search"></i>
+					</div>
+				    </span>
+				</div>
+
+          <ui-select multiple sortable="true" ng-model="ctrl.filteredLabels" theme="bootstrap" class="form-control" title="Choose a label">
+            <ui-select-match placeholder="Label filter">{{$item.name}}</ui-select-match>
+            <ui-select-choices repeat="item in ctrl.labelProjects ">
+              <div class="label label-success" style="background-color:{{item.color}}" ng-bind-html="item.name "></div>
+              <small ng-bind-html="item.description "></small>
+            </ui-select-choices>
+          </ui-select>
+	<br>
+		  <ui-select multiple sortable="true" ng-model="ctrl.filteredRepos" theme="bootstrap" class="form-control" title="Choose a repo">
+		    <ui-select-match placeholder="Repo filter">{{$item.name}}</ui-select-match>
+		    <ui-select-choices repeat="item in ctrl.repos ">
+				{{item.name}}
+		    </ui-select-choices>
+		  </ui-select>
+
+			    </form>
+<hr>
+<div ng-repeat="r in ctrl.filteredRepos" class="panel panel-default">
+  <div class="panel-heading">{{r.name}}</div>
+  <div class="panel-body">
+<table class="table table-hover ">
+    <tbody>
+	
+    <tr ng-repeat="l in r.labs | filter :{name:filterName} | filter:ctrl.hasLabel">
+	<td class="text-center"><a  href="#" ng-click="ctrl.getURL(r.name, l.name)"> {{l.name }}</a></td>
+	<td class="text-center">{{l.informations.description}}</td>
+	<td class="text-center">
+		<div ng-repeat="label in l.labels" class="label label-primary" style="background-color:{{label.color}}">{{label.name}}</div>
+
+	</td>
+
+      </tr>
+
+    </tbody>
+  </table>
+
+</div>
+</div>
+
+
+
+</div>
+
+</div>

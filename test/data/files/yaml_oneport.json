@@ -1,0 +1,1 @@
+{"clistDrawed":[{"name":"Porte","selectedImage":{"name":"daindragon2/debian_networking","description":"a Debian networking image","exposedPorts":[22,80],"icon":"assets/docker_image_icons/host.png","action":"NOT ALREADY IMPLEMENTED"},"ports":{"22":"11000","80":"12000"},"networks":{}}]}

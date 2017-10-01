@@ -1,0 +1,29 @@
+{ 
+	"images" : [
+		{
+			"path" : "dsp_debian_base", 
+			"imageName" : "dsp/debian_base"
+		},
+		{
+			"path" : "dsp_debian_bot", 
+			"imageName" : "dsp/debian_bot"
+		},
+		{
+			"path" : "dsp_telnet_server", 
+			"imageName" : "dsp/telnet_server"
+		},
+		{
+			"path" : "dsp_ftp_server", 
+			"imageName" : "dsp/ftp_server"
+		},
+		{
+			"path" : "dsp_shellinabox", 
+			"imageName" : "dsp/shellinabox"
+		},
+		{
+			"path" : "dsp_linode_lamp", 
+			"imageName" : "dsp/linode_lamp"
+		}
+	]
+
+}

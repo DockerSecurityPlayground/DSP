@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+  <title>Docker Security Playground </title>
+
+
+  <base href="/">
+  <!-- JS Libraries --> 
+  <script src="assets/js/underscore-min.js"> </script>
+  <!-- ANGULAR DEPENDENCIES --> 
+  <script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
+  <script src="assets/js/angular.min.js"></script>
+  <script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
+
+  <script src="assets/js/angular-animate.min.js"></script>
+  <script src="assets/js/angular-sanitize.min.js"></script>
+  <script src="assets/js/angular-ui-notification.min.js"></script>
+  <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+  <script src="assets/js/angular-route-min.js"></script>
+  <script src="assets/js/angular-ui-notification.min.js"></script>
+  <script src="assets/js/bootstrap-colorpicker-module.min.js"> </script>
+  <script src="assets/js/angular-websocket.min.js"></script>
+
+  <link href="assets/css/select.css" rel="stylesheet" type='text/css' >
+  <!--CUSTOMS ANGULAR COMPONENTS --> 
+  <script src="app/controllers/mainCtrl.js"> </script>
+  <script src="app/controllers/labsCtrl.js"> </script>
+  <script src="app/controllers/labCtrl.js"> </script>
+  <script src="app/controllers/labelsCtrl.js"> </script>
+  <script src="app/controllers/configCtrl.js"> </script>
+  <script src="app/services/breadcrumbs_services.js"> </script>
+  <script src="app/services/ajax_service.js"> </script>
+  <script src="app/services/regex_service.js"> </script>
+  <script src="app/services/walker_service.js"> </script>
+  <script src="app/services/current_lab.js"> </script>
+  <script src="app/services/socket_service.js"> </script>
+  <script src="app/services/safe_apply_service.js"> </script>
+  <script src="app/services/constants_service.js"> </script>
+  <script src="app/services/response_server_service.js"> </script>
+  <script src="app/components/dsp_deleteConfirm.js"> </script>
+  <script src="app/components/dsp_changeGithub.js"> </script>
+
+   <!-- COLORPICKER STYLES --> 
+	<!-- BOOTSTRAP STYLES-->
+    <link href="assets/css/bootstrap.css" type="text/css" rel="stylesheet" >
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">    -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css"> -->
+
+     <!-- FONTAWESOME STYLES-->
+    <link href="assets/css/font-awesome.css" type="text/css" rel="stylesheet" >
+        <!-- CUSTOM STYLES-->
+    <link href="assets/css/custom.css" type="text/css" rel="stylesheet" >
+     <!-- GOOGLE FONTS-->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' >
+    <link href="assets/css/colorpicker.css" rel="stylesheet prefetch" type='text/css' />
+    <link href="assets/css/build.css" rel="stylesheet" type='text/css' />
+    <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
+   <script src="assets/js/select.js"> </script>
+
+    <!-- JSTree Imports -->
+    <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
+
+    <script src="assets/js/jquery-min.js"> </script>
+    <script src="assets/jstree/jstree.js"></script>
+    <script src="app/components/jsTree.directive.js"></script>
+
+
+	<script>
+          var underscore = angular.module('underscore', []);
+          underscore.factory('_', function() {
+            return window._; //Underscore must already be loaded on the page
+          });
+          //ANGULAR COMPONENT REGISTRATION 
+          angular.module("myApp", ['ui.tinymce', 'jsTree.directive', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module'] )
+
+            .factory('FetchFileFactory', ['$http',
+              function($http) {
+                var _factory = {};
+
+                _factory.fetchFile = function(file) {
+                  return $http.get('/api/resource?resource=' + encodeURIComponent(file));
+                };
+
+                return _factory;
+              }
+            ])
+          .service("BreadCrumbs", dsp_BreadCrumbs) 
+          .service("AjaxService", dsp_AjaxService) 
+          .service("ServerResponse", dsp_server_response)
+          .service("WalkerService", dsp_WalkerService) 
+          .service("CurrentLabService", dsp_currentLab) 
+          .service("RegexService", dsp_regex_service) 
+          .service("Constants", dsp_Constants) 
+          .service("SocketService", SocketService) 
+          .service("SafeApply", SafeApply)
+          .controller("MainCtrl", dsp_MainCtrl)
+          .controller("labelsCtrl", dsp_LabelsCtrl) 
+          .controller("labsCtrl",  dsp_LabsCtrl) 
+          .controller("labCtrl",  dsp_LabCtrl) 
+          .controller("configCtrl", dsp_ConfigCtrl)
+          .run(['$anchorScroll', function($anchorScroll) {
+            $anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
+          }])
+
+        //Delete confirm component 
+         .component('modalComponent', dsp_deleteConfirmComponent)  
+         .component('changeGithubComponent', dsp_changeGithub)  
+         .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider) { 
+            NotificationProvider.setOptions({
+                delay: 3500,
+                startTop: 20,
+                startRight: 10,
+                verticalSpacing: 20,
+                horizontalSpacing: 20,
+                positionX: 'center',
+                positionY: 'bottom'
+            })
+
+                $routeProvider 
+                        .when('/', { 
+                                templateUrl: "views/labs.html" ,
+                                controller: "labsCtrl as ctrl"
+                        }) 
+                        .when("/labs", {
+                                templateUrl: "views/labs.html" ,
+                                controller: "labsCtrl as ctrl"
+                        }) 
+                        .when("/lab/:action/:repo/:namelab", {
+                                templateUrl: "views/lab.html" ,
+                                controller: "labCtrl as ctrl"
+                        }) 
+                        .when("/lab/:action/", {
+                                templateUrl: "views/edit_lab.html" ,
+                                controller: "labCtrl as ctrl"
+                        }) 
+                        .when("/lab/:action/:namelab", {
+                                templateUrl: "views/edit_lab.html" ,
+                                controller: "labCtrl as ctrl"
+                        }) 
+                        .when("/labels", {
+                                templateUrl: "views/labels.html" ,
+                                controller: "labelsCtrl",
+                                //Don't reload ctrl when anchor scrolling
+                                reloadOnSearch: false
+                        }) 
+                        .when("/configuration", {
+                                templateUrl: "views/configuration.html" ,
+                                controller: "configCtrl"
+                        })
+                        .otherwise(
+                                {redirectTo: "/labs"} 
+                        );
+
+                  $locationProvider.html5Mode(true)
+                  //Add x http methods to fully support methods
+                  $httpProvider.defaults.headers.put = { 'X-HTTP-Method-Override': 'PUT'};
+                  $httpProvider.defaults.headers.delete = { 'X-HTTP-Method-Override': 'DELETE'};
+                })
+	
+
+
+
+	</script>
+</head>
+<body ng-app="myApp">
+  <div id="wrapper" ng-controller="MainCtrl">
+  <div ng-include="'views/header.html'"> </div>
+  <div ng-include="'views/sidebar.html'"> </div>
+  <div class="ng-view"> </div> 
+  </div>
+  <!-- /. WRAPPER  -->
+  <div ng-include="'views/footer.html'"> </div> 
+</body>
+</html>

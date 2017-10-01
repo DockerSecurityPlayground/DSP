@@ -1,0 +1,11 @@
+version: '2'
+services:
+  SamePortConatiner:
+    image: 'dsp/linode_lamp:latest'
+    stdin_open: true
+    tty: true
+    ports:
+      - '90:80'
+    cap_add:
+      - NET_ADMIN
+networks: {}
