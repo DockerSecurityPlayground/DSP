@@ -132,12 +132,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 	/************************** NETWORK INFO  **********************/
 	//Current network view
 	$scope.n = {
-		name : "", subnet:"192.168.1.1/24", color:"black", 
+		name : "", subnet:"193.20.1.1/24", color:"black", 
 			more_validation : "###"
 	};
 	$scope.subnet = { 
-		first:"192",
-		two:"168",
+		first:"193",
+		two:"20",
 		three:"1",
 		four:"1"
 	};
