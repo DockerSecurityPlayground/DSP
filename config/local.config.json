@@ -5,7 +5,7 @@
                     "static_content": "../public/",
                     "repos": [
                               {
-                                        "name": "DSP_LightProjects",
+                                        "name": "DSP_Projects",
                                         "url": "https://github.com/giper45/DSP_LightProjects.git"
                               }
                     ],
