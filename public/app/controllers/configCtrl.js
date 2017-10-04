@@ -7,6 +7,7 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
   $scope.isRepoSynchronized; 
   $scope.isReposUploading = false;
   $scope.isAppUpdating = false;
+  $scope.isAppRestarting = false;
   $scope.isUserRepoUpdating = false; 
   $scope.filetypePattern = RegexService.nameRegex;
   $scope.urlPattern = RegexService.urlRegex;

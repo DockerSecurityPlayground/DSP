@@ -49,10 +49,21 @@
     </div>
     <div class="col-sm-8"> 
     <div class="row">
-      <div class="col-sm-12"><p><button type="submit" ng-click="updateApplication()" class="btn btn-primary">Update Docker Security Playground</button>  </p></div>
+      <div class="col-sm-12"><p>
+          <button type="submit" 
+              ng-click="updateApplication()" 
+              ng-disabled="isAppUpdating || isAppRestarting"
+              class="btn btn-primary">Update Docker Security Playground</button>  </p></div>
     </div>
     <div class="row">
-      <div class="col-sm-12"><p><button type="submit" ng-click="restartApplication()" class="btn btn-danger">Reinstall Docker Security Playground</button></p> </div>
+      <div class="col-sm-12"><p>
+        <button 
+           type="submit" 
+           ng-click="restartApplication()" 
+           ng-disabled="isAppUpdating || isAppRestarting"
+           class="btn btn-danger">
+            Reinstall Docker Security Playground
+        </button></p> </div>
     </div>
     <div ng-show="isAppUpdating" class="alert alert-success col-sm-5"> Update, pls wait...</div> 
     </div>
