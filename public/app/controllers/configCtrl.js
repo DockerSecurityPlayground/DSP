@@ -6,6 +6,7 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
   $scope.labTreeModel = [];
   $scope.isRepoSynchronized; 
   $scope.isReposUploading = false;
+  $scope.isAppUpdating = false;
   $scope.isUserRepoUpdating = false; 
   $scope.filetypePattern = RegexService.nameRegex;
   $scope.urlPattern = RegexService.urlRegex;
@@ -226,32 +227,32 @@ else {
   }); 
 }   
 }
-// $scope.updateRepository = function() {
-//   $scope.isUserRepoUpdating = true;
-//   var socket = new WebSocket('ws://localhost:8080'); 
-//   socket.onopen = function() {
-//     socket.send(JSON.stringify({
-//       action : 'update_localrepo' 
-//       body : { 
-//     }));
 
-//     socket.onmessage = function(event) {
-//       var data = JSON.parse(event.data); 
-//       if(data.status === 'success')  { 
-//               console.log("Success") 
-//               Notification({message:"Project uploaded!"}, 'success');
-//               $scope.isReposUploading = false;
-//               window.location.href = '/configuration';
-//       } else if (data.status === 'error') {
-//           Notification('Server error: '+ data.message, 'error');
-//           $scope.isReposUploading = false;
-//       } else {
-//           Notification('Some error in uploading...', 'error');
-//           $scope.isReposUploading = false;
-//         }
-//       }
-//   }
-// }
+$scope.restartApplication = function() {
+  alert("TBD")
+}
+$scope.updateApplication = function() {
+  $scope.isAppUpdating = true;
+  SocketService.manage( 
+        JSON.stringify({
+          action : 'update_application' 
+      }),
+    function(event) {
+      var data = JSON.parse(event.data); 
+      if(data.status === 'success')  { 
+              console.log("Success") 
+              Notification({message:"Application uploaded!"}, 'success');
+          // Your application has indicated there's an error
+          window.setTimeout(function(){
+        // Move to a new location or you can do something else
+        window.location.href = "/configuration";
+      }, 2000)
+    }
+    else {
+      Notification('Error in update application');
+    }
+  })
+}
 
 $scope.updateProjects = function() {
   $scope.isReposUploading = true;

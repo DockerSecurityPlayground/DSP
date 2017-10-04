@@ -1,8 +1,11 @@
+// const appRoot = require('app-root-path');
+const appRoot = require('app-root-path');
 const WebSocket = require('ws');
 const installationHandler = require('./ws_installation.js');
 const dockerActions = require('./ws_docker_actions.js');
 const wsGitHandler = require('./ws_git_manager');
 const AppUtils = require('../util/AppUtils');
+const cmd = require('node-cmd');
 
 const log = AppUtils.getLogger();
 
@@ -40,23 +43,25 @@ function sendProgressMessage(ws, message) {
 }
 
 function manageInstallation(ws, jsonMessage) {
-  installationHandler.installation(jsonMessage.config,
-  // End callback
-(err) => {
-  sendResponse(ws, err);
-},
-// Called during installation
-(dataline) => {
-  // In order to reduce overhead ws.send use a buffer
-  if (counterLine < MAXLINES) {
-    bufferLine += dataline;
-    counterLine += 1;
-  } else {
-    counterLine = 0;
-    sendProgressMessage(ws, bufferLine);
-    bufferLine = '';
-  }
-});
+  installationHandler.installation(
+    jsonMessage.config,
+    // End callback
+    (err) => {
+      sendResponse(ws, err);
+    },
+    // Called during installation
+    (dataline) => {
+    // In order to reduce overhead ws.send use a buffer
+      if (counterLine < MAXLINES) {
+        bufferLine += dataline;
+        counterLine += 1;
+      } else {
+        counterLine = 0;
+        sendProgressMessage(ws, bufferLine);
+        bufferLine = '';
+      }
+    }
+  );
 }
 
 
@@ -90,6 +95,22 @@ function manageUpdateProjects(ws) {
     sendResponse(ws, err);
   });
 }
+function manageUpdateApplication(ws) {
+  const appRootString = appRoot.toString();
+  log.info('[WS_HANDLER] Update Application [====]');
+  wsGitHandler.updateApplication((err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, err);
+    }
+    else {
+      // Restart command
+      sendResponse(ws, null);
+      log.info('Restart server');
+      cmd.get(`sh ${appRootString}/server_restart.sh`);
+    }
+  });
+}
 
 exports.init = function init(server) {
   const wss = new WebSocket.Server({
@@ -103,20 +124,23 @@ exports.init = function init(server) {
     ws.on('message', (message) => {
       const jsonMessage = JSON.parse(message);
       switch (jsonMessage.action) {
-        case 'installation' :
+        case 'installation':
           manageInstallation(ws, jsonMessage);
           break;
-        case 'docker_up' :
+        case 'docker_up':
           manageDockerUp(ws, jsonMessage);
           break;
-        case 'docker_down' :
+        case 'docker_down':
           manageDockerDown(ws, jsonMessage);
           break;
-        case 'synchronize_github' :
+        case 'synchronize_github':
           manageSyncGithub(ws, jsonMessage);
           break;
-        case 'update_projects' :
+        case 'update_projects':
           manageUpdateProjects(ws, jsonMessage);
+          break;
+        case 'update_application':
+          manageUpdateApplication(ws, jsonMessage);
           break;
         default:
           log.error(`in web socket message: ${jsonMessage.action} is no registered`);

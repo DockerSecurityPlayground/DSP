@@ -19,7 +19,7 @@ failAuthError.code = -2;
 
 module.exports = {
   clone(giturl, params, callback) {
-    //const url = this.getGitUrl(giturl, params);
+    // const url = this.getGitUrl(giturl, params);
     const url = giturl;
     configData.getConfig((err, c) => {
       if (err) {
@@ -40,16 +40,16 @@ module.exports = {
       if (!pathExists.sync(nameRepo)) { callback(new Error('No exists main dir')); }
       // Explore tree
       Walker(nameRepo)
-      .filterDir((dir) => haveToFilter(nameRepo, dir))
-      .on('dir', (dir) => {
-        const gitFile = path.join(dir, '.git');
-        if (pathExists.sync(gitFile)) { repoRet.push(path.basename(dir)); }
-      })
-      .on('end', () => {
-        // Sort by name
-        const repos = _.sortBy(repoRet, (e) => e);
-        callback(null, repos);
-      });
+        .filterDir((dir) => haveToFilter(nameRepo, dir))
+        .on('dir', (dir) => {
+          const gitFile = path.join(dir, '.git');
+          if (pathExists.sync(gitFile)) { repoRet.push(path.basename(dir)); }
+        })
+        .on('end', () => {
+          // Sort by name
+          const repos = _.sortBy(repoRet, (e) => e);
+          callback(null, repos);
+        });
     // Cannot create, launch erro
     } catch (err) {
       callback(err);
@@ -71,6 +71,9 @@ module.exports = {
     }
     return url;
   },
+  pullApplication(callback) {
+    simpleGit(process.env.DSP_PATH).pull(callback);
+  },
   pullRepo(reponame, callback) {
     pathExists(reponame).then((ex) => {
       if (ex) {
@@ -85,11 +88,11 @@ module.exports = {
       if (ex) {
         const theRepo = simpleGit(reponame);
         theRepo
-        .add(path.join(reponame, '*'))
-        .addConfig('user.name', params.username)
-        .addConfig('user.email', params.email)
-        .commit(params.commit)
-        .push(callback);
+          .add(path.join(reponame, '*'))
+          .addConfig('user.name', params.username)
+          .addConfig('user.email', params.email)
+          .commit(params.commit)
+          .push(callback);
       } else {
         callback(new Error('Doesn\t exists'));
       }

@@ -46,8 +46,10 @@ const api = {
       },
       (cb) => fs.mkdir(userPath, cb),
       // Clone repository
-      (cb) => GitUtils.initRepository(username, params.githubURL, cb,
-          (dataline) => log.debug(dataline)),
+      (cb) => GitUtils.initRepository(
+        username, params.githubURL, cb,
+        (dataline) => log.debug(dataline)
+      ),
       // No error in init repository, add github url to configuratoin file
       (cb) => {
         const newConfig = oldConfig;
@@ -67,65 +69,73 @@ const api = {
       }
     });
   },
+  updateApplication(callback) {
+    log.info('[WS_GIT_MANAGER] calling pull repo');
+    repogitData.pullApplication(callback);
+  },
 
   updateProjects(callback) {
     log.info('[IN UPDATE PROJECTS API]');
     let repos;
     let rootDir;
-    async.waterfall([
-      (cb) => configData.getConfig(cb),
-      (config, cb) => {
-        rootDir = config.mainDir;
-        repos = localConfig.config.repos;
-        cb(null);
-      },
-      /* Check if all are stopped
+    async.waterfall(
+      [
+        (cb) => configData.getConfig(cb),
+        (config, cb) => {
+          rootDir = config.mainDir;
+          repos = localConfig.config.repos;
+          cb(null);
+        },
+        /* Check if all are stopped
           NOTE: When clone for the first time
           the state af all cloned labs is setted to STOPPED
           DSP trusts that all labs inside the cloned labs
           are not in NO_NETWORK state during cloning ->
           (See initRepositories inside project_init.js  function )
         */
-      (cb) => {
-        log.info(' Check all stopped ');
-        async.eachSeries(repos, (r, c) => {
-          LabStates.checkAll(r.name, 'STOPPED', (err, areStopped, labsRunning) => {
-            if (err) c(err);
-            else if (areStopped) c(null);
-            else {
-              log.warn(`${r.name} is not stopped!`);
-              // Send to web socket response all running labs
-              c(Checker.errorLabNoStopped(labsRunning));
-            }
-          });
-        }, // Final after eachSeries
-        (errCheck) => {
-          cb(errCheck);
-        });
-      }, // End callback check are stopped
-      (cb) => {
-        log.info(' All stopped, pulling repos ');
-        // For each repo call pullRepo
-        async.eachSeries(repos, (item, c) => {
-          log.info(`PULLING ${item}...`);
-          // Pull repo and update the table state
-          repogitData.pullRepo(path.join(homedir(), rootDir, item.name), (err) => {
-            if (err) c(err);
-            // If no error  it's been pulled, update the state file
-            else {
-              log.info('Building images');
-              GitUtils.buildImages(item.name, (buildErr) => {
-                if (buildErr) c(buildErr);
-                // Initialize the states of repository
-                else LabStates.initStates(item.name, c);
+        (cb) => {
+          log.info(' Check all stopped ');
+          async.eachSeries(
+            repos, (r, c) => {
+              LabStates.checkAll(r.name, 'STOPPED', (err, areStopped, labsRunning) => {
+                if (err) c(err);
+                else if (areStopped) c(null);
+                else {
+                  log.warn(`${r.name} is not stopped!`);
+                  // Send to web socket response all running labs
+                  c(Checker.errorLabNoStopped(labsRunning));
+                }
               });
-              // End waterfall -> call parent callback
-              (someErrorInternal) => c(someErrorInternal);
+            }, // Final after eachSeries
+            (errCheck) => {
+              cb(errCheck);
             }
-          }, (dataLine) => log.debug(dataLine));
-        }, (err) => cb(err));
-      }],
-    (err) => callback(err));
+          );
+        }, // End callback check are stopped
+        (cb) => {
+          log.info(' All stopped, pulling repos ');
+          // For each repo call pullRepo
+          async.eachSeries(repos, (item, c) => {
+            log.info(`PULLING ${item}...`);
+            // Pull repo and update the table state
+            repogitData.pullRepo(path.join(homedir(), rootDir, item.name), (err) => {
+              if (err) c(err);
+              // If no error  it's been pulled, update the state file
+              else {
+                log.info('Building images');
+                GitUtils.buildImages(item.name, (buildErr) => {
+                  if (buildErr) c(buildErr);
+                  // Initialize the states of repository
+                  else LabStates.initStates(item.name, c);
+                });
+                // End waterfall -> call parent callback
+                (someErrorInternal) => c(someErrorInternal);
+              }
+            }, (dataLine) => log.debug(dataLine));
+          }, (err) => cb(err));
+        }],
+      (err) => callback(err)
+    );
   }
 };
 

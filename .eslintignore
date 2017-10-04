@@ -1,0 +1,3 @@
+./public/app/controllers/*.js
+./public/app/services/*.js
+./public/app/views/*
