@@ -3,6 +3,7 @@ DockerAPIService : function DockerAPIService($log, $http, containerManager, Noti
 	
 	var api = '/dsp_v1/docker_network/' ;
 	var api_docker = '/dsp_v1/docker_images/' ;
+        var url = 'http://' + location.host + '/';
 
 	// Returns a stub rappresentation of images
 	function stubImages()
@@ -12,14 +13,14 @@ DockerAPIService : function DockerAPIService($log, $http, containerManager, Noti
 	name: 'daindragon2/debian_networking',
 	description: 'a Debian networking image',
 	//exposedPorts : [22,80],
-	icon: 'assets/docker_image_icons/host.png' ,
+	icon: url+'assets/docker_image_icons/host.png' ,
 	action: "NOT ALREADY IMPLEMENTED"
 	}, 
 	{
 	name: 'daindragon2/debian_telnet',
 	description: 'a Debian ftp server ',
 	//exposedPorts : [21],
-	icon: 'assets/docker_image_icons/server.png', 
+	icon: url+'assets/docker_image_icons/server.png', 
 	action: "NOT ALREADY IMPLEMENTED" 
 
 	},
@@ -27,7 +28,7 @@ DockerAPIService : function DockerAPIService($log, $http, containerManager, Noti
 	name: 'daindragon2/debian_ftp',
 	description: 'a Debian ftp server ',
 	//exposedPorts : [21],
-	icon: 'assets/docker_image_icons/server.png', 
+	icon: url+'assets/docker_image_icons/server.png', 
 	action: "NOT ALREADY IMPLEMENTED" 
 
 	}
