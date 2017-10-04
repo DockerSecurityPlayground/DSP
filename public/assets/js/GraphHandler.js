@@ -341,10 +341,10 @@ GraphHandler = function GraphHandler(cname) {
                                 var arr = url.split("/");
                                 var currentLocation =  arr[0] + "//" + arr[2] + "/assets/docker_image_icons/";
                                 // Replace http://localhost to replace with current location
-                                var jsonStringFixed = jsonString.replace(/http:\/\/.*:.*\//g, currentLocation)
-                                jsonStringFixed = jsonString.replace(/https:\/\/.*:.*\//g, currentLocation)
+                                var jsonStringFixed = jsonString.replace (/https?:\/\/.*\/docker_image_icons\//g, currentLocation)
+
                                 var fixedJSON = JSON.parse(jsonStringFixed);
-				canvas.loadFromJSON(fixedJSON, canvas.renderAll.bind(canvas));
+                                canvas.loadFromJSON(fixedJSON, canvas.renderAll.bind(canvas));
 		},
 		getGraphicJSON : function getGraphicJSON() {
 			return canvas.toJSON(['id'])
