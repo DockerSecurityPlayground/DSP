@@ -45,6 +45,10 @@ Checker.isInstalled((isInstalled) => {
     });
   }
 });
+if (!process.env.DSP_PATH) {
+  log.error('VARIABLE DSP_PATH NOT DEFINED!');
+  process.exit(1);
+}
 
 // Parse application/x-www-form-urlencoded & JSON
 app.use(bodyParser.urlencoded({ extended: false }));

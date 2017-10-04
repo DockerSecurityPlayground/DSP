@@ -1,3 +1,1 @@
-
-forever
-/root/git/DockerSecurityPlayground/index.js
+running
