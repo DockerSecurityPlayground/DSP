@@ -334,7 +334,17 @@ GraphHandler = function GraphHandler(cname) {
 		
 		},
 		loadGraphicJSON : function loadGraphicJSON(json) {
-				canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
+                                console.log("IN LOAD GRAPHICS")
+                                var jsonString = JSON.stringify(json, null, 2)
+                                // giper 04/10/17 : fix the url location to use not only with localhost 
+                                var url = window.location.href
+                                var arr = url.split("/");
+                                var currentLocation =  arr[0] + "//" + arr[2] + "/assets/docker_image_icons/";
+                                // Replace http://localhost to replace with current location
+                                var jsonStringFixed = jsonString.replace(/http:\/\/.*:.*\//g, currentLocation)
+                                jsonStringFixed = jsonString.replace(/https:\/\/.*:.*\//g, currentLocation)
+                                var fixedJSON = JSON.parse(jsonStringFixed);
+				canvas.loadFromJSON(fixedJSON, canvas.renderAll.bind(canvas));
 		},
 		getGraphicJSON : function getGraphicJSON() {
 			return canvas.toJSON(['id'])
