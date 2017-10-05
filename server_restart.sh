@@ -1,9 +1,9 @@
-mainDSP=${DSP_PATH}/index.js
-
 isStarted=0;
-if [ -z ${DSP_PATH+x} ]; 
-  then echo "Pls set DSP_PATH variable in your environment"
+if [ -z ${1+x} ]; 
+  then echo "Pls send variable path"
 else 
+DSP_PATH=${1};
+mainDSP=${1}/index.js
   forever list --plain --no-colors | awk '{print $5}' > ${DSP_PATH}/scripts/runningList.txt
   # has already started?
   for processName in $(cat  ${DSP_PATH}/scripts/runningList.txt); 

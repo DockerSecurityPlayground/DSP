@@ -6,6 +6,7 @@ const simpleGit = require('simple-git');
 const strings = require('help-nodejs').strings;
 const homedir = require('homedir');
 const _ = require('underscore');
+const appRoot = require('app-root-path');
 
 function haveToFilter(baseDir, dir) {
   const re = new RegExp(`${baseDir}/?([^/]+/?){0,1}$`);
@@ -72,7 +73,7 @@ module.exports = {
     return url;
   },
   pullApplication(callback) {
-    simpleGit(process.env.DSP_PATH).pull(callback);
+    simpleGit(appRoot.toString()).pull(callback);
   },
   pullRepo(reponame, callback) {
     pathExists(reponame).then((ex) => {
