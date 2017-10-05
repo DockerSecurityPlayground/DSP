@@ -1,1 +1,1 @@
-forever stop /root/git/DockerSecurityPlayground/index.js
+forever stop $1
