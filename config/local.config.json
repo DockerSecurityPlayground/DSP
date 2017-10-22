@@ -6,8 +6,8 @@
                     "applicationRepo": "https://github.com/giper45/DockerSecurityPlayground.git",
                     "repos": [
                               {
-                                        "name": "DSP_LightProjects",
-                                        "url": "https://github.com/giper45/DSP_LightProjects.git"
+                                        "name": "DSP_Projects",
+                                        "url": "https://github.com/giper45/DSP_Projects.git"
                               }
                     ],
                     "test": false
