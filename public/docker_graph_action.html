@@ -162,11 +162,35 @@
 </p>
 </div>
  
-</div>
-</div>
 <div class="row">
  <!-- End container list -->
-	<div style="margin-left:20px" class="col-sm-9">
+        <div 
+          ng-hide="labState.actionLabel !== 'Stop lab'"
+          class="col-sm-3"
+          >
+
+	<h4 class="text-center">Containers</h4>
+	<hr>	
+	<div class="list-group">
+          <div id="{{c.name}}" class="list-group-item" 
+	ng-repeat="(key,c) in listContainers">
+          <div class="row">
+            <div class="col-sm-6">
+              {{c.name}}
+            </div>
+            <div class="col-sm-6">
+              <button 
+                class="glyphicon glyphicon-share"
+                ng-click="goToContainer(c.name)"
+                > 
+              
+              </button> 
+            </div>
+        </div>
+          </div> <!-- end a container -->
+        </div> <!-- end container list -->
+  </div> <!-- end container list -->
+	<div class="col-sm-9">
 		<canvas ng-click="canvasClick()" width=1150px height=600px id="c"></canvas>
 	</div>
 

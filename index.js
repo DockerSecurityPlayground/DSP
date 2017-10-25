@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const path = require('path');
 
 const app = express();
 const http = require('http');
@@ -24,7 +25,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const server = http.createServer(app);
 const AppUtils = require('./app/util/AppUtils.js');
+const dockerSocket = require('./app/util/docker_socket');
 
+// const webshellConfigFile = 
 const log = AppUtils.getLogger();
 // Initialize the checker
 Checker.init((err) => {
@@ -49,6 +52,7 @@ Checker.isInstalled((isInstalled) => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
+app.use('/webshell', express.static(path.join(__dirname, 'public','webshell')));
 // app.use((err, req, res) => {
 //  res.status(500);
 //  res.end(`${err}\n`);
@@ -188,6 +192,8 @@ app.use(errorHandler({ server }));
 
 // Initialize web socket handler
 webSocketHandler.init(server);
+dockerSocket.init(server);
+
 
 server.listen(port, () => {
   if (localConfig.config.test) { log.warn('Testing mode enabled'); }

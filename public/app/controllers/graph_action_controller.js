@@ -66,7 +66,10 @@ DSP_GraphActionController : function DSP_GraphActionController($scope,$sce, Sock
 
   } //End startlab
 
-
+  // Container go to shell
+  $scope.goToContainer = function goToContainer(nameContainer)  {
+    console.log(nameContainer)
+  }
   //Stop the lab
   $scope.stopLab = function stopLab() {
     console.log("We're stopping lab")
@@ -193,7 +196,7 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
         if(_.isEmpty(data.clistToDraw)) 
           $scope.warningMessage = warningMessageHeader+ networkEmptyMessage;
 
-
+        $scope.listContainers = data.clistToDraw;
         var canvasJSON = data.canvasJSON; 
         gh.loadGraphicJSON(canvasJSON)
         containerManager.loadContainers(data, {imageList : $scope.imageList})
