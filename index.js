@@ -126,6 +126,8 @@ app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 // API DOCKER MANAGMENT
 app.get('/dsp_v1/docker_images/', networkHandler.getListImages);
 
+
+app.post('/dsp_v1/dockershell', networkHandler.dockershell)
 // Check if a dir exists
 app.post('/dsp_v1/dir_exists', networkHandler.dirExists);
 // Manage repositories

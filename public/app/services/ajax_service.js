@@ -174,6 +174,9 @@ self.init = function(onSuccess) {
       })
 
   }
+  
+ 
+
   self.updateProjects = function() {
       return $http.get(apiUrl+'git_repos');
   } 

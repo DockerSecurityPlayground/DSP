@@ -1,4 +1,4 @@
-DSP_GraphActionController : function DSP_GraphActionController($scope,$sce, SocketService, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
+var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
   $scope.labName= '';
   $scope.labInfos = {} ;
   $scope.yamlfile='';
@@ -69,7 +69,22 @@ DSP_GraphActionController : function DSP_GraphActionController($scope,$sce, Sock
   // Container go to shell
   $scope.goToContainer = function goToContainer(nameContainer)  {
     console.log(nameContainer)
-  }
+     $http.post('/dsp_v1/dockershell', { 
+        namerepo : $scope.nameRepo,	
+        namelab : $scope.labName,
+        dockername: nameContainer 
+     })
+    .then( 
+            function success(response) {
+                     
+             window.location.href= 'docker_socket.html';
+            },
+            function error(err) {
+              // Lab running error
+              Notification({message:"Server error: "+err.data.message}, 'error');
+            });
+    }
+
   //Stop the lab
   $scope.stopLab = function stopLab() {
     console.log("We're stopping lab")

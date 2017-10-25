@@ -2,11 +2,14 @@ const networkData = require('../data/network.js');
 const appRoot = require('app-root-path');
 const async = require('async');
 const dockerVolumes = require('../data/dockerVolumes.js');
+const configData = require('../data/config.js');
+const path = require('path');
+const homedir = require('homedir');
 const httpHelper = require('help-nodejs').httpHelper;
 const LabStates = require('../util/LabStates.js');
 const AppUtils = require('../util/AppUtils');
 const pathExists = require('path-exists');
-
+const dockerSocket = require('../util/docker_socket');
 const dockerImages = require(`${appRoot}/app/data/docker-images`);
 
 const Checker = require('../util/AppChecker');
@@ -91,7 +94,29 @@ function getListImages(req, res) {
   });
 }
 
-
+function dockershell(req, res) {
+  async.waterfall([
+    (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername'], cb),
+    // Get config
+    (cb) => configData.getConfig(cb),
+    // get path 
+    (config, cb) => {
+      mainDir = config.mainDir;
+      const dockerInfos = {
+      mainPath : path.join(homedir(), mainDir),
+      nameRepo : req.body.namerepo,
+      labName : req.body.namelab,
+      dockerName : req.body.dockername
+      }
+      cb(null, dockerInfos);
+    },
+    (dockerInfos, cb) => {
+      dockerSocket.setDockerShell(dockerInfos);
+      cb(null);
+    }], (err) => {
+      httpHelper.response(res, err);
+    });
+}
 function dirExists(req, res) {
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['filename'], cb),
@@ -110,4 +135,4 @@ exports.save = save;
 exports.get = get;
 exports.getListImages = getListImages;
 exports.dirExists = dirExists;
-
+exports.dockershell = dockershell;

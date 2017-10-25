@@ -122,6 +122,7 @@ exports.init = function init(server) {
     // You might use location.query.access_token to authenticate or share sessions
     // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
     ws.on('message', (message) => {
+      try {
       const jsonMessage = JSON.parse(message);
       switch (jsonMessage.action) {
         case 'installation':
@@ -146,7 +147,12 @@ exports.init = function init(server) {
           log.error(`in web socket message: ${jsonMessage.action} is no registered`);
           sendResponse(ws, new Error(`${jsonMessage.action} is not registered`));
           break;
+        }
       }
+    catch(e) {
+      log.error(e);
+      //sendResponse(ws, null);
+    }
     });
   });
 };
