@@ -11,6 +11,10 @@ const AppUtils = require('../util/AppUtils');
 const pathExists = require('path-exists');
 const dockerSocket = require('../util/docker_socket');
 const dockerImages = require(`${appRoot}/app/data/docker-images`);
+const zipdir = require('zip-dir');
+const rimraf = require('rimraf');
+//const zipFolder = require('zip-folder');
+const fs = require('fs');
 
 const Checker = require('../util/AppChecker');
 
@@ -23,7 +27,6 @@ const log = AppUtils.getLogger();
 // const log = appUtils.getLogger();
 
 function save(req, res) {
-  console.log('IN SAVE');
   async.waterfall([
     // Check values
     (cb) => Checker.checkParams(req.params, ['namelab'], cb),
@@ -93,6 +96,52 @@ function getListImages(req, res) {
     httpHelper.response(res, err, data);
   });
 }
+function dockercopy(req, res) {
+  console.log("SONO IN DOCKER COPY")
+  console.log(req.body)
+  let destinationPath;
+  let destinationDir;
+  async.waterfall([
+    (cb) => Checker.checkParams(req.body, ['namelab', 'namerepo', 'dockername', 'pathContainer'], cb),
+    // Get config
+    (cb) => configData.getConfig(cb),
+    // get path
+    (config, cb) => {
+      mainDir = config.mainDir;
+      const dockerInfos = {
+      mainPath : path.join(homedir(), mainDir),
+      nameRepo : req.body.namerepo,
+      labName : req.body.namelab,
+      dockerName : req.body.dockername,
+      pathContainer: req.body.pathContainer
+      }
+      cb(null, dockerInfos);
+    },
+    (dockerInfos, cb) => {
+      const pathLab = path.join(dockerInfos.mainPath, dockerInfos.nameRepo, dockerInfos.labName)
+      destinationDir = path.join("public","downloads", `${dockerInfos.nameRepo}_${dockerInfos.labName}`)
+      destinationPath = path.join(destinationDir, path.basename(dockerInfos.pathContainer));
+      dockerComposer.cpFrom(pathLab, dockerInfos.dockerName, dockerInfos.pathContainer, destinationPath, cb);
+    },
+    (data,cb) => {
+      // If is a directory zip the file
+      if (fs.statSync(destinationPath).isDirectory()) {
+        console.log("ZIPPING FILE")
+        zipdir(destinationPath, { saveTo: `${destinationPath}.zip`}, (err, buffer) => { cb(err, true); })
+      }
+      else cb(null, false);
+    },
+    (wasDir, cb) => {
+    // Zip has been saved, destroy directory
+     if(wasDir) {
+       rimraf(destinationPath, cb);
+       destinationPath = `${destinationPath}.zip`;
+     } 
+     else cb(null);
+    }], (err) => {
+      httpHelper.response(res, err, destinationPath);
+    });
+}
 
 function dockershell(req, res) {
   async.waterfall([
@@ -136,3 +185,4 @@ exports.get = get;
 exports.getListImages = getListImages;
 exports.dirExists = dirExists;
 exports.dockershell = dockershell;
+exports.dockercopy = dockercopy;

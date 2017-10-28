@@ -9,13 +9,13 @@
 
   <p class="row">
     <div class="col-sm-6"> <label> Download </label> </div>
-    <div class="col-sm-6"><input type="submit" class="btn" ng-click="$ctrl.download()"></div>
+    <div class="col-sm-2"><input type="submit" class="btn btn-primary" ng-click="$ctrl.download()" value="Get"></div>
+    <div class="col-sm-2"><button class="btn btn-danger" type="button" ng-click="$ctrl.cancel()">Cancel</button></div>
   </p>
     
 </div>
 <br>
 <br>
-<div class="modal-footer">
-    <button class="btn btn-success" type="button" ng-click="$ctrl.ok()">Yes</button>
-    <button class="btn btn-danger" type="button" ng-click="$ctrl.cancel()">No</button>
+<div ng-show="$ctrl.fileDownload" class="modal-footer row">
+  <div class="col-sm-12 text-left"> You can download ad <a ng-click="$ctrl.getFile()" href="#" >  {{$ctrl.fileDownload}} </a> </div>
 </div>

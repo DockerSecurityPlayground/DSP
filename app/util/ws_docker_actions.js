@@ -8,11 +8,14 @@ const async = require('async');
 const Checker = require('./AppChecker');
 const LabStates = require('./LabStates');
 const appUtils = require('../util/AppUtils');
+const fs = require('fs');
+const rimraf = require('rimraf');
 
 
 const dockerAction = require(`${appRoot}/app/data/docker_actions`);
 const dockerFilesToCopy = require(`${appRoot}/app/data/docker_filesToCopy`);
 const log = appUtils.getLogger();
+const downloadPath = 'public/downloads';
 
 
 // Start compose up and execute commands in body there are cListToDraw containers
@@ -22,11 +25,23 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   log.info(params);
   let mainDir;
   let thePath;
+  let config;
+
   async.waterfall([
     (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
     (cb) => configData.getConfig(cb),
+    // Create download directory
+    (theConfig, cb) => {
+      const pathCopyDirectory = path.join(downloadPath, `${params.namerepo}_${params.namelab}`);
+      config = theConfig;
+      if(!fs.existsSync(pathCopyDirectory)) {
+        console.log("DEVO CREARE")
+        fs.mkdir(pathCopyDirectory, cb);
+      }
+      else cb(null);
+    },
     // call docker compose up
-    (config, cb) => {
+    (cb) => {
       mainDir = config.mainDir;
       thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
       // Don't block if some action error is verified but notify to interface
@@ -113,13 +128,19 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
     // End function , return correct or error
     (err) => {
       if (err) {
-        // Call dockerComposer down
-        dockerComposer.down(thePath, (errDown) => {
-          // Log the error of compose down
-          if (errDown) log.error(`ERROR IN COMPOSE DOWN : ${errDown.message}`);
-          // Send error to user
-          callback(err);
-        });
+        // Remove download repository 
+        rimraf.sync(path.join(pathCopyDirectory, params.namelab));
+        console.log("ERROR")
+        // Call dockerComposer down if thePath has been defined (already dockerCompose up)
+        if (thePath) {
+          dockerComposer.down(thePath, (errDown) => {
+            // Log the error of compose down
+            if (errDown) log.error(`ERROR IN COMPOSE DOWN : ${errDown.message}`);
+            // Send error to user
+            callback(err);
+          });
+        }
+        else callback(err)
       }
       else callback(null);
     });
@@ -134,6 +155,9 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
     (config, cb) => {
       const mainDir = config.mainDir;
       const thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
+      // Remove download repository
+      const toRemoveElement = `${params.namerepo}_${params.namelab}`;
+      rimraf.sync(path.join(downloadPath, toRemoveElement));
       // Call docker-compose down
       dockerComposer.down(thePath, (err) => {
         if (!err) { cb(null); } else cb(err);
