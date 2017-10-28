@@ -42,11 +42,13 @@
 	   <script src="app/services/container_manager_service.js"> </script>
 	    <!-- angular controllers -->
 	    <script src="app/controllers/graph_action_controller.js"></script>
+	    <script src="app/components/dsp_copyFromContainer.js"></script>
 	
 
 <script>
 	//ANGULAR COMPONENT REGISTRATION 
 	angular.module("dockersecplayground", ['ngAnimate', 'chieffancypants.loadingBar', 'ngSanitize', 'ui.bootstrap', 'ngWebSocket', 'ui-notification', 'colorpicker.module'] )
+                .component("copyFromContainerComponent", dsp_copyFromContainer)
 		.service('dockerAPIService', DockerAPIService) 
                 .service('SocketService', SocketService) 
 		.service('containerManager', dsp_ContainerManagerService)
@@ -179,9 +181,15 @@
               {{c.name}}
             </div>
             <div class="col-sm-6">
+              
+              </button> 
               <button 
                 class="glyphicon glyphicon-share"
                 ng-click="goToContainer(c.name)"
+                > 
+              <button 
+                class="glyphicon glyphicon-download"
+                ng-click="copyFromContainer(c.name)"
                 > 
               
               </button> 

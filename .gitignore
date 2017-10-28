@@ -43,3 +43,6 @@ public/bower_components/
 .node_repl_history
 # Ignore configuration file
 config/config_user.json
+
+# Download files inside directory
+public/downloads/**

@@ -1,4 +1,4 @@
-var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
+var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, $uibModal, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
   $scope.labName= '';
   $scope.labInfos = {} ;
   $scope.yamlfile='';
@@ -66,6 +66,28 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
 
   } //End startlab
 
+  $scope.copyFromContainer = function (nameContainer) {
+    console.log("OPENNN")
+var modalInstance = $uibModal.open({
+        animation: true,
+        component: 'copyFromContainerComponent',
+        resolve: {
+          lab: function () {
+          return  {
+            namerepo : $scope.nameRepo,	
+            namelab : $scope.labName,
+            namecontainer: nameContainer
+            };
+          }
+        }
+    });
+
+    modalInstance.result.then(function () {
+      console.log("responso modalInstance")
+                }, function () {
+                        $log.info('modal-component dismissed at: ' + new Date());
+                            });
+  }
   // Container go to shell
   $scope.goToContainer = function goToContainer(nameContainer)  {
     console.log(nameContainer)
