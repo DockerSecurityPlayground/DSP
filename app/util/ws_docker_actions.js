@@ -26,13 +26,14 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let mainDir;
   let thePath;
   let config;
+  let pathCopyDirectory
 
   async.waterfall([
     (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
     (cb) => configData.getConfig(cb),
     // Create download directory
     (theConfig, cb) => {
-      const pathCopyDirectory = path.join(downloadPath, `${params.namerepo}_${params.namelab}`);
+      pathCopyDirectory = path.join(downloadPath, `${params.namerepo}_${params.namelab}`);
       config = theConfig;
       if(!fs.existsSync(pathCopyDirectory)) {
         console.log("DEVO CREARE")

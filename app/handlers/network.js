@@ -121,7 +121,11 @@ function dockercopy(req, res) {
       const pathLab = path.join(dockerInfos.mainPath, dockerInfos.nameRepo, dockerInfos.labName)
       destinationDir = path.join("public","downloads", `${dockerInfos.nameRepo}_${dockerInfos.labName}`)
       destinationPath = path.join(destinationDir, path.basename(dockerInfos.pathContainer));
+      // Fix for space directories
+      destinationPath = `"${destinationPath}"`
       dockerComposer.cpFrom(pathLab, dockerInfos.dockerName, dockerInfos.pathContainer, destinationPath, cb);
+      // Readjust destinationPath name
+      destinationPath = destinationPath.substring(1, destinationPath.length -1)
     },
     (data,cb) => {
       // If is a directory zip the file

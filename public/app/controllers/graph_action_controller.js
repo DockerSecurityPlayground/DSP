@@ -98,7 +98,6 @@ var modalInstance = $uibModal.open({
      })
     .then( 
             function success(response) {
-                     
              window.location.href= 'docker_socket.html';
             },
             function error(err) {

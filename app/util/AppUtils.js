@@ -10,6 +10,7 @@ const fs = require('fs');
 const httpHelper = require('help-nodejs').httpHelper;
 const cpFile = require('cp-file');
 const ncp = require('ncp').ncp;
+const localConfig = require('../../config/local.config.json').config;
 
 function copyFile(source, target, cb) {
   cpFile(source, target)
@@ -48,7 +49,71 @@ function pathUserConfig() {
 function getConfigSync() {
   return jsonfile.readFileSync(pathUserConfig());
 }
-
+function getRealLogger() {
+    const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
+    return logger({
+      name: 'DockerSecurityPlayground',
+      streams: [
+        {
+          level: 'info',
+          stream: process.stdout
+        },
+        {
+          level: 'info',
+          type: 'rotating-file',
+          period: '1h',
+          count: 1,
+          path: logPath
+        },
+        {
+          level: 'debug',
+          type: 'rotating-file',
+          period: '1h',
+          count: 1,
+          path: logPath
+        },
+        {
+          level: 'error',
+          stream: process.stderr
+        },
+        {
+          level: 'error',
+          type: 'rotating-file',
+          period: '1h',
+          count: 1,
+          path: logPath
+        },
+        {
+          level: 'warn',
+          path: logPath
+        },
+        {
+          level: 'warn',
+          type: 'rotating-file',
+          period: '1h',
+          count: 1,
+          path: logPath
+        }]
+    });
+}
+function getNoLogger() {
+    return logger({
+      name: 'DockerSecurityPlayground',
+      streams: [
+        {
+          level: 'info',
+          stream: process.stdout
+        },
+        {
+          level: 'error',
+          stream: process.stderr
+        },
+        {
+          level: 'warn',
+          stream: process.stdout
+        }]
+    });
+}
 // exports.getLocalConfigSync = getLocalConfigSync;
 module.exports = {
   getLocalConfig(cb) {
@@ -79,39 +144,9 @@ module.exports = {
   getConfigSync,
 
   getLogger() {
-    const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
-    return logger({
-      name: 'DockerSecurityPlayground',
-      streams: [
-        {
-          level: 'info',
-          stream: process.stdout
-        },
-        {
-          level: 'info',
-          path: logPath
-        },
-        {
-          level: 'debug',
-          path: logPath
-        },
-        {
-          level: 'error',
-          stream: process.stderr
-        },
-        {
-          level: 'error',
-          path: logPath
-        },
-        {
-          level: 'warn',
-          path: logPath
-        },
-        {
-          level: 'warn',
-          path: logPath
-        }]
-    });
+    if (localConfig.enableLogin)
+      return getRealLogger();
+    else return getNoLogger();
   },
   // It works only for labs (repoName is a repository )
   getDSPDirs: function getDSPDirs(repoName, callback) {

@@ -1,5 +1,6 @@
 {
           "config": {
+                    "enableLogin": false,
                     "dsp_reponame": "dsp_repo",
                     "name_labelfile": "labels.json",
                     "static_content": "../public/",
