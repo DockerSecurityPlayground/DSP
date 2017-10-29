@@ -59,8 +59,8 @@ function buildImages(repoName, callback, notifyCallback) {
           'data',
           (data) => {
             // Trim dataline to MAX_LOGLENGTH
-            if (datalLine > MAX_LOG_LENGTH)
-              dataLine = dataLine.substring(dataLine.length - MAX_LOG_LENGTH, dataLine.length)
+            if (dataLine.length > MAX_LOG_LENGTH)
+              dataLine = ""
             dataLine += data;
             if (dataLine[dataLine.length - 1] === '\n') {
               if (notifyCallback && typeof notifyCallback === 'function') { notifyCallback(dataLine); }
