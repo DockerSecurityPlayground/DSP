@@ -7,7 +7,7 @@
       </li>
       <!-- end search form -->
       <li ng-repeat="r in repos"> 
-          <a href="#"  name="{{r.name}}" ng-click="r.isCollapsed= !r.isCollapsed" ><i class="fa fa-sitemap fa-3x"></i> {{r.name}}<span class="fa arrow"></span></a>
+        <a href="#"  name="{{r.name}}" ng-click="r.isCollapsed= !r.isCollapsed" ><i class="fa fa-sitemap fa-3x"></i> {{r.name}}_{{r.version }}<span class="fa arrow"></span></a>
           <div uib-collapse="r.isCollapsed"> 
             <ul class="nav nav-second-level">
               <li ng-repeat="lab in r.labs">

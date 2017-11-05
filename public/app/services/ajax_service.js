@@ -76,7 +76,7 @@ self.init = function(onSuccess) {
             console.log(response.data) 
             dAll.resolve(response.data)
             //Repos
-            WalkerService.init(response.data.data.repos, name_repo)
+            WalkerService.init(response.data.data.repos, name_repo, response.data.data.version)
     },
     function errorCallback(response) { 
             console.log("Error in acquisition all") 

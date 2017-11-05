@@ -6,6 +6,7 @@ var dsp_MainCtrl = function($scope, $location, BreadCrumbs, AjaxService,CurrentL
   AjaxService.init()
     .dAll.then(function(res) {
       $scope.repos = WalkerService.repos;
+      $scope.version = WalkerService.version;
     },
     function(err) {
 
