@@ -16,22 +16,28 @@ const log = appUtils.getLogger();
 
 
 function processNode(_p, f) {
-  const s = fs.statSync(path.join(_p, f));
-  return {
-    id: path.join(_p, f),
-    text: f,
-    icon: s.isDirectory() ? 'jstree-custom-folder' : 'jstree-custom-file',
-    state: {
-      opened: false,
-      disabled: false,
-      selected: false,
-    },
-    li_attr: {
-      base: path.join(_p, f),
-      isLeaf: !s.isDirectory(),
-    },
-    children: s.isDirectory(),
-  };
+  fp = path.join(_p, f);
+  // Fixinr broken links
+  if (!fs.existsSync(fp))
+    return ""
+  else {
+    const s = fs.statSync(path.join(_p, f));
+    return {
+      id: path.join(_p, f),
+      text: f,
+      icon: s.isDirectory() ? 'jstree-custom-folder' : 'jstree-custom-file',
+      state: {
+        opened: false,
+        disabled: false,
+        selected: false,
+      },
+      li_attr: {
+        base: path.join(_p, f),
+        isLeaf: !s.isDirectory(),
+      },
+      children: s.isDirectory(),
+    };
+  }
 }
 
 function processReq(_p, res) {
@@ -41,7 +47,10 @@ function processReq(_p, res) {
     if (exists) {
       fs.readdir(_p, (err, list) => {
         for (let i = list.length - 1; i >= 0; i -= 1) {
-          resp.push(processNode(_p, list[i]));
+          if (list[i]) {
+            newNode = processNode(_p, list[i])
+            if (newNode != "") resp.push(newNode);
+          }
         }
         res.json(resp);
       });
