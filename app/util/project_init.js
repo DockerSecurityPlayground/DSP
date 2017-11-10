@@ -47,6 +47,8 @@ exports.createDSP = (nameConfig, callback, notifyCallback) => {
     fs.mkdirSync(homeDSP);
     // Create json file labStates
     jsonfile.writeFileSync(path.join(homeDSP, 'lab_states.json'), []);
+    // Create first version file
+    jsonfile.writeFileSync(path.join(homeDSP, 'version.json'), {version:"1.0"});
     // Create shared directory
     fs.mkdirSync(path.join(homeDSP, 'shared'), []);
     // No synchronization with github

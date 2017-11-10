@@ -7,6 +7,7 @@ const EventEmitter = require('events').EventEmitter;
 const async = require('async');
 const LabStates = require('../util/LabStates.js');
 const jsonfile = require('jsonfile');
+const packageJSON =require('../../package.json')
 const _ = require('underscore');
 
 const log = AppUtils.getLogger();
@@ -41,6 +42,9 @@ const BaseWalker = stampit(MyEmitter).init(function init(obj) {
     return (file === path.join(this.dir, 'labels.json'));
   };
 
+  this.isVersion = function isVersion(file) {
+    return (file === path.join(this.dir, 'version.json'));
+  }
   this.isNetwork = function isInformation(file) {
     return (file === path.join(this.dir, 'network.json'));
   };
@@ -98,6 +102,9 @@ const RepoWalker = stampit(BaseWalker)
     .init(function init() {
       this.labs = [];
       this.fileFound = function fileFound(file) {
+        if (this.isVersion(file)) {
+            this.version = file;
+        }
       //  Save labels informations
         if (this.isLabel(file)) {
           this.labels = file;
@@ -181,21 +188,40 @@ const DSPWalk = stampit(MyEmitter)
           const r = { name: ele.name };
           r.labs = ele.repo.labs;
           const labelFile = ele.repo.labels;
-          if (labelFile) {
-            jsonfile.readFile(labelFile, (err, json) => {
-              //  Parsing error
-              if (!err && json.labels) {
-                r.labels = json.labels;
-              }
-              retObj.repos.push(r);
-              callback(null);
-            });
-          } else {
-            retObj.repos.push(r);
-            callback(null);
-          }
+          const versionFile = ele.repo.version;
+          async.waterfall([ 
+              // Read label file
+              (cb) => {
+                if (labelFile) {
+                  jsonfile.readFile(labelFile, cb);
+                }
+                else { 
+                  cb(null)
+                }
+              },
+              (json, cb) => {
+                //  Parsing error
+                if (json && json.labels) {
+                  r.labels = json.labels;
+                }
+                cb(null)
+              },
+              // Read version file
+              (cb) => {
+                if (versionFile) { 
+                  jsonfile.readFile(versionFile, cb)
+                }
+                else cb(null, null)
+              },
+              (json, cb) => {
+                if (json && json.version) r.version = json.version
+                cb(null)
+                }], (err) => {
+                retObj.repos.push(r);
+                callback(err);
+              })
         },
-    (err) => cb(err || null));
+          (err) => cb(err || null));
       },
       //  Convert all lab files
       (cb) => {
@@ -204,6 +230,7 @@ const DSPWalk = stampit(MyEmitter)
         //  Sort repos by name
         repos = _.sortBy(repos, 'name');
         retObj.repos = repos;
+        retObj.version = packageJSON.version;
         //  For each repo
         async.each(repos, (r, repocallback) => {
           let labs = r.labs;

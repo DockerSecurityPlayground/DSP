@@ -4,12 +4,10 @@ var dsp_WalkerService = function($log) {
   self.username; 
   self.currentLabName;
 
-  self.init = function init(repos, username) {
+  self.init = function init(repos, username, version) {
     self.repos = repos;
     self.username = username;
-    console.trace();
-    console.log('USERNAME:');
-    console.log(username);
+    self.version = version
   }
 
   self.repoNewLab = function(newLab) {
