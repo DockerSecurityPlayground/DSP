@@ -40,6 +40,7 @@
 	   <script src="app/services/docker_service.js"> </script>
           <script src="app/services/socket_service.js"> </script>
 	   <script src="app/services/container_manager_service.js"> </script>
+	   <script src="app/services/cleaner_service.js"> </script>
 	    <!-- angular controllers -->
 	    <script src="app/controllers/graph_action_controller.js"></script>
 	    <script src="app/components/dsp_copyFromContainer.js"></script>
@@ -52,6 +53,7 @@
 		.service('dockerAPIService', DockerAPIService) 
                 .service('SocketService', SocketService) 
 		.service('containerManager', dsp_ContainerManagerService)
+		.service('CleanerService', dsp_cleanerService)
 		.controller('actionController', DSP_GraphActionController)
 		.filter('split',function(){
 	    return function(str,length) {

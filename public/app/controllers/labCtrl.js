@@ -1,4 +1,4 @@
-var dsp_LabCtrl = function($scope, ServerResponse, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, CurrentLabService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
+var dsp_LabCtrl = function($scope, ServerResponse, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
 var userDir;
 var vm = this;
 var buttonDeleteProto = { action:openConfirmDelete, label:"Delete Lab" , class: "btn btn-danger"} 
@@ -83,6 +83,7 @@ else if (action === 'edit') {
         toEditName = labToUse.name
         vm.lab.name= labToUse.name;	
         vm.lab.description = labToUse.informations.description;
+        //vm.lab.goal = CleanerService.parse(labToUse.informations.goal);
         vm.lab.goal = labToUse.informations.goal;
         vm.lab.solution = labToUse.informations.solution;
         vm.previewSolution = vm.lab.solution;
@@ -166,8 +167,9 @@ if(labToUse) {
 
       if(labToUse.informations) {
         vm.lab.description = labToUse.informations.description;
-        vm.lab.goal = labToUse.informations.goal;
-        vm.lab.solution = labToUse.informations.solution;
+        //vm.lab.goal = labToUse.informations.goal;
+        vm.lab.goal = CleanerService.parse(labToUse.informations.goal);
+        vm.lab.solution = CleanerService.parse(labToUse.informations.solution);
         vm.tinymceHtmlGoal= $sce.trustAsHtml(vm.lab.goal); 
         vm.tinymceHtmlSolution = $sce.trustAsHtml(vm.lab.solution); 
         

@@ -39,6 +39,7 @@
   <script src="app/services/safe_apply_service.js"> </script>
   <script src="app/services/constants_service.js"> </script>
   <script src="app/services/response_server_service.js"> </script>
+  <script src="app/services/cleaner_service.js"> </script>
   <script src="app/components/dsp_deleteConfirm.js"> </script>
   <script src="app/components/dsp_changeGithub.js"> </script>
 
@@ -96,6 +97,7 @@
           .service("Constants", dsp_Constants) 
           .service("SocketService", SocketService) 
           .service("SafeApply", SafeApply)
+          .service("CleanerService", dsp_cleanerService)
           .controller("MainCtrl", dsp_MainCtrl)
           .controller("labelsCtrl", dsp_LabelsCtrl) 
           .controller("labsCtrl",  dsp_LabsCtrl) 

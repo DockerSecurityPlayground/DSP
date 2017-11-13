@@ -1,4 +1,4 @@
-var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, $uibModal, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
+var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, CleanerService, $uibModal, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
   $scope.labName= '';
   $scope.labInfos = {} ;
   $scope.yamlfile='';
@@ -184,6 +184,8 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
   .then(function successCallback(response) {
     console.log("Success:") 
     $scope.labInfos = response.data.data
+    $scope.labInfos.goal = CleanerService.parse($scope.labInfos.goal)
+    $scope.labInfos.solution = CleanerService.parse($scope.labInfos.solution)
     $scope.tinymceSolution = $sce.trustAsHtml($scope.labInfos.solution) 
     $scope.tinymceGoal = $sce.trustAsHtml($scope.labInfos.goal) 
     },
