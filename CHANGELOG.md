@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 Versioning of Docker Security Playground 
 
+
 Fix of Angular WebSocket Code during installation long running
 
 
