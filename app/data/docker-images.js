@@ -51,23 +51,24 @@ module.exports = {
           return ret;
         });
         _.each(images, (ele) => {
-          const convertedLabels = dot.object(ele.labels);
-          if (convertedLabels.type) {
-            switch (convertedLabels.type) {
-              case 'server' : convertedLabels.icon = `${pathIcons}server.png`;
-                break;
-              case 'entry_point' : convertedLabels.icon = `${pathIcons}entry_point.png`;
-                break;
+          try {
+            const convertedLabels = dot.object(ele.labels);
+            if (convertedLabels.type) {
+              switch (convertedLabels.type) {
+                case 'server' : convertedLabels.icon = `${pathIcons}server.png`;
+                  break;
+                case 'entry_point' : convertedLabels.icon = `${pathIcons}entry_point.png`;
+                  break;
 
-              case 'host' : convertedLabels.icon = `${pathIcons}host.png`;
-                break;
+                case 'host' : convertedLabels.icon = `${pathIcons}host.png`;
+                  break;
 
-              case 'router' : convertedLabels.icon = `${pathIcons}router.png`;
-                break;
-              default:
-                convertedLabels.icon = `${pathIcons}host.png`;
-                break;
-            }
+                case 'router' : convertedLabels.icon = `${pathIcons}router.png`;
+                  break;
+                default:
+                  convertedLabels.icon = `${pathIcons}host.png`;
+                  break;
+              }
           }
 
           const pathIcon = `${pathIcons}host.png`;
@@ -89,6 +90,11 @@ module.exports = {
             // ele.selectedAction = ele.actions[_.keys(ele.actions)[0]]
           }
           ele.icon = convertedLabels.icon;
+        }
+          // Some images could not properly be converted by dot notation
+          catch (labelError) {
+            ele.icon = `${pathIcons}host.png`;
+          }
         });
         callback(err, images);
       }

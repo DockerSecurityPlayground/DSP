@@ -6,9 +6,17 @@ All notable changes to this project will be documented in this file.
 Versioning of Docker Security Playground 
 
 
-Fix of Angular WebSocket Code during installation long running
+ Fix of Angular WebSocket Code during installation long running
+ Fix the filterImage bug in edit container page OK
+ Fix the .data bug (delete when .data is empty)
+ Different vertical size image canvas
+ New terminal on a new tab in visual editor
 
 
+## [1.6] - 2017-01-19
+ Fix bug of docker images with cmd label
+ Docker network ip visibility implemented
+ Docker compose file visibility implemented
 ## [1.5] - 2017-07-07
  In all the code "Drawed" variables are changed to "ToDraw" variables;
  Strange error lowercases in util/ws_handlers.js fixed.

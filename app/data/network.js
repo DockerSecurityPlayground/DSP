@@ -29,7 +29,27 @@ function networkExists(namerepo, namelab, callback) {
   });
 }
 
+function filterNetwork(theNetwork) {
+  retNetwork = theNetwork;
+  if (retNetwork.clistToDraw) {
+    cl = retNetwork.clistToDraw;
+    cl.forEach((c) => {
+      networks = c.networks;
+      if (networks) {
+        Object.keys(networks).forEach((key) => {
+          n = networks[key];
+          // If is not visibile set ip to false
+          if (n.isVisible == false) {
+            //console.log(n);
+            n.ip = ""
+          }
+        })
+      }
 
+    })
+  }
+  return retNetwork
+}
 function get(namerepo, namelab, callback) {
   let yamlFile;
   async.waterfall([
@@ -43,6 +63,7 @@ function get(namerepo, namelab, callback) {
       jsonfile.readFile(networkfile, cb);
     },
     (network, cb) => {
+      // network = filterNetwork(network)
       // Read yaml file
       fs.readFile(yamlFile, 'utf-8', (err, data) => {
         if (err) { cb(err); } else {

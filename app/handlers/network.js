@@ -86,6 +86,12 @@ function get(req, res) {
           }
         });
       }
+    },
+    (response, cb) => {
+      if (req.query.isEditing == '0' && response.isComposeVisible == false) {
+        response.yamlfile = "";
+      }
+      cb(null, response);
     }
   ], (err, response) => AppUtils.response('NETWORK GET', res, err, response));
 }

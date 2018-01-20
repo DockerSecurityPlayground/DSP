@@ -57,7 +57,7 @@
 		      </select>
 		      </div>
 			<div class="col-sm-4"> 
-		      <input type="text" class="form-control" placeholder="Image Filter" ng-model="filterImage"  >
+		      <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
 		      </input>
 		      </div>
 	      </div>
@@ -107,6 +107,13 @@
 		<option value="left" > Left </option>
 		<option value="bottom" >  Bottom </option>
 			</select>
+                  <span 
+                    ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked)? 'visible': 'hidden'}" 
+                    >
+                    <label> <input name="isVisibleCheck" type="checkbox" ng-model="currentContainer.networks[n.name].isVisible"> Is Visible </label> 
+                  </span>
+
+
 		</div>
 
 

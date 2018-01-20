@@ -39,20 +39,23 @@ DockerAPIService : function DockerAPIService($log, $http, containerManager, Noti
 
 
 	return {
-		saveLab:function saveLab(labName, cld, clnd, nl, graphJSON) {
+		saveLab:function saveLab(labName, cld, clnd, nl, graphJSON, icv) {
 			var data = {
 				networkList : nl,
 				canvasJSON : graphJSON,
 				clistToDraw : cld,
-				clistNotToDraw : clnd
+				clistNotToDraw : clnd,
+                                isComposeVisible: icv
 			}	
 			return $http.post(api+labName, 
 				data
 				)
 			
 		},
-		loadLab : function loadLab(repoName,labName, successCB) {
-			$http.get(api+repoName+"/"+labName)
+		loadLab : function loadLab(repoName,labName, isEdit, successCB) {
+                        isEditing = (isEdit) ? 1 : 0;
+                        sendReq = api+repoName+"/"+labName+"?isEditing="+isEditing
+			$http.get(sendReq)
 				.then(function successCallback(response) {   
 					successCB(response.data.data)
 					console.log(response.data.data)

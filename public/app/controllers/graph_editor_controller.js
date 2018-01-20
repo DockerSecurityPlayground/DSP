@@ -3,6 +3,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
 	$scope.labName= '';
 	$scope.yamlfile='';
+        $scope.isComposeVisible = true;
 	const protoAddAction = 'New container',
 		protoEditAction = 'Edit ';
 	
@@ -47,13 +48,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       //Init container manager
       containerManager.init($scope.imageList) 
       $scope.changedImage($scope.imageList[0])
-      if(params.action && (params.action==='edit' || params.action ==='new'))
-      {
+      if(params.action && (params.action==='edit' || params.action ==='new')) {
               if(params.action === 'edit') 
               {
 
               //When imageList it's loded load lab 
-              dockerAPIService.loadLab($scope.repoName, $scope.labName, function(data) {
+              dockerAPIService.loadLab($scope.repoName, $scope.labName, true, function(data) {
                               var canvasJSON = data.canvasJSON; 
                               gh.loadGraphicJSON(canvasJSON)
                               containerManager.loadContainers(data, {imageList : $scope.imageList})
@@ -66,6 +66,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
                               if(data.networkList)
                                       NetworkManagerService.setNetworkList(data.networkList)		
                               $scope.networkList =  NetworkManagerService.getNetworks() 
+                              // Set isComposeVisible
+                              if (data.isComposeVisible == false)
+                                $scope.isComposeVisible = false
                               })
 
 
@@ -450,6 +453,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 			var ip = NetworkManagerService.getFirst(nameNetwork)	
 			container.networks[nameNetwork].ip = ip 
 			container.networks[nameNetwork].position = 'right'
+                        container.networks[nameNetwork].isVisible = true
 			NetworkManagerService.useAddress(ip)
 			}
 			//If isn't checked delete 
@@ -477,8 +481,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 			//Find color 
 			var subnet = NetworkManagerService.subnetOf(e.ip);
 			var n=NetworkManagerService.getNetworkBySubnet(subnet);
+                        console.log("NETWORK TO DRAW")
+                        console.log(e);
 			networkToDraw.push({
-				name:e.ip,
+                                // Draw only if is visible
+                                name: (e.isVisible == false) ?  '' : e.ip,
 				color:n.color,
 				position:e.position
 			})
@@ -752,6 +759,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 	//When click edit button show edit buttons and set name editContainer
 	$scope.onClickEditContainer =  function(i) {
 		$scope.isAddContainer = false;
+                // Fix filtered image
 	//	console.log($scope.containerListNotToDraw)
 		//Eventually redirect to edit 
 
@@ -767,6 +775,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
                 
 		containerManager.setContainer(containerToEdit, $scope.currentContainer);
+                $scope.filterImage = ""
                 setDefaultAction($scope.currentContainer.selectedImage);
                 // Load ports
                 loadOptionalPorts($scope.currentContainer.ports, $scope.currentContainer.selectedImage);
@@ -921,7 +930,8 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 				$scope.containerListToDraw,
 				$scope.containerListNotToDraw,
 				$scope.networkList,
-				gh.getGraphicJSON()
+				gh.getGraphicJSON(),
+                                $scope.isComposeVisible
 				)
 			
 					.then(function successCallback(response) {  
