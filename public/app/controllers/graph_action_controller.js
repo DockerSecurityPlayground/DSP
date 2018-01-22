@@ -11,6 +11,12 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   const warningMessageHeader = 'WARNING: ';
   const networkEmptyMessage =  'Network is empty! Have you drawed the containers?';
 
+  function openInNewTab(url) {
+        var a = document.createElement("a");
+        a.target = "_blank";
+        a.href = url;
+        a.click();
+  }
   $scope.warningMessage = '';
   //Proto actions 
   const playProto = {  actionLabel:"Start lab",  actionClass:"glyphicon glyphicon-play", statusLabel: "Lab is inactive" , actionButton:"btn btn-success", state:'inactive' , statusClass:"alert alert-danger text-center"}
@@ -98,7 +104,8 @@ var modalInstance = $uibModal.open({
      })
     .then( 
             function success(response) {
-             window.location.href= 'docker_socket.html';
+             // window.location.href= 'docker_socket.html';
+              $window.open('docker_socket.html', '_blank');
             },
             function error(err) {
               // Lab running error

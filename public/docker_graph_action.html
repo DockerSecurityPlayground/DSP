@@ -169,9 +169,9 @@
 <div class="row">
  <!-- End container list -->
         <div 
-          ng-hide="labState.actionLabel !== 'Stop lab'"
           class="col-sm-3"
           >
+          <div  ng-hide="labState.actionLabel !== 'Stop lab'">
 
 	<h4 class="text-center">Containers</h4>
 	<hr>	
@@ -203,9 +203,10 @@
         </div>
           </div> <!-- end a container -->
         </div> <!-- end container list -->
+      </div>
   </div> <!-- end container list -->
 	<div class="col-sm-9">
-		<canvas ng-click="canvasClick()" width=1150px height=600px id="c"></canvas>
+		<canvas ng-click="canvasClick()" width=900px height=900px id="c"></canvas>
 	</div>
 
 </div>

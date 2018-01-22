@@ -8,7 +8,8 @@ var currentContainer = {
 		environments : [],
 		some_network_selected:false, 
 		volumes : [], 
-		filesToCopy : []
+		filesToCopy : [],
+                isShellEnabled: true
 	} 
 
 var containerToDraw = null
@@ -49,6 +50,7 @@ function resetCurrent(imageList, networkList)
 	currentContainer.actions = []
 	currentContainer.volumes = []
 	currentContainer.filesToCopy = []
+        currentContainer.isShellEnabled = true
 
 	//Zero select image 
 	currentContainer.selectedImage = imageList[0] 

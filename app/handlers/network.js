@@ -20,6 +20,7 @@ const Checker = require('../util/AppChecker');
 
 const dockerConverter = require(`${appRoot}/app/data/docker-converter.js`);
 const dockerComposer = require('mydockerjs').dockerComposer;
+const _ = require('underscore');
 
 const log = AppUtils.getLogger();
 // const appUtils = require('../util/AppUtils.js');
@@ -97,20 +98,29 @@ function get(req, res) {
 }
 
 
-function getListImages(req, res) {
-  dockerImages.getListImages((err, data) => {
-    httpHelper.response(res, err, data);
+function getListImages(req, res) { dockerImages.getListImages((err, data) => { httpHelper.response(res, err, data);
   });
 }
 function dockercopy(req, res) {
-  console.log("SONO IN DOCKER COPY")
-  console.log(req.body)
+  // console.log("SONO IN DOCKER COPY")
+  // console.log(req.body)
   let destinationPath;
   let destinationDir;
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['namelab', 'namerepo', 'dockername', 'pathContainer'], cb),
+    (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
+    (networkInfo, cb) => { 
     // Get config
-    (cb) => configData.getConfig(cb),
+      dockername = req.body.dockername;
+      cld = networkInfo.clistToDraw;
+      containerToCopy = _.findWhere(cld, {name: dockername});
+      if (!containerToCopy.isShellEnabled) {
+        cb(new Error("Copy not allowed"));
+      }
+      else {
+        configData.getConfig(cb);
+      }
+    },
     // get path
     (config, cb) => {
       mainDir = config.mainDir;
@@ -156,8 +166,19 @@ function dockercopy(req, res) {
 function dockershell(req, res) {
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername'], cb),
+    (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
+    (networkInfo, cb) => { 
     // Get config
-    (cb) => configData.getConfig(cb),
+      dockername = req.body.dockername;
+      cld = networkInfo.clistToDraw;
+      containerToCopy = _.findWhere(cld, {name: dockername});
+      if (!containerToCopy.isShellEnabled) {
+        cb(new Error("Shell not allowed"));
+      }
+      else {
+        configData.getConfig(cb);
+      }
+    },
     // get path 
     (config, cb) => {
       mainDir = config.mainDir;

@@ -1,5 +1,5 @@
 const server = require('socket.io');
-const pty = require('pty.js');
+const pty = require('node-pty');
 const path = require('path');
 
 

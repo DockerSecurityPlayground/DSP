@@ -122,6 +122,15 @@
                     
 		      </div>
 	      </div>  <!-- END FORM NETWORKS -->
+              <!-- START COPY SHELL -->
+                <div class="row form-group"> 
+		      <label class="control-label col-sm-2" for="container_network"> Enable shell/copy:</label>
+		      <div class="col-sm-10 " > 
+                        <input type="checkbox" ng-model="currentContainer.isShellEnabled" />
+		      </div>
+	      </div>
+
+
 		<!--- PORT INPUT SELECT -->
 		<div ng-repeat="(key,port) in currentContainer.selectedImage.exposedPorts" class="form-group"> 
                   <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="container_ports">
