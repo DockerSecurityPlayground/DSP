@@ -3,7 +3,8 @@
 logs/**
 # Only clean_logs.js
 !logs/clean_logs.js 
-
+# All _tmpname
+_MEI*
 *.log
 npm-debug.log*
 
