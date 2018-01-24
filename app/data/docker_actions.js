@@ -8,11 +8,18 @@ function findContainerImage(allImages, selectedImage) {
 function getUpdatedCommand(currentAction, imageActions) {
   // Find updated actions
   const updatedAction = _.findWhere(imageActions, { name: currentAction.name });
-  return updatedAction.command;
+  console.log(currentAction);
+  console.log("ACTIONS IMAGE");
+  console.log(imageActions); 
+  if (updatedAction && updatedAction.command) {
+    return updatedAction.command;
+  }
+  else return "IMAGE_ERROR";
+
 }
 function getBackgroundMode(currentAction, imageActions) {
   const updatedAction = _.findWhere(imageActions, { name: currentAction.name });
-  if (updatedAction.backgroundMode) return true;
+  if (updatedAction && updatedAction.backgroundMode) return true;
     else return false;
 }
 
@@ -23,7 +30,6 @@ exports.getActionsSync = (clistToDraw) => {
   _.each(clistToDraw, (ele) => {
     const cname = ele.name;
     const cActions = ele.actions;
-    console.log(ele.selectedImage);
     if (cActions) {
       // For each action in actions of container
       _.each(cActions, (a) => {
@@ -58,7 +64,13 @@ exports.getActions = (clistToDraw, cb) => {
           _.each(cActions, (a) => {
             const aa = _.extend({}, a, { cname });
             aa.command = getUpdatedCommand(aa, updatedImage.actions);
+	    if (aa.command == "IMAGE_ERROR") {
+		      throw new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
+	    }
+
+	    console.log(aa.command);
             aa.backgroundMode = getBackgroundMode(aa, updatedImage.actions);
+	    console.log(aa.command);
             if (!aa.command) {
               actionError = new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
             }
