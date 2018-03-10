@@ -97,6 +97,7 @@ var modalInstance = $uibModal.open({
   // Container go to shell
   $scope.goToContainer = function goToContainer(nameContainer)  {
     console.log(nameContainer)
+      var windowReference = window.open();
      $http.post('/dsp_v1/dockershell', { 
         namerepo : $scope.nameRepo,	
         namelab : $scope.labName,
@@ -104,8 +105,8 @@ var modalInstance = $uibModal.open({
      })
     .then( 
             function success(response) {
-             // window.location.href= 'docker_socket.html';
-              $window.open('docker_socket.html', '_blank');
+              windowReference.location = "docker_socket.html";
+             // window.open('docker_socket.html', '_blank');
             },
             function error(err) {
               // Lab running error
