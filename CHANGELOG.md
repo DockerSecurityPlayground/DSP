@@ -11,6 +11,7 @@ Versioning of Docker Security Playground
  Fix the .data bug (delete when .data is empty)
  Different vertical size image canvas
  New terminal on a new tab in visual editor
+ If the user have not a Docker image he should be notified (no docker pull)
 
 
 ## [1.6] - 2017-01-19

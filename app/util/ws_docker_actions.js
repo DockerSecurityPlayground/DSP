@@ -36,7 +36,6 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
       pathCopyDirectory = path.join(downloadPath, `${params.namerepo}_${params.namelab}`);
       config = theConfig;
       if(!fs.existsSync(pathCopyDirectory)) {
-        console.log("DEVO CREARE")
         fs.mkdir(pathCopyDirectory, cb);
       }
       else cb(null);
