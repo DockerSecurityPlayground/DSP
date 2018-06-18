@@ -24,7 +24,11 @@ body {
     background-color:#fff!important;
     padding:10px;
 }
-
+a.disabled {
+   pointer-events: none;
+   cursor: default;
+   color:gray;
+}
 .text-center {
     text-align:center;
 }

@@ -1,7 +1,9 @@
 const networkData = require('../data/network.js');
 const appRoot = require('app-root-path');
 const configData = require('../data/config.js');
+const dockerImages = require('../data/docker-images.js');
 const dockerComposer = require('mydockerjs').dockerComposer;
+const imageMgr = require('mydockerjs').imageMgr;
 const homedir = require('homedir');
 const path = require('path');
 const async = require('async');
@@ -21,8 +23,6 @@ const downloadPath = 'public/downloads';
 // Start compose up and execute commands in body there are cListToDraw containers
 exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let networkInfo;
-  log.info('params:');
-  log.info(params);
   let mainDir;
   let thePath;
   let config;
@@ -30,6 +30,16 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
 
   async.waterfall([
     (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    // Check if all images exists
+    (cb) => dockerImages.getImagesLabNames(params.namerepo, params.namelab, cb),
+    (imagesLab, cb) => imageMgr.areImagesInstalled(imagesLab, cb),
+    (installedResult, cb) => {
+      if(installedResult.areInstalled) {
+        cb(null);
+      } else {
+        cb(new Error(`The following images are not installed: ${installedResult.notInstalled}`));
+      }
+    },
     (cb) => configData.getConfig(cb),
     // Create download directory
     (theConfig, cb) => {
@@ -128,9 +138,10 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
     // End function , return correct or error
     (err) => {
       if (err) {
-        // Remove download repository 
-        rimraf.sync(path.join(pathCopyDirectory, params.namelab));
-        console.log("ERROR")
+        // Remove download repository
+        if (pathCopyDirectory) {
+          rimraf.sync(path.join(pathCopyDirectory, params.namelab));
+        }
         // Call dockerComposer down if thePath has been defined (already dockerCompose up)
         if (thePath) {
           dockerComposer.down(thePath, (errDown) => {
@@ -176,3 +187,30 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
     callback(err);
   });
 };
+exports.downloadImages = function downloadImages(params, body, callback, notifyCallback) {
+  log.info('[DOCKER ACTIONS - DOWNLOAD IMAGE]')
+  async.waterfall([
+    (cb) => Checker.checkParams(params, ['name', 'tag'], cb),
+    (cb) => imageMgr.pullImage(params.name, params.tag, callback, notifyCallback)
+  ],
+  (err) => {
+    if (err) {
+      log.error(err.message);
+    }
+    callback(err)
+  })
+};
+
+exports.removeImage = function removeImage(params, body, callback) {
+  log.info('[DOCKER ACTIONS - REMOVE IMAGE]')
+  async.waterfall([
+    (cb) => Checker.checkParams(params, ['name', 'tag'], cb),
+    (cb) => imageMgr.removeImage(params.name, params.tag, callback)
+  ],
+  (err) => {
+    if (err) {
+      log.error(err.message);
+    }
+    callback(err)
+  })
+}

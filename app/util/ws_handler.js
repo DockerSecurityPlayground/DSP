@@ -84,6 +84,22 @@ function manageDockerDown(ws, jsonMessage) {
     sendProgressMessage(ws, dataline);
   });
 }
+function manageRemoveImage(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  const params = jsonMessage.params;
+  dockerActions.removeImage(params, body, (err) => {
+    sendResponse(ws, err);
+  })
+}
+function manageDownloadImages(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  const params = jsonMessage.params;
+  dockerActions.downloadImages(params, body, (err) => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
 
 function manageSyncGithub(ws, jsonMessage) {
   wsGitHandler.synchronizeLocalGithub(jsonMessage.body, (err) => sendResponse(ws, err));
@@ -133,6 +149,12 @@ exports.init = function init(server) {
           break;
         case 'docker_down':
           manageDockerDown(ws, jsonMessage);
+          break;
+        case 'remove_image':
+          manageRemoveImage(ws, jsonMessage);
+          break;
+        case 'download_images':
+          manageDownloadImages(ws, jsonMessage);
           break;
         case 'synchronize_github':
           manageSyncGithub(ws, jsonMessage);

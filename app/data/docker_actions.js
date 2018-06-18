@@ -8,9 +8,6 @@ function findContainerImage(allImages, selectedImage) {
 function getUpdatedCommand(currentAction, imageActions) {
   // Find updated actions
   const updatedAction = _.findWhere(imageActions, { name: currentAction.name });
-  console.log(currentAction);
-  console.log("ACTIONS IMAGE");
-  console.log(imageActions); 
   if (updatedAction && updatedAction.command) {
     return updatedAction.command;
   }
@@ -68,9 +65,7 @@ exports.getActions = (clistToDraw, cb) => {
 		      throw new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
 	    }
 
-	    console.log(aa.command);
             aa.backgroundMode = getBackgroundMode(aa, updatedImage.actions);
-	    console.log(aa.command);
             if (!aa.command) {
               actionError = new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
             }

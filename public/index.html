@@ -9,10 +9,12 @@
   <base href="/">
   <!-- JS Libraries --> 
   <script src="assets/js/underscore-min.js"> </script>
+  <!-- -->
   <!-- ANGULAR DEPENDENCIES --> 
   <script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
   <script src="assets/js/angular.min.js"></script>
   <script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
+
 
   <script src="assets/js/angular-animate.min.js"></script>
   <script src="assets/js/angular-sanitize.min.js"></script>
@@ -24,14 +26,9 @@
   <script src="assets/js/angular-websocket.min.js"></script>
 
   <link href="assets/css/select.css" rel="stylesheet" type='text/css' >
-  <!--CUSTOMS ANGULAR COMPONENTS --> 
-  <script src="app/controllers/mainCtrl.js"> </script>
-  <script src="app/controllers/labsCtrl.js"> </script>
-  <script src="app/controllers/labCtrl.js"> </script>
-  <script src="app/controllers/labelsCtrl.js"> </script>
-  <script src="app/controllers/configCtrl.js"> </script>
   <script src="app/services/breadcrumbs_services.js"> </script>
   <script src="app/services/ajax_service.js"> </script>
+ <script src="app/services/docker_service.js"> </script>
   <script src="app/services/regex_service.js"> </script>
   <script src="app/services/walker_service.js"> </script>
   <script src="app/services/current_lab.js"> </script>
@@ -39,10 +36,18 @@
   <script src="app/services/safe_apply_service.js"> </script>
   <script src="app/services/constants_service.js"> </script>
   <script src="app/services/response_server_service.js"> </script>
+  <script src="app/services/container_manager_service.js"> </script>
   <script src="app/services/cleaner_service.js"> </script>
   <script src="app/components/dsp_deleteConfirm.js"> </script>
   <script src="app/components/dsp_changeGithub.js"> </script>
 
+  <!--CUSTOMS ANGULAR COMPONENTS --> 
+  <script src="app/controllers/mainCtrl.js"> </script>
+  <script src="app/controllers/labsCtrl.js"> </script>
+  <script src="app/controllers/labCtrl.js"> </script>
+  <script src="app/controllers/labelsCtrl.js"> </script>
+  <script src="app/controllers/imagesCtrl.js"> </script>
+  <script src="app/controllers/configCtrl.js"> </script>
    <!-- COLORPICKER STYLES --> 
 	<!-- BOOTSTRAP STYLES-->
     <link href="assets/css/bootstrap.css" type="text/css" rel="stylesheet" >
@@ -75,7 +80,7 @@
             return window._; //Underscore must already be loaded on the page
           });
           //ANGULAR COMPONENT REGISTRATION 
-          angular.module("myApp", ['ui.tinymce', 'jsTree.directive', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module'] )
+          angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module'] )
 
             .factory('FetchFileFactory', ['$http',
               function($http) {
@@ -98,11 +103,14 @@
           .service("SocketService", SocketService) 
           .service("SafeApply", SafeApply)
           .service("CleanerService", dsp_cleanerService)
+		  .service('dockerAPIService', DockerAPIService) 
+		  .service('containerManager',dsp_ContainerManagerService) 
           .controller("MainCtrl", dsp_MainCtrl)
           .controller("labelsCtrl", dsp_LabelsCtrl) 
           .controller("labsCtrl",  dsp_LabsCtrl) 
           .controller("labCtrl",  dsp_LabCtrl) 
           .controller("configCtrl", dsp_ConfigCtrl)
+          .controller("imagesCtrl", dsp_ImagesCtrl)
           .run(['$anchorScroll', function($anchorScroll) {
             $anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
           }])
@@ -151,6 +159,10 @@
                         .when("/configuration", {
                                 templateUrl: "views/configuration.html" ,
                                 controller: "configCtrl"
+                        })
+                        .when("/images", {
+                                templateUrl: "views/images.html" ,
+                                controller: "imagesCtrl"
                         })
                         .otherwise(
                                 {redirectTo: "/labs"} 

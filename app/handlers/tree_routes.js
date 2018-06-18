@@ -63,8 +63,8 @@ function manageTree(pSaved, req, res) {
   let _p;
   if (req.query.id === '1') {
     _p = pSaved;
-    log.info('path:');
-    log.info(_p);
+    // log.info('path:');
+    // log.info(_p);
     processReq(_p, res);
   } else if (req.query.id) {
     _p = req.query.id;
@@ -77,12 +77,12 @@ function manageTree(pSaved, req, res) {
 function projectTreeSearch(req, res) {
   // log.info("sono in project tree search")
   configData.getUserPath((err, data) => {
-    log.info('sono in config get userpath');
+    //log.info('sono in config get userpath');
     if (!err) {
       const userPath = data;
       const pathData = path.join(userPath, '.data');
       if (fs.existsSync(pathData)) {
-        log.info('exists');
+        //log.info('exists');
         const pSaved = pathData;
         manageTree(pSaved, req, res);
       } else log.info(`path ${pathData} doesn't exists!`);
@@ -93,14 +93,14 @@ function projectTreeSearch(req, res) {
 }
 
 function treeSearch(req, res) {
-  log.info('sono in treeSearch');
+  //log.info('sono in treeSearch');
   const pSaved = homedir();
   manageTree(pSaved, req, res);
 }
 
   /* Serve a Resource */
 function resourceSearch(req) {
-  log.info('RESOURCE SEARCH');
+  //log.info('RESOURCE SEARCH');
   log.info(req.query.resource);
     // res.send(fs.readFileSync(req.query.resource, 'UTF-8'));
 }
@@ -117,7 +117,7 @@ function copyFile(source, target, cb) {
 }
 
 function uploadFile(req, res) {
-  log.info('sono in upload file');
+  //log.info('sono in upload file');
   log.info(req.body);
   let filename;
   let dataPath;
@@ -140,8 +140,8 @@ function uploadFile(req, res) {
 
 function deleteFile(req, res) {
   const filename = req.query.id;
-  log.info('DELETE FILE');
-  log.info(`try to delete ${filename}`);
+  //log.info('DELETE FILE');
+  //log.info(`try to delete ${filename}`);
   fs.stat(filename, (err, stats) => {
     if (err) { appUtils.response('DELETE FILE', res, err); } else {
       networkData.canDeleteFile(filename, (errCanDelete) => {

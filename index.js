@@ -10,6 +10,7 @@ const labels = require('./app/handlers/labels');
 const labs = require('./app/handlers/labs');
 const configHandler = require('./app/handlers/config');
 const networkHandler = require('./app/handlers/network');
+const dockerImages = require('./app/handlers/docker-images');
 // const installationHandler = require('./app/handlers/installation.js');
 const treeRoutes = require('./app/handlers/tree_routes.js');
 const Checker = require('./app/util/AppChecker.js');
@@ -27,7 +28,7 @@ const server = http.createServer(app);
 const AppUtils = require('./app/util/AppUtils.js');
 const dockerSocket = require('./app/util/docker_socket');
 
-// const webshellConfigFile = 
+// const webshellConfigFile =
 const log = AppUtils.getLogger();
 // Initialize the checker
 Checker.init((err) => {
@@ -81,14 +82,16 @@ app.use((req, res, next) => {
     if (installed) {
       next();
     } else {
-      console.log('Devo installare');
       if (!res.headersSent) {
         res.redirect('/installation.html');
       }
     }
   });
 });
-
+// Api images
+app.get('/dsp_v1/docker_images/', networkHandler.getListImages);
+app.get('/dsp_v1/dsp_images', dockerImages.getImagesAllRepos);
+app.get('/dsp_v1/dsp_images/:reponame', dockerImages.getImagesRepo);
 // Api labels
 app.get('/dsp_v1/labels/:repo', labels.allLabels);
 app.get('/dsp_v1/labels/:repo/:nameLab', labels.labelsOfLab);
@@ -103,8 +106,8 @@ app.get('/dsp_v1/all/', labs.getAll);
 app.post('/dsp_v1/all/', labs.importLab);
 // Api labs
 app.get('/dsp_v1/labs/:repo', labs.getLabs);
-app.get('/dsp_v1/labs/:repo/:labname', labs.getInformations);
-app.put('/dsp_v1/labs/:labname', labs.saveInformations);
+app.get('/dsp_v1/labs/:repo/:labname', labs.getInformation);
+app.put('/dsp_v1/labs/:labname', labs.saveInformation);
 app.post('/dsp_v1/labs/:labname', (req, res) => {
   if (req.query.wantToCopy) {
     labs.copyLab(req, res);
@@ -124,7 +127,6 @@ app.get('/dsp_v1/docker_network/:namerepo/:namelab', networkHandler.get);
 app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 
 // API DOCKER MANAGMENT
-app.get('/dsp_v1/docker_images/', networkHandler.getListImages);
 
 // Open docker shell
 app.post('/dsp_v1/dockershell', networkHandler.dockershell)
@@ -198,7 +200,8 @@ app.use(errorHandler({ server }));
 // Initialize web socket handler
 webSocketHandler.init(server);
 dockerSocket.init(server);
-
+// Set COMPOSE_INTERACTIVE_NO_CLI=1
+process.env.COMPOSE_INTERACTIVE_NO_CLI = 1
 
 server.listen(port, () => {
   if (localConfig.config.test) { log.warn('Testing mode enabled'); }

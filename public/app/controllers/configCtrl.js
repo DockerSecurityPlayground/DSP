@@ -255,6 +255,9 @@ $scope.updateApplication = function() {
   })
 }
 
+$scope.manageImages = function() {
+window.location.href = "/images";
+}
 $scope.updateProjects = function() {
   $scope.isReposUploading = true;
 

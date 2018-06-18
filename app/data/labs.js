@@ -38,7 +38,7 @@ function renameLab(oldName, newName, cb) {
   }
 }
 
-function newLab(name, informations, callback) {
+function newLab(name, information, callback) {
   let up = '';
   let userName;
   async.waterfall([
@@ -82,7 +82,7 @@ function newLab(name, informations, callback) {
       infos.goal = '';
       infos.solution = '';
       infos.author = userName;
-      infos = _.extend(infos, informations);
+      infos = _.extend(infos, information);
 
       jsonfile.writeFile(pathToWrite, infos, cb);
     },
@@ -190,9 +190,9 @@ function saveLabels(labName, labels, callback) {
   });
 }
 
-function saveInformations(name, informations, callback) {
+function saveInformation(name, information, callback) {
   let userPath;
-  // log.info('in save informations')
+  // log.info('in save information')
   async.waterfall([
 
     (cb) => config.getUserPath(cb),
@@ -207,11 +207,11 @@ function saveInformations(name, informations, callback) {
     (cb) => {
       const informationFile = path.join(userPath, name, 'information.json');
       const author = path.basename(userPath);
-      const toSave = informations;
+      const toSave = information;
       toSave.author = author;
       jsonfile.writeFile(informationFile, toSave, (err) => {
         if (err) cb(err);
-        else cb(null, informations);
+        else cb(null, information);
       });
     }],
   (err, results) => {
@@ -221,7 +221,7 @@ function saveInformations(name, informations, callback) {
 }
 
 
-function getInformations(nameRepo, nameLab, callback) {
+function getInformation(nameRepo, nameLab, callback) {
   async.waterfall([
     // Get config userpath
     (cb) => config.getConfig(cb),
@@ -240,6 +240,6 @@ exports.deleteLab = deleteLab;
 exports.saveLabels = saveLabels;
 // json file information {description , goal, solution }
 exports.renameLab = renameLab;
-exports.saveInformations = saveInformations;
-exports.getInformations = getInformations;
+exports.saveInformation = saveInformation;
+exports.getInformation = getInformation;
 exports.getLabs = getLabs;

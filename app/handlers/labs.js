@@ -103,11 +103,11 @@ function deleteLab(req, res) {
 }
 
 
-function getInformations(req, res) {
+function getInformation(req, res) {
   log.info('[IN GET INFORMATIONS]');
   async.waterfall([
     (cb) => Checker.checkParams(req.params, ['labname', 'repo'], cb),
-    (cb) => labsData.getInformations(req.params.repo, req.params.labname, cb),
+    (cb) => labsData.getInformation(req.params.repo, req.params.labname, cb),
   ],
   (err, results) => appUtils.response('GET INFORMATIONS', res, err, results));// End waterfall
 }
@@ -121,7 +121,7 @@ function wantToRename(req) {
 //    (up, cb) => {
 //      cb(null);
 //    },
-function saveInformations(req, res) {
+function saveInformation(req, res) {
   log.info('[IN SAVE INFORMATIONS]');
   let newName;
   let oldName;
@@ -151,9 +151,9 @@ function saveInformations(req, res) {
         goal: infos.goal || '',
         solution: infos.solution || '',
       };
-      log.info('Info received:');
-      log.info(JSON.stringify(i));
-      labsData.saveInformations(req.params.labname, i, cb);
+      // log.info('Info received:');
+      // log.info(JSON.stringify(i));
+      labsData.saveInformation(req.params.labname, i, cb);
     },
     // Rename?
     (is, cb) => {
@@ -341,8 +341,8 @@ function importLab(req, res) {
 exports.deleteLab = deleteLab;
 exports.getAll = getAll;
 exports.getLabs = getLabs;
-exports.getInformations = getInformations;
-exports.saveInformations = saveInformations;
+exports.getInformation = getInformation;
+exports.saveInformation = saveInformation;
 exports.newLab = newLab;
 exports.copyLab = copyLab;
 exports.importLab = importLab;

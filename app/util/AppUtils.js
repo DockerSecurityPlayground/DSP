@@ -204,7 +204,7 @@ module.exports = {
       log.error(`Error server: ${err.message}`);
     }
     else if (respo) {
-      log.info(`Success, server response: ${JSON.stringify(respo)}`);
+      // log.info(`Success, server response: ${JSON.stringify(respo)}`);
     } else log.info('Success');
 
     httpHelper.response(res, err, respo);
@@ -215,5 +215,6 @@ module.exports = {
     pathExists(filename).then((exists) => {
       callback(exists);
     });
-  } };
+  }
+};
 

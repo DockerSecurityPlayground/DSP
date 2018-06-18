@@ -79,8 +79,8 @@ const createLabels = function createLabels(labelname, arr, callback) {
       let labArr = jsonObj.labels;
       let alreadyError;
       let updateError;
-      log.info('labels received:');
-      log.info(arr);
+      // log.info('labels received:');
+      // log.info(arr);
       if (arr instanceof Array || arr.labels instanceof Array) {
         const arrToUpdate = (arr.labels instanceof Array) ? arr.labels : arr;
         arrToUpdate.forEach((data) => {

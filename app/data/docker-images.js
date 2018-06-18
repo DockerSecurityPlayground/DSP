@@ -4,9 +4,104 @@ const _ = require('underscore');
 const path = require('path');
 const jsonfile = require('jsonfile');
 const async = require('async');
-
+const Walker = require('walker');
+const homedir = require('homedir');
+const configData = require('./config.js');
 const pathIcons = 'assets/docker_image_icons/';
+const pathExists = require('path-exists');
 const jsonFile = 'images_to_build.json';
+const networkManager = require('./network.js')
+const AppUtils = require('../util/AppUtils');
+
+function getRepoImagePath(namerepo, callback) {
+  async.waterfall([
+    (cb) => configData.getConfig(cb),
+    (config, cb) => {
+      const ps = path.join(homedir(), config.mainDir, namerepo, '.docker-images')
+      pathExists(ps)
+        .then((exists) => {
+          if (exists) {
+            cb(null, ps);
+          }
+          else {
+            cb(new Error("image path file does not exists!"), null);
+          }
+        })
+    }
+  ],
+  (err, results) => {
+    if (err) { callback(err); } else callback(null, results);
+  });
+}
+
+function getRepoImages(namerepo, callback) {
+  async.waterfall([
+    (cb) => getRepoImagePath(namerepo,cb),
+    (imagePath, cb) => {
+      imageListFile = path.join(imagePath, 'image_list.json')
+      jsonfile.readFile(imageListFile, cb)
+    }
+  ],
+  (err, results) => {
+    if (err) { callback(err); } else callback(null, results);
+  });
+}
+
+function getRepoImageNames(namerepo, callback) {
+  arr = []
+  getRepoImages(namerepo, (err, res) => {
+    if (err) {
+      callback(err,null)
+    }
+    else {
+      _.each(res, (image) => {
+        arr.push(image.image_name)
+      })
+      callback(null, arr)
+    }
+  })
+}
+function containsRepoImage(namerepo, nameimage, callback) {
+  let imagePath = ""
+  async.waterfall([
+      (cb) => getRepoImagePath(namerepo, cb),
+      (ip, cb) => {
+        imagePath = ip
+        getRepoImages(namerepo, cb)
+      },
+      (images, cb) => {
+        imageName = _.where(images, {
+          image_name:nameimage
+          })
+        cb(null, imageName.length != 0)
+      }
+  ], (err, data) => { callback(err, data); })
+}
+
+function buildImage(namerepo, nameimage, callback, notifyCallback) {
+  let imagePath = ""
+  async.waterfall([
+      (cb) => getRepoImagePath(namerepo, cb),
+      (ip, cb) => {
+        imagePath = ip
+        getRepoImages(namerepo, cb)
+      },
+      (images, cb) => {
+        imageName = _.where(images, {
+          image_name:nameimage
+          })
+        if (imageName.length == 0) {
+          cb(new Error(`Image ${nameimage} does not exists`))
+        }
+        else {
+          image = imageName[0]
+          pathDockerfile = path.join(imagePath, image.image_path)
+          imageMgr.buildImage(pathDockerfile, image.image_name, cb, notifyCallback)
+        }
+      }
+  ], (err) => { callback(err); })
+}
+
 
 // buildImage : function buildImage(dockerPath, imageName, callback) {
 function buildImages(thepath, callback, notifyBuild) {
@@ -31,15 +126,179 @@ function buildImages(thepath, callback, notifyBuild) {
     }
   });
 }
+function getCurrentImages(labImages, images) {
+  retImages =  []
+  ims = images.map(i => i.name)
+  _.each(labImages, function(i) {
+      newI = {}
+      newI.name = i
+      newI.contains = _.contains(ims, i) ? true : false;
+      retImages.push(newI);
+})
+  return retImages
+}
 
+function getImagesLabNames(reponame, labname, callback) {
+  let listIms = []
+  let arrRet = []
+  networkManager.get(reponame, labname, (err, data) => {
+    if (err) {
+        callback(err)
+      } else {
+        // Get images
+        _.each(data.clistToDraw, (ele) => {
+          listIms.push(ele.selectedImage.name)
+        })
+        callback(null, listIms)
+      }
+    })
+}
 
-module.exports = {
-  buildImages,
-  // Change from data - err to err, data
-  // Set icon if labels doesn't contains a correct path
-  getListImages: function getListImages(callback) {
+function getImagesLab(reponame, labname, allImages, callback) {
+  let listIms = []
+  let arrRet = []
+  networkManager.get(reponame, labname, (err, data) => {
+    if (err) {
+        callback(err)
+      } else {
+        // Get images
+        _.each(data.clistToDraw, (ele) => {
+          listIms.push(ele.selectedImage.name)
+        })
+        arrRet = getCurrentImages(listIms, allImages)
+        callback(null, arrRet)
+      }
+    })
+  }
+function _isRepoPath(thePath) {
+  return (path.basename(thePath) !== ".data" &&
+          path.basename(thePath) !== ".docker-images" &&
+          path.basename(thePath) !== ".git"
+      );
+}
+function getImagesAllLabs(namerepo, callback) {
+  let images = [];
+  let lab_images = [];
+  let allImages = [];
+  async.waterfall([
+    (cb) => getListImages(cb),
+    (ims, cb) => {
+      allImages = ims;
+      configData.getConfig(cb)
+    },
+    (config, cb) => {
+      const ps = path.join(homedir(), config.mainDir, namerepo);
+      cb(null, ps);
+    },
+    (pathRepo, cb) => {
+      pathExists(pathRepo).then(ex => {
+        if (!ex) cb(new Error(`${pathRepo} does not exists`));
+        else {
+          cb(null, pathRepo);
+        }
+      });
+    },
+    // Get repo paths
+    (pathRepo, cb) => {
+      let labsPath = [];
+      Walker(pathRepo)
+        .filterDir((dir, stat) => {
+          // Only one subdir
+          const re = new RegExp(`${pathRepo}/?([^/]+/?){0,1}$`);
+          return (re.test(dir));
+        })
+        .on('dir', (dir, stat) => {
+          if (dir !== pathRepo && _isRepoPath(dir)) {
+            labsPath.push(dir);
+          }
+        })
+        .on('error', (err, entry, stat) => {
+          cb(err);
+        })
+        .on('end', () => {
+          cb(null, labsPath);
+        });
+    },
+    (labsPath, cb) => {
+      async.each(labsPath, (lb, c) => {
+        getImagesLab(namerepo, path.basename(lb), allImages, (err, data) => {
+          if (err) {
+            c(err);
+          } else {
+           let nameLab = path.basename(lb)
+           lab_images.push({
+               nameLab : nameLab,
+               images : data
+           })
+        images = _.union(images, data);
+           c(null);
+          }
+        });
+      }, cb);
+    }
+  ], (err) => {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, {
+            lab_images,
+            images
+        });
+      }
+    });
+  }
+function getImagesAllRepos(callback) {
+  let repoImages = {};
+  let repoPaths = [];
+
+  async.waterfall([
+    (cb) => configData.getConfig(cb),
+    (config, cb) => {
+      const ps = path.join(homedir(), config.mainDir);
+      cb(null, ps);
+    },
+    (mainDirPath, cb) => {
+      repoPaths = [];
+      Walker(mainDirPath)
+        .filterDir((dir, stat) => {
+          // Only one subdir
+          const re = new RegExp(`${mainDirPath}/?([^/]+/?){0,1}$`);
+          return (re.test(dir));
+        })
+        .on('dir', (dir, stat) => {
+          if (dir !== mainDirPath) {
+            AppUtils.isDSPDir(dir, (isDSP) => {
+              if(isDSP) {
+                repoPaths.push(dir);
+              }
+            })
+          }
+        })
+        .on('error', (err, entry, stat) => {
+          cb(err);
+        })
+        // Ok all paths
+        .on('end', () => {
+            async.each(repoPaths, (r, c) => {
+              let rb = path.basename(r);
+              getImagesAllLabs(rb, (err, images) => {
+                if(err) {
+                  c(err);
+                } else {
+                  repoImages[rb] = images;
+                  c(null);
+                }
+              })
+          }, (err) => {
+            cb(err, repoImages);
+          });
+        });
+      }], (err, repoImages) => callback(err, repoImages));
+}
+
+function getListImages(callback) {
     // log.info("in get list images data")
-    dockerImages.getDetailedList((err, data) => {
+    dockerImages.getDetailedList((err, data, completeDescription) => {
       if (err) {
         callback(err);
       } else {
@@ -99,4 +358,17 @@ module.exports = {
         callback(err, images);
       }
     });
-  } };
+}
+
+module.exports = {
+  buildImages,
+  getRepoImages,
+  getRepoImages,
+  getImagesLab,
+  getImagesLabNames,
+  getImagesAllLabs,
+  getImagesAllRepos,
+  // Change from data - err to err, data
+  // Set icon if labels doesn't contains a correct path
+  getListImages
+};

@@ -98,7 +98,9 @@ function get(req, res) {
 }
 
 
-function getListImages(req, res) { dockerImages.getListImages((err, data) => { httpHelper.response(res, err, data);
+function getListImages(req, res) {
+    completeDescription = req.query.completeDescription
+    dockerImages.getListImages((err, data, completeDescription) => { httpHelper.response(res, err, data);
   });
 }
 function dockercopy(req, res) {
@@ -109,7 +111,7 @@ function dockercopy(req, res) {
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['namelab', 'namerepo', 'dockername', 'pathContainer'], cb),
     (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
-    (networkInfo, cb) => { 
+    (networkInfo, cb) => {
     // Get config
       dockername = req.body.dockername;
       cld = networkInfo.clistToDraw;
@@ -156,7 +158,7 @@ function dockercopy(req, res) {
      if(wasDir) {
        rimraf(destinationPath, cb);
        destinationPath = `${destinationPath}.zip`;
-     } 
+     }
      else cb(null);
     }], (err) => {
       httpHelper.response(res, err, destinationPath);
@@ -167,7 +169,7 @@ function dockershell(req, res) {
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername'], cb),
     (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
-    (networkInfo, cb) => { 
+    (networkInfo, cb) => {
     // Get config
       dockername = req.body.dockername;
       cld = networkInfo.clistToDraw;
@@ -179,7 +181,7 @@ function dockershell(req, res) {
         configData.getConfig(cb);
       }
     },
-    // get path 
+    // get path
     (config, cb) => {
       mainDir = config.mainDir;
       const dockerInfos = {

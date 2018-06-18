@@ -123,11 +123,12 @@ const api = {
               // If no error  it's been pulled, update the state file
               else {
                 log.info('Building images');
-                GitUtils.buildImages(item.name, (buildErr) => {
-                  if (buildErr) c(buildErr);
-                  // Initialize the states of repository
-                  else LabStates.initStates(item.name, c);
-                });
+                LabStates.initStates(item.name, c);
+                // GitUtils.buildImages(item.name, (buildErr) => {
+                //   if (buildErr) c(buildErr);
+                //   // Initialize the states of repository
+                //   else LabStates.initStates(item.name, c);
+                // });
                 // End waterfall -> call parent callback
                 (someErrorInternal) => c(someErrorInternal);
               }
