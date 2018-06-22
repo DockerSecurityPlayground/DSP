@@ -29,6 +29,12 @@ file to read rules.
 ## Any Questions? 
 Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/issues)**  in order to ask everything you want!. 
 
+## Update the application: 
+When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
+```
+git pull
+npm update
+```
 
 ## Documentation   
 For documentation go to Wiki page 
