@@ -12,6 +12,12 @@ labs**. For more informations look at the [Labs Managment]() page.
 Go to [wiki] (http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)
 to learn all about the application.
 
+## Prerequisites
+* Nodejs (v 7 or later)
+* git
+* docker
+* docker-compose
+* 
  
 ## Contributing
 
