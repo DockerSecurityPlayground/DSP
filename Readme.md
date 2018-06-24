@@ -25,16 +25,11 @@ to learn all about the application.
  
 ## Contributing
 
-Fork the project, validate with eslint (modified airbnb rules, look at 
-[eslint.js](the http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/blob/master/.eslintrc.js)
-file to read rules. 
-  
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`  
-4. Check all code with `npm run eslint` command 
-5. Push to the branch: `git push origin my-new-feature`
-6. Submit a pull request, we'll check 
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request, we'll check 
 
 ## Any Questions? 
 Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/issues)**  in order to ask everything you want!. 
