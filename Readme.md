@@ -21,7 +21,7 @@ to learn all about the application.
 * git
 * docker
 * docker-compose
-* 
+* compiler tools (g++, c, c++)
  
 ## Contributing
 
