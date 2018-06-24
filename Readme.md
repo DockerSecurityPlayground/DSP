@@ -1,4 +1,8 @@
 # DockerSecurityPlayground
+![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/dsp_logo.png)
+
+
+
 Docker Security Playground is an application that allows you to: 
 - Create **network and network security scenarios**, in order to understand all the network protocols,  
 rules, and security issues with host networks. . 
