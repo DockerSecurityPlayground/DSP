@@ -8,9 +8,23 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   $scope.tinymceGoal = 'goal';
   $scope.responseErrorHeader= "ERROR: ";
   $scope.responseError = "";
-  const warningMessageHeader = 'WARNING: ';
-  const networkEmptyMessage =  'Network is empty! Have you drawed the containers?';
+  $scope.networkList = [];
 
+
+  const warningMessageHeader = 'WARNING: ';
+  const networkEmptyMessage =  'Network is empty! Have you drawn the containers?';
+
+  function initNetworkList() {
+    console.log("INIT NETWORK LIST");
+    dockerAPIService.getNetworkList($scope.nameRepo, $scope.labName)
+      .then(function successCallback(response) {
+        console.log("SUCCESS NETWORK");
+        console.log(response);
+        $scope.networkList = response.data.data;
+      }, function errorCallback(error) {
+        Notification({message:"Server error: "+error}, 'error');
+    });
+  }
   function openInNewTab(url) {
         var a = document.createElement("a");
         a.target = "_blank";
@@ -55,6 +69,7 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
       //Set state on stop
       $scope.labState = stopProto
       $scope.action = $scope.stopLab
+      initNetworkList();
       //End load action
       completeLoad()
     }
@@ -73,8 +88,9 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
 
   } //End startlab
 
-  $scope.copyFromContainer = function (nameContainer) {
+  $scope.copyFromContainer = function (nameContainer, dc="true") {
     console.log("OPENNN")
+    console.log(dc);
 var modalInstance = $uibModal.open({
         animation: true,
         component: 'copyFromContainerComponent',
@@ -83,7 +99,8 @@ var modalInstance = $uibModal.open({
           return  {
             namerepo : $scope.nameRepo,
             namelab : $scope.labName,
-            namecontainer: nameContainer
+            namecontainer: nameContainer,
+            dockercompose : dc
             };
           }
         }
@@ -96,16 +113,19 @@ var modalInstance = $uibModal.open({
                             });
   }
   // Container go to shell
-  $scope.goToContainer = function goToContainer(nameContainer)  {
+  $scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
     console.log(nameContainer)
-      var windowReference = window.open();
+    console.log(dc)
      $http.post('/dsp_v1/dockershell', {
         namerepo : $scope.nameRepo,
         namelab : $scope.labName,
-        dockername: nameContainer
+        dockername: nameContainer,
+        dockercompose : dc
      })
     .then(
             function success(response) {
+              console.log("SUCCESS");
+              var windowReference = window.open();
               windowReference.location = "docker_socket.html";
              // window.open('docker_socket.html', '_blank');
             },
@@ -131,10 +151,13 @@ var modalInstance = $uibModal.open({
         namerepo : $scope.nameRepo,
         namelab : $scope.labName
       }
-    }), function(event) {
+    }),
+    function(event) {
       var data = JSON.parse(event.data);
       if(data.status === 'success')  {
         console.log("Success")
+        console.log($scope.listServices);
+        dockerAPIService.detachAllServices();
         //Complete spinner
         completeLoad()
         //labState to play proto
@@ -177,7 +200,13 @@ var modalInstance = $uibModal.open({
 //   };
 //
   $scope.goToImages = function goToImages() {
-         window.location.href='/images'
+     if($scope.labState.state === 'loading') {
+       Notification('Pls wait the end of operation', 'warning');
+     }
+      // Only if it's been defined
+       else {
+         window.location.href='/images';
+      }
   }
   $scope.exitLab = function exitLab() { 
      if($scope.labState.state === 'loading') {
@@ -261,7 +290,13 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
         //  if(data.networkList)
         //  NetworkManagerService.setNetworkList(data.networkList)
         //$scope.networkList =  NetworkManagerService.getNetworks()
-        });
+
+        // Init Network List if the lab is running
+        if(data.state === 'RUNNING') {
+          initNetworkList();
+        }
+      });
+
     },function errorCallback(response) {})
 
     $scope.clearLogs = function() {

@@ -112,10 +112,10 @@ function checkAll(repoName, state, callback) {
 }
 // Returns true if some repo is in state
 function checkSome(repoName, state, callback) {
-  console.log('IN CHECKSOME');
-  console.log(repoName);
-  console.log(state);
-  console.log(callback);
+  // console.log('IN CHECKSOME');
+  // console.log(repoName);
+  // console.log(state);
+  // console.log(callback);
   let someInState = false;
   const labsWrong = [];
   async.waterfall([

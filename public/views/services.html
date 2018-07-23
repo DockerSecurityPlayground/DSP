@@ -1,0 +1,323 @@
+<div ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
+  <h3 class="text-center" > <a href="#" ng-click="showServices = !showServices"> Hack Tools </a> </h3>
+  <div ng-show="showServices">
+  <hr>	
+  <!-- Table sevices -->
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name </th>
+      <th scope="col">Image </th>
+      <th scope="col">Ports (container port => host port) </th>
+      <th scope="col">Status</th>
+      <th scope="col">Networks (click on name to change default network routing) </th>
+      <th scope="col">Command</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+    <tbody>
+  <tr  ng-repeat="(key,c) in listServices"	>
+  <td> {{c.name}} </td>
+  <td> {{c.image}} </td>
+  <td>
+
+    <div ng-repeat="p in c.ports">
+        <div> {{p}} </div></br>
+    </div>
+
+  </td>
+  <td> <div ng-bind-html=c.state></div> </td>
+  <td> 
+    <form>
+      <div ng-repeat="n in networkList">
+            <label class="radio-inline">
+              <input type="radio" ng-disabled="!containerHasNetwork(c,n)" ng-click="setAsDefault(c, n.name)" id="{{n.name}}"> <i>{{n.name}}</i>
+            </label>
+            <!-- <i ng-if="n.isDefault"> {{n.name}} </i> -->
+
+        <button type="button" class="btn btn-sm btn-primary" ng-if="!containerHasNetwork(c,n)" ng-click="attachNetwork(c,n)">   Attach</button>
+        <button type="button" class="btn btn-sm btn-warning" ng-if="containerHasNetwork(c,n)" ng-click="detachNetwork(c,n)">   Detach</button>
+      </div>
+    </form>
+  </td>
+  <td> 
+    <i> {{c.command}} </i>
+  </td>
+  <td> 
+    <button class="btn btn-success" ng-if="c.showRun" ng-click="startService(c.name)"> Start </button>
+    <button class="btn btn-danger" ng-if="c.showRun" ng-click="deleteService(c.name)"> Delete </button>
+    <div ng-if="!c.showRun">
+    <div class="row">
+      <div class="col-sm-3">
+        <button 
+          class="btn btn-default glyphicon glyphicon-share"
+          ng-click="goToContainer(c.name, 'false')"
+          > 
+      </div>
+
+      <div class="col-sm-3">
+        <button 
+          class="btn btn-default glyphicon glyphicon-download"
+          ng-click="copyFromContainer(c.name, 'false')"
+          > 
+      </div>
+      <div class="col-sm-3">
+        <button 
+          class="btn btn-danger"
+          ng-click="stopService(c.name)"
+          > 
+          Stop
+        </button>
+      </div>
+    </div>
+  
+  </td>
+  <!-- <a href="#" ng-click="onClickEditContainer(key)" style="margin-left:20px" class="fa fa-pencil"> </a> -->
+  <!-- <a href="#" ng-click="deleteContainer(key)" style="margin-left:20px" class="fa fa-remove"> </a> -->
+  <!-- <a href="#" ng-click="copyContainer(key)" style="margin-left:20px" class="fa fa-files-o"> </a> -->
+    </tr>
+    </tbody>
+  </table> <!-- END TABLE -->
+
+<!-- <uib-tabset active="active"> -->    
+<!--       <uib-tab index="0" heading="Re"> -->
+  <div> <!-- Start add container -->
+  <h3 class="text-center">{{currentAction}} </h3>
+  <hr>
+
+  <ng-form name="form_add_container" id="form_add_container" class="form-horizontal" novalidate>
+          <div class="form-group"> 
+      <!-- NAME CONTAINER -->
+          <label class="control-label col-sm-2" for="container_name">Name: </label>
+          
+            <div class="col-sm-9">
+            <input type="text" class="form-control"  
+          name="container_name" 
+          id="container_name" 
+          placeholder="Name"
+          ng-pattern="nameContainerRegex"
+          ng-model="currentContainer.name" 
+          ng-change="checkContainerChange()"
+          ng-required="true"
+          ng-class="{
+            'invalid-syntax':form_add_container.container_name.$invalid
+            }" 	
+        >	
+            </div>
+
+            
+          </div>
+      <div class="text text-danger" style="margin-left:45px"
+        ng-style="{ 'visibility' : (containerErrors.someError)? 'visible': 'hidden'}" 
+        > 
+        {{containerErrors.message}}	
+      </div>
+      
+          <div class="form-group"> 
+          <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
+            <div class="col-sm-5"> 
+            <select 
+          ng-model="currentContainer.selectedImage" 
+          ng-change="changedImage(currentContainer.selectedImage)" 
+          ng-required=true
+          ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
+            </select>
+            </div>
+        <div class="col-sm-4"> 
+            <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
+            </input>
+            </div>
+          </div>
+          <div class="row form-group">
+            <label class="control-label col-sm-2" for="container_flags">Options: </label>
+           <div class="form-check col-sm-1">
+            <input class="form-check-input" type="checkbox" id="interactive" ng-model="currentContainer.isInteractive">
+            <label class="form-check-label" for="inlineCheckbox1">Interactive</label>
+          </div>
+          <div class="form-check col-sm-1">
+            <input class="form-check-input" type="checkbox" id="daemonize" ng-model="currentContainer.isDaemonized">
+            <label class="form-check-label" for="inlineCheckbox2">Daemonize</label>
+          </div>
+          </div>
+          <div class="row">
+            <label class="control-label col-sm-2" for="container_command">Command: </label>
+            <div class="col-sm-9" >
+            <input type="text" class="form-control"  
+          name="container_command" 
+          id="container_command" 
+          placeholder="Name"
+          ng-model="currentContainer.command" 
+        >	
+                
+            </div>
+          </div>
+            <!-- END FORM NETWORKS -->
+                <!-- START COPY SHELL -->
+                  
+
+
+      <!--- PORT INPUT SELECT -->
+   <div class="text-center" style="margin-right:40px"> 
+                  <table class="table table-reduced-width col-sm-offset-1">
+                    <thead>
+                      <tr>
+                        <th class="text-center"> Container Port => Host Port  </th>
+                        <th class="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="op in optionalPorts"> 
+                        <td> {{op.container}} => {{op.host}} </td>
+                        <td> <button class="btn btn-danger" ng-click="removeOptionalPort($index)"> - </button></td>
+                      </tr>
+                    </tbody>
+
+                  </table>
+        </div>
+                  
+          <div class="optionalPorts form-group"> 
+            <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="optional_ports"> Ports</label>
+            <form name="optionalPortForm">
+              <div class="col-sm-2">
+                <input type="number"   
+                          class="form-control" 
+                          min=1
+                          max=65535
+                          ng-model="optPort.container"
+                          name="containerOptPort"
+                          ng-class="{
+                                  'invalid-syntax':optionalPortForm.containerOptPort.$invalid
+                                  }" 	
+                > </input>
+              </div>
+              <div class="col-sm-2">
+                <input type="number"   
+                          class="form-control" 
+                          min=1
+                          max=65535
+                          ng-model="optPort.host"
+                          name="hostOptPort"
+                          ng-class="{
+                                  'invalid-syntax':optionalPortForm.hostOptPort.$invalid
+                                  }" 	
+                > </input>
+              </div>
+              <div class="col-sm-2">
+                <button 
+                  class="btn btn-success" 
+                  ng-disabled=optionalPortForm.$invalid
+                  ng-click="addOptionalPort()"
+                > 
+                  + 
+                </button> 
+              </div>
+            </form>
+
+
+          </div>
+      <!-- ENVIRONMENTS -->
+
+
+          <div class="row">
+            <label class="control-label col-sm-2" >Environments: </div>
+          </div>
+            <br/>
+    
+    <!-- Start Env -->
+      <div class="row" ng-repeat="env in currentContainer.environments">
+          <div class="col-sm-2 col-sm-offset-2">
+          {{env.name}} 
+          </div>
+          <div class="col-sm-2"> 
+            {{env.value}}
+          </div>
+            <button type="button" class="btn btn-sm btn-danger" ng-click="deleteEnvironment(env.name)">   Del </button>
+      </div>
+
+      <div class="row">
+            <div class="col-sm-2 col-sm-offset-2">
+              <input class="form-control" type="text" ng-model="currentEnvironment.name"> </input>
+            </div>
+
+            <div class="col-sm-2">
+              <input class="form-control" type="text" ng-model="currentEnvironment.value"> </input>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" ng-click="addEnvironment()">   Add </button>
+    </div>
+
+
+
+        <br>
+      <!-- END ENV -->
+  
+  
+  
+      <!--</div> -->
+
+
+      <!-- END ACTIONS -->
+          <!-- Volumes -->
+    <!--
+    <div class="form-group"> 
+      <label class="control-label col-sm-offset-1" for="container_name">Volumes: </label>
+        </div>
+          <div ng-if="currentContainer.volumes.length > 0" >
+            <div ng-repeat="volume in currentContainer.volumes" class="row" style="margin-bottom:10px">
+              <div class="col-sm-offset-2 col-sm-8">{{volume}}</div>
+              <div class="col-sm-2"> <button ng-click="removeVolume($index)" class="btn btn-danger"> x </button> </div>
+            </div>
+          </div>
+
+
+
+  <div class="row">
+    <div class="col-sm-3 col-sm-offset-2 text-center"> 
+      <label class="control-label " for="container_name">Host Path</label>	 
+    </div>
+    <div class="col-sm-3 text-center"> 
+      <label class="control-label " for="container_name">Container Path</label>	 	 
+    </div>
+  </div>
+  <br>
+
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-3"> 
+      <input type="text" class="form-control" ng-model="volumeHost"> </input> 
+    </div><div class="col-sm-3"> 
+      <input type="text" class="form-control" ng-model="volumeContainer"> </input> 
+    </div>
+  </div>
+  <div class="row">
+        <div class="col-sm-offset-10 col-sm-1"> <button ng-click="addVolume(volumeHost, volumeContainer)" class="btn btn-success"> + </button> </div>
+      </div>
+    -->
+  <br>			
+
+      <div class="form-group" > 
+         <div class="col-sm-offset-2 col-sm-10">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
+              <button type="submit" class="btn btn-success" ng-click="runService()">Run</button>
+            </div>
+      </div>
+        <!-- more validation in controller -->
+        <input type="text" 
+        ng-model="containerErrors.more_validation" 
+        style="visibility:hidden" 
+        name="containerErrors.more_validation" 
+        ng-required="true" 
+        value="###"> 
+          </form>
+        
+    </div> <!-- END DIV CONTAINER ADD -->
+<!-- </uib-tab> -->
+<!--   <uib-tab index="1" heading="Static title">Static content -->
+<!--   </uib-tab> -->
+<!-- </uib-tabset> -->
+    <!-- <uib-tab index="1" heading="D title"> -->
+    <!--   RET -->
+    <!-- </uib-tab> -->
+
+<!-- </uib-tabset> -->
+  </div>
+  </div> <!-- END  SHOW SERVICES-->
+</div> <!-- END CONTROLLER -->

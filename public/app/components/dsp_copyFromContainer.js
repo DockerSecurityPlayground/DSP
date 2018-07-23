@@ -1,4 +1,4 @@
-var dsp_copyFromContainer = 
+var dsp_copyFromContainer =
 {
     templateUrl: 'views/copyFromContainer.html',
     bindings: {
@@ -25,18 +25,19 @@ var dsp_copyFromContainer =
 
       $ctrl.getFile = function() {
         console.log("GET FILE")
-         window.open($ctrl.fileDownload, '_blank'); 
+         window.open($ctrl.fileDownload, '_blank');
       }
       $ctrl.download = function() {
-          var body = { 
+          var body = {
            namelab: $ctrl.lab.namelab,
            namerepo: $ctrl.lab.namerepo,
            dockername: $ctrl.lab.namecontainer,
-           pathContainer: $ctrl.pathSelected
+           pathContainer: $ctrl.pathSelected,
+           dockercompose : $ctrl.lab.dockercompose
          }
           console.log(body)
          $http.post('/dsp_v1/dockercopy', body)
-      .then( 
+      .then(
             function success(response) {
               var ret= response.data.data;
               ret = ret.substring("public/".length, ret.length)
@@ -50,5 +51,5 @@ var dsp_copyFromContainer =
             });
 
       }
-    }	
+    }
 }

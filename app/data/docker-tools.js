@@ -4,6 +4,19 @@ const appUtils = require('../util/AppUtils.js');
 const log = appUtils.getLogger();
 const service_prefix="dsp_hacktool"
 const allowedNetworks = ['external', 'public', 'default'];
+const routerIDs = ['router', 'firewall'];
+const async = require('async');
+
+function parsePorts(ports) {
+  const retPorts = []
+  _.each(ports, (p) => {
+    if(p.IP && p.PrivatePort && p.PublicPort) {
+      let portToAdd = `${p.IP}:${p.PrivatePort} => ${p.PublicPort}`;
+      retPorts.push(portToAdd);
+    }
+  });
+  return retPorts
+}
 
 function getServices(callback) {
   const arrRet = []
@@ -13,24 +26,34 @@ function getServices(callback) {
     } else {
       containersObj = JSON.parse(containersJSON);
       _.each(containersObj, (c) => {
+        if (c.Names[0].slice(1).startsWith(service_prefix)) {
         let objToInsert = {}
+        let networkArr = [];
         objToInsert.name = c.Names[0].slice(1);
         objToInsert.id = c.Id;
-        arrRet.push(objToInsert)
+        objToInsert.image = c.Image;
+        objToInsert.command = c.Command;
+        objToInsert.ports = parsePorts(c.Ports);
+        objToInsert.state = c.State;
+        let networks = c.NetworkSettings.Networks;
+        _.each(Object.keys(networks), (k) => {
+            networks[k].name = k;
+            networkArr.push(networks[k]);
+          });
+        objToInsert.networks = networkArr;
+        arrRet.push(objToInsert);
+        }
       });
       callback(null, arrRet);
     }
-  }, true)
-}
-function startService(name, callback) {
-  const nameService = `${service_prefix}_${name}`
-  dockerJS.start(nameService, callback)
+  }, true);
 }
 
-function stopService(name, callback) {
-  const nameService = `${service_prefix}_${name}`
-  dockerJS.stop(nameService, callback)
+
+function isService(name) {
+  return  name.startsWith(service_prefix);
 }
+
 
 function runService(image, name,options, callback) {
   const nameService = `${service_prefix}_${name}`
@@ -38,13 +61,59 @@ function runService(image, name,options, callback) {
   dockerJS.run(image,callback, _.extend({}, {name: nameService},  options))
 }
 
-function attachServiceToNetwork(nameContainer, networkName, callback) {
-  const nameService = `${service_prefix}_${nameContainer}`
-  dockerJS.connectToNetwork(nameContainer, networkName, callback);
+function startService(nameService, callback) {
+  if (!isService(nameService)) {
+    nameService = `${service_prefix}_${nameService}`;
+  }
+  dockerJS.start(nameService, callback)
 }
-function detachServiceToNetwork(nameContainer, networkName, callback) {
-  const nameService = `${service_prefix}_${nameContainer}`
-  dockerJS.disconnectFromNetwork(nameContainer, networkName, callback);
+
+function stopService(nameService, callback) {
+  if (!isService(nameService)) {
+    nameService = `${service_prefix}_${nameService}`;
+  }
+  dockerJS.stop(nameService, callback)
+}
+function removeService(nameService, callback) {
+  if (!isService(nameService)) {
+    nameService = `${service_prefix}_${nameService}`;
+  }
+  dockerJS.rm(nameService, callback);
+}
+
+function isDefaultNetwork(networkName) {
+  return networkName.endsWith("default");
+}
+
+function _attachUserNetwork(nameService, networkName, callback) {
+  async.waterfall([
+    // Find a free address
+    (cb) => getFreeAddress(networkName, cb),
+    // Connect container to free address
+    (ip, cb) => dockerJS.connectToNetwork(nameService, networkName, cb, ip)
+  ], callback);
+  // dockerJS.connectToNetwork(nameContainer, networkName, ip, callback);
+}
+
+function attachServiceToNetwork(nameService, networkName, callback) {
+  log.info("Attach service to network");
+  if (!isService(nameService)) {
+    nameService = `${service_prefix}_${nameService}`
+  }
+  if (isDefaultNetwork(networkName)) {
+    log.info("Attach to Default Network");
+    dockerJS.connectToNetwork(nameService, networkName, callback);
+  } else {
+    log.info("Attach to User Network");
+    _attachUserNetwork(nameService, networkName, callback);
+  }
+}
+
+function detachServiceToNetwork(nameService, networkName, callback) {
+  if (!isService(nameService)) {
+    nameService = `${service_prefix}_${nameService}`
+  }
+  dockerJS.disconnectFromNetwork(nameService, networkName, callback);
 }
 
 function getInfoContainer(nameContainer, callback) {
@@ -64,8 +133,10 @@ function isAllowedNetwork(nameLab, networkName) {
 function __getLabNetwork(nameLab, networks) {
   const networksLab = [];
   _.each(networks, (n) => {
-    if (n.Name.startsWith(nameLab)) {
-      if(isAllowedNetwork(nameLab, n.Name)) {
+    const networkName = n.Name.toLowerCase();
+    const ln = nameLab.toLowerCase();
+    if (networkName.startsWith(ln)) {
+      if(isAllowedNetwork(ln, networkName)) {
       networksLab.push({
         name: n.Name,
         id: n.Id,
@@ -104,7 +175,6 @@ function _generateSubnet(ipvaddress) {
 }
 
 function _getFreeAddress(containers) {
-  log.info("Search a free address");
   const busyAddresses = [];
   let retAddress = '';
   let allAddresses = [];
@@ -128,6 +198,7 @@ function _getFreeAddress(containers) {
 }
 
 function getFreeAddress(networkName, callback) {
+  log.info("Get a free address");
   dockerJS.getNetwork(networkName, (err, data) => {
     if (err) {
       callback(err);
@@ -141,27 +212,99 @@ function getFreeAddress(networkName, callback) {
 
 function getNetworksLab(nameLab, callback) {
   let networksLab = [];
-  dockerJS.networkList((err, data) => {
-    if (err) {
-      callback(err);
-    } else {
-      obj = JSON.parse(data)
+  let retNetworks = [];
+  async.waterfall([
+    (cb) => dockerJS.networkList(cb),
+    (data, cb) => {
+      const obj = JSON.parse(data)
       networksLab = __getLabNetwork(nameLab, obj);
-      _.each(networksLab, (n) => {
-      })
-    }
-  });
+      async.each(networksLab, (n, c) => {
+        dockerJS.getNetwork(n.name, (err, theNetwork) => {
+          if (err) {
+            c(err);
+          } else {
+            const N = n;
+            N.containers = JSON.parse(theNetwork).Containers;
+            // N.isDefault = isDefaultNetwork(n.name);
+            retNetworks.push(N);
+            c(null);
+          }
+        });
+      }, (err) => cb(err, retNetworks));
+    }], (err, networks) => {
+      callback(err, networks);
+    });
 }
 
+  function findRouterIp(nameNetwork, callback) {
+    let routerName = '';
+    async.waterfall([
+    (cb) => dockerJS.getNetwork(nameNetwork, cb),
+    // Find the router in the network containers
+    (data, cb) => {
+      const theNetwork = JSON.parse(data)
+      let theIp;
+      log.info("NETWORK");
+      if (isDefaultNetwork(nameNetwork)) {
+        log.info("DEFAULT NETWORK");
+        theIp = theNetwork.IPAM.Config[0].Gateway;
+        cb(null, theIp);
+      } else if (!theNetwork.Containers) {
+        cb(new Error(`No Containers in ${theNetwork}`));
+      } else {
+        const containers = theNetwork.Containers;
+        _.each(containers, (c) => {
+          let containerName = c.Name;
+          _.each(routerIDs, (rid) => {
+            if (containerName.indexOf(rid) !== -1) {
+              log.info(`${containerName} is network router! `);
+              routerName = containerName;
+              theIp = c.IPv4Address.split("/")[0];
+            }
+          });
+        });
+        if (routerName === '') {
+          cb(new Error(`${nameNetwork} does not contain routers`));
+        } else {
+          cb(null, theIp);
+        }
+      }
+    },
+    // Set default router
+    (theIp, cb) => {
+        cb(null, theIp);
+      }], (err, theIp) => {
+      callback(err, theIp);
+    });
+}
 
+function setDefaultGW(nameService, ipRouter, callback) {
+  async.waterfall([
+    (cb) => {
+    log.info(`Execute ip route replace default via ${ipRouter}`);
+    dockerJS.exec(nameService, `ip route replace default via ${ipRouter}`, cb)
+    }],(err) => callback(err));
+}
+    // if (err) {
+    //   callback(err);
+    // } else {
+    //   obj = JSON.parse(data)
+    //   networksLab = __getLabNetwork(nameLab, obj);
+    //   callback(null, networksLab);
+    // }
+  // });
 
 module.exports = {
   getServices,
+  isService,
   startService,
   stopService,
+  removeService,
   detachServiceToNetwork,
   attachServiceToNetwork,
   getFreeAddress,
   getNetworksLab,
-  runService
+  findRouterIp,
+  runService,
+  setDefaultGW
 }

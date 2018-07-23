@@ -15,18 +15,34 @@ const zipdir = require('zip-dir');
 const rimraf = require('rimraf');
 //const zipFolder = require('zip-folder');
 const fs = require('fs');
-
 const Checker = require('../util/AppChecker');
 
 const dockerConverter = require(`${appRoot}/app/data/docker-converter.js`);
 const dockerComposer = require('mydockerjs').dockerComposer;
-const dockerJS = require('mydockerjs').docker;
 const _ = require('underscore');
-
+const dockerServices = require('../data/docker-tools.js');
 const log = AppUtils.getLogger();
 // const appUtils = require('../util/AppUtils.js');
 
 // const log = appUtils.getLogger();
+function _parseOptions(service) {
+  let options = {};
+  options.interactive = service.isInteractive;
+  options.detached = service.isDaemonized;
+  if (service.command) {
+  options.cmd = service.command;
+  }
+  // Add capability
+  options.cap_add = "NET_ADMIN";
+  if (service.ports) {
+    options.ports = service.ports;
+  }
+  if (service.environments) {
+    options.environments = service.environments;
+  }
+  console.log(service);
+  return options;
+}
 
 function save(req, res) {
   async.waterfall([
@@ -70,33 +86,89 @@ function save(req, res) {
 }
 
 // Get network description
-function get(req, res) {
-  async.waterfall([
-    (cb) => Checker.checkParams(req.params, ['namelab', 'namerepo'], cb),
-    // get current state
-    (cb) => {
-      LabStates.getState(req.params.namerepo, req.params.namelab, cb);
-    },
-    // Save state in response for user browser
-    (status, cb) => {
-      if (req.query && req.query.exists && req.query.exists === '1') { networkData.networkExists(req.params.namerepo, req.params.namelab, cb); } else {
-        networkData.get(req.params.namerepo, req.params.namelab, (ndErr, ndResponse) => {
-          if (ndErr) cb(ndErr);
-          else {
-            ndResponse.state = status;
-            cb(ndErr, ndResponse);
-          }
-        });
-      }
-    },
-    (response, cb) => {
-      if (req.query.isEditing == '0' && response.isComposeVisible == false) {
-        response.yamlfile = "";
-      }
-      cb(null, response);
-    }
-  ], (err, response) => AppUtils.response('NETWORK GET', res, err, response));
+function getServices(req, res) {
+  log.info("[DOCKER TOOLS] Get Services")
+  dockerServices.getServices((err, data) => {
+    AppUtils.response('GET SERVICES', res, err, data, true)
+  });
 }
+function getNetworkList(req, res) {
+  log.info("[DOCKER TOOLS] Get Network List")
+  async.waterfall([
+  (cb) => Checker.checkParams(req.params, ['namelab'], cb),
+  (cb) => dockerServices.getNetworksLab(req.params.namelab, cb)
+  ], (err, data) => {
+    AppUtils.response("NETWORK LIST", res, err, data, true);
+  });
+}
+
+  function runService(req, res) {
+  let containerName;
+  let imageName;
+  let options;
+  log.info("[DOCKER TOOLS] Run Service Request");
+  async.waterfall([
+    // Check values
+    (cb) => Checker.checkParams(req.params, ['nameservice'], cb),
+    (cb) => Checker.checkParams(req.body, ['name', 'selectedImage', 'isInteractive', 'isDaemonized'], cb),
+    (cb) => {
+      containerName = req.body.name;
+      imageName = req.body.selectedImage.name;
+      options = _parseOptions(req.body);
+      dockerServices.runService(imageName, containerName, options, cb)
+    }], (err, data) => {
+  AppUtils.response('Run Service Request', res, err, data, true)
+  });
+}
+
+function startService(req, res) {
+  log.info("[DOCKER TOOLS] Start Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['nameservice'], cb),
+    (cb) => {
+      dockerServices.startService(req.params.nameservice, cb)
+    }], (err) => {
+      AppUtils.response('Start Service Request', res, err, null, true);
+    });
+}
+
+function stopService(req, res) {
+  log.info("[DOCKER TOOLS] Stop Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['nameservice'], cb),
+    (cb) => {
+      dockerServices.stopService(req.params.nameservice, cb)
+    }], (err) => {
+      AppUtils.response('Stop Service Request', res, err, null, true);
+    });
+}
+
+function removeService(req, res) {
+  log.info("[DOCKER TOOLS] Remove Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['nameservice'], cb),
+    (cb) => {
+      dockerServices.removeService(req.params.nameservice, cb)
+    }], (err) => {
+      AppUtils.response('Stop Service Request', res, err, null, true);
+    });
+}
+
+// function get(req, res) {
+//   let config;
+//   let mainDIr;
+//   async.waterfall([
+//     (cb) => Checker.checkParams(req.params, ['namelab', 'namerepo'], cb),
+//     (cb) => configData.getConfig(cb),
+//     (theConfig, cb) => {
+//       config = theConfig;
+//       mainDir = config.mainDir;
+//       thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
+
+
+//     }
+//   ], (err, response) => AppUtils.response('SERVICES GET', res, err, response));
+// }
 
 
 function getListImages(req, res) {
@@ -104,39 +176,22 @@ function getListImages(req, res) {
     dockerImages.getListImages((err, data, completeDescription) => { httpHelper.response(res, err, data);
   });
 }
-
-
-
-
-
 function dockercopy(req, res) {
-  // console.log("SONO IN DOCKER COPY")
   // console.log(req.body)
   let destinationPath;
   let destinationDir;
-  const dc = req.body.dockercompose;
   async.waterfall([
-    (cb) => Checker.checkParams(req.body, ['namelab', 'namerepo', 'dockername', 'pathContainer', 'dockercompose'], cb),
+    (cb) => Checker.checkParams(req.body, ['namelab', 'namerepo', 'dockername', 'pathContainer'], cb),
     (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
     (networkInfo, cb) => {
     // Get config
       dockername = req.body.dockername;
       cld = networkInfo.clistToDraw;
       containerToCopy = _.findWhere(cld, {name: dockername});
-      // Docker Compose Action: check isShellEnabled
-      if (dc === "true") {
-        log.info("[DOCKER COPY COMPOSE]")
-        if(!containerToCopy)  {
-          cb(new Error(`Cannot find ${dockername} in network`));
-        } else if(!containerToCopy.isShellEnabled) {
-          cb(new Error("Copy not allowed"));
-        } else {
-          configData.getConfig(cb);
-        }
+      if (!containerToCopy.isShellEnabled) {
+        cb(new Error("Copy not allowed"));
       }
-      // Docker Copy
       else {
-        log.info("[DOCKER COPY CONTAINER]")
         configData.getConfig(cb);
       }
     },
@@ -158,13 +213,8 @@ function dockercopy(req, res) {
       destinationPath = path.join(destinationDir, path.basename(dockerInfos.pathContainer));
       // Fix for space directories
       destinationPath = `"${destinationPath}"`
-      if (dc === "true") {
       dockerComposer.cpFrom(pathLab, dockerInfos.dockerName, dockerInfos.pathContainer, destinationPath, cb);
-      } else {
-      log.info(`Execute docker cp ${dockerInfos.dockerName} ${dockerInfos.pathContainer} ${destinationPath}`);
-      dockerJS.cpFrom(dockerInfos.dockerName, dockerInfos.pathContainer, destinationPath, cb);
-      }
-      // Readjust destinationPath name TODO Check this
+      // Readjust destinationPath name
       destinationPath = destinationPath.substring(1, destinationPath.length -1)
     },
     (data,cb) => {
@@ -184,13 +234,12 @@ function dockercopy(req, res) {
      else cb(null);
     }], (err) => {
       httpHelper.response(res, err, destinationPath);
-  });
+    });
 }
 
-function dockershellcompose(req, res) {
-  log.info("[IN DOCKER SHELL COMPOSE ]");
+function dockershell(req, res) {
   async.waterfall([
-    (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername', 'dockercompose'], cb),
+    (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername'], cb),
     (cb) => networkData.get(req.body.namerepo, req.body.namelab, cb),
     (networkInfo, cb) => {
     // Get config
@@ -211,8 +260,7 @@ function dockershellcompose(req, res) {
       mainPath : path.join(homedir(), mainDir),
       nameRepo : req.body.namerepo,
       labName : req.body.namelab,
-      dockerName : req.body.dockername,
-      dockercompose : req.body.dockercompose
+      dockerName : req.body.dockername
       }
       cb(null, dockerInfos);
     },
@@ -223,42 +271,6 @@ function dockershellcompose(req, res) {
       httpHelper.response(res, err);
     });
 }
-function dockershellcontainer(req, res) {
-  log.info("[IN DOCKER SHELL CONTAINER]");
-  async.waterfall([
-    (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername', 'dockercompose'], cb),
-    (cb) => configData.getConfig(cb),
-    (config, cb) => {
-      const dockerInfos = {
-      mainPath: config.mainDir,
-      nameRepo : req.body.namerepo,
-      labName : req.body.namelab,
-      dockerName : req.body.dockername,
-      dockercompose : req.body.dockercompose
-      }
-      cb(null, dockerInfos);
-    },
-    (dockerInfos, cb) => {
-      dockerSocket.setDockerShell(dockerInfos);
-      cb(null);
-    }], (err) => {
-      httpHelper.response(res, err);
-    });
-}
-
-function dockershell(req, res) {
-  log.info("[IN DOCKER SHELL]")
-  Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername', 'dockercompose'], (err, data) => {
-    if (err) {
-      httpHelper.response(res, err);
-    } else if(req.body.dockercompose === "true") {
-        dockershellcompose(req, res);
-    } else {
-        dockershellcontainer(req, res);
-    }
-  });
-}
-
 function dirExists(req, res) {
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['filename'], cb),
@@ -272,10 +284,60 @@ function dirExists(req, res) {
     httpHelper.response(res, null, exists);
   });
 }
+function attachNetwork(req, res) {
+  log.info("ATTACH NETWORK");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.body, ['networkname', 'servicename'], cb),
+    (cb) => dockerServices.attachServiceToNetwork(req.body.servicename, req.body.networkname, cb)],
+    (err, data) => {
+      AppUtils.response('ATTACH NETWORK', res, err);
+    });
+}
 
-exports.save = save;
-exports.get = get;
-exports.getListImages = getListImages;
-exports.dirExists = dirExists;
-exports.dockershell = dockershell;
-exports.dockercopy = dockercopy;
+function detachNetwork(req, res) {
+  log.info("DETaCH NETWORK");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.query, ['networkname', 'servicename'], cb),
+    (cb) => dockerServices.detachServiceToNetwork(req.query.servicename, req.query.networkname, cb)],
+    (err, data) => {
+      AppUtils.response('DETACH NETWORK', res, err);
+    });
+}
+
+function setAsDefault(req, res) {
+  log.info("Set Default Network");
+  let networkName;
+  let nameService;
+  async.waterfall([
+    (cb) => Checker.checkParams(req.body, ['networkname'], cb),
+    (cb) => Checker.checkParams(req.params, ['nameservice'], cb),
+    (cb) => {
+      networkName  = req.body.networkname;
+      nameService = req.params.nameservice;
+      dockerServices.findRouterIp(req.body.networkname, cb);
+    },
+    (routerIP, cb) => {
+      log.info(`Router IP: ${routerIP}`);
+      dockerServices.setDefaultGW(nameService, routerIP, cb);
+    }],
+    (err, data) => {
+      AppUtils.response('SET DEFAULT NETWORK', res, err);
+    });
+
+}
+
+
+// exports.save = save;
+exports.getServices = getServices;
+exports.runService = runService;
+exports.startService = startService;
+exports.stopService = stopService;
+exports.removeService = removeService;
+exports.getNetworkList = getNetworkList;
+exports.attachNetwork = attachNetwork;
+exports.detachNetwork = detachNetwork;
+exports.setAsDefault = setAsDefault;
+// exports.getListImages = getListImages;
+// exports.dirExists = dirExists;
+// exports.dockershell = dockershell;
+// exports.dockercopy = dockercopy;

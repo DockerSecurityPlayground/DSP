@@ -75,14 +75,25 @@ function getInfoContainer() {
     }
   })
 }
+function getPS() {
+
+  ex.getServices((err, data) => {
+    if (err) {
+      callback(err);
+    } else {
+      console.log("SUCCESS");
+      console.log(data);
+    }
+  })
+}
 
 function getNetworkLab() {
-  ex.getNetworkLab("bruteforceme", (err, data) => {
+  ex.getNetworksLab("bruteforceme", (err, data) => {
     if (err) {
       console.log("ERROR");
       console.log(err);
     } else {
-      // console.log(data);
+      console.log(data);
     }
   });
 }
@@ -98,8 +109,10 @@ function getFreeAddress() {
     }
   });
 }
+
+// getPS();
 // disconnect()
 // createAttach()
 // run()
-// getNetworkLab();
-getFreeAddress();
+getNetworkLab();
+// getFreeAddress();

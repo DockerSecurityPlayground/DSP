@@ -11,6 +11,7 @@ const labs = require('./app/handlers/labs');
 const configHandler = require('./app/handlers/config');
 const networkHandler = require('./app/handlers/network');
 const dockerImages = require('./app/handlers/docker-images');
+const serviceHandler = require('./app/handlers/services')
 // const installationHandler = require('./app/handlers/installation.js');
 const treeRoutes = require('./app/handlers/tree_routes.js');
 const Checker = require('./app/util/AppChecker.js');
@@ -127,6 +128,18 @@ app.get('/dsp_v1/docker_network/:namerepo/:namelab', networkHandler.get);
 app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 
 // API DOCKER MANAGMENT
+app.get('/dsp_v1/services', serviceHandler.getServices);
+app.post('/dsp_v1/services/:nameservice', serviceHandler.runService);
+app.put('/dsp_v1/services/start/:nameservice', serviceHandler.startService);
+app.put('/dsp_v1/services/stop/:nameservice', serviceHandler.stopService);
+app.put('/dsp_v1/services/defaultnetwork/:nameservice', serviceHandler.setAsDefault);
+app.delete('/dsp_v1/services/:nameservice', serviceHandler.removeService);
+
+
+
+app.get('/dsp_v1/networkservices/:namerepo/:namelab', serviceHandler.getNetworkList);
+app.post('/dsp_v1/networkservices', serviceHandler.attachNetwork);
+app.delete('/dsp_v1/networkservices', serviceHandler.detachNetwork);
 
 // Open docker shell
 app.post('/dsp_v1/dockershell', networkHandler.dockershell)

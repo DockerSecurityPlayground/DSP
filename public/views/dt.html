@@ -1,0 +1,147 @@
+﻿<div id="dockertools" ng-controller="DockerToolsCtrl">
+  <h3 class="text-center">Hacking Tools</h3>
+  <h4 class="text-center">New Service</h4>
+  <form>
+  <div class="row form-group">
+	<label class="control-label col-sm-1 text-right"  for="namecontainer">  <i> Name: </i>  </label>
+    <input type="text" class="form-control-plaintext col-sm-1" id="namecontainer" ng-value="newContainer.name">
+	<label class="flags col-sm-1 text-right"  for="flags">  <i> Flags: </i>  </label>
+    <!-- Flags -->
+    <div class="col-sm-2">
+        <div class="form-check">
+      <input class="form-check-input" type="checkbox" ng-model="newContainer.isDaemon" id="isDaemon">
+      <label class="form-check-label" for="isDaemon">
+    Deamon 
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" ng-model="newContainer.isInteractive" id="isInteractive">
+      <label class="form-check-label" for="isInteractive">
+        Interactive 
+        </label>
+      </div>
+    </div> <!-- End Flags -->
+	<label class="control-label col-sm-1"  for="networkcontainer">  <i> Networks: </i>  </label>
+  <button class="btn btn-success" ng-click="runService()"> Run </button>
+  
+  </div> <!-- End row -->
+</form>
+  <h4 class="text-center"> Running Services </h4>
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+  <hr>	
+  <!-- <div id="page-inner"> -->
+  <!--    <div class="btn-group"> -->
+  <!--       <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'repo_images'">Repo Images</label> -->
+  <!--       <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'all_images'">All Images</label> -->
+  <!--   </div> -->
+  <!--   <div ng-if="imagePanel === 'repo_images'"> -->
+  <!--         <h2 class="text-center"> Repo Images </h2> -->
+  <!--   <hr> -->
+
+  <!--   <div class="list-group"> -->
+  <!--     <div ng-repeat="i in imageList" class="panel panel-default"> -->
+  <!--         <div class="panel-heading">{{ i.repoName }}</div> -->
+  <!--         <div class="panel-body"> -->
+  <!--           <table class="table table-hover "> -->
+  <!--               <tbody> -->
+                
+  <!--               <tr ng-repeat="li in i.lab_images"> -->
+  <!--                   <td class="text-center"> --> 
+  <!--                     {{ li.nameLab }} --> 
+  <!--                   <p> --> 
+  <!--                       <button class="btn btn-default" ng-click="downloadAll(li)"> Download All </button> -->
+  <!--                   </p> -->
+                    
+  <!--                   </td> -->
+  <!--                   <td class="text-center"> --> 
+  <!--                       <ul class="list-group"> -->
+  <!--                           <li class="list-group-item borderless" ng-repeat="p in li.images"> -->
+  <!--                           <div class="row"> -->
+  <!--                               <b class="{{ p.textType }} col-sm-6"> -->
+  <!--                                   {{ p.name }} -->
+  <!--                               </b> -->
+  <!--                               <div ng-if=!p.contains class="col-sm-3"> -->
+  <!--                                 <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="downloadImage(p)" >Download   <span class="glyphicon glyphicon-download"></span></a> -->
+  <!--                               </div> -->
+  <!--                               <div ng-if=p.contains class="col-sm-3"> -->
+  <!--                                   <a href="" id="delAction" ng-click="delImage(p)" >Delete   <span class="glyphicon glyphicon-remove"></span></a> -->
+  <!--                               </div> -->
+
+  <!--                           </div> -->
+  <!--                           <div class="row"> -->
+  <!--                               <br> -->
+  <!--                               <textarea ng-if=p.progress class="form-control" rows="5" id="comment"> -->
+  <!--                                 {{ p.progress }} --> 
+  <!--                               </textarea> -->
+  <!--                           </div> -->
+  <!--                           </li> -->
+  <!--                       </ul> --> 
+                    
+  <!--                   </td> -->
+  <!--                 </tr> -->
+  <!--               </tbody> -->
+  <!--             </table> -->
+  <!--         </div> -->
+  <!--       </div> -->
+  <!--     </div> -->
+  <!--   </div> -->
+  <!--               <1!-- All Images --1> --> 
+  <!--    <div ng-if="imagePanel === 'all_images'"> -->
+  <!--         <h2 class="text-center"> Local Images </h2> -->
+  <!--   <hr> -->
+  <!--   <ul class="list-group"> -->
+  <!--     <li class="list-group-item borderless" ng-repeat="ele in allImages"> --> 
+  <!--       <div ng-if=ele.contains class="row"> --> 
+  <!--         <div class="col-sm-6" ng-class="ele.textType"> <b>{{ ele.name }} </b></div> -->
+  <!--         <div  class="col-sm-6"> -->
+  <!--           <a href="" id="delAction" ng-click="delImage(ele)" >Delete   <span class="glyphicon glyphicon-remove"></span></a> -->
+  <!--       </div> -->
+  <!--       </div> -->
+      
+      
+  <!--     </li> -->
+  <!--   </ul> -->
+
+
+  <!--   </div> -->   
+    
+    
+  <!--         <1!-- <a  id="addAction" href="" ng-click="graphAction($event)" > <div class="glyphicon glyphicon-plus"></div></a></span> --1> -->
+
+  <!--       <1!-- <div class="row"> --1> -->
+  <!--       <1!--     <div class="col-sm-4"> --1> -->
+  <!--       <1!--         <i style="margin-left:10px">{{ i.name }} </i> --1> -->
+  <!--       <1!--     </div> --1> -->
+  <!--       <1!--     <div class="col-sm-4"> --1> -->
+  <!--       <1!--         <i style="margin-left:10px">{{ i.name }} </i> --1> -->
+  <!--       <1!--     </div> --1> -->
+  <!-- </div> -->
+</div>

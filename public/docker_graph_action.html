@@ -13,8 +13,7 @@
 		<script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
 		<script src="assets/js/angular.min.js"></script>
 		<script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
-		<script src="assets/js/angular-animate.min.js"></script>
-		<script src="assets/js/angular-sanitize.min.js"></script>
+		<script src="assets/js/angular-animate.min.js"></script> <script src="assets/js/angular-sanitize.min.js"></script>
 		<script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
 		<script src="assets/js/angular-ui-notification.min.js"></script>
 
@@ -43,6 +42,7 @@
 	   <script src="app/services/cleaner_service.js"> </script>
 	    <!-- angular controllers -->
 	    <script src="app/controllers/graph_action_controller.js"></script>
+	    <script src="app/controllers/docker_tools_controller.js"></script>
 	    <script src="app/components/dsp_copyFromContainer.js"></script>
 	
 
@@ -55,6 +55,7 @@
 		.service('containerManager', dsp_ContainerManagerService)
 		.service('CleanerService', dsp_cleanerService)
 		.controller('actionController', DSP_GraphActionController)
+		.controller('DockerToolsCtrl', DSP_DockerToolsCtrl)
 		.filter('split',function(){
 	    return function(str,length) {
 	       str = str || "";
@@ -217,11 +218,13 @@
 
 </div>
 
+<div ng-include="'views/services.html'"> </div>
 <h3 class="text-center" > <a href="#" ng-click="showSolution = !showSolution"> Solution </a> </h3>
 <div style="margin-left:10px" 
   class="large_div"
   ng-show="showSolution" 
   ng-bind-html="tinymceSolution"> </div>
+
 
   <hr>
 <div ng-show="yamlfile !== ''" class="row">

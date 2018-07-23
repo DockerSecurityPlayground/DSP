@@ -16,6 +16,7 @@ const rimraf = require('rimraf');
 
 const dockerAction = require(`${appRoot}/app/data/docker_actions`);
 const dockerFilesToCopy = require(`${appRoot}/app/data/docker_filesToCopy`);
+const dockerTools = require('../data/docker-tools.js');
 const log = appUtils.getLogger();
 const downloadPath = 'public/downloads';
 
@@ -161,8 +162,26 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
   log.info('[COMPOSE DOWN]');
   async.waterfall([
     (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    (cb) => {
+      log.info("Remove containers from the network");
+      log.info("Get lab networks");
+      dockerTools.getNetworksLab(params.namelab, cb);
+    },
+    (networks, cb) => {
+      // Detach all containers
+      async.each(networks, (n, c) => {
+        async.each(n.containers, (theContainer, cc) => {
+          // Detach service containers
+          if (dockerTools.isService(theContainer.Name)) {
+            dockerTools.detachServiceToNetwork(theContainer.Name, n.name, cc);
+          } else {
+            cc(null);
+          }
+        }, (err) => c(err));
+      }, (err) => cb(err));
+    },
     (cb) => configData.getConfig(cb),
-  // build path
+    // build path
     (config, cb) => {
       const mainDir = config.mainDir;
       const thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
