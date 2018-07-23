@@ -23,6 +23,27 @@ to learn all about the application.
 * docker-compose
 * compiler tools (g++, c, c++)
  
+## Error Debug
+
+
+MacOS ECONNRESET error: 
+
+```
+events.js:183
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: read ECONNRESET
+    at _errnoException (util.js:992:11)
+    at TCP.onread (net.js:618:25)
+```
+On Mac it seems that there is some problem with some node package, so in order to solve this run:
+```
+MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save-dev --save-exact
+```
+
+
+
 ## Contributing
 
 1. Fork it!
