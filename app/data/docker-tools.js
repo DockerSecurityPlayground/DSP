@@ -264,8 +264,20 @@ function getNetworksLab(nameLab, callback) {
           });
         });
         if (routerName === '') {
-          cb(new Error(`${nameNetwork} does not contain routers`));
-        } else {
+          try {
+            log.warn("No Router, try to set to default gw");
+            theIp = theNetwork.IPAM.Config[0].Subnet.split("/")[0];
+            // Check if the ip exists
+            if (theIp) {
+            cb(null, theIp);
+            } else {
+                cb(new Error("NO ROUTER DEFINED"));
+              }
+          } catch (e) {
+            cb(null, theIp);
+            cb(new Error(`${nameNetwork} does not contain routers`));
+        }
+      }   else {
           cb(null, theIp);
         }
       }
