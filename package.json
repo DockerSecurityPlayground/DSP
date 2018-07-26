@@ -54,6 +54,7 @@
     "path-exists": "^3.0.0",
     "q": "^1.5.0",
     "randomstring": "^1.1.5",
+    "request": "^2.87.0",
     "rimraf": "^2.6.1",
     "simple-git": "^1.70.0",
     "socket.io": "^2.0.4",

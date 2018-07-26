@@ -12,6 +12,7 @@ const pathExists = require('path-exists');
 const jsonFile = 'images_to_build.json';
 const networkManager = require('./network.js')
 const AppUtils = require('../util/AppUtils');
+const log = AppUtils.getLogger();
 
 function getRepoImagePath(namerepo, callback) {
   async.waterfall([
@@ -279,10 +280,12 @@ function getImagesAllRepos(callback) {
         })
         // Ok all paths
         .on('end', () => {
-            async.each(repoPaths, (r, c) => {
+            async.eachSeries(repoPaths, (r, c) => {
               let rb = path.basename(r);
+              log.info(`Find ${rb} repository`);
               getImagesAllLabs(rb, (err, images) => {
                 if(err) {
+                  log.error(err);
                   c(err);
                 } else {
                   repoImages[rb] = images;

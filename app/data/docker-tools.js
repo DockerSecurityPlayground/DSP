@@ -20,13 +20,14 @@ function parsePorts(ports) {
 
 function getServices(callback) {
   const arrRet = []
-  dockerJS.ps((err, containersJSON) => {
+  dockerJS.dockerodePS((err, containersObj) => {
     if(err) {
       callback(err);
     } else {
-      containersObj = JSON.parse(containersJSON);
       _.each(containersObj, (c) => {
+        console.log(c.Names);
         if (c.Names[0].slice(1).startsWith(service_prefix)) {
+        console.log("sono qui");
         let objToInsert = {}
         let networkArr = [];
         objToInsert.name = c.Names[0].slice(1);
@@ -199,11 +200,10 @@ function _getFreeAddress(containers) {
 
 function getFreeAddress(networkName, callback) {
   log.info("Get a free address");
-  dockerJS.getNetwork(networkName, (err, data) => {
+  dockerJS.getNetwork(networkName, (err, network) => {
     if (err) {
       callback(err);
     } else {
-      const network = JSON.parse(data)
       freeAddress = _getFreeAddress(network.Containers);
       callback(null, freeAddress);
     }
@@ -215,16 +215,16 @@ function getNetworksLab(nameLab, callback) {
   let retNetworks = [];
   async.waterfall([
     (cb) => dockerJS.networkList(cb),
-    (data, cb) => {
-      const obj = JSON.parse(data)
+    (obj, cb) => {
       networksLab = __getLabNetwork(nameLab, obj);
-      async.each(networksLab, (n, c) => {
+      async.eachSeries(networksLab, (n, c) => {
         dockerJS.getNetwork(n.name, (err, theNetwork) => {
           if (err) {
+            log.err(err);
             c(err);
           } else {
             const N = n;
-            N.containers = JSON.parse(theNetwork).Containers;
+            N.containers = theNetwork.Containers;
             // N.isDefault = isDefaultNetwork(n.name);
             retNetworks.push(N);
             c(null);
@@ -241,8 +241,7 @@ function getNetworksLab(nameLab, callback) {
     async.waterfall([
     (cb) => dockerJS.getNetwork(nameNetwork, cb),
     // Find the router in the network containers
-    (data, cb) => {
-      const theNetwork = JSON.parse(data)
+    (theNetwork, cb) => {
       let theIp;
       log.info("NETWORK");
       if (isDefaultNetwork(nameNetwork)) {

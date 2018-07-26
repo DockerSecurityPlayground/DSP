@@ -19,6 +19,7 @@ var api = '/dsp_v1/docker_network/' ;
 
   function _initServices(listServ) {
     listServices.length = 0;
+    console.log(listServ);
     _.each(listServ, function(s) {
       var o = {}
       o.name = s.name;
