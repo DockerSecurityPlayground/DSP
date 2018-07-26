@@ -47,7 +47,7 @@
     "jsonfile": "^4.0.0",
     "method-override": "^2.3.8",
     "multer": "^1.3.0",
-    "mydockerjs": "^1.22.0",
+    "mydockerjs": "^2.0.0",
     "ncp": "^2.0.0",
     "node-cmd": "^3.0.0",
     "node-pty": "^0.7.4",
