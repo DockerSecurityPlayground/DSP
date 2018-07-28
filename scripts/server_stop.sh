@@ -1,1 +1,2 @@
-forever stop $1
+cd $1
+forever stop index.js
