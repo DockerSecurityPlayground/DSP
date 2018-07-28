@@ -7,13 +7,15 @@ var api = '/dsp_v1/docker_network/' ;
 	var dsp_service_network = '/dsp_v1/networkservices' ;
   var url = 'http://' + location.host + '/';
 
+  const runButton = "<button type='button' class='btn btn-success'>Run</button>";
+
   const successStatus = "<b class='text-success'>Running </b>";
   const stoppedStatus = "<b class='text-warning'>Stopped </b>";
   const unknownStatus = "<b class='text-danger'>Unknown </b>";
 
   var listServices;
 
-  function getRunningServices() {
+  function getServices() {
         return $http.get(dsp_running_services);
   }
 
@@ -159,9 +161,9 @@ var api = '/dsp_v1/docker_network/' ;
         e.networks = [];
       });
     },
-    getRunningServices :     getRunningServices,
+    getServices :     getServices,
     initServices : function initServices() {
-      getRunningServices()
+      getServices()
         .then(function successCallback(response) {
           console.log("RUNNING SERVICES");
           _initServices(response.data.data)

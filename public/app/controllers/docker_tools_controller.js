@@ -6,7 +6,6 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService) {
   $scope.currentEnvironment = {name: '', value: ''};
 
 
-  const runButton = "<button type='button' class='btn btn-success'>Run</button>";
   $scope.currentContainer
   $scope.t = {
     name: 'red'
