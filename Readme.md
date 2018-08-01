@@ -45,9 +45,9 @@ MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save
 ## Q&A  
 How can I share my labs with the world ?   
 During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
-DSP Repository must have several requirements, so I have created a base DSP TPL that you can use to create your personal repository.   
+DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
 So, the easiest way to share labs is the following:   
-- Fork the project DSP_TPL (https://github.com/giper45/DSP_TPL.git)   
+- Fork the project DSP_Repo (https://github.com/giper45/DSP_Repo.git)   
 -  During the installation set github directory param to your forked repository.   
 - Now create your labs and share it! . 
 At current time you there is no support to have more repositories in your DSP environment, anyway you can add git repositories to DSP in this way   
