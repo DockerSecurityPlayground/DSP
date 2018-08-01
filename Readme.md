@@ -49,10 +49,17 @@ DSP Repository must have several requirements, so I have created a base DSP Repo
 So, the easiest way to share labs is the following:   
 - Fork the project DSP_Repo (https://github.com/giper45/DSP_Repo.git)   
 -  During the installation set github directory param to your forked repository.   
-- Now create your labs and share it! . 
+- Now create your labs and share it! .   
+It is important that all images that you use should be available to other users, so:   
+- You can publish on docker hub and update the "pull.sh" script under .docker-image application  other users can pull your images in order to use your labs.   
+- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and to use your repo   
+
+If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
+
 At current time you there is no support to have more repositories in your DSP environment, anyway you can add git repositories to DSP in this way   
 
-- git clone the repository on main dsp directory. This is a manual way, so you will have to install all docker images 
+- git clone the repository on main dsp directory. This is a manual way, so you will have to install all docker images. If the repo make has created a "pull.sh" script under the .docker-images you can use it to download images. 
+
 - Switch your local repository .    
 
 Next developments will allow to manage more repositories.  
@@ -75,7 +82,11 @@ npm run update
 ```
 
 ## Documentation   
-For documentation go to Wiki page 
+For documentation about DSP usage go to Wiki page: 
+http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home  
+
+It is a little outdated, I will update it as possible !  
+
 ## History
 TODO: Write history    
 
