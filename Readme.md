@@ -42,7 +42,20 @@ On Mac it seems that there is some problem with some node package, so in order t
 MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save-dev --save-exact
 ```
 
+## Q&A  
+How can I share my labs with the world ?   
+During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
+DSP Repository must have several requirements, so I have created a base DSP TPL that you can use to create your personal repository.   
+So, the easiest way to share labs is the following:   
+- Fork the project DSP_TPL (https://github.com/giper45/DSP_TPL.git)   
+-  During the installation set github directory param to your forked repository.   
+- Now create your labs and share it! . 
+At current time you there is no support to have more repositories in your DSP environment, anyway you can add git repositories to DSP in this way   
 
+- git clone the repository on main dsp directory. This is a manual way, so you will have to install all docker images 
+- Switch your local repository .    
+
+Next developments will allow to manage more repositories.  
 
 ## Contributing
 
@@ -58,8 +71,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 ## Update the application: 
 When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
 ```
-git pull
-npm update
+npm run update
 ```
 
 ## Documentation   
