@@ -9,6 +9,7 @@ const LabStates = require('../util/LabStates.js');
 const jsonfile = require('jsonfile');
 const packageJSON =require('../../package.json')
 const _ = require('underscore');
+// const log = appUtils.getLogger();
 
 const log = AppUtils.getLogger();
 const MyEmitter = stampit()
@@ -189,13 +190,13 @@ const DSPWalk = stampit(MyEmitter)
           r.labs = ele.repo.labs;
           const labelFile = ele.repo.labels;
           const versionFile = ele.repo.version;
-          async.waterfall([ 
+          async.waterfall([
               // Read label file
               (cb) => {
                 if (labelFile) {
                   jsonfile.readFile(labelFile, cb);
                 }
-                else { 
+                else {
                   cb(null)
                 }
               },
@@ -208,7 +209,7 @@ const DSPWalk = stampit(MyEmitter)
               },
               // Read version file
               (cb) => {
-                if (versionFile) { 
+                if (versionFile) {
                   jsonfile.readFile(versionFile, cb)
                 }
                 else cb(null, null)

@@ -187,6 +187,44 @@ function dockercopy(req, res) {
   });
 }
 
+function dockerupload(req, res) {
+  log.info("[IN DOCKER UPLOAD]");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.body, ['dockername', 'hostPath' ,'containerPath'], cb),
+    (cb) => {
+      try {
+        if (!fs.statSync(req.body.hostPath).isFile()) {
+          var theErr = new Error(`${req.body.hostPath} is not a file`);
+          cb(theErr);
+        } else {
+          cb(null);
+        }
+      } catch(e) {
+        cb(e);
+      }
+    },
+    (cb) => configData.getConfig(cb),
+    // get path
+    (config, cb) => {
+      mainDir = config.mainDir;
+      const dockerInfo = {
+      dockerName : req.body.dockername,
+      containerPath: req.body.containerPath,
+      hostPath  : req.body.hostPath
+      };
+      cb(null, dockerInfo);
+    },
+    (dockerInfo, cb) => {
+      log.info(`Copy ${dockerInfo.hostPath} inside ${dockerInfo.dockerName}:${dockerInfo.containerPath}`);
+      dockerJS.cp(dockerInfo.dockerName, dockerInfo.hostPath, dockerInfo.containerPath, cb);
+    }],
+    (err) => {
+    httpHelper.response(res, err);
+  })
+}
+
+
+
 function dockershellcompose(req, res) {
   log.info("[IN DOCKER SHELL COMPOSE ]");
   async.waterfall([
@@ -279,3 +317,4 @@ exports.getListImages = getListImages;
 exports.dirExists = dirExists;
 exports.dockershell = dockershell;
 exports.dockercopy = dockercopy;
+exports.dockerupload = dockerupload;

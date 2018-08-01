@@ -44,7 +44,6 @@ module.exports = {
 //    return volumes;
 //  },
   destroyOldVolumes(nameLab, clistToDraw, clistNotToDraw, callback) {
-    console.log('IN DESTROY');
     let volumes = _getVolumes(clistToDraw);
     volumes = volumes.concat(_getVolumes(clistNotToDraw));
     const log = appUtils.getLogger();
@@ -58,7 +57,6 @@ module.exports = {
       if (err) callback(err);
       else {
         const labDir = path.join(up, nameLab);
-        log.info('INIT WALKER');
         Walker(labDir)
           // Only one subdirectory
           .filterDir((dir) => {
@@ -70,7 +68,7 @@ module.exports = {
             // log.info(hostVolumes);
             console.log(dir);
             if (dir !== labDir && !_.contains(hostVolumes, path.join('/', path.basename(dir)))) {
-              log.warn(`${dir} no more used, destroy it`);
+              // log.warn(`${dir} no more used, destroy it`);
               // volumesToDestroy.push(dir);
             }
           })

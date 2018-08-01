@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">Copy files inside {{$ctrl.lab.namecontainer}} </h3>
+</div>
+<div class="modal-body" id="modal-body">
+  <p class="row">
+    <div class="col-sm-6"><label> Select File From Host </label> </div>
+    <div class="col-sm-6"><input text ng-model="$ctrl.hostPath" ></div>
+  </p>
+  <p class="row">
+    <div class="col-sm-6"><label> Select Container Destination Dir</label> </div>
+    <div class="col-sm-6"><input text ng-model="$ctrl.containerPath" ></div>
+  </p>
+
+  <p class="row">
+    <div class="col-sm-6"> <label> Upload </label> </div>
+    <div class="col-sm-2"><input type="submit" class="btn btn-primary" ng-click="$ctrl.upload()" value="Upload"></div>
+    <div class="col-sm-2"><button class="btn btn-danger" type="button" ng-click="$ctrl.cancel()">Cancel</button></div>
+  </p>
+    
+</div>
+<br>
+<br>

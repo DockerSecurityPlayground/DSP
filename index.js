@@ -145,6 +145,7 @@ app.delete('/dsp_v1/networkservices', serviceHandler.detachNetwork);
 app.post('/dsp_v1/dockershell', networkHandler.dockershell)
 // Copy from container to download dir
 app.post('/dsp_v1/dockercopy', networkHandler.dockercopy)
+app.post('/dsp_v1/dockerupload', networkHandler.dockerupload)
 
 // Check if a dir exists
 app.post('/dsp_v1/dir_exists', networkHandler.dirExists);

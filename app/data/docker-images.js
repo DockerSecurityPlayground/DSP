@@ -139,9 +139,12 @@ function getCurrentImages(labImages, images) {
   return retImages
 }
 
+// Take images of a lab from a network.json
 function getImagesLabNames(reponame, labname, callback) {
   let listIms = []
   let arrRet = []
+  console.log("IN GETIMAGESLABNAMES");
+  // Get network.json
   networkManager.get(reponame, labname, (err, data) => {
     if (err) {
         callback(err)
@@ -178,9 +181,11 @@ function _isRepoPath(thePath) {
       );
 }
 function getImagesAllLabs(namerepo, callback) {
+  log.info("[Docker Images] Get Images All Labs");
   let images = [];
   let lab_images = [];
   let allImages = [];
+  log.info("[Docker Images] Get All Images");
   async.waterfall([
     (cb) => getListImages(cb),
     (ims, cb) => {
@@ -222,10 +227,14 @@ function getImagesAllLabs(namerepo, callback) {
     },
     (labsPath, cb) => {
       async.each(labsPath, (lb, c) => {
+        log.info(`[Docker Images] Get Lab ${path.basename(lb)} Images`);
+
         getImagesLab(namerepo, path.basename(lb), allImages, (err, data) => {
           if (err) {
-            c(err);
-          } else {
+            // Do not block other images
+            log.error(`${path.basename(lb)} Lab has not network.json file!`);
+            data = [];
+          }
            let nameLab = path.basename(lb)
            lab_images.push({
                nameLab : nameLab,
@@ -233,7 +242,6 @@ function getImagesAllLabs(namerepo, callback) {
            })
         images = _.union(images, data);
            c(null);
-          }
         });
       }, cb);
     }
@@ -282,7 +290,7 @@ function getImagesAllRepos(callback) {
         .on('end', () => {
             async.eachSeries(repoPaths, (r, c) => {
               let rb = path.basename(r);
-              log.info(`Find ${rb} repository`);
+              log.info(`[Docker Images] Find ${rb} repository`);
               getImagesAllLabs(rb, (err, images) => {
                 if(err) {
                   log.error(err);

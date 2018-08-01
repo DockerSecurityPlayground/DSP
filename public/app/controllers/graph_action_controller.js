@@ -89,11 +89,32 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   } //End startlab
 
   $scope.copyFromContainer = function (nameContainer, dc="true") {
-    console.log("OPENNN")
-    console.log(dc);
 var modalInstance = $uibModal.open({
         animation: true,
         component: 'copyFromContainerComponent',
+        resolve: {
+          lab: function () {
+          return  {
+            namerepo : $scope.nameRepo,
+            namelab : $scope.labName,
+            namecontainer: nameContainer,
+            dockercompose : dc
+            };
+          }
+        }
+    });
+
+    modalInstance.result.then(function () {
+      console.log("responso modalInstance")
+                }, function () {
+                        $log.info('modal-component dismissed at: ' + new Date());
+                            });
+  }
+
+$scope.copyInContainer = function (nameContainer, dc="false") {
+  var modalInstance = $uibModal.open({
+        animation: true,
+        component: 'copyInContainerComponent',
         resolve: {
           lab: function () {
           return  {

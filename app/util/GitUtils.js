@@ -97,6 +97,7 @@ function initRepository(nameProject, githubUrl, callback, notifyCallback) {
         }
       }, (err) => cb(err))
     }
+    // IMAGES ARE NOT MORE
     // (cb) => buildImages(nameProject, cb, notifyCallback),
   ], (err) => callback(err));
 }

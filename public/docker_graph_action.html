@@ -44,12 +44,14 @@
 	    <script src="app/controllers/graph_action_controller.js"></script>
 	    <script src="app/controllers/docker_tools_controller.js"></script>
 	    <script src="app/components/dsp_copyFromContainer.js"></script>
+	    <script src="app/components/dsp_copyInContainer.js"></script>
 	
 
 <script>
 	//ANGULAR COMPONENT REGISTRATION 
 	angular.module("dockersecplayground", ['ngAnimate', 'chieffancypants.loadingBar', 'ngSanitize', 'ui.bootstrap', 'ngWebSocket', 'ui-notification', 'colorpicker.module'] )
-                .component("copyFromContainerComponent", dsp_copyFromContainer)
+    .component("copyFromContainerComponent", dsp_copyFromContainer)
+    .component("copyInContainerComponent", dsp_copyInContainer)
 		.service('dockerAPIService', DockerAPIService) 
                 .service('SocketService', SocketService) 
 		.service('containerManager', dsp_ContainerManagerService)
