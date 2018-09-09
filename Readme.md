@@ -4,13 +4,13 @@
 
 
 Docker Security Playground is an application that allows you to: 
-- Create **network and network security scenarios**, in order to understand all the network protocols,  
-rules, and security issues with host networks. . 
-- To Learn **penetration testing techniques** by simulating vulnerability labs scenarios
--  **Manage a set of docker-compose project** . Main goal of DSP is to skilling 
-in penetration testing and network security, but his flexibility allows you the 
+- Create **network and network security scenarios**, in order to understand network protocols,  
+rules, and security issues by installing DSP in your PC.  
+- Learn **penetration testing techniques** by simulating vulnerability labs scenarios
+-  **Manage a set of docker-compose project** . Main goal of DSP is to learn 
+in penetration testing and network security, but its flexibility allows you the 
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
-labs**. For more informations look at the [Labs Managment]() page. 
+labs**. For more information look at the [Labs Managment]() page. 
 
 ## Installation  and Guides
 Go to [wiki] (http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)
@@ -90,14 +90,20 @@ It is a little outdated, I will update it as possible !
 ## History
 TODO: Write history    
 
+
+## Links
+- [![Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.toolswatch.org/2018/05/black-hat-arsenal-usa-2018-the-w0w-lineup/)  
+- [DSP Vagrant Box used in Blackhat session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
+- [Blackhat scenario in gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git) 
+
 ## Contributors   
 
 
-* **Technical support**: Gaetano Perrone 
-* **Documentation support** Gaetano Perrone
+* **Technical support**: Gaetano Perrone, Francesco Caturano 
+* **Documentation support** Gaetano Perrone, Francesco Caturano
 * **Application design: Gaetano Perrone, Simon Pietro Romano**
-* **Application development: Gaetano Perrone**
-* **Docker wrapper image development: Gaetano Perrone**
+* **Application development: Gaetano Perrone, Francesco Caturano**
+* **Docker wrapper image development: Gaetano Perrone, Francesco Caturano**
 
 
 Thanks to **Giuseppe Criscuolo** for the logo design
