@@ -93,8 +93,8 @@ TODO: Write history
 
 ## Links
 - [![Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.toolswatch.org/2018/05/black-hat-arsenal-usa-2018-the-w0w-lineup/)  
-- [DSP Vagrant Box used in Blackhat session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
-- [Blackhat scenario in gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git) 
+- [DSP Vagrant Box used in Blackhat Session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
+- [Blackhat scenario in Gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git) 
 
 ## Contributors   
 
