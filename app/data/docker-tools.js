@@ -134,7 +134,7 @@ function __getLabNetwork(nameLab, networks) {
   const networksLab = [];
   _.each(networks, (n) => {
     const networkName = n.Name.toLowerCase();
-    const ln = nameLab.toLowerCase();
+    const ln = nameLab.toLowerCase().replace(/ /g,'');
     if (networkName.startsWith(ln)) {
       if(isAllowedNetwork(ln, networkName)) {
       networksLab.push({
