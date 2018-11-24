@@ -84,6 +84,7 @@ const api = {
         (config, cb) => {
           rootDir = config.mainDir;
           repos = localConfig.config.repos;
+          console.log(repos);
           cb(null);
         },
         /* Check if all are stopped

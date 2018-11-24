@@ -1,0 +1,65 @@
+﻿<div id="page-wrapper">
+  <h1 class="text-center">Repositories</h1>
+  <hr>	
+  <div id="page-inner">
+    <table class="table">
+    <thead>
+      <tr>
+        <th>Repository</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="r in repos">
+        <td><a href="{{r.url}}" target="_blank">{{r.url}}</a></td>
+        <td>
+          <div class="row">
+              <div class="col-sm-1 text-center" ><a class="editing-components" >  <span uib-popover="Update" popover-trigger="'mouseenter'"  ng-click="updateRepo(l)" class="fa fa-download"> </span> </a> </div>
+              <div class="col-sm-2 text-center"><a class="editing-components" ><span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-remove" ng-click="removeRepository(l.name)"> </span> </a> </div>
+          </div>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="row">
+  <div class="col-sm-3 col-sm-offset-9">
+    <button ng-disabled="areReposUploading" class="btn btn-blue" ng-click="updateAll()">  Update All</button>
+  </div>
+    <!-- <div style='margin-top:10px' class="text-muted small">Press this to update all main Lab Projects</div> -->
+  </p>
+  <br>
+  <div ng-show="areReposUploading" class="alert alert-info"> Uploading Repositories, pls wait... </div>
+  <form name="githubForm"> 
+          <label for="github_project">Add Github Repository</label>
+          <input 
+                 type="text" 
+                 class="form-control" 
+                 name="githubURL"
+                 ng-required="true"
+                ng-pattern="urlPattern"
+                 id="githubURL" 
+                 ng-model=nameRepository
+          >
+          <div class="text-muted small">Add repository</div>
+
+      <div ng-show='isLoadingGit' class="alert alert-info">  Inserting Repo</div>
+
+          <button class="btn btn-success" 
+            ng-click="addRepository()"
+            ng-disabled="githubForm.$invalid"
+            > Add repo </button>
+    </form>
+
+
+
+
+</div>
+
+
+
+    </div>   
+    
+     
+  </div>
+</div>

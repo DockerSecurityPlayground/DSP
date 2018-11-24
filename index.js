@@ -10,6 +10,7 @@ const labels = require('./app/handlers/labels');
 const labs = require('./app/handlers/labs');
 const configHandler = require('./app/handlers/config');
 const networkHandler = require('./app/handlers/network');
+const repoHandler = require('./app/handlers/repos');
 const dockerImages = require('./app/handlers/docker-images');
 const serviceHandler = require('./app/handlers/services')
 // const installationHandler = require('./app/handlers/installation.js');
@@ -136,6 +137,8 @@ app.put('/dsp_v1/services/defaultnetwork/:nameservice', serviceHandler.setAsDefa
 app.delete('/dsp_v1/services/:nameservice', serviceHandler.removeService);
 
 
+// API GIT REPOS
+app.get('/dsp_v1/git_repos', repoHandler.get);
 
 app.get('/dsp_v1/networkservices/:namerepo/:namelab', serviceHandler.getNetworkList);
 app.post('/dsp_v1/networkservices', serviceHandler.attachNetwork);

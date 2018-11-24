@@ -1,18 +1,18 @@
 var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, AjaxService, FetchFileFactory) {
   console.log("in config")
 
-  var file; 
+  var file;
   var urlRepoTree = '/api/tree/repo';
   $scope.labTreeModel = [];
-  $scope.isRepoSynchronized; 
+  $scope.isRepoSynchronized;
   $scope.isReposUploading = false;
   $scope.isAppUpdating = false;
   $scope.isAppRestarting = false;
-  $scope.isUserRepoUpdating = false; 
+  $scope.isUserRepoUpdating = false;
   $scope.filetypePattern = RegexService.nameRegex;
   $scope.urlPattern = RegexService.urlRegex;
-  $scope.isLoadingGit = false;        
-  
+  $scope.isLoadingGit = false;
+
   $scope.githubError = {
     show: false,
     message: ''
@@ -23,29 +23,29 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
     if(AjaxService.configExists()) {
       $scope.config = angular.copy(AjaxService.config);
       $scope.gitUrlToEdit = angular.copy($scope.config.githubURL);
-      if($scope.config.githubURL !== '') 
+      if($scope.config.githubURL !== '')
         $scope.isRepoSynchronized = true;
-      
-    } 
+
+    }
     else {
       AjaxService.init(function onSuccess() {
         console.log("SONO IN ON SUCCESS");
         $scope.config = angular.copy(AjaxService.config);
         $scope.gitUrlToEdit = angular.copy($scope.config.githubURL);
-        if($scope.config.githubURL !== '') 
+        if($scope.config.githubURL !== '')
           $scope.isRepoSynchronized = true;
       });
   }
-          
-          CurrentLabService.resetLab() 
-          uploadTreeLabModel() 
+
+          CurrentLabService.resetLab()
+          uploadTreeLabModel()
   }())
 
 
   $scope.updateConfig= function() {
   console.log($scope.config);
   AjaxService.updateConfig($scope.config)
-  .then( 
+  .then(
           function success(response) {
                   Notification({message:"Success upload"}, 'success');
                   // Success, update inside ajaxaservice the config
@@ -64,9 +64,9 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
 
   $scope.setFiles = function(element) {
           console.log(element.files)
-          if(element.files.length > 0) 
+          if(element.files.length > 0)
           {
-                  console.log("update:") 
+                  console.log("update:")
                   file = element.files[0]
           }
 
@@ -81,7 +81,7 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
     modalInstance.result.then(function () {
       console.log("CONFIRM");
       $scope.isLoadingGit = true;
-      SocketService.manage( 
+      SocketService.manage(
         JSON.stringify({
           action : 'synchronize_github',
           body: {
@@ -89,18 +89,18 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
           }
         }),
         function(event) {
-          var data = JSON.parse(event.data); 
-          if(data.status === 'success')  { 
-            console.log("Success") 
+          var data = JSON.parse(event.data);
+          if(data.status === 'success')  {
+            console.log("Success")
             window.location.href = '/labs';
-          } 
+          }
           else if (data.status === 'error') {
               $scope.isLoadingGit = false;
               Notification('Server error: '+ data.message, 'error');
-            } 
+            }
           }
       );
-      //var socket = new WebSocket('ws://localhost:8080'); 
+      //var socket = new WebSocket('ws://localhost:8080');
       //socket.onopen = function() {
       //  socket.send(
       //  JSON.stringify({
@@ -110,17 +110,17 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
       //  }
       //}));
 
-//      socket.onmessage = 
+//      socket.onmessage =
 //      function(event) {
-//        var data = JSON.parse(event.data); 
-//        if(data.status === 'success')  { 
-//          console.log("Success") 
+//        var data = JSON.parse(event.data);
+//        if(data.status === 'success')  {
+//          console.log("Success")
 //          window.location.href = '/labs';
-//        } 
+//        }
 //        else if (data.status === 'error') {
 //            $scope.isLoadingGit = false;
 //            Notification('Server error: '+ data.message, 'error');
-//          } 
+//          }
 //        }
 //      }
     }, function() {});
@@ -133,13 +133,13 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
   function uploadTreeLabModel() {
     console.log(urlRepoTree+'?id=1')
     $http.get(urlRepoTree+'?id=1')
-      .then(function successCallback(response) { 
+      .then(function successCallback(response) {
               console.log("successs")
               $scope.labTreeModel = response.data
               console.log($scope.labTreeModel)
       },
-      function errorCallback(response) {  
-              console.log("error in upload")	
+      function errorCallback(response) {
+              console.log("error in upload")
       })
 
   }
@@ -165,16 +165,16 @@ check_callback: function (operation, node, node_parent, node_position, more) {
 
 $scope.deleteFile = function() {
 	console.log($scope.currentFileInLab)
-	$http.delete(urlRepoTree+"?id="+$scope.currentFileInLab ) 
-		.then(function successCallback(response) { 
+	$http.delete(urlRepoTree+"?id="+$scope.currentFileInLab )
+		.then(function successCallback(response) {
                   $scope.errorDelete = '';
                   Notification({message:"Deleted"}, 'success');
                   uploadTreeLabModel()
 		},
-		function errorCallback(response) {   
-                  if(response.data.error === 1007) 
+		function errorCallback(response) {
+                  if(response.data.error === 1007)
                     $scope.errorDelete = response.data.message;
-                  else { 
+                  else {
                     Notification({message:"Server error:"+ response.data.message}, 'error');
                   }
 
@@ -189,21 +189,21 @@ $scope.uploadFile = function() {
     {
     Notification({message:"Pls select first a file"}, 'error');
     }
-    else 
+    else
     {
     console.log(urlRepoTree)
     console.log(body)
-    $http.post(urlRepoTree, body)  
-            .then(function successCallback(response) {  
+    $http.post(urlRepoTree, body)
+            .then(function successCallback(response) {
                     Notification({message:"File uploaded!"}, 'success');
                     uploadTreeLabModel()
             },
 
-            function errorCallback(response) {  
+            function errorCallback(response) {
                     Notification({message:"Upload error"}, 'error');
             })
     }
-    
+
 
   }
 
@@ -221,12 +221,12 @@ if (_l.isLeaf) {
       _d = JSON.stringify(_d, undefined, 2);
     }
   });
-} 
+}
 else {
   //http://jimhoskins.com/2012/12/17/angularjs-and-apply.html//
   $scope.$apply(function() {
-  }); 
-}   
+  });
+}
 }
 
 $scope.restartApplication = function() {
@@ -234,14 +234,14 @@ $scope.restartApplication = function() {
 }
 $scope.updateApplication = function() {
   $scope.isAppUpdating = true;
-  SocketService.manage( 
+  SocketService.manage(
         JSON.stringify({
-          action : 'update_application' 
+          action : 'update_application'
       }),
     function(event) {
-      var data = JSON.parse(event.data); 
-      if(data.status === 'success')  { 
-              console.log("Success") 
+      var data = JSON.parse(event.data);
+      if(data.status === 'success')  {
+              console.log("Success")
               Notification({message:"Application uploaded!"}, 'success');
           // Your application has indicated there's an error
           window.setTimeout(function(){
@@ -256,40 +256,43 @@ $scope.updateApplication = function() {
 }
 
 $scope.manageImages = function() {
-window.location.href = "/images";
+  window.location.href = "/images";
+}
+$scope.manageRepos = function() {
+  window.location.href = "/repositories";
 }
 $scope.updateProjects = function() {
   $scope.isReposUploading = true;
 
-  SocketService.manage( 
-        JSON.stringify({
-          action : 'update_projects' 
-      }),
+    SocketService.manage(
+          JSON.stringify({
+            action : 'update_projects'
+     }),
     function(event) {
-      var data = JSON.parse(event.data); 
-      if(data.status === 'success')  { 
-              console.log("Success") 
+      var data = JSON.parse(event.data);
+      if(data.status === 'success')  {
+              console.log("Success")
               Notification({message:"Project uploaded!"}, 'success');
               $scope.isReposUploading = false;
               window.location.href = '/configuration';
       } else if (data.status === 'error') {
-          console.log(data.status); 
-          console.log(data.code); 
+          console.log(data.status);
+          console.log(data.code);
 
           if (data.code === Constants.RUNNING_CODE_ERROR) {
-        
+
             SafeApply.exec($scope, function() {
               $scope.githubError.show = true;
               $scope.githubError.message = 'Pls stop all running labs first! <br>\
               Running labs: <b>'+ data.message + '</b>';
               $scope.isReposUploading = false;
             });
-          } 
+          }
           else {
           Notification('Server error: '+ data.code, 'error');
           }
           $scope.isReposUploading = false;
-      } 
+      }
       else {
           Notification('Some error in uploading...', 'error');
           $scope.isReposUploading = false;
@@ -297,38 +300,38 @@ $scope.updateProjects = function() {
     }
   );
 
-  //var socket = new WebSocket('ws://localhost:8080'); 
+  //var socket = new WebSocket('ws://localhost:8080');
   //socket.onopen = function() {
   //  socket.send(
   //      JSON.stringify({
   //    action : 'update_projects' }));
 
-  //  socket.onmessage = 
+  //  socket.onmessage =
   //    function(event) {
-  //    var data = JSON.parse(event.data); 
-  //    if(data.status === 'success')  { 
-  //            console.log("Success") 
+  //    var data = JSON.parse(event.data);
+  //    if(data.status === 'success')  {
+  //            console.log("Success")
   //            Notification({message:"Project uploaded!"}, 'success');
   //            $scope.isReposUploading = false;
   //            window.location.href = '/configuration';
   //    } else if (data.status === 'error') {
-  //        console.log(data.status); 
-  //        console.log(data.code); 
+  //        console.log(data.status);
+  //        console.log(data.code);
 
   //        if (data.code === Constants.RUNNING_CODE_ERROR) {
-  //      
+  //
   //          SafeApply.exec($scope, function() {
   //            $scope.githubError.show = true;
   //            $scope.githubError.message = 'Pls stop all running labs first! <br>\
   //            Running labs: <b>'+ data.message + '</b>';
   //            $scope.isReposUploading = false;
   //          });
-  //        } 
+  //        }
   //        else {
   //        Notification('Server error: '+ data.code, 'error');
   //        }
   //        $scope.isReposUploading = false;
-  //    } 
+  //    }
   //    else {
   //        Notification('Some error in uploading...', 'error');
   //        $scope.isReposUploading = false;
@@ -352,12 +355,12 @@ if (_l.isLeaf) {
       _d = JSON.stringify(_d, undefined, 2);
     }
   });
-} 
+}
 else {
   //http://jimhoskins.com/2012/12/17/angularjs-and-apply.html//
   $scope.$apply(function() {
-  }); 
-}   
+  });
+}
 
 
 };
