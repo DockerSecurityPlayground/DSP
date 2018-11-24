@@ -101,7 +101,8 @@ function get(req, res) {
 
 function getListImages(req, res) {
     completeDescription = req.query.completeDescription
-    dockerImages.getListImages((err, data, completeDescription) => { httpHelper.response(res, err, data);
+    dockerImages.getListImages((err, data, completeDescription) => {
+        httpHelper.response(res, err, data);
   });
 }
 
@@ -110,8 +111,6 @@ function getListImages(req, res) {
 
 
 function dockercopy(req, res) {
-  // console.log("SONO IN DOCKER COPY")
-  // console.log(req.body)
   let destinationPath;
   let destinationDir;
   const dc = req.body.dockercompose;
@@ -170,7 +169,6 @@ function dockercopy(req, res) {
     (data,cb) => {
       // If is a directory zip the file
       if (fs.statSync(destinationPath).isDirectory()) {
-        console.log("ZIPPING FILE")
         zipdir(destinationPath, { saveTo: `${destinationPath}.zip`}, (err, buffer) => { cb(err, true); })
       }
       else cb(null, false);

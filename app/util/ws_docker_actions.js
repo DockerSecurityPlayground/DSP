@@ -91,7 +91,7 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
           async.eachSeries(actions, (a, innerCallback) => {
             log.info('Calling action:');
             const command = dockerAction.getCommand(a);
-            log.info(`${a.cname} ${command}`);
+             log.info(`${a.cname} ${command}`);
             if (a.backgroundMode) {
               log.info(`${command} in backgroundMode`);
             }

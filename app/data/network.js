@@ -40,7 +40,6 @@ function filterNetwork(theNetwork) {
           n = networks[key];
           // If is not visibile set ip to false
           if (n.isVisible == false) {
-            //console.log(n);
             n.ip = ""
           }
         })

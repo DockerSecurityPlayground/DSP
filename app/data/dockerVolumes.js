@@ -66,7 +66,6 @@ module.exports = {
           })
           .on('dir', (dir) => {
             // log.info(hostVolumes);
-            console.log(dir);
             if (dir !== labDir && !_.contains(hostVolumes, path.join('/', path.basename(dir)))) {
               // log.warn(`${dir} no more used, destroy it`);
               // volumesToDestroy.push(dir);

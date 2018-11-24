@@ -25,7 +25,6 @@ function getServices(callback) {
       callback(err);
     } else {
       _.each(containersObj, (c) => {
-        console.log(c.Names);
         if (c.Names[0].slice(1).startsWith(service_prefix)) {
         let objToInsert = {}
         let networkArr = [];

@@ -40,7 +40,6 @@ function _parseOptions(service) {
   if (service.environments) {
     options.environments = service.environments;
   }
-  console.log(service);
   return options;
 }
 
@@ -177,7 +176,6 @@ function getListImages(req, res) {
   });
 }
 function dockercopy(req, res) {
-  // console.log(req.body)
   let destinationPath;
   let destinationDir;
   async.waterfall([
@@ -220,7 +218,6 @@ function dockercopy(req, res) {
     (data,cb) => {
       // If is a directory zip the file
       if (fs.statSync(destinationPath).isDirectory()) {
-        console.log("ZIPPING FILE")
         zipdir(destinationPath, { saveTo: `${destinationPath}.zip`}, (err, buffer) => { cb(err, true); })
       }
       else cb(null, false);

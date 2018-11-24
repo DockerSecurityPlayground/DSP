@@ -104,12 +104,12 @@ function deleteLab(req, res) {
 
 
 function getInformation(req, res) {
-  log.info('[IN GET INFORMATIONS]');
+  log.info('[IN GET INFORMATION]');
   async.waterfall([
     (cb) => Checker.checkParams(req.params, ['labname', 'repo'], cb),
     (cb) => labsData.getInformation(req.params.repo, req.params.labname, cb),
   ],
-  (err, results) => appUtils.response('GET INFORMATIONS', res, err, results));// End waterfall
+  (err, results) => appUtils.response('GET INFORMATION', res, err, results));// End waterfall
 }
 
 

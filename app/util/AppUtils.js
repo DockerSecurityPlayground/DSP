@@ -206,7 +206,7 @@ module.exports = {
     else if (respo) {
       // log.info(`Success, server response: ${JSON.stringify(respo)}`);
     } else log.info('Success');
-    httpHelper.response(res, err, respo);
+     httpHelper.response(res, err, respo);
   },
   // Returns true if is a lab
   isDSPDir(dir, callback) {

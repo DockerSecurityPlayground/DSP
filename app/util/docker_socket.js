@@ -54,12 +54,10 @@ exports.init = function init(httpserv) {
             term.write(data);
         });
         socket.on('disconnect', function() {
-            console.log('term end');
             term.end();
         });
       }
     else {
-        console.log("No dockerShell variable setted");
         socket.emit('exit', '/logout');
     }
   })

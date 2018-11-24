@@ -143,7 +143,6 @@ function getCurrentImages(labImages, images) {
 function getImagesLabNames(reponame, labname, callback) {
   let listIms = []
   let arrRet = []
-  console.log("IN GETIMAGESLABNAMES");
   // Get network.json
   networkManager.get(reponame, labname, (err, data) => {
     if (err) {
