@@ -12,6 +12,8 @@ const commandExistsSync = require('command-exists').sync;
 const async = require('async');
 const configData = require('../data/config.js');
 const c = require('../../config/local.config.json').config;
+const repoData = require('../data/repos.js');
+const log = appUtils.getLogger();
 
 const _ = require('underscore');
 
@@ -172,7 +174,7 @@ module.exports = {
   initConditions,
   // Initialize the application
   init(callback) {
-    const repost = c.repos;
+    const repos = c.repos;
 
     initErrors();
     initConditions();
@@ -195,9 +197,13 @@ module.exports = {
         });
       },
       // Check if the json repositories exists in maindir
-      (cb) => {
-      }],
-     (err) => { callback(err); });
+      (cb) => repoData.exists(cb),
+      (exists, cb) => {
+        if (!exists) {
+          log.warn('repos.json does not exists, create it');
+          repoData.post(repos, cb);
+        }
+      }],(err) => { callback(err); });
   },
   AppConditions: Checker,
 

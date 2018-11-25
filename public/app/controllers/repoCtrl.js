@@ -13,7 +13,7 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
   }
   AjaxService.getProjects()
     .then(function successCallback(response) {
-      $scope.repos = response.data.data.repos;
+      $scope.repos = response.data.data;
     }, function errorCallback(err) {
       Notification('Server error:'+ response.data.message, 'error');
     });
