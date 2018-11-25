@@ -25,6 +25,9 @@ function get(cb) {
       cb(err, jsonRepos);
   });
 }
+function add(repo, cb) {
+
+}
 
 exports.get = get;
 exports.version = '0.1.0';

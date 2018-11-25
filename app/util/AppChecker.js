@@ -11,6 +11,7 @@ const isValidPath = require('is-valid-path');
 const commandExistsSync = require('command-exists').sync;
 const async = require('async');
 const configData = require('../data/config.js');
+const c = require('../../config/local.config.json').config;
 
 const _ = require('underscore');
 
@@ -171,6 +172,8 @@ module.exports = {
   initConditions,
   // Initialize the application
   init(callback) {
+    const repost = c.repos;
+
     initErrors();
     initConditions();
     async.waterfall([
@@ -190,6 +193,9 @@ module.exports = {
             });
           } else cb(null);
         });
+      },
+      // Check if the json repositories exists in maindir
+      (cb) => {
       }],
      (err) => { callback(err); });
   },

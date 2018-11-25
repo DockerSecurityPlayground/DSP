@@ -5,7 +5,11 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
   $scope.repos = [];
   $scope.nameRepository = "";
   $scope.areReposUploading = false;
+  $scope.isRepoUploading = false;
   $scope.addRepository = function() {
+      $scope.isRepoUploading = true;
+      console.log($scope.nameRepository)
+
   }
   AjaxService.getProjects()
     .then(function successCallback(response) {
@@ -13,6 +17,7 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
     }, function errorCallback(err) {
       Notification('Server error:'+ response.data.message, 'error');
     });
+
 
   $scope.updateAll= function() {
     $scope.areReposUploading = true;

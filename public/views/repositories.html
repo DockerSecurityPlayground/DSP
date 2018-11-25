@@ -41,13 +41,14 @@
                  id="githubURL" 
                  ng-model=nameRepository
           >
+          <div ng-show="isRepoUploading" class="alert alert-info"> Uploading Repo, pls wait... </div>
           <div class="text-muted small">Add repository</div>
 
       <div ng-show='isLoadingGit' class="alert alert-info">  Inserting Repo</div>
 
           <button class="btn btn-success" 
             ng-click="addRepository()"
-            ng-disabled="githubForm.$invalid"
+            ng-disabled="githubForm.$invalid || isRepoUploading"
             > Add repo </button>
     </form>
 
