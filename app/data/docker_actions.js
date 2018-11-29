@@ -1,5 +1,7 @@
 const _ = require('underscore');
 const dockerImages = require('./docker-images');
+const appUtils = require('../util/AppUtils');
+const log = appUtils.getLogger();
 
 function findContainerImage(allImages, selectedImage) {
   return _.findWhere(allImages, { name: selectedImage.name });
@@ -95,6 +97,18 @@ function getArg(key, arg) {
   // Boolean argument
   else return (arg.val === 'true') ? `${flag}${key} ` : ' ';
 }
+
+exports.getComposeOptions = function getComposeOptions(clistToDraw) {
+  let options = "";
+  _.each(clistToDraw, (c) => {
+    // --scale <name_service>=N)
+    if (c.scale && c.scale.isEnabled && c.scale.num) {
+      log.info(`[Docker-compose option] Scale option  for service ${c.name} (num)= ${c.scale.num}`);
+      options += ` --scale ${c.name}=${c.scale.num}`
+    }
+  });
+  return options;
+};
 
 exports.getCommand = function getCommand(a) {
   const args = a.args;

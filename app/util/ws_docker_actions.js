@@ -28,6 +28,7 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let thePath;
   let config;
   let pathCopyDirectory
+  let dockerComposeOptions = "";
 
   async.waterfall([
     (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
@@ -51,6 +52,16 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
       }
       else cb(null);
     },
+    // Get clistToDraw
+    (cb) => {
+      networkData.get(params.namerepo, params.namelab, cb);
+    },
+    (ni, cb) => {
+      networkInfo = ni;
+      dockerComposeOptions = dockerAction.getComposeOptions(ni.clistToDraw);
+      cb(null);
+
+    },
     // call docker compose up
     (cb) => {
       mainDir = config.mainDir;
@@ -64,15 +75,10 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
           cb(null);
         } else cb(err);
       },
-    notifyCallback);
-    },
-    // Get clistToDraw
-    (cb) => {
-      networkData.get(params.namerepo, params.namelab, cb);
+    notifyCallback, dockerComposeOptions);
     },
     // Copy before actions
-    (ni, cb) => {
-      networkInfo = ni;
+    (cb) => {
       dockerFilesToCopy.copyBeforeActions(mainDir, params.namerepo,
           thePath, networkInfo.clistToDraw, cb);
     },

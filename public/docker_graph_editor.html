@@ -203,9 +203,10 @@
 	<label>Networks:</label>
 	</div>
 
+  
 	<div class="col-sm-9">
 	<div ng-if="e.isChecked === true" ng-repeat="(k,e) in containerDescription.networks ">
-	{{k}} : {{e.ip}}
+	{{k}} : {{(e.isDynamic)? "DHCP" : e.ip}}
 	</div>
 	</div>
 

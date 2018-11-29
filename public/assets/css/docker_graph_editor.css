@@ -18,9 +18,7 @@ height: 70px;
 .collassa { 
 	background-color:white ;
 	padding-bottom:10px;
-	
-
-	}
+}
 
 .collassa.in {
 overflow-y: hidden;
@@ -85,7 +83,6 @@ padding: 15px;
 .center_align {
 	margin: auto;
 	width: 50%;
-
 } 
 
 /*** OPTION PANELS  ***/ 

@@ -18,7 +18,11 @@ function JDCGetContainerNetworks(container) {
   // Add network to network services {n1 : {} , n2: {}}
   _.each(networks, (nValue, key) => {
     // Only checkeds
-    if (nValue.isChecked) ns[key] = { ipv4_address: nValue.ip };
+    if (nValue.isChecked && !nValue.isDynamic) {
+      ns[key] = { ipv4_address: nValue.ip  };
+    } else if (nValue.isDynamic) {
+      ns[key] = {};
+    }
   });
   return ns;
 }

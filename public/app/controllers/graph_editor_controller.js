@@ -49,6 +49,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       containerManager.init($scope.imageList)
       $scope.changedImage($scope.imageList[0])
       if(params.action && (params.action==='edit' || params.action ==='new')) {
+              // Edit a lab
               if(params.action === 'edit')
               {
 
@@ -63,6 +64,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
                               yamlcode.text(data.yamlfile)
                               Prism.highlightAll();
                               $scope.yamlfile = data.yamlfile;
+                              // If exists a networkList add the netwokr list
                               if(data.networkList)
                                       NetworkManagerService.setNetworkList(data.networkList)
                               $scope.networkList =  NetworkManagerService.getNetworks()
@@ -101,7 +103,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 			console.log("DiStruzione in att")
 			$scope.containerDescription = null
 		}
-		console.log(JSON.stringify($scope.containerListToDraw))
 		//Delete current container drawer element , it cannot be more used
 		gh.setCurrent(null)
 		$scope.containerToDraw = null
@@ -166,12 +167,15 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 			$scope.networkList = NetworkManagerService.getNetworks()
 		}
 	};
+  $scope.changeIpType = function(currentContainer, nameNetwork) {
+    console.log("In change ip type");
+    console.log(currentContainer.networks[nameNetwork]);
+  }
 
 	//Add a new network to list of networks
 	$scope.addNetworkElement = function() {
 		var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
-		console.log("three:")
-		console.log($scope.subnet.three)
+
 		//Increase the third cipher of form ip
 		$scope.subnet.three =  (parseInt($scope.subnet.three)+1)%255
 
@@ -481,13 +485,13 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 			//Find color
 			var subnet = NetworkManagerService.subnetOf(e.ip);
 			var n=NetworkManagerService.getNetworkBySubnet(subnet);
-                        console.log("NETWORK TO DRAW")
-                        console.log(e);
 			networkToDraw.push({
-                                // Draw only if is visible
-                                name: (e.isVisible == false) ?  '' : e.ip,
+        nameNetwork : n.name,
+        // Draw only if is visible
+        name: (e.isVisible == false) ?  '' : e.ip,
 				color:n.color,
-				position:e.position
+				position:e.position,
+        isDynamic: e.isDynamic
 			})
 		}
 
@@ -924,6 +928,8 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 	//	console.log($scope.containerListNotToDraw)
 	//	console.log($scope.networkList)
 	//	console.log(gh.getGraphicJSON())
+  console.log($scope.containerListToDraw);
+  console.log($scope.containerListNotToDraw);
 		dockerAPIService.saveLab($scope.labName,
 				$scope.containerListToDraw,
 				$scope.containerListNotToDraw,
