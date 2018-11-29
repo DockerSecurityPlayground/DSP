@@ -2,6 +2,7 @@ const path = require('path');
 const homedir = require('homedir');
 const repogitData = require('../util/repogitData.js');
 const configData = require('../data/config.js');
+const repoData = require('../data/repos.js');
 const localConfig = require('../../config/local.config.json');
 const async = require('async');
 const fs = require('fs');
@@ -74,6 +75,48 @@ const api = {
     repogitData.pullApplication(callback);
   },
 
+  addProject(repo, callback) {
+    log.info('[WS_GIT_MANAGER] Add repo');
+    async.waterfall([
+    (cb) => Checker.checkParams(repo, ['name', 'url'], cb),
+    // Initialize repository
+    (cb) => GitUtils.initRepository(repo.name, repo.url, cb, (data) => {
+        log.info(data);
+      }),
+    // Add to list of repos
+    (cb) => repoData.post(repo, cb)
+    ], (err) => callback(err));
+  },
+
+  // Update a single project
+  updateProject(repo, callback) {
+    async.waterfall([
+    (cb) => Checker.checkParams(repo, ['name'], cb),
+    (cb) => configData.getConfig(cb),
+    (config, cb) => {
+      rootDir = config.mainDir;
+      repos = localConfig.config.repos;
+      cb(null);
+    }, (cb) => LabStates.checkAll(repo.name, 'STOPPED', (err, areStopped, labsRunnings) => {
+      if (err) {
+        cb(err);
+      } else if (areStopped) cb(null);
+      else {
+        log.warn(`${r.name} is not stopped!`);
+        cb(Checker.errorLabNoStopped(labsRunning));
+      }
+    }),
+    (cb) => {
+      log.info(' All stopped, pulling repo ');
+      repogitData.pullRepo(path.join(homedir(), rootDir, repo.name), cb);
+    },
+    (summary, cb) => {
+      log.info("Update state table");
+      LabStates.initStates(repo.name, cb);
+    }], (err) => callback(err))
+  },
+
+  // Update all projects
   updateProjects(callback) {
     log.info('[IN UPDATE PROJECTS API]');
     let repos;
@@ -83,10 +126,9 @@ const api = {
         (cb) => configData.getConfig(cb),
         (config, cb) => {
           rootDir = config.mainDir;
-          repos = localConfig.config.repos;
-          console.log(repos);
           cb(null);
         },
+        (cb) => repoData.get(cb),
         /* Check if all are stopped
           NOTE: When clone for the first time
           the state af all cloned labs is setted to STOPPED
@@ -94,7 +136,8 @@ const api = {
           are not in NO_NETWORK state during cloning ->
           (See initRepositories inside project_init.js  function )
         */
-        (cb) => {
+        (repositories, cb) => {
+          repos = repositories;
           log.info(' Check all stopped ');
           async.eachSeries(
             repos, (r, c) => {

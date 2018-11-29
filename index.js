@@ -138,7 +138,8 @@ app.delete('/dsp_v1/services/:nameservice', serviceHandler.removeService);
 
 
 // API GIT REPOS
-app.get('/dsp_v1/git_repos', repoHandler.get);
+app.get('/dsp_v1/git-repos', repoHandler.get);
+app.delete('/dsp_v1/git-repos/:name', repoHandler.remove);
 
 app.get('/dsp_v1/networkservices/:namerepo/:namelab', serviceHandler.getNetworkList);
 app.post('/dsp_v1/networkservices', serviceHandler.attachNetwork);

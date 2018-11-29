@@ -106,11 +106,39 @@ function manageSyncGithub(ws, jsonMessage) {
 }
 
 
+function manageAddProject(ws, jsonMessage) {
+  wsGitHandler.addProject(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    }
+    else {
+      // Restart command
+      sendResponse(ws,null);
+    }
+  });
+}
+// Update a single project
+function manageUpdateProject(ws, jsonMessage) {
+  wsGitHandler.updateProject(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    }
+    else {
+      // Restart command
+      sendResponse(ws,null);
+    }
+  });
+}
+
+// Update multiple projects
 function manageUpdateProjects(ws) {
   wsGitHandler.updateProjects((err) => {
     sendResponse(ws, err);
   });
 }
+
 function manageUpdateApplication(ws) {
   const appRootString = appRoot.toString();
   log.info('[WS_HANDLER] Update Application [====]');
@@ -159,8 +187,14 @@ exports.init = function init(server) {
         case 'synchronize_github':
           manageSyncGithub(ws, jsonMessage);
           break;
+        case 'update_project':
+          manageUpdateProject(ws, jsonMessage);
+          break;
         case 'update_projects':
           manageUpdateProjects(ws, jsonMessage);
+          break;
+        case 'add_project':
+          manageAddProject(ws, jsonMessage);
           break;
         case 'update_application':
           manageUpdateApplication(ws, jsonMessage);

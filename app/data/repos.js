@@ -8,6 +8,7 @@ const ncp = require('ncp').ncp;
 const pathExists = require('path-exists');
 const appUtils = require('../util/AppUtils.js');
 const LabStates = require('../util/LabStates.js');
+const rimraf = require('rimraf');
 
 const _ = require('underscore');
 
@@ -23,7 +24,6 @@ function get(cb) {
       cb(null, repoFile);
     }, (repoFile, cb) => jsonfile.readFile(repoFile, cb)
     ], (err, jsonRepos) => {
-      console.log(jsonRepos);
       cb(err, jsonRepos);
   });
 }
@@ -38,30 +38,58 @@ function exists(cb) {
         cb(err);
       } else {
           pathExists(repoFile).then(exists => {
-        console.log(exists);
         cb(null, exists);
       })
     }
    });
   }
-function post(repos, cb) {
-
+function post(repo, cb) {
+  log.info("[repositories ] post repos]");
+  let repoFile;
   async.waterfall([
+    // Update repos.json file
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      const repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
-      cb(null, repoFile);
-    }, (repoFile, cb) => jsonfile.writeFile(repoFile, repos, cb)
-    ], (err, jsonRepos) => {
-      cb(err, jsonRepos);
+      repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      cb(null);
+    },
+    (cb) => get(cb),
+    (repos, cb) => {
+      repos.push({
+      "name": repo.name,
+      "url": repo.url
+      });
+      jsonfile.writeFile(repoFile, repos, cb);
+    }], (err) => {
+      cb(err);
   });
 }
 
-function put(repo, cb) {
-
+function remove(reponame, cb) {
+  let mainDir;
+  let repoFile;
+  log.info("reponame:"+reponame);
+  async.waterfall([
+    (cb) => configData.getConfig(cb),
+    (conf, cb) => {
+      mainDir = path.join(homedir(), conf.mainDir);
+      repoFile = path.join(mainDir, "repos.json");
+      cb(null);
+    },
+    // Remove directory from the main directory
+    (cb) => rimraf(path.join(mainDir, reponame), cb),
+    (cb) => get(cb),
+    // Remove from repos.json
+    (repos, cb) => {
+      const newRepos = _.reject(repos, {name:reponame});
+      log.info("Write new repos.json");
+      jsonfile.writeFile(repoFile, newRepos, cb);
+    }], cb);
 }
+
 
 exports.get = get;
 exports.post = post;
 exports.exists = exists;
+exports.remove = remove;
 exports.version = '0.1.0';

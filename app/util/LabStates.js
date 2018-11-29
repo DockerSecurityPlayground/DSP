@@ -252,6 +252,9 @@ function removeStates(repoName, callback) {
     }], (err) => callback(err));
 }
 
+function removeStatesRepos(repos, callback) {
+}
+
 function initStates(repoName, callback) {
   const log = appUtils.getLogger();
   const dirs = appUtils.getDSPDirsSync(repoName);
@@ -266,6 +269,33 @@ function initStates(repoName, callback) {
       }, (errInit) => callback(errInit));
     }
   });
+}
+
+function removeDirtyStates(allDirs, cb) {
+    const log = appUtils.getLogger();
+    let allRepos = [];
+    let reposInState = [];
+    _.each(allDirs, (e) => {
+      allRepos.push(e.repoName);
+    });
+    allRepos = _.uniq(allRepos);
+    const states = getStatesSync();
+    _.each(states, (e) => {
+      reposInState.push(e.repoName);
+    });
+    reposInState = _.uniq(reposInState);
+    let reposToRemove = _.difference(reposInState, allRepos);
+    if (reposToRemove.length != 0) {
+      log.info("[LAB STATES] Remove dirty states");
+      log.info("[LAB STATES] Repos to remove:" + reposToRemove);
+      async.eachSeries(reposToRemove, (r, c) => {
+        log.info("Remove states of "+ r);
+        removeStates(r, c);
+      }, (err) => cb(err));
+
+    } else {
+      cb(null);
+    }
 }
 
 module.exports = {
@@ -285,6 +315,7 @@ module.exports = {
   newStateSync,
   removeState,
   removeStates,
+  removeDirtyStates,
   initStates,
   checkSome,
   checkAll

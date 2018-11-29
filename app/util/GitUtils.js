@@ -13,6 +13,7 @@ const LabStates = require('./LabStates.js');
 const dockerManager = require('../data/docker-images.js');
 const imageMgr = require('mydockerjs').imageMgr;
 
+// Clone a project in the main directory
 function cloneProject(nameProject, githubUrl, callback) {
   const log = appUtils.getLogger();
   log.info('Cloning...');

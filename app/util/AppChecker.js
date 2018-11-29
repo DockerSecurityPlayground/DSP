@@ -174,6 +174,7 @@ module.exports = {
   initConditions,
   // Initialize the application
   init(callback) {
+    // Official repositories
     const repos = c.repos;
 
     initErrors();

@@ -43,7 +43,6 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
 
 
   $scope.updateConfig= function() {
-  console.log($scope.config);
   AjaxService.updateConfig($scope.config)
   .then(
           function success(response) {

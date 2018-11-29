@@ -176,7 +176,15 @@ self.init = function(onSuccess) {
   }
 
   self.getProjects = function() {
-      return $http.get(apiUrl+'git_repos');
+      return $http.get(apiUrl+'git-repos');
   }
-
+  self.removeProject = function(repo, repoUrl) {
+      return $http.delete(apiUrl+'git-repos'+'/'+repo);
+  }
+  self.addProject = function(repoName, repoUrl) {
+      return $http.post(apiUrl+'git-repos', {
+        repoName: repoName,
+        repoUrl: repoUrl
+      });
+  }
 }

@@ -13,6 +13,9 @@ Versioning of Docker Security Playground
  New terminal on a new tab in visual editor
  If the user have not a Docker image he should be notified (no docker pull)
 
+## [2.2] - 2018-11-29
+Multiple repositories support added
+
 ## [2.1] - 2018-10-01
  Fix space names network allowed bug
 

@@ -3,14 +3,80 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
   var imageList = [];
   //$scope.urlPattern = RegexService.urlRegex;
   $scope.repos = [];
-  $scope.nameRepository = "";
-  $scope.areReposUploading = false;
+  $scope.repo = {
+    name: "",
+    url: ""
+  }
+
   $scope.isRepoUploading = false;
+
   $scope.addRepository = function() {
       $scope.isRepoUploading = true;
-      console.log($scope.nameRepository)
+      if ($scope.repo.name  == '') {
+        $theUrl = $scope.repo.url;
+        $scope.repo.name = $theUrl.substring($theUrl.lastIndexOf('/') + 1, $theUrl.length - 4);
+      }
 
+      SocketService.manage(
+        JSON.stringify({
+          action: 'add_project',
+          body: $scope.repo
+      }), function (event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          window.location.href = '/repositories';
+      } else if (data.status === 'error') {
+          Notification(data.message, 'error');
+          $scope.isRepoUploading = false;
+      };
+    });
   }
+
+
+  $scope.updateRepository = function(repo) {
+      $scope.isRepoUploading = true;
+
+      SocketService.manage(
+        JSON.stringify({
+          action: 'update_project',
+          body: repo
+      }), function (event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+        Notification("Repository updated", 'success');
+        $scope.isRepoUploading = false;
+      } else if (data.status === 'error') {
+          Notification(data.message, 'error');
+          $scope.isRepoUploading = false;
+      };
+    });
+  }
+  $scope.removeRepository = function(p) {
+      var modalInstance = $uibModal.open({
+        component: 'modalComponent',
+        resolve: {
+        lab: function () {
+          return p;
+          }
+        }
+    });
+      modalInstance.result.then(function yes() {
+        console.log("DELETE");
+        AjaxService.removeProject(p.name)
+        .then(function success() {
+          Notification({message:"Project deleted"}, 'success');
+          for (var i = 0; i < $scope.repos.length; i++) {
+            if ($scope.repos[i].name == p.name) {
+              $scope.repos.splice(i, 1);
+            }
+          }
+        }, function exception(data) {
+          Notification("Error in delete", 'error');
+        });
+      }, function no() {
+    });
+  }
+
   AjaxService.getProjects()
     .then(function successCallback(response) {
       $scope.repos = response.data.data;
@@ -20,7 +86,7 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
 
 
   $scope.updateAll= function() {
-    $scope.areReposUploading = true;
+    $scope.isReposUploading = true;
 
       SocketService.manage(
             JSON.stringify({
@@ -30,8 +96,8 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
         var data = JSON.parse(event.data);
         if(data.status === 'success')  {
                 console.log("Success")
-                Notification({message:"Project uploaded!"}, 'success');
-                $scope.areReposUploading = false;
+                Notification({message:"Projects uploaded!"}, 'success');
+                $scope.isReposUploading = false;
         } else if (data.status === 'error') {
             console.log(data.status);
             console.log(data.code);

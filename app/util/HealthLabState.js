@@ -4,6 +4,7 @@ const path = require('path');
 const LabStates = require('./LabStates.js');
 const async = require('async');
 const AppUtils = require('./AppUtils.js');
+const _ = require('underscore');
 
 // function checkLabels() {
 //
@@ -41,6 +42,7 @@ module.exports = {
   run(cb, debug) {
     log.info(`Start Healt Checker in ${debug ? 'debug' : 'normal'} mode!`);
     const allDirs = AppUtils.getAllDSPDirsSync();
+
     async.eachSeries(allDirs, (d, c) => {
       const hasDocker = checkNetworkDescription(d.thePath);
       // STATE TABLE TO UPDATE
@@ -59,6 +61,8 @@ module.exports = {
         });
       }
       else c(null);
-    }, (err) => cb(err));
+    }, (err) => {
+        LabStates.removeDirtyStates(allDirs, cb);
+    });
   }
 };
