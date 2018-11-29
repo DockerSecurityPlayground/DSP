@@ -46,7 +46,6 @@ function setContainer(container, dest) {
 }
 function resetCurrent(imageList, networkList)
 {
-  console.log("SONO IN RESET");
 	//var c = c || $scope.currentContainer
 	//Zero name
 	currentContainer.name=""

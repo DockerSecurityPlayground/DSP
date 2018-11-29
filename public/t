@@ -1,0 +1,14 @@
+container
+	networks
+		network
+			networkName
+			ip
+			type
+
+
+networkList
+	network
+		name
+		subnet
+		color
+		listIP

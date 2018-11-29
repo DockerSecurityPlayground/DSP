@@ -29,7 +29,6 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
     }
     else {
       AjaxService.init(function onSuccess() {
-        console.log("SONO IN ON SUCCESS");
         $scope.config = angular.copy(AjaxService.config);
         $scope.gitUrlToEdit = angular.copy($scope.config.githubURL);
         if($scope.config.githubURL !== '')
