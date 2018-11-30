@@ -53,8 +53,10 @@ function resetCurrent(imageList, networkList)
 	currentContainer.environments = []
 	currentContainer.actions = []
 	currentContainer.volumes = []
-  currentContainer.scale.isEnabled = false
-  currentContainer.scale.num = 1
+  currentContainer.scale = {
+    isEnabled : false,
+    num : 1
+  };
 	currentContainer.filesToCopy = []
         currentContainer.isShellEnabled = true
 
