@@ -179,33 +179,33 @@ module.exports = {
 
     initErrors();
     initConditions();
-    async.waterfall([
-      // Check requires
-      (cb) => checkDSPRequires(cb),
-      (cb) => {
-        this.isInstalled((isInstalled) => {
-          if (isInstalled) {
-            configData.getConfig((err, config) => {
-              if (err) cb(err);
-              else {
-                const userPath = path.join(homedir(), config.mainDir, config.name);
-                if (!fs.existsSync(userPath)) { cb(new Error(`${userPath} dir not found! Pls delete config_user.json and reinstall `)); }
-                // Update repogitData
-                cb(null);
-              }
-            });
-          } else cb(null);
-        });
-      },
-      // Check if the json repositories exists in maindir
-      (cb) => repoData.exists(cb),
-      (exists, cb) => {
-        if (!exists) {
-          log.warn('repos.json does not exists, create it');
-          repoData.post(repos, cb);
-        }
-      }],(err) => { callback(err); });
-  },
+      async.waterfall([
+        // Check requires
+        (cb) => checkDSPRequires(cb),
+        (cb) => {
+          this.isInstalled((isInstalled) => {
+            if (isInstalled) {
+              configData.getConfig((err, config) => {
+                if (err) cb(err);
+                else {
+                  const userPath = path.join(homedir(), config.mainDir, config.name);
+                  if (!fs.existsSync(userPath)) { cb(new Error(`${userPath} dir not found! Pls delete config_user.json and reinstall `)); }
+                  // Update repogitData
+                  cb(null);
+                }
+              });
+            } else cb(null);
+          });
+        },
+        // Check if the json repositories exists in maindir
+        (cb) => repoData.exists(cb),
+        (exists, cb) => {
+          if (!exists) {
+            log.warn('repos.json does not exists, create it');
+            repoData.create(repos, cb);
+          }
+        }],(err) => { callback(err); });
+    },
   AppConditions: Checker,
 
 

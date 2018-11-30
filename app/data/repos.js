@@ -43,6 +43,23 @@ function exists(cb) {
     }
    });
   }
+
+function create(repos, cb) {
+  log.info("[repositories ] create repos]");
+  let repoFile;
+  async.waterfall([
+    // Update repos.json file
+    (cb) => configData.getConfig(cb),
+    (conf, cb) => {
+      repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      cb(null);
+    },
+    (cb) => {
+      jsonfile.writeFile(repoFile, repos, cb);
+    }], (err) => {
+      cb(err);
+  });
+}
 function post(repo, cb) {
   log.info("[repositories ] post repos]");
   let repoFile;
@@ -92,4 +109,5 @@ exports.get = get;
 exports.post = post;
 exports.exists = exists;
 exports.remove = remove;
+exports.create = create;
 exports.version = '0.1.0';
