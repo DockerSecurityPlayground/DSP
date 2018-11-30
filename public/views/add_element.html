@@ -128,11 +128,13 @@
 	      </div>  
         <!-- END FORM NETWORKS -->
         <!-- Scale option -->
+        <br>
+        <br>
         <div class="row form-group"> 
 		      <label class="control-label col-sm-2" for="container_scale"> Scale:</label>
 		      <div class="col-sm-10 " id="container_scale" name="container_scale"> 
             <div class="row checkbox checkbox-primary checkbox-circle" >
-              <div class="col-sm-1"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
+              <div class="col-sm-1 col-sm-offset-2"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
             <div ng-style="{ 'visibility' : (currentContainer.scale.isEnabled)? 'visible': 'hidden'}" >
               <label class="control-label col-sm-2" for="numreplicas"> Num replicas:</label>
             <div 
