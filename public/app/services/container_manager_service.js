@@ -156,11 +156,12 @@ return {
 		var clistToDraw = data.clistToDraw,
 		    clistNotToDraw = data.clistNotToDraw
 		_.each(clistNotToDraw, function(ele) {
-
-			var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
-			ele.selectedImage = imageSelected;
-		   clnd.push(ele)
-		})
+            if (ele.selectedImage && ele.selectedImage.name) {
+                var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
+                ele.selectedImage = imageSelected;
+                clnd.push(ele)
+          }
+    })
 		_.each(clistToDraw, function(ele) {
 
 			var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
