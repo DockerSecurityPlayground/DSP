@@ -3,6 +3,8 @@ const projectInit = require('../util/project_init.js');
 const async = require('async');
 const appUtils = require('../util/AppUtils');
 const path = require('path');
+const c = require('../../config/local.config.json').config;
+const repoData = require('../data/repos.js');
 
 const JoiAppConditions = Checker.JoiAppConditions;
 const AppConditions = Checker.AppConditions;
@@ -32,6 +34,10 @@ function installation(config, callback, notifyCallback) {
     (cb) => {
       log.info('Create dsp directories ');
       projectInit.createDSP(path.basename(appUtils.path_userconfig()), cb, notifyCallback);
+    },
+    (cb) => {
+        const repos = c.repos;
+        repoData.create(repos, cb);
     },
     (cb) => projectInit.initRepos(cb, notifyCallback)
     // Clone main repository

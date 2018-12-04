@@ -37,11 +37,10 @@ function exists(cb) {
       if (err) {
         cb(err);
       } else {
-          pathExists(repoFile).then(exists => {
+        const exists = pathExists.sync(repoFile);
         cb(null, exists);
-      })
-    }
-   });
+      }
+    })
   }
 
 function create(repos, cb) {

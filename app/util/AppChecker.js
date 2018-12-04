@@ -17,6 +17,22 @@ const log = appUtils.getLogger();
 
 const _ = require('underscore');
 
+function _checkRepos(cb) {
+    // Official repositories
+    repoData.exists((err, exists) => {
+        if (err) {
+            cb(err);
+        } else {
+            if (!exists) {
+                log.warn('repos.json does not exists, create it');
+                repoData.create(repos, cb);
+            } else {
+                log.info("repos.json exists");
+          }
+        }
+    });
+}
+
 
 function checkDSPRequires(callback) {
   const log = appUtils.getLogger();
@@ -174,8 +190,7 @@ module.exports = {
   initConditions,
   // Initialize the application
   init(callback) {
-    // Official repositories
-    const repos = c.repos;
+    let isInstalledApplication;
 
     initErrors();
     initConditions();
@@ -184,6 +199,7 @@ module.exports = {
         (cb) => checkDSPRequires(cb),
         (cb) => {
           this.isInstalled((isInstalled) => {
+            isInstalledApplication = isInstalled;
             if (isInstalled) {
               configData.getConfig((err, config) => {
                 if (err) cb(err);
@@ -198,13 +214,14 @@ module.exports = {
           });
         },
         // Check if the json repositories exists in maindir
-        (cb) => repoData.exists(cb),
-        (exists, cb) => {
-          if (!exists) {
-            log.warn('repos.json does not exists, create it');
-            repoData.create(repos, cb);
-          }
-        }],(err) => { callback(err); });
+        (cb) => {
+        if (isInstalledApplication) {
+            log.info("Check if repos.json exists");
+            _checkRepos(cb);
+        } else {
+            cb(null);
+        }
+      }],(err) => { callback(err); });
     },
   AppConditions: Checker,
 
