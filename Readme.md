@@ -12,16 +12,39 @@ in penetration testing and network security, but its flexibility allows you the
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
 labs**. For more information look at the [Labs Managment]() page. 
 
-## Installation  and Guides
-Go to [wiki] (http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)
-to learn all about the application.
-
 ## Prerequisites
 * Nodejs (v 7 or later)
 * git
 * docker
 * docker-compose
 * compiler tools (g++, c, c++)
+
+## Installation
+Install prerequisites and run: 
+
+```
+npm install
+```
+
+## Update the application: 
+When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
+```
+npm run update
+```  
+
+## Start  
+Run 
+
+```
+npm start  
+```
+To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
+
+
+Go to you favourite browser and digit localhost:8080. You'll be redirected on installation page, set parameters and click install.   
+
+
+
  
 ## Error Debug
 
@@ -41,28 +64,27 @@ On Mac it seems that there is some problem with some node package, so in order t
 ```
 MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save-dev --save-exact
 ```
+Other info here: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors)  
+
 
 ## Q&A  
-How can I share my labs with the world ?   
+- How can I **share my labs with the world** ?
+   
 During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
 DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
-So, the easiest way to share labs is the following:   
-- Fork the project DSP_Repo (https://github.com/giper45/DSP_Repo.git)   
--  During the installation set github directory param to your forked repository.   
-- Now create your labs and share it! .   
+So, the easiest way to share labs is the following:    
+
+1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
+2. During the installation set github directory param to your forked repository.     
+3.  Now create your labs and share it!   
+
 It is important that all images that you use should be available to other users, so:   
-- You can publish on docker hub and update the "pull.sh" script under .docker-image application  other users can pull your images in order to use your labs.   
-- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and to use your repo   
+- You can publish on docker hub so other users can pull your images in order to use your labs.   
+- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
 
 If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
 
-At current time you there is no support to have more repositories in your DSP environment, anyway you can add git repositories to DSP in this way   
-
-- git clone the repository on main dsp directory. This is a manual way, so you will have to install all docker images. If the repo make has created a "pull.sh" script under the .docker-images you can use it to download images. 
-
-- Switch your local repository .    
-
-Next developments will allow to manage more repositories.  
+In DSP you can manage multiple user repositories (Repositories tab) 
 
 ## Contributing
 
@@ -75,20 +97,19 @@ Next developments will allow to manage more repositories.
 ## Any Questions? 
 Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/issues)**  in order to ask everything you want!. 
 
-## Update the application: 
-When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
-```
-npm run update
-```
+## Docker Wrapper Image  
+DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
+Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)
 
 ## Documentation   
-For documentation about DSP usage go to Wiki page: 
-http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home  
+For documentation about DSP usage go to Wiki page:   
+* Main Page: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)    
+* User Guide[http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide)  
+* Docker Wrapper Image: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)  
+* 
 
 It is a little outdated, I will update it as possible !  
-
-## History
-TODO: Write history    
+    
 
 
 ## Links
