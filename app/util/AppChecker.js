@@ -12,6 +12,7 @@ const commandExistsSync = require('command-exists').sync;
 const async = require('async');
 const configData = require('../data/config.js');
 const c = require('../../config/local.config.json').config;
+const repos = c.repos
 const repoData = require('../data/repos.js');
 const log = appUtils.getLogger();
 
