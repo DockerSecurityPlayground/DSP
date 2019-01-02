@@ -49,7 +49,7 @@ For documentation about DSP usage go to Wiki page:
 * Main Page: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)    
 * User Guide[http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide)  
 * Docker Wrapper Image: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)  
-* 
+
 
 It is a little outdated, I will update it as possible !  
    
