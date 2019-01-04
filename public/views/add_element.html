@@ -1,734 +1,589 @@
-<div style="background-color:white; height:500px;overflow:scroll;">
+<!-- <div style="background-color:white; height:1000px;overflow:scroll;"> -->
+<div style="background-color:white; height:100%; overflow:scroll">
+  <link rel="stylesheet" type="text/css" href="../assets/css/tab_graph.css">
+  <div  ng-repeat="(key,c) in containerListNotToDraw"	>
+    <h4 id="{{c.name}}" class="text-center " >
 
-<h3 class="text-center">Container List </h3>
-<hr>	
-
-<div  ng-repeat="(key,c) in containerListNotToDraw"	>
-<h4 id="{{c.name}}" class="text-center " >
-
-  <!-- <b> {{c}} </b> -->
-<b> {{c.name}}  </b>
-<a href="#" ng-click="onClickEditContainer(key)" style="margin-left:20px" class="fa fa-pencil"> </a>
-<a href="#" ng-click="deleteContainer(key)" style="margin-left:20px" class="fa fa-remove"> </a>
-<a href="#" ng-click="copyContainer(key)" style="margin-left:20px" class="fa fa-files-o"> </a>
-<hr>
-</h4>
+      <!-- <b> {{c}} </b> -->
+    <b> {{c.name}}  </b>
+    <a href="#" ng-click="onClickEditContainer(key)" style="margin-left:20px" class="fa fa-pencil"> </a>
+    <a href="#" ng-click="deleteContainer(key)" style="margin-left:20px" class="fa fa-remove"> </a>
+    <a href="#" ng-click="copyContainer(key)" style="margin-left:20px" class="fa fa-files-o"> </a>
+    <br>
+    </h4>
   </div>
+  <button type="submit" class="btn btn-default" ng-disabled="form_add_container.$invalid" ng-click="editContainer()"> 
+    <i class="glyphicon glyphicon-floppy-saved"> </i>    Save
+  </button> 
 
-  
-<div>
-<h3 class="text-center">{{currentAction}} </h3>
-<hr>
 
-<ng-form name="form_add_container" id="form_add_container" class="form-horizontal" novalidate>
-	      <div class="form-group"> 
-		<!-- NAME CONTAINER -->
-	      <label class="control-label col-sm-2" for="container_name">Name: </label>
-		      <div class="col-sm-9">
-		      <input type="text" class="form-control"  
-				name="container_name" 
-				id="container_name" 
-				placeholder="Name"
-				ng-pattern="nameContainerRegex"
-				ng-model="currentContainer.name" 
-				ng-change="checkContainerChange()"
-				ng-required="true"
-				ng-class="{
-					'invalid-syntax':form_add_container.container_name.$invalid
-					}" 	
-			>	
-		      </div>
+  <h3 class="text-center">{{currentAction}} </h3>
+  <div id='cssmenu'>
+    <ul>
+      <li id="tab_container" class={{tabs[0]}} ><a href='#' ng-click="elementTabChange(0)">Container</a></li>
+      <li id="tab_interfaces" class={{tabs[1]}} ng-click="elementTabChange(1)"><a href='#'>Interfaces</a></li>
+      <li id="tab_ports" class="{{tabs[2]}}" ng-click="elementTabChange(2)"><a href='#'>Ports</a></li>
+      <li id="tab_volumes" class="{{tabs[3]}}" ng-click="elementTabChange(3)"><a href='#'>Volumes</a></li>
+      <li id="tab_copy" class="{{tabs[4]}}" ng-click="elementTabChange(4)"><a href='#'>Copy</a></li>
+      <li id="tab_actions" class="{{tabs[5]}}" ng-click="elementTabChange(5)"><a href='#'>Actions</a></li>
+      <li id="tab_environment" class="{{tabs[6]}}" ng-click="elementTabChange(6)"><a href='#'>Environment</a></li>
+    </ul>
+  </div>
+  <br>
 
-		      
-	      </div>
-		<div class="text text-danger" style="margin-left:45px"
-			ng-style="{ 'visibility' : (containerErrors.someError)? 'visible': 'hidden'}" 
-	    > 
-			{{containerErrors.message}}	
-		</div>
-	      <div class="form-group"> 
-	      <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
-		      <div class="col-sm-5"> 
-		      <select 
-				ng-model="currentContainer.selectedImage" 
-				ng-change="changedImage(currentContainer.selectedImage)" 
-				ng-required=true
-				ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
-		      </select>
-		      </div>
-			<div class="col-sm-4"> 
-		      <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
-		      </input>
-		      </div>
-	      </div>
-	      <div class="row form-group"> 
-		      <label class="control-label col-sm-2" for="container_network"> Networks:</label>
-		      <div class="col-sm-10 " id="container_network" name="container_network"> 
-	
-		  
-			<!-- Network group -->
-                    <div class="row checkbox checkbox-primary checkbox-circle" ng-repeat="n in networkList">
-			<div class="col-sm-3">
-			<!-- NETWORK INPUT CHOICES -->
-			<!-- if you want check ip (no default bridge network used) add this -->
-			<!-- 	ng-required="!currentContainer.some_network_selected" -->
-			<input 
-				ng-model="currentContainer.networks[n.name].isChecked" 
-				 class="styled" 
-				type="checkbox" 
-				ng-change="checkNetworkClicked(n.name , currentContainer )"
-			>
+  <ng-form name="form_add_container" id="form_add_container" class="form-horizontal" novalidate>
 
-                        <label for="currentContainer.networks[n.name].ip" style="color:{{n.color}}; font-weight:bold; font-style:italic ">
-				{{n.name}} 
-                        </label>
-			</div>	
-      <!-- Network configuration -->
-      <div ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked)? 'visible': 'hidden'}" >
-      <!-- Dynamic or static ? -->
-        <div class="col-sm-1">
-            <input class="form-check-input" ng-click="changeIpType(currentContainer, n.name)" type="checkbox" ng-model="currentContainer.networks[n.name].isDynamic" id="defaultCheck1"> Dynamic
+    <div id="panel_container" ng-show=tabs[0]> <!-- START PANEL CONTAINER -->
+      <div class="form-group"> 
+        <!-- NAME CONTAINER -->
+        <label class="control-label col-sm-2" for="container_name">Name: </label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control"  
+                             name="container_name" 
+                             id="container_name" 
+                             placeholder="Name"
+                             ng-pattern="nameContainerRegex"
+                             ng-model="currentContainer.name" 
+                             ng-change="checkContainerChange()"
+                             ng-required="true"
+                             ng-class="{
+                             'invalid-syntax':form_add_container.container_name.$invalid
+                             }" 	
+                             >	
         </div>
-      <!-- If static -->
-      <div class="col-sm-8" ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked && !currentContainer.networks[n.name].isDynamic)? 'visible': 'hidden'}">
-          <select class="form-ip form-network"  
-          ng-click="changeContainerIP($event,currentContainer, n.name)"
-        > 
-          <!--ng-model="currentContainer.networks[n.name].ip"  -->
-          <option value"{{currentContainer.networks[n.name].ip}}" selected >
-            {{currentContainer.networks[n.name].ip}}
-           </option>
-          <option value="{{s}}" 
-            ng-repeat="s in n.listIP"
-            > 
-            {{s}}
-            
-          </option>
-            </select>
-          <select   class="form-ip form-network" 
-          ng-model="currentContainer.networks[n.name].position" > 
-            
-          <option value="right" selected> Right </option>
-          <option value="left" > Left </option>
-          <option value="bottom" >  Bottom </option>
-            </select>
-                        <span 
-                          >
-                          <label> <input name="isVisibleCheck" type="checkbox" ng-model="currentContainer.networks[n.name].isVisible"> Is Visible </label> 
-                        </span>
+      </div>
 
-
+      <div class="text text-danger" style="margin-left:45px"
+                                    ng-style="{ 'visibility' : (containerErrors.someError)? 'visible': 'hidden'}" 
+                                    > 
+                                    {{containerErrors.message}}	
+      </div>
+        <!-- IMAGE -->
+        <div class="form-group"> 
+          <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
+          <div class="col-sm-5"> 
+            <select 
+               ng-model="currentContainer.selectedImage" 
+               ng-change="changedImage(currentContainer.selectedImage)" 
+               ng-required=true
+               ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
+            </select>
           </div>
-
-
-
-	    </div>
-                    
-		      </div>
-	      </div>  
-        <!-- END FORM NETWORKS -->
-        <!-- Scale option -->
-        <br>
-        <br>
+          <div class="col-sm-4"> 
+            <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
+            </input>
+          </div>
+        </div>
         <div class="row form-group"> 
-		      <label class="control-label col-sm-2" for="container_scale"> Scale:</label>
-		      <div class="col-sm-10 " id="container_scale" name="container_scale"> 
-            <div class="row checkbox checkbox-primary checkbox-circle" >
-              <div class="col-sm-1 col-sm-offset-2"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
-            <div ng-style="{ 'visibility' : (currentContainer.scale.isEnabled)? 'visible': 'hidden'}" >
-              <label class="control-label col-sm-2" for="numreplicas"> Num replicas:</label>
-            <div 
-              class="col-sm-2"
-            >
-              <input type="number"   
-                        class="form-control" 
-                        min=1
-                        max=255
-                        ng-model="currentContainer.scale.num"
-                        name="scalenumber"
-              > </input>
+          <label class="control-label col-sm-2" for="container_network"> Networks:</label>
+          <div class="col-sm-10 " id="container_network" name="container_network"> 
+
+
+            <!-- Network group -->
+            <div class="row checkbox checkbox-primary checkbox-circle" ng-repeat="n in networkList">
+              <div class="col-sm-3">
+                <!-- NETWORK INPUT CHOICES -->
+                <!-- if you want check ip (no default bridge network used) add this -->
+                <!-- 	ng-required="!currentContainer.some_network_selected" -->
+                <input 
+                      ng-model="currentContainer.networks[n.name].isChecked" 
+                      class="styled" 
+                      type="checkbox" 
+                      ng-change="checkNetworkClicked(n.name , currentContainer )"
+                      >
+
+                      <label for="currentContainer.networks[n.name].ip" style="color:{{n.color}}; font-weight:bold; font-style:italic ">
+                        {{n.name}} 
+                      </label>
+              </div>	
+              <!-- Network configuration -->
+              <div ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked)? 'visible': 'hidden'}" >
+                <!-- Dynamic or static ? -->
+                <div class="col-sm-1">
+                  <input class="form-check-input" ng-click="changeIpType(currentContainer, n.name)" type="checkbox" ng-model="currentContainer.networks[n.name].isDynamic" id="defaultCheck1"> Dynamic
+                </div>
+                <!-- If static -->
+                <div class="col-sm-8" ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked && !currentContainer.networks[n.name].isDynamic)? 'visible': 'hidden'}">
+                  <select class="form-ip form-network"  
+                          ng-click="changeContainerIP($event,currentContainer, n.name)"
+                          > 
+                          <!--ng-model="currentContainer.networks[n.name].ip"  -->
+                    <option value"{{currentContainer.networks[n.name].ip}}" selected >
+                    {{currentContainer.networks[n.name].ip}}
+                    </option>
+                    <option value="{{s}}" 
+                            ng-repeat="s in n.listIP"
+                            > 
+                            {{s}}
+
+                    </option>
+                  </select>
+                  <select   class="form-ip form-network" 
+                            ng-model="currentContainer.networks[n.name].position" > 
+
+                            <option value="right" selected> Right </option>
+                            <option value="left" > Left </option>
+                            <option value="bottom" >  Bottom </option>
+                  </select>
+                  <span 
+                                    >
+                                    <label> <input name="isVisibleCheck" type="checkbox" ng-model="currentContainer.networks[n.name].isVisible"> Is Visible </label> 
+                  </span>
+                </div>
+              </div>
             </div>
+          </div>  
+          <!-- END FORM NETWORKS -->
+          <!-- Scale option -->
+          <br>
+          <br>
+          <div class="row form-group"> 
+            <label class="control-label col-sm-2" for="container_scale"> Scale:</label>
+            <div class="col-sm-10 " id="container_scale" name="container_scale"> 
+              <div class="row checkbox checkbox-primary checkbox-circle" >
+                <div class="col-sm-1 col-sm-offset-2"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
+                <div ng-style="{ 'visibility' : (currentContainer.scale.isEnabled)? 'visible': 'hidden'}" >
+                  <label class="control-label col-sm-2" for="numreplicas"> Num replicas:</label>
+                  <div 
+                                                        class="col-sm-2"
+                                                        >
+                                                        <input type="number"   
+                                                               class="form-control" 
+                                                               min=1
+                                                               max=255
+                                                               ng-model="currentContainer.scale.num"
+                                                               name="scalenumber"
+                                                               > </input>
+                  </div>
+                </div>
+
+              </div>
             </div>
-              
-            </div>
-          </div>
-			<!-- Network group -->
-	      </div>  
+            <!-- Network group -->
+          </div>  
         </div>
         <!-- END SCALE -->
         <!-- Scale option -->
-        
-              <!-- START COPY SHELL -->
+
+        <!-- START COPY SHELL -->
         <div class="row form-group"> 
-		      <label class="control-label col-sm-2" for="container_network"> Enable shell/copy:</label>
-		      <div class="col-sm-10 " > 
-                  <input type="checkbox" ng-model="currentContainer.isShellEnabled" />
-		      </div>
-	      </div>
+          <label class="control-label col-sm-2" for="container_network"> Enable shell/copy:</label>
+          <div class="col-sm-10 " > 
+            <input type="checkbox" ng-model="currentContainer.isShellEnabled" />
+          </div>
+        </div>
+        <!-- End copy shell -->
+        <!-- START DEPENDS ON  -->
+        <div class="form-group row" >
+
+          <div class="col-sm-offset-1 col-sm-2">
+            <label for="currentContainer.dependsOn" >
+              Depends on : 
+            </label>
+          </div>
+
+          <div class="col-sm-4">
+            <div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
+              <label><input type="checkbox" ng-model="currentContainer.dependsOn[cnd.name]"  value="{{cnd.name}}">{{cnd.name}}</label>
+            </div>
+          </div>
+          <br>
+        </div>
+        <!-- END DEPENDS ON -->
+        <div class="form-group row" >
+          <div class="col-sm-offset-1 col-sm-2">
+            <label for="currentContainer.Links" >
+              Links: 
+            </label>
+          </div>
+
+          <div class="col-sm-4">
+            <div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
+              <label><input type="checkbox" ng-model="currentContainer.links[cnd.name]" value="{{cnd.name}}">{{cnd.name}}</label>
+            </div>
 
 
-		<!--- PORT INPUT SELECT -->
-		<div ng-repeat="(key,port) in currentContainer.selectedImage.exposedPorts" class="form-group"> 
-                  <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="container_ports">
-                           Port <b> {{port}} </b> forwarded to:
-                  </label>
-                  <div class="col-sm-2">
-                    <ng-form name="formPorts">
-                      <input type="number" 
-                        class="form-control" 
-                        min=1
-                        max=65535
-                        ng-required=true 
-                        ng-class="{
-                                'invalid-syntax':formPorts.$invalid
-                                }" 	
-                        ng-model="currentContainer.ports[port]"> </input> 
-                        (1 - 65535)
-                  </ng-form>
-              </div>
-		</div>
-		<!-- END PORT INPUT -->
- <div class="text-center" style="margin-right:40px"> 
-                <table class="table table-reduced-width col-sm-offset-1">
-                  <thead>
-                    <tr>
-                      <th class="text-center"> Container Port => Host Port  </th>
-                      <th class="text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr ng-repeat="op in optionalPorts"> 
-                      <td> {{op.container}} => {{op.host}} </td>
-                      <td> <button class="btn btn-danger" ng-click="removeOptionalPort($index)"> - </button></td>
-                    </tr>
-                  </tbody>
+          </div>
+          <br>
+        </div>
+    </div> <!-- END CONTAINER PANEL  -->
 
-                </table>
+    <div id="panel_ports" ng-show="tabs[2]">
+      <!--- PORT INPUT SELECT -->
+      <div ng-repeat="(key,port) in currentContainer.selectedImage.exposedPorts" class="form-group"> 
+        <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="container_ports">
+          Port <b> {{port}} </b> forwarded to:
+        </label>
+        <div class="col-sm-2">
+          <ng-form name="formPorts">
+            <input type="number" 
+                   class="form-control" 
+                   min=1
+                   max=65535
+                   ng-required=true 
+                   ng-class="{
+                   'invalid-syntax':formPorts.$invalid
+                   }" 	
+                   ng-model="currentContainer.ports[port]"> </input> 
+            (1 - 65535)
+          </ng-form>
+        </div>
       </div>
-                
-        <div class="optionalPorts form-group"> 
-          <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="optional_ports"> Optional ports </label>
-          <form name="optionalPortForm">
-            <div class="col-sm-2">
-              <input type="number"   
-                        class="form-control" 
-                        min=1
-                        max=65535
-                        ng-model="optPort.container"
-                        name="containerOptPort"
-                        ng-class="{
-                                'invalid-syntax':optionalPortForm.containerOptPort.$invalid
-                                }" 	
-              > </input>
-            </div>
-            <div class="col-sm-2">
-              <input type="number"   
-                        class="form-control" 
-                        min=1
-                        max=65535
-                        ng-model="optPort.host"
-                        name="hostOptPort"
-                        ng-class="{
-                                'invalid-syntax':optionalPortForm.hostOptPort.$invalid
-                                }" 	
-              > </input>
-            </div>
-            <div class="col-sm-2">
-              <button 
-                class="btn btn-success" 
-                ng-disabled=optionalPortForm.$invalid
-                ng-click="addOptionalPort()"
-              > 
-                + 
-              </button> 
-            </div>
-          </form>
+      <!-- END PORT INPUT -->
+      <div class="text-center" style="margin-right:40px"> 
+        <table class="table table-reduced-width col-sm-offset-1">
+          <thead>
+            <tr>
+              <th class="text-center"> Container Port => Host Port  </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="op in optionalPorts"> 
+              <td> {{op.container}} => {{op.host}} </td>
+              <td> <button class="btn btn-danger" ng-click="removeOptionalPort($index)"> - </button></td>
+            </tr>
+          </tbody>
 
+        </table>
+      </div>
+
+      <div class="optionalPorts form-group"> 
+        <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="optional_ports"> Optional ports </label>
+        <form name="optionalPortForm">
+          <div class="col-sm-2">
+            <input type="number"   
+                   class="form-control" 
+                   min=1
+                   max=65535
+                   ng-model="optPort.container"
+                   name="containerOptPort"
+                   ng-class="{
+                   'invalid-syntax':optionalPortForm.containerOptPort.$invalid
+                   }" 	
+                   > </input>
+          </div>
+          <div class="col-sm-2">
+            <input type="number"   
+                   class="form-control" 
+                   min=1
+                   max=65535
+                   ng-model="optPort.host"
+                   name="hostOptPort"
+                   ng-class="{
+                   'invalid-syntax':optionalPortForm.hostOptPort.$invalid
+                   }" 	
+                   > </input>
+          </div>
+          <div class="col-sm-2">
+            <button 
+               class="btn btn-success" 
+               ng-disabled=optionalPortForm.$invalid
+               ng-click="addOptionalPort()"
+               > 
+               + 
+            </button> 
+          </div>
+        </form>
+      </div>
+    </div> <!-- END PANEL PORTS -->
+
+  <!-- Volumes -->
+  <div id="panel_volumes" ng-show="tabs[3]"> <!-- START VOLUMES -->
+  <div class="form-group"> 
+    <label class="control-label col-sm-offset-1" for="container_name">Volumes: </label>
+  </div>
+  <div ng-if="currentContainer.volumes.length > 0" >
+    <div ng-repeat="volume in currentContainer.volumes" class="row" style="margin-bottom:10px">
+      <div class="col-sm-offset-2 col-sm-8">{{volume}}</div>
+      <div class="col-sm-2"> <button ng-click="removeVolume($index)" class="btn btn-danger"> x </button> </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3 col-sm-offset-2 text-center"> 
+      <label class="control-label " for="container_name">Host Path</label>	 
+    </div>
+    <div class="col-sm-3 text-center"> 
+      <label class="control-label " for="container_name">Container Path</label>	 	 
+    </div>
+  </div>
+  <br>
+
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-3"> 
+      <input type="text" class="form-control" ng-model="volumeHost"> </input> 
+    </div><div class="col-sm-3"> 
+      <input type="text" class="form-control" ng-model="volumeContainer"> </input> 
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-offset-10 col-sm-1"> <button ng-click="addVolume(volumeHost, volumeContainer)" class="btn btn-success"> + </button> </div>
+  </div>
+</div> <!-- END PANEL VOLUME -->
+<div id="panel_copy" ng-show="tabs[4]"> <!-- START COPY -->
+      <div class="text-center">  <label>Copy files   </label></div>
+      <div class="text-left" style="margin-right:40px"> 
+
+        <table class="col-sm-offset-1 table table-reduced-width">
+          <thead>
+            <tr>
+              <th>file</th>
+              <th>where ?</th>
+              <th>after action?</th>
+              <th>delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="ftc in currentContainer.filesToCopy">
+              <td> {{ftc.filename}} </td>
+              <td> {{ftc.containerPath}}</td>
+              <td> {{ftc.afterAction}}</td>
+              <td>   <button id="action_remove" type="button "  ng-click="deleteFile($index)" class="btn btn-danger  glyphicon glyphicon-remove " /> </td> 
+            </tr>
+
+
+          </tbody>
+        </table>
+      </div>     
+
+      <div class="row">
+        <div class="col-sm-offset-1 col-sm-4">
+          <h4>Data repo </h4>
+          <js-tree 
+             tree-events="select_node:nodeSelected" 
+             tree-ajax="/api/tree/repo"
+             tree-core="tree_core"
+             tree-plugins="dnd"
+             >
+          </js-tree>
 
         </div>
-		<!-- ENVIRONMENTS -->
+        <div class="col-sm-4"> 
+          <h4> Path in container </h4>
+          <input type="text" class="form-control" ng-model="currentFileInContainer.data">  </input> 
 
-	<div class="form-group"> 
-		      <label class="control-label col-sm-2" for="container_name">Environments: </label>
-	</div>
-	
-		<div ng-repeat="(key,env) in currentContainer.environments">
-			<div class="row" >
-			      <div class="col-sm-offset-2 col-sm-4">
-			      <input type="text" class="form-control"  
-					placeholder="Name"
-					ng-model="currentContainer.environments[key].name" 
-				>	
-				
-			      </div>
-			      <div class="col-sm-4">
-			      <input type="text" class="form-control"  
-					placeholder="Value"
-					ng-model="currentContainer.environments[key].value" 
-				>	
-				
-			      </div>
-			</div>
-			<br>
-		</div>
+        </div>
 
-	
+        <div class="col-sm-2"> 
+          <br>
+          <br>
+          <div class="checkbox">
+            <label><input type="checkbox" ng-model="currentFileInContainer.afterAction" >After actions?</label>
+          </div>
 
-	<div class="row">
-			<div class="col-sm-offset-9 col-sm-2"> <button ng-click="addEnvironment()" class="btn btn-success"> + </button> <button ng-click="removeEnvironment()" class="btn btn-danger"> x </button></div>
-		</div>
-		
-
-
-<div class="text-center">  <label>Copy files   </label></div>
- <div class="text-left" style="margin-right:40px"> 
-
-				<table class="col-sm-offset-1 table table-reduced-width">
-				    <thead>
-				      <tr>
-					<th>file</th>
-					<th>where ?</th>
-					<th>after action?</th>
-					<th>delete</th>
-				      </tr>
-				    </thead>
-				    <tbody>
-				      <tr ng-repeat="ftc in currentContainer.filesToCopy">
-					<td> {{ftc.filename}} </td>
-					<td> {{ftc.containerPath}}</td>
-					<td> {{ftc.afterAction}}</td>
-					<td>   <button id="action_remove" type="button "  ng-click="deleteFile($index)" class="btn btn-danger  glyphicon glyphicon-remove " /> </td> 
-				      </tr>
-				      
-				     
-				    </tbody>
-				  </table>
-
-
-		</div>     
-
-<div class="row">
-	<div class="col-sm-offset-1 col-sm-4">
-	<h4>Data repo </h4>
-		<js-tree 
-				tree-events="select_node:nodeSelected" 
-				tree-ajax="/api/tree/repo"
-				tree-core="tree_core"
-				tree-plugins="dnd"
-			      >
-			</js-tree>
-
-	</div>
-	<div class="col-sm-4"> 
-	<h4> Path in container </h4>
-	<input type="text" class="form-control" ng-model="currentFileInContainer.data">  </input> 
-
-	</div>
-
-	<div class="col-sm-2"> 
-	<br>
-	<br>
-	<div class="checkbox">
-		 <label><input type="checkbox" ng-model="currentFileInContainer.afterAction" >After actions?</label>
-	</div>
-
-	</div>
-</div>
-<div class="row text-center">
-<button class="btn btn-default" ng-click="uploadFile()">  Upload </button>
-</div>
-<br>
-
-<br>
-<br>
-
-		<!-- Start ACTIONS -->
-<div ng-show='currentContainer.selectedImage.actions'>
-		<div class="row text-center">
-		<label for="container_network">
-		   Actions:</label>
-		</div>
-                <!-- <div class="row"> -->
-
-				<table class="table table-reduced-width col-sm-offset-1">
-				    <thead>
-				      <tr>
-					<th>action</th>
-					<th>args</th>
-					<th>priority</th>
-					<th>Manage</th>
-				      </tr>
-				    </thead>
-				    <tbody>
-				      <tr ng-repeat="a in currentContainer.actions">
-					<td> {{a.name}}</td>
-					<td> 
-                                          <div ng-repeat="(k,argument) in a.args"> <i>{{k}} </i> : {{argument.val}} </div>
-                                        
-                                        </td>
-					<td> {{a.priority}}</td>
-					<td>   
-						<button id="action_edit" type="button "  ng-click="editAction($index)" class="btn btn-warning  glyphicon glyphicon-edit " /> 
-						<button id="action_remove" type="button "  ng-click="removeAction($index)" class="btn btn-danger  glyphicon glyphicon-remove " /> 
-	
-					</td>
-				      </tr>
-				     <div> 
-					</div> 
-				     
-				    </tbody>
-				  </table>
-                                  <!-- </div>-->
-		<hr>
-<div  ng-if="showEdit">
-  <form>
-  <div class="row">
-  <div class="col-sm-offset-1">				
-    <label> Edit action: </label> {{actionToEdit.name}}	
-    <div class="form-group" ng-repeat="(k,arg) in argsToEdit">
-      <label class="control-label col-sm-4" for="arg">{{k}}</label>
-      <div class="col-sm-3">
-        <input 
-          type="text"
-          class="form-control" 
-          name="arguments"
-          ng-model="argsToEdit[k].val" 
-          >  </input>
+        </div>
       </div>
-  </div>
-  </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-offset-1">				
-    <div class="form-group">
-      <label class="control-label col-sm-4"> Priority </label>
-      <div class="col-sm-3">
-          <select class=" form-control" ng-change="changePrio(priorityToEdit)" ng-options="p for p in listPriority" ng-model="priorityToEdit">	 </select>
+      <div class="row text-center">
+        <button class="btn btn-default" ng-click="uploadFile()">  Upload </button>
       </div>
-    </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-offset-1">
-    <button class="btn btn-warning" ng-click="confirmEditAction()"> Edit action </button>
-    <button class="btn btn-danger" ng-click="cancelEditAction()">Cancel</button>
-    </div>
-  </div>
-    <hr>
-    </form>
-  </div>
+    </div> <!-- END COPY -->
 
 
-        <div class="row" style="margin-bottom:10px">
-                <div class="col-sm-offset-2 col-sm-3">
-                <label>Name action </label>
-                </div>
-                <div class="col-sm-3">
-                        <label>Description</label>
-                </div>
-                <div class="col-sm-3">
-                        <label>Args</label>
-                </div>
-                <div class="col-sm-1">
-                        <label>Priority</label>
-                </div>
+
+<div id="panel_actions" ng-show=tabs[5]> <!-- Start ACTIONS -->
+  <div ng-show='currentContainer.selectedImage.actions'>
+    <div class="row text-center">
+      <label for="container_network">
+        Actions:</label>
+    </div>
+    <!-- <div class="row"> -->
+
+    <table class="table table-reduced-width col-sm-offset-1">
+      <thead>
+        <tr>
+          <th>action</th>
+          <th>args</th>
+          <th>priority</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="a in currentContainer.actions">
+          <td> {{a.name}}</td>
+          <td> 
+            <div ng-repeat="(k,argument) in a.args"> <i>{{k}} </i> : {{argument.val}} </div>
+
+          </td>
+          <td> {{a.priority}}</td>
+          <td>   
+            <button id="action_edit" type="button "  ng-click="editAction($index)" class="btn btn-warning  glyphicon glyphicon-edit " /> 
+              <button id="action_remove" type="button "  ng-click="removeAction($index)" class="btn btn-danger  glyphicon glyphicon-remove " /> 
+
+          </td>
+        </tr>
+        <div> 
         </div> 
 
-
-                <div class="col-sm-offset-1 col-sm-4">
-                    <select   class="form-control" ng-model="selectedAction" ng-change="defaultArgs(selectedAction)" ng-options="a.name for a in currentContainer.selectedImage.actions"> 
-                        <!--<option ng-repeat="(key, value) in currentContainer.selectedImage.actions" > {{value.name}} </option>-->
-                   </select>
-                </div>
-                <div class="col-sm-2">
-                        <i>{{selectedAction.description}} </i>
-                </div>
-                <div class="col-sm-4">
-                          <!-- Arguments -->
-                          <div class="row form-group" ng-repeat="(k,arg) in selectedAction.args">
-                            <label class="control-label col-sm-4" for="arg">{{k}}</label>
-                            <div class="col-sm-8" ng-switch="arg.type">
-                              <!--{{arg}}-->
-                              <input 
-                                        ng-switch-when="boolean"
-                                        type="checkbox"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-true-value="'true'"
-                                        ng-false-value="'false'"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </input>
-                              <textarea 
-                                        ng-switch-when="longText"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </textarea>
-                              <input 
-                                        ng-switch-when="text"
-                                        type="text"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </input>
-                                {{form_arguments}}
-                            </div>
-                          </div>
-                          
-                          <div class="row form-group"> 
-                            <div class="col-sm-offset-9 col-sm-3">
-                              <button type="submit" ng-click="addAction(selectedAction, actionPriority)" class="btn btn-success">+</button>
-                            </div>
-                          </div>
-                        
-                        
-                </div>
-        <div class="col-sm-1">
-                        <select class="form-control" ng-options="p for p in listPriority" ng-model="actionPriority">	 </select>
-                </div>
-
-</div>
-</div>
-		<!-- Start ACTIONS -->
-<div ng-show='currentContainer.selectedImage.actions'>
-		<div class="row text-center">
-		<label for="container_network">
-		   Actions:</label>
-		</div>
-                <!-- <div class="row"> -->
-
-				<table class="table table-reduced-width col-sm-offset-1">
-				    <thead>
-				      <tr>
-					<th>action</th>
-					<th>args</th>
-					<th>priority</th>
-					<th>Manage</th>
-				      </tr>
-				    </thead>
-				    <tbody>
-				      <tr ng-repeat="a in currentContainer.actions">
-					<td> {{a.name}}</td>
-					<td> 
-                                          <div ng-repeat="(k,argument) in a.args"> <i>{{k}} </i> : {{argument.val}} </div>
-                                        
-                                        </td>
-					<td> {{a.priority}}</td>
-					<td>   
-						<button id="action_edit" type="button "  ng-click="editAction($index)" class="btn btn-warning  glyphicon glyphicon-edit " /> 
-						<button id="action_remove" type="button "  ng-click="removeAction($index)" class="btn btn-danger  glyphicon glyphicon-remove " /> 
-	
-					</td>
-				      </tr>
-				     <div> 
-					</div> 
-				     
-				    </tbody>
-				  </table>
-                                  <!-- </div>-->
-		<hr>
-<div  ng-if="showEdit">
-  <form>
-  <div class="row">
-  <div class="col-sm-offset-1">				
-    <label> Edit action: </label> {{actionToEdit.name}}	
-    <div class="form-group" ng-repeat="(k,arg) in argsToEdit">
-      <label class="control-label col-sm-4" for="arg">{{k}}</label>
-      <div class="col-sm-3">
-        <input 
-          type="text"
-          class="form-control" 
-          name="arguments"
-          ng-model="argsToEdit[k].val" 
-          >  </input>
-      </div>
-  </div>
-  </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-offset-1">				
-    <div class="form-group">
-      <label class="control-label col-sm-4"> Priority </label>
-      <div class="col-sm-3">
-          <select class=" form-control" ng-change="changePrio(priorityToEdit)" ng-options="p for p in listPriority" ng-model="priorityToEdit">	 </select>
-      </div>
-    </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-offset-1">
-    <button class="btn btn-warning" ng-click="confirmEditAction()"> Edit action </button>
-    <button class="btn btn-danger" ng-click="cancelEditAction()">Cancel</button>
-    </div>
-  </div>
-    <hr>
-    </form>
-  </div>
-
-
-        <div class="row" style="margin-bottom:10px">
-                <div class="col-sm-offset-2 col-sm-3">
-                <label>Name action </label>
-                </div>
-                <div class="col-sm-3">
-                        <label>Description</label>
-                </div>
-                <div class="col-sm-3">
-                        <label>Args</label>
-                </div>
-                <div class="col-sm-1">
-                        <label>Priority</label>
-                </div>
-        </div> 
-
-
-                <div class="col-sm-offset-1 col-sm-4">
-                    <select   class="form-control" ng-model="selectedAction" ng-change="defaultArgs(selectedAction)" ng-options="a.name for a in currentContainer.selectedImage.actions"> 
-                        <!--<option ng-repeat="(key, value) in currentContainer.selectedImage.actions" > {{value.name}} </option>-->
-                   </select>
-                </div>
-                <div class="col-sm-2">
-                        <i>{{selectedAction.description}} </i>
-                </div>
-                <div class="col-sm-4">
-                          <!-- Arguments -->
-                          <div class="row form-group" ng-repeat="(k,arg) in selectedAction.args">
-                            <label class="control-label col-sm-4" for="arg">{{k}}</label>
-                            <div class="col-sm-8" ng-switch="arg.type">
-                              <!--{{arg}}-->
-                              <input 
-                                        ng-switch-when="boolean"
-                                        type="checkbox"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-true-value="'true'"
-                                        ng-false-value="'false'"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </input>
-                              <textarea 
-                                        ng-switch-when="longText"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </textarea>
-                              <input 
-                                        ng-switch-when="text"
-                                        type="text"
-                                        class="form-control" 
-                                        name="arguments"
-                                        ng-model="selectedArgs[k].val" 
-                                >  </input>
-                                {{form_arguments}}
-                            </div>
-                          </div>
-                          
-                          <div class="row form-group"> 
-                            <div class="col-sm-offset-9 col-sm-3">
-                              <button type="submit" ng-click="addAction(selectedAction, actionPriority)" class="btn btn-success">+</button>
-                            </div>
-                          </div>
-                        
-                        
-                </div>
-        <div class="col-sm-1">
-                        <select class="form-control" ng-options="p for p in listPriority" ng-model="actionPriority">	 </select>
-                </div>
-
-</div>
-		<!-- END ACTIONS -->
-        <!-- Volumes -->
-	<div class="form-group"> 
-	  <label class="control-label col-sm-offset-1" for="container_name">Volumes: </label>
-	    </div>
-        <div ng-if="currentContainer.volumes.length > 0" >
-          <div ng-repeat="volume in currentContainer.volumes" class="row" style="margin-bottom:10px">
-            <div class="col-sm-offset-2 col-sm-8">{{volume}}</div>
-            <div class="col-sm-2"> <button ng-click="removeVolume($index)" class="btn btn-danger"> x </button> </div>
+      </tbody>
+    </table>
+    <!-- </div>-->
+    <br>
+    <div  ng-if="showEdit">
+      <form>
+        <div class="row">
+          <div class="col-sm-offset-1">				
+            <label> Edit action: </label> {{actionToEdit.name}}	
+            <div class="form-group" ng-repeat="(k,arg) in argsToEdit">
+              <label class="control-label col-sm-4" for="arg">{{k}}</label>
+              <div class="col-sm-3">
+                <input 
+                   type="text"
+                   class="form-control" 
+                   name="arguments"
+                   ng-model="argsToEdit[k].val" 
+                   >  </input>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1">				
+            <div class="form-group">
+              <label class="control-label col-sm-4"> Priority </label>
+              <div class="col-sm-3">
+                <select class=" form-control" ng-change="changePrio(priorityToEdit)" ng-options="p for p in listPriority" ng-model="priorityToEdit">	 </select>
+              </div>
+            </div>
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-sm-offset-1">
+            <button class="btn btn-warning" ng-click="confirmEditAction()"> Edit action </button>
+            <button class="btn btn-danger" ng-click="cancelEditAction()">Cancel</button>
+          </div>
+        </div>
+        <br>
+      </form>
+    </div>
 
 
-<div class="row">
-	<div class="col-sm-3 col-sm-offset-2 text-center"> 
-		<label class="control-label " for="container_name">Host Path</label>	 
-	</div>
-	<div class="col-sm-3 text-center"> 
-	 	<label class="control-label " for="container_name">Container Path</label>	 	 
-	</div>
+    <div class="row" style="margin-bottom:10px">
+      <div class="col-sm-offset-2 col-sm-3">
+        <label>Name action </label>
+      </div>
+      <div class="col-sm-3">
+        <label>Description</label>
+      </div>
+      <div class="col-sm-3">
+        <label>Args</label>
+      </div>
+      <div class="col-sm-1">
+        <label>Priority</label>
+      </div>
+    </div> 
+
+
+    <div class="col-sm-offset-1 col-sm-4">
+      <select   class="form-control" ng-model="selectedAction" ng-change="defaultArgs(selectedAction)" ng-options="a.name for a in currentContainer.selectedImage.actions"> 
+        <!--<option ng-repeat="(key, value) in currentContainer.selectedImage.actions" > {{value.name}} </option>-->
+      </select>
+    </div>
+    <div class="col-sm-2">
+      <i>{{selectedAction.description}} </i>
+    </div>
+    <div class="col-sm-4">
+      <!-- Arguments -->
+      <div class="row form-group" ng-repeat="(k,arg) in selectedAction.args">
+        <label class="control-label col-sm-4" for="arg">{{k}}</label>
+        <div class="col-sm-8" ng-switch="arg.type">
+          <!--{{arg}}-->
+          <input 
+                              ng-switch-when="boolean"
+                              type="checkbox"
+                              class="form-control" 
+                              name="arguments"
+                              ng-true-value="'true'"
+                              ng-false-value="'false'"
+                              ng-model="selectedArgs[k].val" 
+                              >  </input>
+          <textarea 
+                              ng-switch-when="longText"
+                              class="form-control" 
+                              name="arguments"
+                              ng-model="selectedArgs[k].val" 
+                              >  </textarea>
+          <input 
+                              ng-switch-when="text"
+                              type="text"
+                              class="form-control" 
+                              name="arguments"
+                              ng-model="selectedArgs[k].val" 
+                              >  </input>
+          {{form_arguments}}
+        </div>
+      </div>
+
+      <div class="row form-group"> 
+        <div class="col-sm-offset-9 col-sm-3">
+          <button type="submit" ng-click="addAction(selectedAction, actionPriority)" class="btn btn-success">+</button>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="col-sm-1">
+      <select class="form-control" ng-options="p for p in listPriority" ng-model="actionPriority">	 </select>
+    </div>
+
+  </div>
+  <div ng-show='!currentContainer.selectedImage.actions'>
+    <p> <b>  No actions for this image!  </b></p>
+  </div>
+</div> <!-- END ACTIONS -->
+
+  <!-- ENVIRONMENTS -->
+  <div id="panel_environment" ng-show=tabs[6]> <!-- START PANEL ENVIRONMENT -->
+    <div class="form-group"> 
+      <label class="control-label col-sm-2" for="container_name">Environments: </label>
+    </div>
+
+    <div ng-repeat="(key,env) in currentContainer.environments">
+      <div class="row" >
+        <div class="col-sm-offset-2 col-sm-4">
+          <input type="text" class="form-control"  
+                             placeholder="Name"
+                             ng-model="currentContainer.environments[key].name" 
+                             >	
+
+        </div>
+          <div class="col-sm-4">
+            <input type="text" class="form-control"  
+                               placeholder="Value"
+                               ng-model="currentContainer.environments[key].value" 
+                               >	
+
+          </div>
+      </div>
+        <br>
+    </div>
+    <div class="row">
+      <div class="col-sm-offset-9 col-sm-2"> <button ng-click="addEnvironment()" class="btn btn-success"> + </button> <button ng-click="removeEnvironment()" class="btn btn-danger"> x </button></div>
+    </div>
+  </div><!-- END PANEL ENVIRONMENT -->	
+  <br>			
+
+<!--
+  <div class="form-group" ng-show="!isAddContainer"> 
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-warning" ng-disabled="form_add_container.$invalid" ng-click="editContainer()">Edit</button>
+      <button type="submit" class="btn btn-danger" ng-disabled="form_add_container.$invalid" ng-click="cancelEditContainer()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="form-group" ng-show="isAddContainer"> 
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="loadContainer()">New</button>
+    </div>
+  </div>
+-->
+  <!-- more validation in controller -->
+  <input type="text" 
+         ng-model="containerErrors.more_validation" 
+         style="visibility:hidden" 
+         name="containerErrors.more_validation" 
+         ng-required="true" 
+         value="###"> 
+  </form>
+
+  </div> <!-- END DIV CONTAINER ADD -->
 </div>
-<br>
-
-<div class="row">
-	<div class="col-sm-offset-3 col-sm-3"> 
-		<input type="text" class="form-control" ng-model="volumeHost"> </input> 
-	</div><div class="col-sm-3"> 
-		<input type="text" class="form-control" ng-model="volumeContainer"> </input> 
-	</div>
-</div>
-<div class="row">
-			<div class="col-sm-offset-10 col-sm-1"> <button ng-click="addVolume(volumeHost, volumeContainer)" class="btn btn-success"> + </button> </div>
-		</div>
-<br>			
-
-        <!-- START DEPENDS ON  -->
-      	<div class="form-group row" >
-
-				<div class="col-sm-offset-1 col-sm-2">
-				<label for="currentContainer.dependsOn" >
-					Depends on : 
-				</label>
-				</div>
-			      
-			      <div class="col-sm-4">
-				<div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
-				  <label><input type="checkbox" ng-model="currentContainer.dependsOn[cnd.name]"  value="{{cnd.name}}">{{cnd.name}}</label>
-				</div>
-				
-					
-			      </div>
-			<br>
-		</div>
-			<!-- END DEPENDS ON -->
-			<div class="form-group row" >
-				<div class="col-sm-offset-1 col-sm-2">
-				<label for="currentContainer.Links" >
-					Links: 
-				</label>
-				</div>
-			      
-			      <div class="col-sm-4">
-				<div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
-				  <label><input type="checkbox" ng-model="currentContainer.links[cnd.name]" value="{{cnd.name}}">{{cnd.name}}</label>
-				</div>
-				
-					
-			      </div>
-			<br>
-		</div> 
-		<div class="form-group" ng-show="!isAddContainer"> 
-
-		 <div class="col-sm-offset-2 col-sm-10">
-		      <button type="submit" class="btn btn-warning" ng-disabled="form_add_container.$invalid" ng-click="editContainer()">Edit</button>
-		      <button type="submit" class="btn btn-danger" ng-disabled="form_add_container.$invalid" ng-click="cancelEditContainer()">Cancel</button>
-		    </div>
-
-		</div><div class="form-group" ng-show="isAddContainer"> 
-
-		 <div class="col-sm-offset-2 col-sm-10">
-		      <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="loadContainer()">New</button>
-		    </div>
-
-		</div>
-			<!-- more validation in controller -->
-			<input type="text" 
-			ng-model="containerErrors.more_validation" 
-			style="visibility:hidden" 
-			name="containerErrors.more_validation" 
-			ng-required="true" 
-			value="###"> 
-	      </form>
-	    
-</div> <!-- END DIV CONTAINER ADD -->
