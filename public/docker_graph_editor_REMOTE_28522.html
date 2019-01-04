@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <title>Docker Network Graph Editor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <base href="/">
+
+    <!-- Utility libraries  -->
+    <script src="assets/js/underscore-min.js"> </script>
+    <script src="assets/js/jquery-min.js"> </script>
+    <script src="assets/js/angular.min.js"></script>
+    <script src="assets/js/angular-animate.min.js"></script>
+    <script src="assets/js/angular-sanitize.min.js"></script>
+    <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+    <script src="assets/js/angular-ui-notification.min.js"></script>
+    <script src="assets/js/approve.min.js"></script>
+    <script src="assets/js/angular-websocket.min.js"></script>
+
+
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/grapheditor.css" rel="stylesheet">
+    <link href="assets/css/nav_fixed.css" rel="stylesheet">
+    <link rel='stylesheet prefetch' href='assets/css/colorpicker.css'>
+    <link rel='stylesheet' href='assets/css/prism.css'>
+    <link rel="stylesheet" href="assets/css/font-awesome.css"/>
+    <!-- <link rel="stylesheet" href="assets/css/build.css"/>-->
+    <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
+
+
+    <!-- JSTree Imports -->
+    <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
+    <script src="assets/js/jquery-min.js"> </script>
+    <script src="assets/jstree/jstree.js"></script>
+    <script src="app/components/jsTree.directive.js"></script>
+
+
+
+    <!-- Graphic Library -->
+    <script src="assets/js/fabric.min.js"></script>
+    <script src="assets/js/prism.js"></script>
+    <script src="assets/js/GraphHandler.js"></script>
+    <script src="assets/js/bootstrap-colorpicker-module.js"></script>
+
+    <!-- <script src="lib/utils.js"></script> -->
+    <!-- Angular filters -->
+    <script src="app/components/appFilters.js"> </script>
+    <script src="app/components/isolatedForm.directive.js"> </script>
+
+
+
+    <!-- angular services -->
+    <script src="app/services/statemanager.js"> </script>
+    <script src="app/services/regex_service.js"> </script>
+    <script src="app/services/network_manager_service.js"> </script>
+    <script src="app/services/container_manager_service.js"> </script>
+    <script src="app/services/docker_service.js"> </script>
+    <script src="app/services/port_service.js"> </script>
+    <script src="app/services/info_service.js"></script>
+    <!-- angular controllers -->
+    <script src="app/controllers/graph_editor_controller.js"></script>
+
+    <script>
+      //ANGULAR COMPONENT REGISTRATION 
+      angular.module("dockersecplayground", ['jsTree.directive', 'ngAnimate', 'ngWebSocket', 'ngSanitize', 'ui.bootstrap', 'ui-notification', 'colorpicker.module'] )
+  .filter('basenameFilter', basenameFilter) 
+  .service("NetworkManagerService", dsp_networkManagerService) 
+  .service('dockerAPIService', DockerAPIService) 
+  .service('containerManager',dsp_ContainerManagerService) 
+  .service('infoService', DSP_infoService) 
+  .service('RegexService', dsp_regex_service) 
+  .service('portService', dsp_portService) 
+  .controller('actionController', DSP_GraphEditorController)
+  .directive("isolateForm" , dsp_isolatedForm)
+  .directive("ports" , function()  {
+    return { 
+      restrict: "E",
+      templateUrl: "views/tpl_ports.html"
+    }
+
+  })
+  .config(function(NotificationProvider, $locationProvider) {
+    NotificationProvider.setOptions({
+      delay: 2000,
+      startTop: 20,
+      startRight: 10,
+      verticalSpacing: 20,
+      horizontalSpacing: 20,
+      positionX: 'center',
+      positionY: 'bottom'
+    });
+
+    $locationProvider.html5Mode(true) 
+  });
+
+    </script>
+
+
+
+  </head>
+  <body ng-app="dockersecplayground">
+    <!-- Start controller -->
+    <span id="appController" ng-controller="actionController">
+
+      <div class="jumbotron text-center">
+        <h1>{{labName}}</h1>
+        <!--    <p>Lab description</p> -->
+
+      </div>
+
+      <header>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container-fluid">
+            <ul class="nav navbar-nav ">
+              <!-- Single button -->
+
+
+              <li class="menu_style" ng-class="graph_buttons.add"><a  id="addAction" href="" ng-click="graphAction($event)" > <span class="glyphicon glyphicon-plus"></span> Draw  </a></li>
+              <li class="menu_style" ng-class="graph_buttons.remove" >
+                <a href="" id="delAction" ng-click="graphAction($event)" ><span class="glyphicon glyphicon-remove"></span> Delete</a></li>
+              <li class="menu_style"><a id="editAction" ng-class="graph_buttons.edit" href="" ng-click="graphAction($event)" ><span class="glyphicon glyphicon-hand-up"></span> Select</a></li>
+
+            </ul> <!-- end menu -->
+            <ul class="nav navbar-nav navbar-right">
+              <li class="menu_style" > <a id="collapsedButton" href="" 
+                                                               ng-click="commandAction($event)" ng-class="command_buttons.collapsed.class" > 
+                                                               <span   class="glyphicon glyphicon-pencil"> 
+                                                               </span>  Graphic Panel
+                </a> 
+              </li>
+              <li class="menu_style" ng-class="command_buttons.addC.class"> <a id="addContainer" href="" 
+                                                                                                 ng-click="commandAction($event)" > <span   class="glyphicon glyphicon-modal-window"></span> Container Manager</a> </li>
+              <li class="menu_style" ng-class="command_buttons.addN.class">
+                <a id="addNetwork" href=""  ng-click="commandAction($event)"> 
+                  <span class="glyphicon glyphicon-cloud"></span> Add network 
+                </a></li>
+                <li class="menu_style" ng-class="command_buttons.save.class">
+                  <a id="saveLab" href="" ng-click="saveLab()" > 
+                    <span class="glyphicon glyphicon-floppy-save"></span> Save 
+                  </a>
+                </li>
+                <li class="menu_style" ng-class="command_buttons.load.class">
+                  <a id="exitLab" href="" ng-click="exitLab($event)" >
+                    <span class="glyphicon glyphicon glyphicon-log-out"></span> Exit
+                  </a></li>
+            </ul>
+          </div> <!-- end container-fluid -->
+          <div class="collapse collassa" uib-collapse="isNavCollapsed">
+
+            <div ng-include=viewToInclude> </div>
+
+          </div> <!-- end collapse -->
+        </nav>
+
+      </header>
+      <div class="container-fluid"> 
+        <!-- A canvas tag is required or 
+          Fabric.js doesn't know where to draw. -->
+          <div class="row">
+            <div class="col-sm-3">
+              <h4 class="text-center">Containers</h4>
+              <hr>	
+              <div class="list-group">
+                <a href="#" id="{{c.name}}" class="list-group-item" 
+                                            ng-class=" containerToDraw.name===c.name ? 'active' : '' " 
+                                            ng-click="selectContainerAction($event)" ng-repeat="(key,c) in containerListNotToDraw">{{c.name}}</a>
+              </div>
+              <div 
+               ng-if="containerDescription"
+               style="
+               overflow: hidden;
+               white-space: nowrap;
+               text-overflow: ellipsis;
+               display: block;
+               "
+               >
+               <h4 class="text-center">{{containerDescription.name}}</h4>
+
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Image:</label>
+                 </div>
+
+                 <div class="col-sm-4">
+                   <i style="margin-left:10px">{{containerDescription.selectedImage.name}}</i>
+                 </div>
+
+               </div>
+
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Networks:</label>
+                 </div>
+
+
+                 <div class="col-sm-9">
+                   <div ng-if="e.isChecked === true" ng-repeat="(k,e) in containerDescription.networks ">
+                     {{k}} : {{(e.isDynamic)? "DHCP" : e.ip}}
+                   </div>
+                 </div>
+
+               </div>
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Ports:</label>
+                 </div>
+
+                 <div class="col-sm-9">
+                   <div ng-repeat="(k,e) in containerDescription.ports"> 
+                     {{k }} => {{e}}
+                   </div>
+                 </div>
+
+               </div>
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Env:</label>
+                 </div>
+
+                 <div class="col-sm-9">
+                   <div ng-repeat="e in containerDescription.environments"> 
+                     {{e.name}} : {{e.value}}
+                   </div>
+                 </div>
+
+               </div>
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Volumes:</label>
+                 </div>
+
+                 <div class="col-sm-9">
+                   <div ng-repeat="e in containerDescription.volumes"> 
+                     {{e.host}} : {{e.container}}
+                   </div>
+                 </div>
+
+               </div>
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Uploads:</label>
+                 </div>
+
+                 <div class="col-sm-9">
+                   <div ng-repeat="e in containerDescription.filesToCopy"> 
+                     {{ e.filename | basenameFilter }} => {{e.containerPath}}
+                   </div>
+                 </div>
+
+               </div>
+
+               <div class="row">
+                 <div class="col-sm-3">
+                   <label>Actions:</label>
+                 </div>
+               </div>
+               <div class="row">
+
+                 <div class="col-sm-12">
+                   <div ng-repeat="e in containerDescription.actions"> 
+                     <div><i>{{e.name}} - {{e.priority}} </i></div>
+                     <ul>
+                       <li ng-repeat="(k, arg) in e.args"	> 
+                         {{k}} : {{arg.val}}
+                       </li>
+                     </ul>
+                   </div>
+                 </div>
+
+               </div>
+
+              </div> <!-- ENd info -->
+            </div> <!-- End container list -->
+            <div class="col-sm-9">
+              <canvas ng-click="canvasClick()" width=900px height=800px id="c"></canvas>
+            </div>
+          </div> <!-- End container fluid -->
+          <div>
+            <div ng-show="yamlfile !== ''" class="row">
+              <div class="col-sm-offset-3 col-sm-9" > 
+                <h4> JSON Docker Compose </h4>
+                <h5>   <label><input type="checkbox" ng-model="isComposeVisible">Show to user? </label></h5>
+                <hr>
+                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+              </div>
+            </div>
+            <!--
+              <div class="panel panel-default">
+              <div class="panel-heading">DEBUG</div>
+              <div class="panel-body">
+              currentContainer: {{currentContainer}}
+              <hr>
+              networkList : {{networkList}}
+              <hr>
+              notToDraw : {{containerListNotToDraw}}
+              <hr>
+              containerToDraw:  {{containerToDraw}}
+              <hr>
+              containersToDraw : {{containerListToDraw}}
+              <hr>
+              selectedAction:{{selectedAction}}
+
+              </div>
+              </div>
+            -->
+          </div>  <!-- End container-->
+          <!-- <script src="app/js/testing_bot.js"> </script>  -->
+    </span> <!-- end controller -->
+    <footer >
+      <p class="text-center">&copy; 2016 giper MIT licensed</p>
+    </footer>
+  </body>
+</html>
+
