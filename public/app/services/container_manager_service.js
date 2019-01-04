@@ -86,7 +86,7 @@ function addToNotToDraw(n) {
 	var s = n.name
 	clnd.push(n)
 }
-function addToToDraw(n) {
+function addToDraw(n) {
 	//cld[n.name]  = n
 	cld.push(n)
 
@@ -169,7 +169,7 @@ return {
 		   cld.push(ele)
 		})
 	},
-	addToToDraw : addToToDraw,   //function addToToDraw(n)
+	addToDraw : addToDraw,   //function addToToDraw(n)
 	addToNotToDraw : addToNotToDraw,
 	deleteFromNotToDraw : function deleteFromNotToDraw(name) {
 		deleteObj(clnd, name)
@@ -268,11 +268,6 @@ return {
 		})
 
 		return found
-
-
-	}
-
-} //End return
-
-
+    }
+  } //End return
 }
