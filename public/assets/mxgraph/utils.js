@@ -9,7 +9,11 @@ var Popup = function Popup(cell, appScope) {
     if (cell.type == 'Network') {
       var content = document.createElement('div');
       var networkName = cell.id;
-      appScope.onClickEditNetwork(networkName);
+      if(cell.edges && cell.edges.length != 0) {
+      alert("Cannot change a network with attached elements");
+      } else {
+        appScope.onClickEditNetwork(networkName);
+      }
     }  else if (cell.type == 'NetworkElement') { // SHOW EditNetworkElement
       var content = document.createElement('div');
       var containerName = cell.id;
@@ -21,6 +25,22 @@ var Popup = function Popup(cell, appScope) {
   return {
     show: show
   };
+}
+
+// Is already connected the cell?
+function isAlreadyConnected(networkCell, elementCell) {
+  for (var i = 0; i < networkCell.getEdgeCount(); i++)  {
+   var source = ( networkCell.edges[i]).source;
+   var target = ( networkCell.edges[i]).target;
+    console.log(source);
+    console.log(target);
+    console.log(elementCell);
+   if (source.name == elementCell.name || target.name == elementCell.name)
+       return true;
+   else
+       return false;
+  }
+  return false;
 }
 
 function graphRenameProperty(cells, oldName, newName) {
@@ -37,6 +57,11 @@ function graphRenameProperty(cells, oldName, newName) {
 };
 
 
+function getCellsByName(name) {
+  var cells = theGraph.model.cells;
+  return _.filter(cells, {name: name});
+}
+
 function updateElement(cell, newName, oldName) {
   var label = cell.value;
   console.log(label);
@@ -51,12 +76,17 @@ function updateElement(cell, newName, oldName) {
   var cells = theGraph.model.cells
   // Rename cell in id
   graphRenameProperty(cells, oldName, newName);
-  console.log(cells);
+  var cellWithOldName = getCellsByName(oldName);
+  _.each(cellWithOldName, function(e) {
+    console.log("Update "+e.name);
+    e.name= newName;
+  });
   // cells.remove(oldName);
   // cells.put(newName, cell);
 }
 
 function graphEditCallback(oldName, newName) {
+  console.log("Oldname"+ oldName);
   var theCell = theGraph.getModel().getCell(oldName);
   // Update the cell name
   updateElement(theCell, newName, oldName);
@@ -70,18 +100,18 @@ function addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY,
   port.geometry.offset = new mxPoint(offsetX, offsetY);
 }
 
-function addFirstPort(graph, v1) {
+function addFirstPort(graph, v1, name) {
   // addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-  addPort(graph, v1, {type: 'Interface'}, 0, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
+  addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
 }
-function addSecondPort(graph, v1) {
-  addPort(graph, v1, {type: 'Interface'}, 0, 0.75, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
+function addSecondPort(graph, v1, name) {
+  addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
 }
-function addThirdPort(graph, v1) {
-  addPort(graph, v1, {type: 'Interface'}, 1, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -8);
+function addThirdPort(graph, v1, name) {
+  addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -8);
 }
-function addFourthPort(graph, v1) {
-  addPort(graph, v1, {type: 'Interface'}, 1, 0.75, 16, 16,'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -4);
+function addFourthPort(graph, v1, name) {
+  addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -4);
 }
 
 
@@ -127,6 +157,10 @@ function addSidebarElementIcon(graph, sidebar, label, image, appScope) {
     var parent = graph.getDefaultParent();
     var model = graph.getModel();
     var v1 = null;
+    console.log("ELEMNENTS");
+    console.log(getCellsByName("element0") );
+
+    label.name = nameContainer;
 
     model.beginUpdate();
     try {
@@ -139,10 +173,10 @@ function addSidebarElementIcon(graph, sidebar, label, image, appScope) {
 
       // Presets the collapsed size
       v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-      addFirstPort(graph, v1);
-      addSecondPort(graph, v1);
-      addThirdPort(graph, v1);
-      addFourthPort(graph, v1);
+      addFirstPort(graph, v1, nameContainer);
+      addSecondPort(graph, v1, nameContainer);
+      addThirdPort(graph, v1, nameContainer);
+      addFourthPort(graph, v1, nameContainer);
     }
     finally {
       graph.setSelectionCell(v1);
@@ -193,7 +227,8 @@ function addSidebarNetworkIcon(graph, sidebar, image, appScope) {
       // pt.x, pt.y, 120, 120, 'image=' + image);
       v1 = graph.insertVertex(parent, nameNetwork, {
         type: 'Network',
-        contentHTML : '<h5>'+nameNetwork+'</h5>'
+        contentHTML : '<h5>'+nameNetwork+'</h5>',
+        name: nameNetwork
       }, x, y, 120, 120, 'shape=cloud');
 
 
@@ -415,17 +450,85 @@ function mxInitGraph(graph, appScope) {
     var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
     // Add type in cell
     v1.type = value.type;
+    v1.name = value.name;
     return v1;
   }
 
+  mxCloneCells = mxGraph.prototype.cloneCells;
+  mxGraph.prototype.cloneCells = function(cells, allowInvalidEdges, mapping, keepPosition) {
+    console.log("clone cells");
+    return mxCloneCell.apply(this, arguments);
+  }
+
+
+
   // Override the valid target: must not be an Interface
+  /*
   var isValidTarget = mxConnectionHandler.prototype.isValidTarget;
   mxConnectionHandler.prototype.isValidTarget = function(cell) {
-    console.log(cell);
     isInterface = cell.type  == 'Interface';
     console.log("in valid target");
     return !isInterface &&  isValidTarget.apply(this, arguments);
   }
+  */
+  mxGetEdgeValidationError = mxGraph.prototype.getEdgeValidationError;
+  mxGraph.prototype.getEdgeValidationError = function(edge, source, target) {
+    if(target.type == 'Interface') {
+      return "Cannot attach to interface";
+    }
+    if(isAlreadyConnected(target, source)) {
+      return "Network Element Already connected";
+    }
+    return mxGetEdgeValidationError.apply(this, arguments);
+  }
+
+  mxCellRemove= mxGraphModel.prototype.remove;
+  mxGraphModel.prototype.remove = function(cell) {
+    var canRemove = true;
+    console.log("CELL: "+cell);
+    if(cell.type == 'NetworkElement') {
+      console.log("Delete container from model");
+      appScope.deleteContainer(cell.name);
+    } else if(cell.type == 'Network') {
+      console.log("Delete network from model (only if no attached element)");
+      if(!appScope.isNetworkAttached(cell.name)) {
+          appScope.deleteNetwork(cell.name);
+      } else {
+        alert("Cannot delete a network with attached elements");
+        canRemove = false;
+      }
+    }
+    if (canRemove) {
+      console.log("CAN REMOVE");
+      return mxCellRemove.apply(this, arguments);
+    } else {
+      console.log("CANNOTREMOVE");
+      return false;
+    }
+  }
+
+
+  // Called when the connection is created
+  var mxCreateEdge = mxConnectionHandler.prototype.createEdge;
+  mxConnectionHandler.prototype.createEdge = function(value, source, target, style) {
+    appScope.attachNetwork(target.name, source.name);
+    return mxCreateEdge.apply(this, arguments);
+  }
+  // Override remove edge
+  mxRemoveEdge = mxCell.prototype.removeEdge
+  mxCell.prototype.removeEdge = function(edge, isOutgoing) {
+    function firstDelete() {
+      return (edge.source != null && edge.target != null);
+    }
+    // Remove connection only when is the first call
+    if (firstDelete()) {
+      appScope.detachNetwork(edge.target.name, edge.source.name);
+    }
+    return mxRemoveEdge.apply(this, arguments);
+  }
+
+
+
 
   // Uses the port icon while connections are previewed
   graph.connectionHandler.getConnectImage = function(state)
@@ -455,6 +558,7 @@ function mxInitGraph(graph, appScope) {
   {
     return !this.isCellLocked(cell);
   };
+
 
   // Returns a shorter label if the cell is collapsed and no
   // label for expanded groups
