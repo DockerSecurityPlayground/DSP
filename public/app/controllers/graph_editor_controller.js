@@ -123,9 +123,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
    */
 
 
+  $scope.isNetworkAttached = function(name) {
+    return containerManager.checkNetworkInToDraw(name)
+  }
   $scope.deleteNetwork = function(name) {
-    var containersName = containerManager.checkNetworkInToDraw(name)
-    if(containersName)
+    if($scope.isNetworkAttached(name))
       Notification({message:"Cannot delete an used network pls delete first the associated containers:"+containersName}, 'error');
     else {
       NetworkManagerService.removeNetwork(name)
@@ -150,20 +152,28 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     //Update subnet
     $log.warn("TODO UPDATE NAME")
     //Reset n
-    $scope.n.name = ""
+    $scope.n.name = networkName
     //Update informations network of containers
     containerManager.newNetworkOccurred(network)
     console.log($scope.networkList);
   };
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
-  var networkInEditing = '';
+  var networkInEditing = null;
+  // Called when the edit is finished
   $scope.editNetworkElement = function() {
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
     console.log($scope.n);
     console.log(networkInEditing);
+
+    // Update network in network list
+    var networkToEdit = NetworkManagerService.getNetwork(networkInEditing.name);
+    console.log(networkToEdit);
+    networkToEdit.name = $scope.n.name;
+    networkToEdit.subnet = s;
+
     // Callback to graphedit
-    $scope.graphEditTerminatedCallback(networkInEditing, $scope.n.name);
+    $scope.graphEditTerminatedCallback(networkInEditing.name, $scope.n.name);
     // Reset current container
 
     // Don't show the network panel
@@ -189,7 +199,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
 
 
-    if(NetworkManagerService.hasNetwork(networkVal))
+    if(networkVal != networkInEditing.name && NetworkManagerService.hasNetwork(networkVal))
     {
       console.log("ERROR");
       $scope.networkErrors.someError= true
@@ -199,7 +209,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     }
 
     //Check subnet
-    else if(NetworkManagerService.hasSubnet(s))
+    else if(networkInEditing.subnet != s && NetworkManagerService.hasSubnet(s))
     {
 
       $scope.networkErrors.someError= true
@@ -426,10 +436,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
   }
   //Delete a container from containerNotToDraw list
-  $scope.deleteContainer = function deleteContainer($index) {
+  $scope.deleteContainer = function deleteContainer(containerName) {
 
     //Free networks
-    var container=  $scope.containerListNotToDraw[$index]
+    var container=  containerManager.getContainer(containerName);
     var networks = container.networks
     // IF is equl to removed container, delete selection
     if ($scope.containerDescription === container)
@@ -439,7 +449,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       NetworkManagerService.freeAddress(n.ip)
     })
 
-    containerManager.deleteFromNotToDraw(container.name)
+    containerManager.deleteFromToDraw(container.name)
     //containerToDraw
     if($scope.containerToDraw)
       //if is selected must be deleted!
@@ -447,8 +457,29 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       {
         $scope.containerToDraw = null
       }
+  }
 
+  $scope.attachNetwork = function attachNetwork(nameNetwork, containerName) {
+    var ip = NetworkManagerService.getFirst(nameNetwork)
+    var container = containerManager.getContainer(containerName);
+    container.networks[nameNetwork] = {
+        ip: '',
+        position: '',
+        isVisible: '',
+        isDynamic: true
+      }
 
+    container.networks[nameNetwork].ip = ip
+    container.networks[nameNetwork].isChecked = true
+
+    NetworkManagerService.useAddress(ip)
+  }
+  $scope.detachNetwork = function detachNetwork(nameNetwork, containerName) {
+      var container = containerManager.getContainer(containerName);
+      var ip = container.networks[nameNetwork].ip
+      NetworkManagerService.freeAddress(ip)
+      container.networks[nameNetwork].ip = ""
+      container.networks[nameNetwork].isChecked = false;
   }
 
   $scope.checkNetworkClicked = function checkNewtorkClicked(nameNetwork, container) {
@@ -798,8 +829,18 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       if (NetworkManagerService.hasNetwork(networkName)) {
         var theNetwork = NetworkManagerService.getNetwork(networkName);
         // Save the name before that the user edit it
-        networkInEditing = theNetwork.name;
-        $scope.n = theNetwork;
+        networkInEditing = _.clone(theNetwork);
+        $scope.n = _.clone(theNetwork);
+        // Set subnet dotted
+        var ss = $scope.n.subnet.split('.');
+        $scope.subnet = {
+          first: ss[0],
+          two: ss[1],
+          three: ss[2],
+          four: ss[3]
+        }
+        console.log($scope.n);
+        $scope.n.more_validation = "###";
       } else {
         console.log("ERROR: why no network?" + networkName);
       }

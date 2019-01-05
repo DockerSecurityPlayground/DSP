@@ -21,7 +21,7 @@
   <div id='cssmenu'>
     <ul>
       <li id="tab_container" class={{tabs[0]}} ><a href='#' ng-click="elementTabChange(0)">Container</a></li>
-      <li id="tab_interfaces" class={{tabs[1]}} ng-click="elementTabChange(1)"><a href='#'>Interfaces</a></li>
+      <li id="tab_interfaces" class={{tabs[1]}} ng-click="elementTabChange(1)"><a href='#'>Networks</a></li>
       <li id="tab_ports" class="{{tabs[2]}}" ng-click="elementTabChange(2)"><a href='#'>Ports</a></li>
       <li id="tab_volumes" class="{{tabs[3]}}" ng-click="elementTabChange(3)"><a href='#'>Volumes</a></li>
       <li id="tab_copy" class="{{tabs[4]}}" ng-click="elementTabChange(4)"><a href='#'>Copy</a></li>
@@ -74,94 +74,8 @@
             </input>
           </div>
         </div>
-        <div class="row form-group"> 
-          <label class="control-label col-sm-2" for="container_network"> Networks:</label>
-          <div class="col-sm-10 " id="container_network" name="container_network"> 
 
-
-            <!-- Network group -->
-            <div class="row checkbox checkbox-primary checkbox-circle" ng-repeat="n in networkList">
-              <div class="col-sm-3">
-                <!-- NETWORK INPUT CHOICES -->
-                <!-- if you want check ip (no default bridge network used) add this -->
-                <!-- 	ng-required="!currentContainer.some_network_selected" -->
-                <input 
-                      ng-model="currentContainer.networks[n.name].isChecked" 
-                      class="styled" 
-                      type="checkbox" 
-                      ng-change="checkNetworkClicked(n.name , currentContainer )"
-                      >
-
-                      <label for="currentContainer.networks[n.name].ip" style="color:{{n.color}}; font-weight:bold; font-style:italic ">
-                        {{n.name}} 
-                      </label>
-              </div>	
-              <!-- Network configuration -->
-              <div ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked)? 'visible': 'hidden'}" >
-                <!-- Dynamic or static ? -->
-                <div class="col-sm-1">
-                  <input class="form-check-input" ng-click="changeIpType(currentContainer, n.name)" type="checkbox" ng-model="currentContainer.networks[n.name].isDynamic" id="defaultCheck1"> Dynamic
-                </div>
-                <!-- If static -->
-                <div class="col-sm-8" ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked && !currentContainer.networks[n.name].isDynamic)? 'visible': 'hidden'}">
-                  <select class="form-ip form-network"  
-                          ng-click="changeContainerIP($event,currentContainer, n.name)"
-                          > 
-                          <!--ng-model="currentContainer.networks[n.name].ip"  -->
-                    <option value"{{currentContainer.networks[n.name].ip}}" selected >
-                    {{currentContainer.networks[n.name].ip}}
-                    </option>
-                    <option value="{{s}}" 
-                            ng-repeat="s in n.listIP"
-                            > 
-                            {{s}}
-
-                    </option>
-                  </select>
-                  <select   class="form-ip form-network" 
-                            ng-model="currentContainer.networks[n.name].position" > 
-
-                            <option value="right" selected> Right </option>
-                            <option value="left" > Left </option>
-                            <option value="bottom" >  Bottom </option>
-                  </select>
-                  <span 
-                                    >
-                                    <label> <input name="isVisibleCheck" type="checkbox" ng-model="currentContainer.networks[n.name].isVisible"> Is Visible </label> 
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>  
-          <!-- END FORM NETWORKS -->
-          <!-- Scale option -->
-          <br>
-          <br>
-          <div class="row form-group"> 
-            <label class="control-label col-sm-2" for="container_scale"> Scale:</label>
-            <div class="col-sm-10 " id="container_scale" name="container_scale"> 
-              <div class="row checkbox checkbox-primary checkbox-circle" >
-                <div class="col-sm-1 col-sm-offset-2"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
-                <div ng-style="{ 'visibility' : (currentContainer.scale.isEnabled)? 'visible': 'hidden'}" >
-                  <label class="control-label col-sm-2" for="numreplicas"> Num replicas:</label>
-                  <div 
-                                                        class="col-sm-2"
-                                                        >
-                                                        <input type="number"   
-                                                               class="form-control" 
-                                                               min=1
-                                                               max=255
-                                                               ng-model="currentContainer.scale.num"
-                                                               name="scalenumber"
-                                                               > </input>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            <!-- Network group -->
-          </div>  
-        </div>
+    
         <!-- END SCALE -->
         <!-- Scale option -->
 
@@ -206,8 +120,66 @@
           </div>
           <br>
         </div>
-    </div> <!-- END CONTAINER PANEL  -->
+        <!-- Scale option -->
+          <br>
+          <br>
+          <div class="row form-group"> 
+            <label class="control-label col-sm-2" for="container_scale"> Scale:</label>
+            <div class="col-sm-10 " id="container_scale" name="container_scale"> 
+              <div class="row checkbox checkbox-primary checkbox-circle" >
+                <div class="col-sm-1 col-sm-offset-2"> <input type="checkbox" ng-model="currentContainer.scale.isEnabled" /> Is Enabled</div>
+                <div ng-style="{ 'visibility' : (currentContainer.scale.isEnabled)? 'visible': 'hidden'}" >
+                  <label class="control-label col-sm-2" for="numreplicas"> Num replicas:</label>
+                  <div 
+                                                        class="col-sm-2"
+                                                        >
+                                                        <input type="number"   
+                                                               class="form-control" 
+                                                               min=1
+                                                               max=255
+                                                               ng-model="currentContainer.scale.num"
+                                                               name="scalenumber"
+                                                               > </input>
+                  </div>
+                </div>
 
+              </div>
+            </div>
+            <!-- Network group -->
+          </div>
+    </div> <!-- END CONTAINER PANEL  -->
+    <div id="panel_networks" ng-show=tabs[1]> <!-- START PANEL CONTAINER -->
+    <div class="form-group row" ng-repeat="n in networkList"> 
+      <span ng-show="currentContainer.networks[n.name].isChecked" >
+        <!-- NAME CONTAINER -->
+        <label class="control-label col-sm-2" for="">{{n.name}}</label>
+        <div class="col-sm-9" ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked)? 'visible': 'hidden'}" >
+                <!-- Dynamic or static ? -->
+                <div class="col-sm-2">
+                  <input class="form-check-input" ng-click="changeIpType(currentContainer, n.name)" type="checkbox" ng-model="currentContainer.networks[n.name].isDynamic" id="defaultCheck1"> Dynamic
+                </div>
+                <!-- If static -->
+                <div class="col-sm-8" ng-style="{ 'visibility' : (currentContainer.networks[n.name].isChecked && !currentContainer.networks[n.name].isDynamic)? 'visible': 'hidden'}">
+                  <select class="form-ip form-network"  
+                          ng-click="changeContainerIP($event,currentContainer, n.name)"
+                          > 
+                          <!--ng-model="currentContainer.networks[n.name].ip"  -->
+                    <option value"{{currentContainer.networks[n.name].ip}}" selected >
+                    {{currentContainer.networks[n.name].ip}}
+                    </option>
+                    <option value="{{s}}" 
+                            ng-repeat="s in n.listIP"
+                            > 
+                            {{s}}
+
+                    </option>
+                  </select>
+                </div>
+              </div>
+      </span>
+      </div>
+      <!-- END FORM NETWORKS -->
+    </div>
     <div id="panel_ports" ng-show="tabs[2]">
       <!--- PORT INPUT SELECT -->
       <div ng-repeat="(key,port) in currentContainer.selectedImage.exposedPorts" class="form-group"> 
