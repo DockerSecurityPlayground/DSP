@@ -231,7 +231,7 @@ return {
 	checkNetworkInToDraw: function checkNetworkInToDraw(name) {
 			var ret = []
 			_.each(clnd, function(ele) {
-				var ns = ele.networks
+				var ns = (ele.networks) ? ele.networks : {};
 				console.log(ns)
 				if(_.has(ns, name) && ns[name].isChecked)
 				{
@@ -239,7 +239,7 @@ return {
 				}
 			})
 			_.each(cld, function(ele) {
-				var ns = ele.networks
+				var ns = (ele.networks) ? ele.networks : {};
 				console.log(ns)
 				if(_.has(ns, name) && ns[name].isChecked)
 				{
@@ -268,6 +268,9 @@ return {
 		})
 
 		return found
-    }
+    },
+  getContainer : function getContainer(e) {
+      return _.findWhere(cld, {name: e});
+   }
   } //End return
 }

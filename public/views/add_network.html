@@ -1,5 +1,5 @@
 <div style="background-color:white; height:100%; overflow:scroll">
-  <button type="submit" class="btn btn-default" ng-disabled="form_add_container.$invalid" ng-click="editNetworkElement()"> 
+  <button type="submit" class="btn btn-default" ng-disabled="formnetwork.$invalid || networkErrors.someError" ng-click="editNetworkElement()"> 
     <i class="glyphicon glyphicon-floppy-saved"> </i>    Save
   </button> 
   <h3 class="text-center">Edit Network </h3>
@@ -89,17 +89,13 @@
            style="visibility:hidden" 
            name="network_more_validation" 
            ng-required="true" 
-           value="###"> 
+           >
   </form>
-</div> <!-- END FORM DIV -->
-<div class="col-sm-3">
-</div>
-</div>
-
 <!-- ERROR NETWORK -->
-<div class="error-style text-danger ng-model=networkErrors" 
+<div class="error-style text-danger" ng-model="networkErrors"
      ng-style="{ 'visibility' : (networkErrors.someError)? 'visible': 'hidden'}" > 
      {{networkErrors.message}}
 </div>
+</div> <!-- END FORM DIV -->
 
   </div> <!-- end network -->
