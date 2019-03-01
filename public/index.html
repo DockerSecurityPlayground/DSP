@@ -24,11 +24,15 @@
   <script src="assets/js/angular-ui-notification.min.js"></script>
   <script src="assets/js/bootstrap-colorpicker-module.min.js"> </script>
   <script src="assets/js/angular-websocket.min.js"></script>
+  <script src="assets/js/svg-assets-cache.js"></script>
+  <script src="assets/js/angular-messages.min.js"></script>
+  <script src="assets/js/angular-material.min.js"></script>
+  <script src="assets/js/angular-aria.min.js"></script>
 
   <link href="assets/css/select.css" rel="stylesheet" type='text/css' >
   <script src="app/services/breadcrumbs_services.js"> </script>
   <script src="app/services/ajax_service.js"> </script>
- <script src="app/services/docker_service.js"> </script>
+  <script src="app/services/docker_service.js"> </script>
   <script src="app/services/regex_service.js"> </script>
   <script src="app/services/walker_service.js"> </script>
   <script src="app/services/current_lab.js"> </script>
@@ -59,13 +63,15 @@
     <link href="assets/css/font-awesome.css" type="text/css" rel="stylesheet" >
         <!-- CUSTOM STYLES-->
     <link href="assets/css/custom.css" type="text/css" rel="stylesheet" >
+    <link href="assets/css/progress.css" rel ="stylesheet">
      <!-- GOOGLE FONTS-->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' >
     <link href="assets/css/colorpicker.css" rel="stylesheet prefetch" type='text/css' />
     <link href="assets/css/build.css" rel="stylesheet" type='text/css' />
     <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
    <script src="assets/js/select.js"> </script>
-
+   <!-- MATERIAL FONT -->
+   <link href="/assets/css/angular-material.min.css" rel="stylesheet"/>
     <!-- JSTree Imports -->
     <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
@@ -81,7 +87,7 @@
             return window._; //Underscore must already be loaded on the page
           });
           //ANGULAR COMPONENT REGISTRATION 
-          angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module'] )
+          angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache'] )
 
             .factory('FetchFileFactory', ['$http',
               function($http) {
@@ -120,7 +126,7 @@
         //Delete confirm component 
          .component('modalComponent', dsp_deleteConfirmComponent)  
          .component('changeGithubComponent', dsp_changeGithub)  
-         .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider) { 
+         .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider) { 
             NotificationProvider.setOptions({
                 delay: 3500,
                 startTop: 20,

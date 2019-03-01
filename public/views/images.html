@@ -40,11 +40,12 @@
                                 </div>
 
                             </div>
-                            <div class="row">
+                            <div ng-show="p.isVisible" class="row">
                                 <br>
-                                <textarea ng-if=p.progress class="form-control" rows="5" id="comment">
-                                  {{ p.progress }} 
-                                </textarea>
+                                <md-progress-linear md-mode="determinate" value="{{p.progress}}"></md-progress-linear>
+                             <!-- <textarea ng-if=p.progress class="form-control" rows="5" id="comment">
+                                    {{ p.progress }} 
+                                </textarea> --> 
                             </div>
                             </li>
                         </ul> 

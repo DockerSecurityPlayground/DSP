@@ -79,25 +79,26 @@ function initRepository(nameProject, githubUrl, callback, notifyCallback) {
   async.waterfall([
     (cb) => cloneProject(nameProject, githubUrl, cb),
     (res, cb) => LabStates.initStates(nameProject, cb),
-    (cb) => dockerManager.getImagesAllLabs(nameProject, cb),
-    (data, cb) => {
-      let images = data.images;
-      async.eachSeries(images, (i, c) => {
-        if (!i.contains) {
-          log.info(`Download Image ${i.name}`);
-          imageSep = i.name.split(":")
-          nameToDownload = imageSep[0]
-          tagToDownload = imageSep[1]
-          imageMgr.pullImage(nameToDownload, tagToDownload, c, notifyCallback)
-        }
-          else {
-          toStr = `Image ${i.name} already present, skipping`
-          log.info(toStr);
-          notifyCallback(toStr)
-          c(null)
-        }
-      }, (err) => cb(err))
-    }
+    //(cb) => dockerManager.getImagesAllLabs(nameProject, cb),
+   //(data, cb) => {
+   //  let images = data.images;
+   //  async.eachSeries(images, (i, c) => {
+   //    if (!i.contains) {
+   //      log.info(`Download Image ${i.name}`);
+   //      imageSep = i.name.split(":")
+   //      nameToDownload = imageSep[0]
+   //      tagToDownload = imageSep[1]
+   //      imageMgr.pullImage(nameToDownload, tagToDownload, c, notifyCallback)
+   //    }
+   //      else {
+   //      toStr = `Image ${i.name} already present, skipping`
+   //      log.info(toStr);
+   //      notifyCallback(toStr)
+   //      c(null)
+   //    }
+   //  },
+   //   (err) => cb(err))
+  // }
     // IMAGES ARE NOT MORE
     // (cb) => buildImages(nameProject, cb, notifyCallback),
   ], (err) => callback(err));

@@ -14,7 +14,6 @@ var api = '/dsp_v1/docker_network/' ;
   const unknownStatus = "<b class='text-danger'>Unknown </b>";
 
   var listServices;
-
   function getServices() {
         return $http.get(dsp_running_services);
   }
@@ -124,19 +123,46 @@ var api = '/dsp_v1/docker_network/' ;
             return $http.get(dsp_images_docker)
     },
     formatPullLog: function formatPullLog(json) {
+   //  ss = JSON.parse(json);
+   //  console.log(ss);
+   //    if(ss.status == 'Pulling fs layer'){
+   //      var obj = {'id': ss.id, 'percentage': 0};
+   //      ids.push(obj);
+   //      console.log(ids);
+   //    }
+   //    if(ss.status == 'Downloading'){
+   //	  _.each(ids, function(element){
+   //	    if(ss.id == element.id){
+   //		  var normalized = (100 / ids.length);
+   //		  element.percentage = ((ss.progressDetail.current * normalized) / ss.progressDetail.total);
+   //		}
+   //	  })
+   //    }
+   //	if(ss.status == 'Download complete'){
+   //	  _.each(ids, function(element){
+   //	    if(ss.id == element.id){
+   //		  var normalized = (100 / ids.length)
+   //		  element.percentage = normalized;
+   //		}
+   //	  })
+   //	}
+   //	_.each(ids,function(element){
+   //	  ret += element.percentage;
+   //	})
+   //    return ret
       var retStr = ""
       splitted = json.split(/\r\n|\r|\n/)
       for (i = 0; i < splitted.length-1; i++) {
-        s = splitted[i];
-        ss = JSON.parse(s)
-        if (!ss.progress)
-          ss.progress=""
-        const status = ss.status
-        const progress = ss.progress
-        const id = ss.id
-        retStr = status + "\t" + progress +"\t" + id
-        return retStr
-      }
+       s = splitted[i];
+       ss = JSON.parse(s)
+       if (!ss.progress)
+         ss.progress=""
+       const status = ss.status
+       const progress = ss.progress
+       const id = ss.id
+       retStr = status + "\t" + progress +"\t" + id
+       return retStr
+       }
     },
     runService : function runService(container) {
       return $http.post(dsp_running_services+container.name, container)
