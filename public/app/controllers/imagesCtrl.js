@@ -144,6 +144,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
           console.log(p.name + " already in downloading")
         } else {
         p.isVisible = true;
+        p.isExtracting = false;
         var ids = [];
         var total = 0;
         imageSep = p.name.split(":")
@@ -188,6 +189,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
                 })
 		      }
 		      if(message.status == 'Download complete'){
+
 		        _.each(ids, function(element){
 			      if(message.id == element.id){
 				    var normalized = (100 / ids.length)
@@ -195,8 +197,11 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
                     total += element.percentage;
 			      }
                 })
-
 		      }
+              if(total > 99)
+              {
+                p.isExtracting = true;
+              }
 		      p.progress = total;
               //p.progress = dockerAPIService.formatPullLog(data.message);
             }
