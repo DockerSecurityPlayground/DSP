@@ -181,18 +181,23 @@ if(labToUse) {
       vm.tinymceHtmlSolution = '';
     }
   }
-// dockerAPIService.getDSPImages()
-//   .then(function successCallback(response) {
-//   var images = response.data.data.images;
-//   labsImages = images[repo.name].lab_images
-//   labImages = _.findWhere(labsImages, {nameLab:labToUse.name})
-//   console.log(repo)
-//   console.log(labToUse)
-//   console.log(labImages);
-//   },
-//   function errorCallback(error) {
-//     Notification({message:"Sorry,  error in loading docker images"}, 'error');
-//   });
+  dockerAPIService.getDSPImages()
+    .then(function successCallback(response) {
+    var images = response.data.data.images;
+    labsImages = images[repo.name].lab_images
+    labImages = _.findWhere(labsImages, {nameLab:labToUse.name})
+    console.log(repo)
+    console.log(labToUse)
+    console.log(labImages);
+    var imagesToInstall = _.where(labImages.images, {contains:false});
+    console.log(imagesToInstall);
+    if(imagesToInstall.length > 0)
+      Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
+
+    },
+    function errorCallback(error) {
+      Notification({message:"Sorry,  error in loading docker images"}, 'error');
+    });
 }
 },
 function(err) {
