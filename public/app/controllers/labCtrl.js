@@ -4,6 +4,7 @@ var vm = this;
 var buttonDeleteProto = { action:openConfirmDelete, label:"Delete Lab" , class: "btn btn-danger"}
 var buttonImportProto = { action:importLab, label:"Import lab in your repo" , class: "btn btn-success"}
 var buttonGoProto = { action:goToUseNetwork, label : "Go", class: "btn btn-lg btn-blue"}
+var buttonGoDisabledProto = {action:goToUseNetwork, label: "Go", class: "btn btn-lg btn-blue disabled"}
 var buttonGoImage = { action:goToImages, label : "Images", class: "btn btn-lg btn-blue"}
 var buttonCreateProto = { action:goToCreateNetwork, label:"Create Docker Network" , class: "btn  btn-lg btn-success"}
 
@@ -36,7 +37,7 @@ vm.isGoalEditShowed = true;
 vm.isSolutionEditShowed = true;
 vm.isSolutionPreviewOpen = false;
 vm.isGoalPreviewOpen= false;
-
+vm.noImages = false;
 vm.actionVisible = true,
 toEditName = ''	;
 AjaxService.init()
@@ -192,7 +193,9 @@ if(labToUse) {
     var imagesToInstall = _.where(labImages.images, {contains:false});
     console.log(imagesToInstall);
     if(imagesToInstall.length > 0)
-      Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
+      vm.noImages = true;
+      vm.buttonAction = buttonGoDisabledProto;
+      //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
 
     },
     function errorCallback(error) {
