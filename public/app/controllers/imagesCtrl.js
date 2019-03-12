@@ -5,7 +5,6 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
 
 
 
-
   dockerAPIService.getDockerImages()
     .then(function successCallback(response) {
           $scope.allImages = response.data.data
@@ -144,6 +143,10 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         if (p.disabled == true) {
           console.log(p.name + " already in downloading")
         } else {
+        p.isVisible = true;
+        p.isExtracting = false;
+        var ids = [];
+        var total = 0;
         imageSep = p.name.split(":")
         nameToDownload = imageSep[0]
         tagToDownload = imageSep[1]
@@ -160,6 +163,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
             if(data.status === 'success')  {
               console.log("Success")
               p.progress=""
+              p.isVisible = false
               successAll(p.name, true)
               // p.textType = "text-success"
             }
@@ -170,7 +174,36 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
               }
             // Notify
             else {
-              p.progress += dockerAPIService.formatPullLog(data.message)+ "\n"
+              var message = JSON.parse(data.message);
+              if(message.status == 'Pulling fs layer'){
+			    var obj = {'id': message.id,'percentage': 0};
+			    ids.push(obj);
+		      }
+		      if(message.status == 'Downloading'){
+			    _.each(ids, function(element){
+			      if(message.id == element.id){
+				    var normalized = (100 / ids.length);
+				    element.percentage = ((message.progressDetail.current * normalized) / message.progressDetail.total) - element.percentage;
+                    total += element.percentage;
+			      }
+                })
+		      }
+		      if(message.status == 'Download complete'){
+
+		        _.each(ids, function(element){
+			      if(message.id == element.id){
+				    var normalized = (100 / ids.length)
+				    element.percentage = normalized - element.percentage;
+                    total += element.percentage;
+			      }
+                })
+		      }
+              if(total > 99)
+              {
+                p.isExtracting = true;
+              }
+		      p.progress = total;
+              //p.progress = dockerAPIService.formatPullLog(data.message);
             }
       })
     }
