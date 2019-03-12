@@ -1,8 +1,7 @@
-var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, AjaxService, dockerAPIService, FetchFileFactory) {
+var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, $anchorScroll, $timeout, AjaxService, dockerAPIService, FetchFileFactory) {
   console.log("in manage images")
   var imageList = [];
   $scope.imagePanel = "repo_images"
-
 
 
   dockerAPIService.getDockerImages()
@@ -29,6 +28,8 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
             });
               $scope.imageList = imageList
               initAllImages()
+              console.log($location.hash());
+              $timeout(function(){$anchorScroll()});
             },
             function errorCallback(response) {
                 Notification({message:"Sorry,  error in loading docker images"}, 'error');
@@ -90,6 +91,8 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         }
       }
   }
+
+
 
     $scope.delImage = function deleteImage(p) {
       var modalInstance = $uibModal.open({
