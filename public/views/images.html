@@ -17,7 +17,8 @@
             <table class="table table-hover ">
                 <tbody>
                 
-                <tr ng-repeat="li in i.lab_images">
+                    <tr id="{{li.nameLab}}" ng-repeat="li in i.lab_images">
+                        
                     <td class="text-center"> 
                       {{ li.nameLab }} 
                     <p> 

@@ -1,7 +1,7 @@
 ﻿<div id="page-wrapper" >
   <div id="page-inner">
     <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div>
-    <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images">Images Manager</a></b></div>
+    <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div>
     <div class="row">
       <div class="col-sm-4"> 
         <button ng-show="ctrl.actionVisible" 
