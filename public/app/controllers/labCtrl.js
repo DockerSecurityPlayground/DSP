@@ -198,7 +198,6 @@ if(labToUse) {
       vm.buttonAction = buttonGoDisabledProto;
     }
       //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
-    }
     },
     function errorCallback(error) {
       Notification({message:"Sorry,  error in loading docker images"}, 'error');
