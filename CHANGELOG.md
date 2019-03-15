@@ -14,6 +14,8 @@ Versioning of Docker Security Playground
  If the user have not a Docker image he should be notified (no docker pull)
 ## [2.3] - 2019-03-12
 Image checking added and progress bar for images implemented
+Added anchor to images
+Added reference from images path to lab
 
 ## [2.2] - 2018-11-29
 Multiple repositories support added

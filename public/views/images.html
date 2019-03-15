@@ -20,7 +20,7 @@
                     <tr id="{{li.nameLab}}" ng-repeat="li in i.lab_images">
                         
                     <td class="text-center"> 
-                      {{ li.nameLab }} 
+                      <a href="/lab/use/{{i.repoName}}/{{ li.nameLab }}" > {{ li.nameLab }} </a>
                     <p> 
                         <button class="btn btn-default" ng-click="downloadAll(li)"> Download All </button>
                     </p>
