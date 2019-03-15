@@ -192,9 +192,11 @@ if(labToUse) {
     console.log(labImages);
     var imagesToInstall = _.where(labImages.images, {contains:false});
     console.log(imagesToInstall);
-    if(imagesToInstall.length > 0){
+
+    if(imagesToInstall.length > 0) {
       vm.noImages = true;
       vm.buttonAction = buttonGoDisabledProto;
+    }
       //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
     }
     },
