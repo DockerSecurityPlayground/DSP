@@ -1,13 +1,35 @@
-<!DOCTYPE html>
-<html lang="en"> 
+<!--
+  Copyright (c) 2006-2013, JGraph Ltd
+
+  Ports example for mxGraph. This example demonstrates implementing
+  ports as child vertices with relative positions and drag and drop
+  as well as the use of images and HTML in cells.
+-->
+<html>
   <head>
-    <title>Docker Network Graph Editor</title>
+    <title>Ports example</title>
+    <style type="text/css" media="screen">
+BODY {
+  font-family: Arial;
+}
+    H1 {
+      font-size: 18px;
+    }
+    H2 {
+      font-size: 16px;
+    }
+    </style>
+
+    <!-- Sets the basepath for the library if not in same directory -->
+    <script type="text/javascript">
+      mxBasePath = 'assets/mxgraph/';
+    </script>
+    <script src="assets/mxgraph/utils.js"> </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
     <base href="/">
-
+    <!-- Loads and initializes the library -->
+    <script type="text/javascript" src="assets/js/mxClient.js"></script>
     <!-- Utility libraries  -->
     <script src="assets/js/underscore-min.js"> </script>
     <script src="assets/js/jquery-min.js"> </script>
@@ -20,38 +42,30 @@
     <script src="assets/js/angular-websocket.min.js"></script>
 
 
+
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <link href="assets/css/grapheditor.css" rel="stylesheet">
     <link href="assets/css/nav_fixed.css" rel="stylesheet">
     <link rel='stylesheet prefetch' href='assets/css/colorpicker.css'>
     <link rel='stylesheet' href='assets/css/prism.css'>
     <link rel="stylesheet" href="assets/css/font-awesome.css"/>
-    <!-- <link rel="stylesheet" href="assets/css/build.css"/>-->
+    <link rel="stylesheet" href="assets/css/build.css"/>
     <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
 
 
-    <!-- JSTree Imports -->
+    <!-- <1!-- JSTree Imports --1>-->
     <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
-    <script src="assets/js/jquery-min.js"> </script>
     <script src="assets/jstree/jstree.js"></script>
     <script src="app/components/jsTree.directive.js"></script>
-
-
-
     <!-- Graphic Library -->
     <script src="assets/js/fabric.min.js"></script>
     <script src="assets/js/prism.js"></script>
-    <script src="assets/js/GraphHandler.js"></script>
     <script src="assets/js/bootstrap-colorpicker-module.js"></script>
-
     <!-- <script src="lib/utils.js"></script> -->
     <!-- Angular filters -->
     <script src="app/components/appFilters.js"> </script>
     <script src="app/components/isolatedForm.directive.js"> </script>
-
-
-
     <!-- angular services -->
     <script src="app/services/statemanager.js"> </script>
     <script src="app/services/regex_service.js"> </script>
@@ -60,12 +74,14 @@
     <script src="app/services/docker_service.js"> </script>
     <script src="app/services/port_service.js"> </script>
     <script src="app/services/info_service.js"></script>
+    <script src="app/services/safe_apply_service.js"></script>
+
     <!-- angular controllers -->
     <script src="app/controllers/graph_editor_controller.js"></script>
 
     <script>
       //ANGULAR COMPONENT REGISTRATION 
-      angular.module("dockersecplayground", ['jsTree.directive', 'ngAnimate', 'ngWebSocket', 'ngSanitize', 'ui.bootstrap', 'ui-notification', 'colorpicker.module'] )
+  angular.module("dockersecplayground", ['jsTree.directive', 'ngAnimate', 'ngWebSocket', 'ngSanitize', 'ui.bootstrap', 'ui-notification', 'colorpicker.module'] )
   .filter('basenameFilter', basenameFilter) 
   .service("NetworkManagerService", dsp_networkManagerService) 
   .service('dockerAPIService', DockerAPIService) 
@@ -73,6 +89,7 @@
   .service('infoService', DSP_infoService) 
   .service('RegexService', dsp_regex_service) 
   .service('portService', dsp_portService) 
+  .service('safeApplyService', SafeApply) 
   .controller('actionController', DSP_GraphEditorController)
   .directive("isolateForm" , dsp_isolatedForm)
   .directive("ports" , function()  {
@@ -99,220 +116,289 @@
     </script>
 
 
+    <!-- Example code -->
+    <script type="text/javascript">
+      // Program starts here. Creates a sample graph in the
+      // DOM node with the specified ID. This function is invoked
+      // from the onLoad event handler of the document (see below).
+      function main(container, outline, toolbar, sidebar, status, appScope) {
+        // Checks if the browser is supported
+        if (!mxClient.isBrowserSupported()) {
+          // Displays an error message if the browser is not supported.
+          mxUtils.error('Browser is not supported!', 200, false);
+        }
+        else {
+          mxInitConstants();
+          mxInitGuides();
+          // Enables snapping waypoints to terminals
+          mxEdgeHandler.prototype.snapToTerminals = true;
+          mxWorkaroundIE();
 
+          // Creates a wrapper editor with a graph inside the given container.
+          // The editor is used to create certain functionality for the
+          // graph, such as the rubberband selection, but most parts
+          // of the UI are custom in this example.
+          var editor = new mxEditor();
+          var graph = editor.graph;
+          var model = graph.getModel();
+
+          mxInitGraph(graph, appScope);
+          mxInitEditor(editor, container);
+          addNetworkElement(graph, sidebar, appScope);
+          addNetwork(graph, sidebar, appScope);
+          //addRouteElement(graph, sidebar);
+
+
+
+          // Adds sidebar icons.
+          //
+          // NOTE: For non-HTML labels a simple string as the third argument
+          // and the alternative style as shown in configureStylesheet should
+          // be used. For example, the first call to addSidebar icon would
+          // be as follows:
+          // addSidebarIcon(graph, sidebar, 'Website', 'assets/mximages/icons48/earth.png');
+          /*
+          addSidebarIcon(graph, sidebar,
+            '<h1 style="margin:0px;">Website</h1><br>'+
+            '<img src="assets/mximages/icons48/earth.png" width="48" height="48">'+
+            '<br>'+
+            '<a href="http://www.jgraph.com" target="_blank">Browse</a>',
+            'assets/mximages/icons48/earth.png');
+          addSidebarIcon(graph, sidebar,
+            '<h1 style="margin:0px;">Process</h1><br>'+
+            '<img src="assets/mximages/icons48/gear.png" width="48" height="48">'+
+            '<br><select><option>Value1</option><option>Value2</option></select><br>',
+            'images/icons48/gear.png');
+          addSidebarIcon(graph, sidebar,
+            '<h1 style="margin:0px;">Keys</h1><br>'+
+            '<img src="assets/mximages/icons48/keys.png" width="48" height="48">'+
+            '<br>'+
+            '<button onclick="mxUtils.alert(\'generate\');">Generate</button>',
+            'assets/mximages/icons48/keys.png');
+          addSidebarIcon(graph, sidebar,
+            '<h1 style="margin:0px;">New Mail</h1><br>'+
+            '<img src="assets/mximages/icons48/mail_new.png" width="48" height="48">'+
+            '<br><input type="checkbox"/>CC Archive',
+            'assets/mximages/icons48/mail_new.png');
+          addSidebarIcon(graph, sidebar,
+            '<h1 style="margin:0px;">Server</h1><br>'+
+            '<img src="assets/mximages/icons48/server.png" width="48" height="48">'+
+            '<br>'+
+            '<input type="text" size="12" value="127.0.0.1"/>',
+            'assets/mximages/icons48/server.png');
+          */
+          // Displays useful hints in a small semi-transparent box.
+          var hints = document.createElement('div');
+          hints.style.position = 'absolute';
+          hints.style.overflow = 'hidden';
+          hints.style.width = '230px';
+          hints.style.bottom = '56px';
+          hints.style.height = '76px';
+          hints.style.right = '20px';
+
+          hints.style.background = 'black';
+          hints.style.color = 'white';
+          hints.style.fontFamily = 'Arial';
+          hints.style.fontSize = '10px';
+          hints.style.padding = '4px';
+
+          mxUtils.setOpacity(hints, 50);
+
+          mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
+          mxUtils.writeln(hints, '- Doubleclick on a vertex or edge to edit');
+          mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
+          mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
+          mxUtils.writeln(hints, '- Click and drag a vertex to move and connect');
+          document.body.appendChild(hints);
+
+          // Creates a new DIV that is used as a toolbar and adds
+          // toolbar buttons.
+          var spacer = document.createElement('div');
+          spacer.style.display = 'inline';
+          spacer.style.padding = '8px';
+
+          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
+
+          // Defines a new action for deleting or ungrouping
+          editor.addAction('groupOrUngroup', function(editor, cell)
+            {
+              cell = cell || editor.graph.getSelectionCell();
+              if (cell != null && editor.graph.isSwimlane(cell))
+              {
+                editor.execute('ungroup', cell);
+              }
+              else
+              {
+                editor.execute('group');
+              }
+            });
+
+          addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
+
+          toolbar.appendChild(spacer.cloneNode(true));
+
+          addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
+          addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
+          addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
+
+          toolbar.appendChild(spacer.cloneNode(true));
+
+          addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
+          addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
+
+          toolbar.appendChild(spacer.cloneNode(true));
+
+          addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');
+
+          toolbar.appendChild(spacer.cloneNode(true));
+
+          // Defines a new export action
+          editor.addAction('export', function(editor, cell)
+            {
+              var textarea = document.createElement('textarea');
+              textarea.style.width = '400px';
+              textarea.style.height = '400px';
+              var enc = new mxCodec(mxUtils.createXmlDocument());
+              var node = enc.encode(editor.graph.getModel());
+              textarea.value = mxUtils.getPrettyXml(node);
+              showModalWindow(graph, 'XML', textarea, 410, 440);
+            });
+
+          addToolbarButton(editor, toolbar, 'export', 'Export', 'assets/mximages/export1.png');
+
+          // ---
+
+          // Adds toolbar buttons into the status bar at the bottom
+          // of the window.
+          addToolbarButton(editor, status, 'collapseAll', 'Collapse All', 'assets/mximages/navigate_minus.png', true);
+          addToolbarButton(editor, status, 'expandAll', 'Expand All', 'assets/mximages/navigate_plus.png', true);
+
+          status.appendChild(spacer.cloneNode(true));
+
+          addToolbarButton(editor, status, 'enterGroup', 'Enter', 'assets/mximages/view_next.png', true);
+          addToolbarButton(editor, status, 'exitGroup', 'Exit', 'assets/mximages/view_previous.png', true);
+
+          status.appendChild(spacer.cloneNode(true));
+
+          addToolbarButton(editor, status, 'zoomIn', '', 'assets/mximages/zoom_in.png', true);
+          addToolbarButton(editor, status, 'zoomOut', '', 'assets/mximages/zoom_out.png', true);
+          addToolbarButton(editor, status, 'actualSize', '', 'assets/mximages/view_1_1.png', true);
+          addToolbarButton(editor, status, 'fit', '', 'assets/mximages/fit_to_size.png', true);
+
+          // Creates the outline (navigator, overview) for moving
+          // around the graph in the top, right corner of the window.
+          var outln = new mxOutline(graph, outline);
+          // <div ng-include=viewToInclude> </div> 
+
+
+          // To show the assets/mximages in the outline, uncomment the following code
+          //outln.outline.labelsVisible = true;
+          //outln.outline.setHtmlLabels(true);
+
+          // Fades-out the splash screen after the UI has been loaded.
+          var splash = document.getElementById('splash');
+          if (splash != null)
+          {
+            try
+            {
+              mxEvent.release(splash);
+              mxEffects.fadeOut(splash, 100, true);
+            }
+            catch (e)
+            {
+
+              // mxUtils is not available (library not loaded)
+              splash.parentNode.removeChild(splash);
+            }
+          }
+        }
+      };
+
+
+
+$( document ).ready(function() {
+  var appScope = angular.element(document.getElementById('appController')).scope();
+  main(document.getElementById('graphContainer'),
+    document.getElementById('outlineContainer'),
+    document.getElementById('toolbarContainer'),
+    document.getElementById('sidebarContainer'),
+    document.getElementById('statusContainer'), 
+    appScope);
+});
+    </script>
   </head>
-  <body ng-app="dockersecplayground">
-    <!-- Start controller -->
+
+  <!-- Page passes the container for the graph to the program -->
+  <body 
+                                          ng-app="dockersecplayground"
+                                          style="margin:0px;">
     <span id="appController" ng-controller="actionController">
-
-      <div class="jumbotron text-center">
-        <h1>{{labName}}</h1>
-        <!--    <p>Lab description</p> -->
-
+      <!-- Creates a container for the splash screen -->
+      <div id="splash"
+           style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:white;z-index:1;">
+        <center id="splash" style="padding-top:230px;">
+          <img src="editors/images/loading.gif">
+        </center>
+      </div>
+      <div>
+        <h1 class="text-center"> {{labName}} </h1>
+      </div>
+      <!-- <div class="row"> -->
+      <!--   <div class="col-sm-1"> <button type="button" class="btn btn-default">(Un)Group</button> -->
+ <!-- </div> -->
+      <!--   <div class="col-sm-1"> <button type="button" class="btn btn-default">Delete</button> -->
+ <!-- </div> -->
+      <!--   <1!-- <div class="col-sm-1"> <button type="button" class="btn btn-dark">Cut</button> --1> -->
+ <!-- <1!-- </div> --1> -->
+      <!--   <1!-- <div class="col-sm-1"> <button type="button" class="btn btn-dark">Copy</button> --1> -->
+ <!-- <1!-- </div> --1> -->
+      <!--   <1!-- <div class="col-sm-1"> <button type="button" class="btn btn-dark">Paste</button> --1> -->
+      <!-- </div> -->
+      <!-- <br> -->
+      
+      <!-- Creates a container for the sidebar -->
+      <div id="toolbarContainer"
+           style="position:absolute;white-space:nowrap;overflow:hidden;top:70px;left:200px;max-height:24px;height:26px;right:0px;padding:4px;background-image:url('images/toolbar_bg.gif');">
       </div>
 
-      <header>
+      <!-- Creates a container for the toolboox -->
+      <div id="sidebarContainer"
+           style="position:absolute;overflow:hidden;top:96px;left:0px;bottom:36px;max-width:110px;width:110px;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');">
+        <h3 class="text-center"> Elements </h3>
+      </div>
 
-        <nav class="navbar navbar-default navbar-fixed-top">
-          <div class="container-fluid">
-            <ul class="nav navbar-nav ">
-              <!-- Single button -->
+      <!-- Creates a container for the graph -->
+      <div id="graphContainer"
+           style="position:absolute;overflow:hidden;top:96px;left:200px;bottom:36px;right:0px;cursor:default;border-width:1px;border-style:solid;border-color:black;">
+      </div>
+      <!-- <div id="graphContainer" -->
+      <!--      style="position:absolute;overflow:hidden;top:96px;left:60px;bottom:36px;right:0px;background-image:url('editors/images/grid.gif');cursor:default;"> -->
+      <!-- </div> -->
 
+      <!-- Creates a container for the outline -->
+      <div id="outlineContainer"
+           style="position:absolute;overflow:hidden;top:96px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;">
+      </div>
 
-              <li class="menu_style" ng-class="graph_buttons.add"><a  id="addAction" href="" ng-click="graphAction($event)" > <span class="glyphicon glyphicon-plus"></span> Draw  </a></li>
-              <li class="menu_style" ng-class="graph_buttons.remove" >
-                <a href="" id="delAction" ng-click="graphAction($event)" ><span class="glyphicon glyphicon-remove"></span> Delete</a></li>
-              <li class="menu_style"><a id="editAction" ng-class="graph_buttons.edit" href="" ng-click="graphAction($event)" ><span class="glyphicon glyphicon-hand-up"></span> Select</a></li>
+      <div 
+           ng-show="showEditContainer"
+           id="networkElementDescription"
+           style="border-style: groove; position:absolute;overflow:hidden;top:120px;left:100px;bottom:36px;right:30px;background-image:url('editors/images/grid.gif');cursor:default;">
+        <div ng-include="'views/add_element.html'"> </div> 
+      </div>
+      <div 
+           ng-show="showEditNetwork"
+           id="networkElement"
+           style="border-style: groove; position:absolute;overflow:hidden;top:120px;left:100px;bottom:36px;right:30px;background-image:url('editors/images/grid.gif');cursor:default;">
+        <div ng-include="'views/add_network.html'"> </div> 
+      </div>
+      <!-- Creates a container for the sidebar -->
+      <div id="statusContainer"
+           style="text-align:right;position:absolute;overflow:hidden;bottom:0px;left:0px;max-height:24px;height:36px;right:0px;color:white;padding:6px;background-image:url('images/toolbar_bg.gif');">
+        <div style="font-size:10pt;float:left;">
+          Created with <a href="http://www.jgraph.com" target="_blank">mxGraph</a>
+        </div>
 
-            </ul> <!-- end menu -->
-            <ul class="nav navbar-nav navbar-right">
-              <li class="menu_style" > <a id="collapsedButton" href="" 
-                                                               ng-click="commandAction($event)" ng-class="command_buttons.collapsed.class" > 
-                                                               <span   class="glyphicon glyphicon-pencil"> 
-                                                               </span>  Graphic Panel
-                </a> 
-              </li>
-              <li class="menu_style" ng-class="command_buttons.addC.class"> <a id="addContainer" href="" 
-                                                                                                 ng-click="commandAction($event)" > <span   class="glyphicon glyphicon-modal-window"></span> Container Manager</a> </li>
-              <li class="menu_style" ng-class="command_buttons.addN.class">
-                <a id="addNetwork" href=""  ng-click="commandAction($event)"> 
-                  <span class="glyphicon glyphicon-cloud"></span> Add network 
-                </a></li>
-                <li class="menu_style" ng-class="command_buttons.save.class">
-                  <a id="saveLab" href="" ng-click="saveLab()" > 
-                    <span class="glyphicon glyphicon-floppy-save"></span> Save 
-                  </a>
-                </li>
-                <li class="menu_style" ng-class="command_buttons.load.class">
-                  <a id="exitLab" href="" ng-click="exitLab($event)" >
-                    <span class="glyphicon glyphicon glyphicon-log-out"></span> Exit
-                  </a></li>
-            </ul>
-          </div> <!-- end container-fluid -->
-          <div class="collapse collassa" uib-collapse="isNavCollapsed">
-
-            <div ng-include=viewToInclude> </div>
-
-          </div> <!-- end collapse -->
-        </nav>
-
-      </header>
-      <div class="container-fluid"> 
-        <!-- A canvas tag is required or 
-          Fabric.js doesn't know where to draw. -->
-          <div class="row">
-            <div class="col-sm-3">
-              <h4 class="text-center">Containers</h4>
-              <hr>	
-              <div class="list-group">
-                <a href="#" id="{{c.name}}" class="list-group-item" 
-                                            ng-class=" containerToDraw.name===c.name ? 'active' : '' " 
-                                            ng-click="selectContainerAction($event)" ng-repeat="(key,c) in containerListNotToDraw">{{c.name}}</a>
-              </div>
-              <div 
-               ng-if="containerDescription"
-               style="
-               overflow: hidden;
-               white-space: nowrap;
-               text-overflow: ellipsis;
-               display: block;
-               "
-               >
-               <h4 class="text-center">{{containerDescription.name}}</h4>
-
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Image:</label>
-                 </div>
-
-                 <div class="col-sm-4">
-                   <i style="margin-left:10px">{{containerDescription.selectedImage.name}}</i>
-                 </div>
-
-               </div>
-
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Networks:</label>
-                 </div>
-
-
-                 <div class="col-sm-9">
-                   <div ng-if="e.isChecked === true" ng-repeat="(k,e) in containerDescription.networks ">
-                     {{k}} : {{(e.isDynamic)? "DHCP" : e.ip}}
-                   </div>
-                 </div>
-
-               </div>
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Ports:</label>
-                 </div>
-
-                 <div class="col-sm-9">
-                   <div ng-repeat="(k,e) in containerDescription.ports"> 
-                     {{k }} => {{e}}
-                   </div>
-                 </div>
-
-               </div>
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Env:</label>
-                 </div>
-
-                 <div class="col-sm-9">
-                   <div ng-repeat="e in containerDescription.environments"> 
-                     {{e.name}} : {{e.value}}
-                   </div>
-                 </div>
-
-               </div>
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Volumes:</label>
-                 </div>
-
-                 <div class="col-sm-9">
-                   <div ng-repeat="e in containerDescription.volumes"> 
-                     {{e.host}} : {{e.container}}
-                   </div>
-                 </div>
-
-               </div>
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Uploads:</label>
-                 </div>
-
-                 <div class="col-sm-9">
-                   <div ng-repeat="e in containerDescription.filesToCopy"> 
-                     {{ e.filename | basenameFilter }} => {{e.containerPath}}
-                   </div>
-                 </div>
-
-               </div>
-
-               <div class="row">
-                 <div class="col-sm-3">
-                   <label>Actions:</label>
-                 </div>
-               </div>
-               <div class="row">
-
-                 <div class="col-sm-12">
-                   <div ng-repeat="e in containerDescription.actions"> 
-                     <div><i>{{e.name}} - {{e.priority}} </i></div>
-                     <ul>
-                       <li ng-repeat="(k, arg) in e.args"	> 
-                         {{k}} : {{arg.val}}
-                       </li>
-                     </ul>
-                   </div>
-                 </div>
-
-               </div>
-
-              </div> <!-- ENd info -->
-            </div> <!-- End container list -->
-            <div class="col-sm-9">
-              <canvas ng-click="canvasClick()" width=900px height=800px id="c"></canvas>
-            </div>
-          </div> <!-- End container fluid -->
-          <div>
-            <div ng-show="yamlfile !== ''" class="row">
-              <div class="col-sm-offset-3 col-sm-9" > 
-                <h4> JSON Docker Compose </h4>
-                <h5>   <label><input type="checkbox" ng-model="isComposeVisible">Show to user? </label></h5>
-                <hr>
-                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
-              </div>
-            </div>
-            <!--
-              <div class="panel panel-default">
-              <div class="panel-heading">DEBUG</div>
-              <div class="panel-body">
-              currentContainer: {{currentContainer}}
-              <hr>
-              networkList : {{networkList}}
-              <hr>
-              notToDraw : {{containerListNotToDraw}}
-              <hr>
-              containerToDraw:  {{containerToDraw}}
-              <hr>
-              containersToDraw : {{containerListToDraw}}
-              <hr>
-              selectedAction:{{selectedAction}}
-
-              </div>
-              </div>
-            -->
-          </div>  <!-- End container-->
-          <!-- <script src="app/js/testing_bot.js"> </script>  -->
-    </span> <!-- end controller -->
-    <footer >
-      <p class="text-center">&copy; 2016 giper MIT licensed</p>
-    </footer>
+      </div>
   </body>
 </html>
-

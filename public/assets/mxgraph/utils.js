@@ -192,7 +192,10 @@ function addSidebarElementIcon(graph, sidebar, label, image, appScope) {
   img.style.width = '48px';
   img.style.height = '48px';
   img.title = 'Drag this to the diagram to create a new vertex';
+  var ele = document.createElement('span');
+  ele.innerHTML = "   Host";
   sidebar.appendChild(img);
+  sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -250,7 +253,10 @@ function addSidebarNetworkIcon(graph, sidebar, image, appScope) {
   img.style.width = '48px';
   img.style.height = '48px';
   img.title = 'Drag this to the diagram to create a new vertex';
+  var ele = document.createElement('span');
+  ele.innerHTML = " Network";
   sidebar.appendChild(img);
+  sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
