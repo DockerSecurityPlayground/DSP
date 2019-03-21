@@ -1,31 +1,41 @@
-var elementNumber = 0;
-var networkNumber = 0;
+var Model__currentElementID = 0;
+var Model__networkID = 0;
+// Angular scope variable
+var Model__AppScope = null;
+const NETWORK_ELEMENT_TYPE = "NetworkElement";
+const NETWORK_TYPE = 'Network';
+const Graph__NetworkElementLabel = {
+  type : NETWORK_ELEMENT_TYPE,
+  contentHTML : '<h5 id="toptitle" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
+  '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
+};
 var elementToEdit = '';
 var theGraph;
-const NETWORK_ELEMENT = "NetworkElement";
-var Popup = function Popup(cell, appScope) {
+
+var Popup = function Popup(cell, Model__AppScope) {
   var popupContainer ;
   function show() {
-    if (cell.type == 'Network') {
+    if (cell.type == NETWORK_TYPE) {
       var content = document.createElement('div');
       var networkName = cell.id;
       if(cell.edges && cell.edges.length != 0) {
       alert("Cannot change a network with attached elements");
       } else {
-        appScope.onClickEditNetwork(networkName);
+        Model__AppScope.onClickEditNetwork(networkName);
       }
     }  else if (cell.type == 'NetworkElement') { // SHOW EditNetworkElement
       var content = document.createElement('div');
       var containerName = cell.id;
       // Initialized for the end
       elementToEdit = containerName;
-      appScope.onClickEditContainer(containerName);
+      Model__AppScope.onClickEditContainer(containerName);
     }
   }
   return {
     show: show
   };
 }
+
 
 // Is already connected the cell?
 function isAlreadyConnected(networkCell, elementCell) {
@@ -62,7 +72,7 @@ function getCellsByName(name) {
   return _.filter(cells, {name: name});
 }
 
-function updateElement(cell, newName, oldName) {
+function Graph__update(cell, newName, oldName) {
   var label = cell.value;
   console.log(label);
   var $html = $('<div />',{html:label});
@@ -89,51 +99,51 @@ function graphEditCallback(oldName, newName) {
   console.log("Oldname"+ oldName);
   var theCell = theGraph.getModel().getCell(oldName);
   // Update the cell name
-  updateElement(theCell, newName, oldName);
+  Graph__update(theCell, newName, oldName);
 }
 
 
-function addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
+function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
   var port = graph.insertVertex(v1, null, value , x, y, width, height, style, relative);
   port.setConnectable(true);
   // Adds the ports at various relative locations
   port.geometry.offset = new mxPoint(offsetX, offsetY);
 }
 
-function addFirstPort(graph, v1, name) {
-  // addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-  addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
+function Graph__addFirstPort(graph, v1, name) {
+  // Graph__addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
 }
-function addSecondPort(graph, v1, name) {
-  addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
+function Graph__addSecondPort(graph, v1, name) {
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
 }
-function addThirdPort(graph, v1, name) {
-  addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -8);
+function Graph__addThirdPort(graph, v1, name) {
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -8);
 }
-function addFourthPort(graph, v1, name) {
-  addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -4);
+function Graph__addFourthPort(graph, v1, name) {
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -4);
 }
 
 
-function addPorts(graph, v1, numPorts) {
+function Graph__addPorts(graph, v1, numPorts) {
   switch(numPorts) {
     case 1:
-      addFirstPort(graph, v1);
+      Graph__addFirstPort(graph, v1);
       break;
     case 2:
-      addFirstPort(graph, v1);
-      addSecondPort(graph, v1);
+      Graph__addFirstPort(graph, v1);
+      Graph__addSecondPort(graph, v1);
       break;
     case 3:
-      addFirstPort(graph, v1);
-      addSecondPort(graph, v1);
-      addThirdPort(graph, v1);
+      Graph__addFirstPort(graph, v1);
+      Graph__addSecondPort(graph, v1);
+      Graph__addThirdPort(graph, v1);
       break;
     case 4:
-      addFirstPort(graph, v1);
-      addSecondPort(graph, v1);
-      addThirdPort(graph, v1);
-      addFourthPort(graph, v1);
+      Graph__addFirstPort(graph, v1);
+      Graph__addSecondPort(graph, v1);
+      Graph__addThirdPort(graph, v1);
+      Graph__addFourthPort(graph, v1);
       break;
     default:
       console.log("Strange number");
@@ -141,54 +151,98 @@ function addPorts(graph, v1, numPorts) {
   }
 }
 
+// Create a new element and update angular model
+function Model__ElementCreate() {
+  var nameContainer = "element"+ Model__currentElementID;
+  console.log("add new element");
+  Model__AppScope.newContainer(nameContainer);
+  Model__currentElementID++;
+  return nameContainer;
+}
+function Model__NetworkCreate() {
+    var nameNetwork = "network_"+ Model__networkID;
+    // Model__AppScope.newContainer(nameContainer);
+    Model__networkID++;
+    Model__AppScope.addNetworkElement(nameNetwork);
+    return nameNetwork;
+}
 
-/*
-  Add an element, the label describes the drawn element
-  */
-function addSidebarElementIcon(graph, sidebar, label, image, appScope) {
-  // Function that is executed when the image is dropped on
-  // the graph. The cell argument points to the cell under
-  // the mousepointer if there is one.
-  var funct = function(graph, evt, cell, x, y) {
-    var nameContainer = "element"+ elementNumber;
-    console.log("add new element");
-    appScope.newContainer(nameContainer);
-    elementNumber++;
-    var parent = graph.getDefaultParent();
+
+function Graph__ElementCreate(graph, nameContainer, x, y) {
+  var parent = graph.getDefaultParent();
+  var model = graph.getModel();
+  var v1 = null;
+  var label = Graph__NetworkElementLabel;
+
+  label.name = nameContainer;
+  model.beginUpdate();
+  try {
+    // NOTE: For non-HTML labels the image must be displayed via the style
+    // rather than the label markup, so use 'image=' + image for the style.
+    // as follows: v1 = graph.insertVertex(parent, null, label,
+    // pt.x, pt.y, 120, 120, 'image=' + image);
+    v1 = graph.insertVertex(parent, nameContainer, label, x, y, 120, 120);
+    v1.setConnectable(false);
+
+    // Presets the collapsed size
+    v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
+    Graph__addFirstPort(graph, v1, nameContainer);
+    Graph__addSecondPort(graph, v1, nameContainer);
+    Graph__addThirdPort(graph, v1, nameContainer);
+    Graph__addFourthPort(graph, v1, nameContainer);
+  }
+  finally {
+    graph.setSelectionCell(v1);
+    model.endUpdate();
+    Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
+  }
+}
+
+function Graph__NetworkCreate(graph, nameNetwork, x, y) {
+  var parent = graph.getDefaultParent();
     var model = graph.getModel();
     var v1 = null;
-    console.log("ELEMNENTS");
-    console.log(getCellsByName("element0") );
-
-    label.name = nameContainer;
-
     model.beginUpdate();
     try {
       // NOTE: For non-HTML labels the image must be displayed via the style
       // rather than the label markup, so use 'image=' + image for the style.
       // as follows: v1 = graph.insertVertex(parent, null, label,
       // pt.x, pt.y, 120, 120, 'image=' + image);
-      v1 = graph.insertVertex(parent, nameContainer, label, x, y, 120, 120);
-      v1.setConnectable(false);
+      v1 = graph.insertVertex(parent, nameNetwork, {
+        type: NETWORK_TYPE,
+        contentHTML : '<h5>'+nameNetwork+'</h5>',
+        name: nameNetwork
+      }, x, y, 120, 120, 'shape=cloud');
+
+
+      v1.setConnectable(true);
 
       // Presets the collapsed size
       v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-      addFirstPort(graph, v1, nameContainer);
-      addSecondPort(graph, v1, nameContainer);
-      addThirdPort(graph, v1, nameContainer);
-      addFourthPort(graph, v1, nameContainer);
     }
     finally {
       graph.setSelectionCell(v1);
       model.endUpdate();
-      console.log(v1);
-      updateElement(v1, nameContainer, NETWORK_ELEMENT);
+      // Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
     }
+}
+
+/*
+  Add an element, the label describes the drawn element
+  */
+function addSidebarElementIcon(graph, sidebar) {
+  // Function that is executed when the image is dropped on
+  // the graph. The cell argument points to the cell under
+  // the mousepointer if there is one.
+  var funct = function(graph, evt, cell, x, y) {
+    var nameContainer = Model__ElementCreate();
+    Graph__ElementCreate(graph, nameContainer, x, y);
   }
 
+  const Graph__NetworkElementImage =  'assets/docker_image_icons/host.png';
   // Creates the image which is used as the sidebar icon (drag source)
   var img = document.createElement('img');
-  img.setAttribute('src', image);
+  img.setAttribute('src', Graph__NetworkElementImage);
   img.style.width = '48px';
   img.style.height = '48px';
   img.title = 'Drag this to the diagram to create a new vertex';
@@ -208,48 +262,19 @@ function addSidebarElementIcon(graph, sidebar, label, image, appScope) {
 
 };
 
-function addSidebarNetworkIcon(graph, sidebar, image, appScope) {
+function addSidebarNetworkIcon(graph, sidebar) {
   // Function that is executed when the image is dropped on
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
   var funct = function(graph, evt, cell, x, y) {
-    var nameNetwork = "network_"+ networkNumber;
-    // appScope.newContainer(nameContainer);
-    networkNumber++;
-    appScope.addNetworkElement(nameNetwork);
-
-
-    var parent = graph.getDefaultParent();
-    var model = graph.getModel();
-    var v1 = null;
-    model.beginUpdate();
-    try {
-      // NOTE: For non-HTML labels the image must be displayed via the style
-      // rather than the label markup, so use 'image=' + image for the style.
-      // as follows: v1 = graph.insertVertex(parent, null, label,
-      // pt.x, pt.y, 120, 120, 'image=' + image);
-      v1 = graph.insertVertex(parent, nameNetwork, {
-        type: 'Network',
-        contentHTML : '<h5>'+nameNetwork+'</h5>',
-        name: nameNetwork
-      }, x, y, 120, 120, 'shape=cloud');
-
-
-      v1.setConnectable(true);
-
-      // Presets the collapsed size
-      v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-    }
-    finally {
-      graph.setSelectionCell(v1);
-      model.endUpdate();
-      // updateElement(v1, nameContainer, NETWORK_ELEMENT);
-    }
+    var nameNetwork = Model__NetworkCreate();
+    Graph__NetworkCreate(graph, nameNetwork, x, y);
   }
 
+  const Graph__NetworkImage =  'assets/docker_image_icons/network_icon.png';
   // Creates the image which is used as the sidebar icon (drag source)
   var img = document.createElement('img');
-  img.setAttribute('src', image);
+  img.setAttribute('src', Graph__NetworkImage);
   img.style.width = '48px';
   img.style.height = '48px';
   img.title = 'Drag this to the diagram to create a new vertex';
@@ -445,10 +470,11 @@ function mxWorkaroundIE() {
 
 
 function mxInitGraph(graph, appScope) {
+  Model__AppScope = appScope;
   // Disable highlight of cells when dragging from toolbar
   theGraph = graph;
   graph.setDropEnabled(false);
-  appScope.initGraphCallbacks([graphEditCallback]);
+  Model__AppScope.initGraphCallbacks([graphEditCallback]);
 
   // Override the insertVertex in order to use toDraw property
   var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
@@ -462,9 +488,9 @@ function mxInitGraph(graph, appScope) {
 
   mxCloneCells = mxGraph.prototype.cloneCells;
   mxGraph.prototype.cloneCells = function(cells, allowInvalidEdges, mapping, keepPosition) {
-    console.log("clone cells");
-    return mxCloneCell.apply(this, arguments);
+    return mxCloneCells.apply(this, arguments);
   }
+
 
 
 
@@ -494,11 +520,11 @@ function mxInitGraph(graph, appScope) {
     console.log("CELL: "+cell);
     if(cell.type == 'NetworkElement') {
       console.log("Delete container from model");
-      appScope.deleteContainer(cell.name);
-    } else if(cell.type == 'Network') {
+      Model__AppScope.deleteContainer(cell.name);
+    } else if(cell.type == NETWORK_TYPE) {
       console.log("Delete network from model (only if no attached element)");
-      if(!appScope.isNetworkAttached(cell.name)) {
-          appScope.deleteNetwork(cell.name);
+      if(!Model__AppScope.isNetworkAttached(cell.name)) {
+          Model__AppScope.deleteNetwork(cell.name);
       } else {
         alert("Cannot delete a network with attached elements");
         canRemove = false;
@@ -512,12 +538,36 @@ function mxInitGraph(graph, appScope) {
       return false;
     }
   }
+  mxPaste = mxClipboard.paste;
+  mxClipboard.paste = function(graph) {
+    if (!mxClipboard.isEmpty()) {
+      var cells = graph.getImportableCells(mxClipboard.getCells());
+      _.each(cells, function(c) {
+        switch (c.type) {
+          case NETWORK_ELEMENT_TYPE:
+            var nc = Model__ElementCreate();
+            const newX  = c.geometry.x + 10;
+            const newY  = c.geometry.y + 10;
+            Graph__ElementCreate(graph, nc, newX, newY);
+            break;
+          case NETWORK_TYPE:
+            var ne = Model__NetworkCreate();
+            const newX2 = c.geometry.x + 10;
+            const newY2 = c.geometry.y + 10;
+            Graph__NetworkCreate(graph, ne, newX2, newY2);
+        }
+      });
+
+  }
+  // return mxPaste.apply(this, arguments);
+}
+
 
 
   // Called when the connection is created
   var mxCreateEdge = mxConnectionHandler.prototype.createEdge;
   mxConnectionHandler.prototype.createEdge = function(value, source, target, style) {
-    appScope.attachNetwork(target.name, source.name);
+    Model__AppScope.attachNetwork(target.name, source.name);
     return mxCreateEdge.apply(this, arguments);
   }
   // Override remove edge
@@ -528,7 +578,7 @@ function mxInitGraph(graph, appScope) {
     }
     // Remove connection only when is the first call
     if (firstDelete()) {
-      appScope.detachNetwork(edge.target.name, edge.source.name);
+      Model__AppScope.detachNetwork(edge.target.name, edge.source.name);
     }
     return mxRemoveEdge.apply(this, arguments);
   }
@@ -633,7 +683,7 @@ function mxInitGraph(graph, appScope) {
         }
         else
         {
-          Popup(cell, appScope).show();
+          Popup(cell, Model__AppScope).show();
         }
       }
 
@@ -670,7 +720,6 @@ function mxInitGraph(graph, appScope) {
 
   // Enables new connections
   graph.setConnectable(true);
-
   // Adds all required styles to the graph (see below)
   configureStylesheet(graph);
 }
@@ -698,19 +747,9 @@ function createHints() {
 
 }
 
-function addNetworkElement(graph, sidebar, appScope) {
-  addSidebarElementIcon(graph, sidebar,
-    {
-      type : 'NetworkElement',
-      contentHTML : '<h5 id="toptitle" style="margin:0px;">'+NETWORK_ELEMENT+'</h5><br>'+
-      '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
-    },
-    'assets/docker_image_icons/host.png'
-    ,
-    appScope);
-
+function mxAddNetworkElement(graph, sidebar) {
+  addSidebarElementIcon(graph, sidebar);
 }
-function addNetwork(graph, sidebar, appScope) {
-  addSidebarNetworkIcon(graph, sidebar, 'assets/docker_image_icons/network_icon.png', appScope);
-
+function mxAddNetwork(graph, sidebar) {
+  addSidebarNetworkIcon(graph, sidebar,);
 }

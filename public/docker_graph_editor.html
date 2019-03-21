@@ -144,8 +144,8 @@ BODY {
 
           mxInitGraph(graph, appScope);
           mxInitEditor(editor, container);
-          addNetworkElement(graph, sidebar, appScope);
-          addNetwork(graph, sidebar, appScope);
+          mxAddNetworkElement(graph, sidebar);
+          mxAddNetwork(graph, sidebar);
           //addRouteElement(graph, sidebar);
 
 
@@ -234,12 +234,12 @@ BODY {
 //            });
 //
           addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
+          addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
+          addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
+          addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
-          //addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
-          //addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
-          //addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
@@ -248,7 +248,7 @@ BODY {
 
           toolbar.appendChild(spacer.cloneNode(true));
 
-          addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');
+          //addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
@@ -264,7 +264,10 @@ BODY {
               showModalWindow(graph, 'XML', textarea, 410, 440);
             });
 
+          for (i = 0; i < 80; i++)
+            toolbar.appendChild(spacer.cloneNode(true));
           addToolbarButton(editor, toolbar, 'export', 'Export', 'assets/mximages/export1.png');
+          addToolbarButton(editor, toolbar, 'export', 'Save Lab', 'assets/mximages/connector.gif');
 
           // ---
 
