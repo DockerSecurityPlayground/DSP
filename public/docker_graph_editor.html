@@ -7,7 +7,7 @@
 -->
 <html>
   <head>
-    <title>Ports example</title>
+    <title>Graph Editor</title>
     <style type="text/css" media="screen">
 BODY {
   font-family: Arial;
@@ -217,34 +217,34 @@ BODY {
           spacer.style.display = 'inline';
           spacer.style.padding = '8px';
 
-          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
-
-          // Defines a new action for deleting or ungrouping
-          editor.addAction('groupOrUngroup', function(editor, cell)
-            {
-              cell = cell || editor.graph.getSelectionCell();
-              if (cell != null && editor.graph.isSwimlane(cell))
-              {
-                editor.execute('ungroup', cell);
-              }
-              else
-              {
-                editor.execute('group');
-              }
-            });
-
+//          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
+//
+//          // Defines a new action for deleting or ungrouping
+//          editor.addAction('groupOrUngroup', function(editor, cell)
+//            {
+//              cell = cell || editor.graph.getSelectionCell();
+//              if (cell != null && editor.graph.isSwimlane(cell))
+//              {
+//                editor.execute('ungroup', cell);
+//              }
+//              else
+//              {
+//                editor.execute('group');
+//              }
+//            });
+//
           addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
-          addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
-          addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
-          addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
+          //addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
+          //addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
+          //addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
-          addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
-          addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
+          //addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
+          //addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
 
           toolbar.appendChild(spacer.cloneNode(true));
 
@@ -312,6 +312,12 @@ BODY {
             }
           }
         }
+        $('html').keyup(function(e){
+          if(e.keyCode == 46 || e.keyCode == 8) {
+            console.log("Delete action");
+            editor.execute('delete');
+        }
+    });
       };
 
 
