@@ -288,7 +288,7 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
 
 
       //When imageList it's loded LOAD LAB (network.json)
-      dockerAPIService.loadLab($scope.nameRepo, $scope.labName, false, function(data) {
+      dockerAPIService.useLab($scope.nameRepo, $scope.labName, false, function(data) {
         //Current labState : if stopped play actions else stop actions
         $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
         $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;

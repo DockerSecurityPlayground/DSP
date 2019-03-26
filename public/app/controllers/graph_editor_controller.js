@@ -49,10 +49,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         // Edit a lab
         if(params.action === 'edit')
         {
+          console.log("SONO QUI");
 
           //When imageList it's loded load lab
-          dockerAPIService.loadLab($scope.repoName, $scope.labName, true, function(data) {
-            var canvasJSON = data.canvasJSON;
+          dockerAPIService.loadLab($scope.labName, true, function(data) {
+            $scope.canvas = data.canvasJSON;
             //TOREFACT gh.loadGraphicJSON(canvasJSON)
             containerManager.loadContainers(data, {imageList : $scope.imageList})
 
@@ -68,6 +69,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
             // Set isComposeVisible
             if (data.isComposeVisible == false)
               $scope.isComposeVisible = false
+            var networkNames = $scope.networkList.map(a => a.name)
+            var containerNames = containerManager.containerListToDraw.map( c => c.name);
+            // Container created, update canvas
+            $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
           })
 
 
@@ -95,6 +100,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
    */
   $scope.initGraphCallbacks = function(callbacks) {
     $scope.graphEditTerminatedCallback = callbacks[0];
+    $scope.canvasLoadedCallback = callbacks[1];
   }
 
 
@@ -476,10 +482,14 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   }
   $scope.detachNetwork = function detachNetwork(nameNetwork, containerName) {
       var container = containerManager.getContainer(containerName);
-      var ip = container.networks[nameNetwork].ip
-      NetworkManagerService.freeAddress(ip)
-      container.networks[nameNetwork].ip = ""
-      container.networks[nameNetwork].isChecked = false;
+      if (container && container.networks && container.networks[nameNetwork]) {
+        console.log("DELETE NETWOK");
+        var ip = container.networks[nameNetwork].ip
+        NetworkManagerService.freeAddress(ip)
+        delete container.networks[nameNetwork];
+        // container.networks[nameNetwork].ip = ""
+        // container.networks[nameNetwork].isChecked = false;
+      }
   }
 
   $scope.checkNetworkClicked = function checkNewtorkClicked(nameNetwork, container) {
@@ -805,6 +815,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
       // THe OLD NAME
       $scope.editContainerName = containerToEdit.name;
+      console.log("EDITONTAINTER " + $scope.editContainerName);
 
       // It' the string EDIT LAB , no action of docker !
       $scope.currentAction = protoEditAction+ $scope.editContainerName;
@@ -978,7 +989,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     }
   }
 
-  $scope.saveLab = function saveLab() {
+  $scope.saveLab = function saveLab(xmlGraphModel) {
     //	console.log("info to save:")
     //	console.log($scope.containerListToDraw)
     //	console.log($scope.containerListNotToDraw)
@@ -988,6 +999,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       $scope.containerListToDraw,
       $scope.containerListNotToDraw,
       $scope.networkList,
+      xmlGraphModel,
       //				gh.getGraphicJSON(),
       $scope.isComposeVisible
     )
@@ -1091,4 +1103,27 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
 
   }
   /* END CONTROLLER  */
+  $scope.goToImageRepository = function() {
+    window.open('/images', '_blank');
+  }
+  $scope.updateImages = function() {
+    dockerAPIService.getDockerImages()
+    .then(function successCallback(response) {
+        var imageList = response.data.data
+        $scope.imageList = imageList
+        containerManager.init($scope.imageList)
+      Notification("Images updated", 'success');
+
+      }, function errorCallback(response) {
+        Notification({message:"Sorry,  error in loading docker images"}, 'error');
+      })
+  }
+  $scope.exportDockerCompose = function() {
+			$scope.toJSON = $scope.yamlfile;
+			var blob = new Blob([$scope.toJSON], { type:"application/json;charset=utf-8;" });
+			var downloadLink = angular.element('<a></a>');
+                        downloadLink.attr('href',window.URL.createObjectURL(blob));
+                        downloadLink.attr('download', 'docker-compose.yml');
+			downloadLink[0].click();
+		};
 }
