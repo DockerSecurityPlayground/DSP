@@ -289,13 +289,17 @@ window.location.href='docker_graph_action.html?nameRepo='+ vm.repoName +'&namela
 
 }
 vm.goToEditNetwork = function goToEditNetwork() {
- $location.url('/lab/edit/'+vm.lab.name);
+ // $location.url('/lab/edit/'+vm.lab.name);
+  window.open('/lab/edit/'+vm.lab.name, '_blank');
 }
 vm.goToNetwork = function goToNetwork() {
 
   if (vm.isRunning)
     Notification('Cannot edit a running lab! Pls stop first', 'warning');
-  else window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
+  else {
+    // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
+    window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
+  }
 
 }
 

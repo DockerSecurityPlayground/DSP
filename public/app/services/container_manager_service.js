@@ -249,7 +249,6 @@ return {
 			if (_.isEmpty(ret)) return null
 			else return JSON.stringify(ret)
 	},
-
 	setContainer : setContainer,
 	updateWhenNotToDraw : function updateWhenNotToDraw (n)  {  shift(cld, clnd, n)  },
 	//Move a contaienr from list not drawed to list drawed

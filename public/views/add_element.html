@@ -69,11 +69,23 @@
                ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
             </select>
           </div>
-          <div class="col-sm-4"> 
+          <div class="col-sm-3"> 
             <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
             </input>
           </div>
+          <div class="col-sm-2">
+            <button class="btn btn-default" ng-click="updateImages()"> 
+              <i class="glyphicon glyphicon-refresh" > </i>
+            </button>
+          </div>
         </div>
+
+        <div class="row">
+          <div class="col-sm-2 col-sm-offset-2">
+            <button class="btn btn-primary" ng-click="goToImageRepository()"> <i class="glyphicon glyphicon-new-window"> </i> Images </button>
+          </div>
+        </div>
+        <br/>
 
     
         <!-- END SCALE -->

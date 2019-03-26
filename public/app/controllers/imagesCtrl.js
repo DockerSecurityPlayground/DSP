@@ -2,6 +2,10 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
   console.log("in manage images")
   var imageList = [];
   $scope.imagePanel = "repo_images"
+  // All images if query string is allimages
+  if ($location.search().allimages && $location.search().allimages == 'true') {
+    $scope.imagePanel = "all_images";
+  }
 
 
 
