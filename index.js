@@ -126,6 +126,7 @@ app.post('/dsp_v1/config', configHandler.updateConfig);
 
 // Api docker network
 app.get('/dsp_v1/docker_network/:namerepo/:namelab', networkHandler.get);
+app.get('/dsp_v1/docker_network/:namelab', networkHandler.getUser);
 app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 
 // API DOCKER MANAGMENT

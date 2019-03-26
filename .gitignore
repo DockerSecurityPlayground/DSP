@@ -55,3 +55,6 @@ config/config_user.json
 # Download files inside directory
 public/downloads/**
 !public/downloads/.keep
+
+# UltiSnip vim plugin
+UltiSnips

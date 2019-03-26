@@ -98,6 +98,40 @@ function get(req, res) {
   ], (err, response) => AppUtils.response('NETWORK GET', res, err, response));
 }
 
+function getUser(req, res) {
+  let namerepo;
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['namelab'], cb),
+    (cb) => configData.getConfig(cb),
+    (config, cb) => {
+      namerepo = config.name;
+      cb(null);
+    },
+    // get current state
+    (cb) => {
+      LabStates.getState(namerepo, req.params.namelab, cb);
+    },
+    // Save state in response for user browser
+    (status, cb) => {
+      if (req.query && req.query.exists && req.query.exists === '1') { networkData.networkExists(req.params.namerepo, req.params.namelab, cb); } else {
+        networkData.get(namerepo, req.params.namelab, (ndErr, ndResponse) => {
+          if (ndErr) cb(ndErr);
+          else {
+            ndResponse.state = status;
+            cb(ndErr, ndResponse);
+          }
+        });
+      }
+    },
+    (response, cb) => {
+      if (req.query.isEditing == '0' && response.isComposeVisible == false) {
+        response.yamlfile = "";
+      }
+      cb(null, response);
+    }
+  ], (err, response) => AppUtils.response('NETWORK GET', res, err, response));
+}
+
 
 function getListImages(req, res) {
     completeDescription = req.query.completeDescription
@@ -311,6 +345,7 @@ function dirExists(req, res) {
 
 exports.save = save;
 exports.get = get;
+exports.getUser = getUser;
 exports.getListImages = getListImages;
 exports.dirExists = dirExists;
 exports.dockershell = dockershell;

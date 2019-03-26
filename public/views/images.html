@@ -1,4 +1,9 @@
-﻿<div id="page-wrapper">
+﻿<style>
+.adjust-label {
+  padding-top: 4px
+}
+</style>
+<div id="page-wrapper">
   <h1 class="text-center"> Manage Images </h1>
   <hr>	
   <div id="page-inner">
@@ -22,7 +27,7 @@
                     <td class="text-center"> 
                       <a href="/lab/use/{{i.repoName}}/{{ li.nameLab }}" > {{ li.nameLab }} </a>
                     <p> 
-                        <button class="btn btn-default" ng-click="downloadAll(li)"> Download All </button>
+                    <button class="btn btn-default" ng-click="downloadAll(li)"> Download All </button>
                     </p>
                     
                     </td>
@@ -62,8 +67,21 @@
     </div>
                 <!-- All Images --> 
      <div ng-if="imagePanel === 'all_images'">
-          <h2 class="text-center"> Local Images </h2>
+          <h2 class="text-center"> Installed Docker Images </h2>
     <hr>
+    <form>
+      <div class="row form-group">
+        <div class="col-sm-2"> <label class="adjust-label control-label" for="download">Name Image:</label> </div>
+       <div class="col-sm-6">
+         <input type="text" class="form-control" id="download" ng-model="imageToDownload" >
+       </div>
+         <div class="col-sm-3">
+           <button class="btn btn-default" ng-click="downloadImage()"> <span class="glyphicon glyphicon-download" ></span>  Download</button>
+         </div>
+      </div>  
+    </form>
+    
+
     <ul class="list-group">
       <li class="list-group-item borderless" ng-repeat="ele in allImages"> 
         <div ng-if=ele.contains class="row"> 

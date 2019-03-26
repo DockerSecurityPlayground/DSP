@@ -1,5 +1,7 @@
 var Model__currentElementID = 0;
 var Model__networkID = 0;
+const Model__CONTAINER_BASENAME = "element_";
+const Model__NETWORK_BASENAME = "network_";
 // Angular scope variable
 var Model__AppScope = null;
 const NETWORK_ELEMENT_TYPE = "NetworkElement";
@@ -102,6 +104,28 @@ function graphEditCallback(oldName, newName) {
   Graph__update(theCell, newName, oldName);
 }
 
+function _incrementID(id, names, stringBase) {
+  _.each(names, function(c) {
+    if(c.startsWith(stringBase)) {
+      var n = c.replace(stringBase, "");
+      if(!isNaN(n)) {
+        if (id<= n)
+          id++;
+      }
+    }
+  });
+  return id;
+}
+
+function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
+  var doc = mxUtils.parseXml(canvasXML);
+  var codec = new mxCodec(doc);
+  codec.decode(doc.documentElement, theGraph.getModel());
+  Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
+  Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
+  }
+
+
 
 function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
   var port = graph.insertVertex(v1, null, value , x, y, width, height, style, relative);
@@ -153,14 +177,14 @@ function Graph__addPorts(graph, v1, numPorts) {
 
 // Create a new element and update angular model
 function Model__ElementCreate() {
-  var nameContainer = "element"+ Model__currentElementID;
+  var nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
   console.log("add new element");
   Model__AppScope.newContainer(nameContainer);
   Model__currentElementID++;
   return nameContainer;
 }
 function Model__NetworkCreate() {
-    var nameNetwork = "network_"+ Model__networkID;
+    var nameNetwork = Model__NETWORK_BASENAME + Model__networkID;
     // Model__AppScope.newContainer(nameContainer);
     Model__networkID++;
     Model__AppScope.addNetworkElement(nameNetwork);
@@ -248,8 +272,16 @@ function addSidebarElementIcon(graph, sidebar) {
   img.title = 'Drag this to the diagram to create a new vertex';
   var ele = document.createElement('span');
   ele.innerHTML = "   Host";
-  sidebar.appendChild(img);
-  sidebar.appendChild(ele);
+  var dragContainer = document.createElement('div');
+  dragContainer.className = "row";
+  dragContainer.style.marginLeft = "40px";
+  dragContainer.appendChild(img);
+  dragContainer.appendChild(ele);
+  // sidebar.appendChild(dragContainer);
+
+
+   sidebar.appendChild(img);
+   sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -280,8 +312,15 @@ function addSidebarNetworkIcon(graph, sidebar) {
   img.title = 'Drag this to the diagram to create a new vertex';
   var ele = document.createElement('span');
   ele.innerHTML = " Network";
-  sidebar.appendChild(img);
-  sidebar.appendChild(ele);
+  var dragContainer = document.createElement('div');
+  dragContainer.className = "row";
+  dragContainer.style.marginLeft = "40px";
+  dragContainer.appendChild(img);
+  dragContainer.appendChild(ele);
+  // sidebar.appendChild(dragContainer);
+
+   sidebar.appendChild(img);
+   sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -389,10 +428,9 @@ function addToolbarButton(editor, toolbar, action, label, image, isTransparent) 
     button.style.color = '#FFFFFF';
     button.style.border = 'none';
   }
-  mxEvent.addListener(button, 'click', function(evt)
-    {
-      editor.execute(action);
-    });
+    mxEvent.addListener(button, 'click', function(evt) {
+        editor.execute(action);
+  });
   mxUtils.write(button, label);
   toolbar.appendChild(button);
 };
@@ -474,7 +512,7 @@ function mxInitGraph(graph, appScope) {
   // Disable highlight of cells when dragging from toolbar
   theGraph = graph;
   graph.setDropEnabled(false);
-  Model__AppScope.initGraphCallbacks([graphEditCallback]);
+  Model__AppScope.initGraphCallbacks([graphEditCallback, canvasLoadedCallback]);
 
   // Override the insertVertex in order to use toDraw property
   var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
@@ -515,10 +553,14 @@ function mxInitGraph(graph, appScope) {
   }
 
   mxCellRemove= mxGraphModel.prototype.remove;
+  var MX__CanRemove = true;
   mxGraphModel.prototype.remove = function(cell) {
-    var canRemove = true;
-    console.log("CELL: "+cell);
-    if(cell.type == 'NetworkElement') {
+    if (cell.edge) {
+      var containerName = cell.source.name;
+      var networkName = cell.target.name;
+      Model__AppScope.detachNetwork(networkName, containerName);
+
+    } else if(cell.type == NETWORK_ELEMENT_TYPE) {
       console.log("Delete container from model");
       Model__AppScope.deleteContainer(cell.name);
     } else if(cell.type == NETWORK_TYPE) {
@@ -527,10 +569,14 @@ function mxInitGraph(graph, appScope) {
           Model__AppScope.deleteNetwork(cell.name);
       } else {
         alert("Cannot delete a network with attached elements");
-        canRemove = false;
+        MX__CanRemove = false;
+        // Set can remoe after 2 seconds in order to enable remove mode after that all ports have been processed
+        setTimeout(function() {
+          MX__CanRemove = true;
+        }, 2000);
       }
     }
-    if (canRemove) {
+    if (MX__CanRemove) {
       console.log("CAN REMOVE");
       return mxCellRemove.apply(this, arguments);
     } else {
@@ -746,6 +792,14 @@ function mxInitEditor(editor, container) {
 function createHints() {
 
 }
+function MX__ExitLab() {
+  window.location.href='/lab/use/'+Model__AppScope.repoName+'/'+Model__AppScope.labName
+}
+
+
+function MX__SaveLab(xml) {
+  Model__AppScope.saveLab(xml);
+}
 
 function mxAddNetworkElement(graph, sidebar) {
   addSidebarElementIcon(graph, sidebar);
@@ -753,3 +807,218 @@ function mxAddNetworkElement(graph, sidebar) {
 function mxAddNetwork(graph, sidebar) {
   addSidebarNetworkIcon(graph, sidebar,);
 }
+
+function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
+  console.log("IN MXMAIN");
+  // Checks if the browser is supported
+  if (!mxClient.isBrowserSupported()) {
+    // Displays an error message if the browser is not supported.
+    mxUtils.error('Browser is not supported!', 200, false);
+  }
+  else {
+    mxInitConstants();
+    mxInitGuides();
+    // Enables snapping waypoints to terminals
+    mxEdgeHandler.prototype.snapToTerminals = true;
+    mxWorkaroundIE();
+
+    // Creates a wrapper editor with a graph inside the given container.
+    // The editor is used to create certain functionality for the
+    // graph, such as the rubberband selection, but most parts
+    // of the UI are custom in this example.
+    var editor = new mxEditor();
+    var graph = editor.graph;
+    var model = graph.getModel();
+
+    mxInitGraph(graph, appScope);
+    mxInitEditor(editor, container);
+    mxAddNetworkElement(graph, sidebar);
+    mxAddNetwork(graph, sidebar);
+    //addRouteElement(graph, sidebar);
+
+
+
+    // Adds sidebar icons.
+    //
+    // NOTE: For non-HTML labels a simple string as the third argument
+    // and the alternative style as shown in configureStylesheet should
+    // be used. For example, the first call to addSidebar icon would
+    // be as follows:
+    // addSidebarIcon(graph, sidebar, 'Website', 'assets/mximages/icons48/earth.png');
+    /*
+    addSidebarIcon(graph, sidebar,
+      '<h1 style="margin:0px;">Website</h1><br>'+
+      '<img src="assets/mximages/icons48/earth.png" width="48" height="48">'+
+      '<br>'+
+      '<a href="http://www.jgraph.com" target="_blank">Browse</a>',
+      'assets/mximages/icons48/earth.png');
+    addSidebarIcon(graph, sidebar,
+      '<h1 style="margin:0px;">Process</h1><br>'+
+      '<img src="assets/mximages/icons48/gear.png" width="48" height="48">'+
+      '<br><select><option>Value1</option><option>Value2</option></select><br>',
+      'images/icons48/gear.png');
+    addSidebarIcon(graph, sidebar,
+      '<h1 style="margin:0px;">Keys</h1><br>'+
+      '<img src="assets/mximages/icons48/keys.png" width="48" height="48">'+
+      '<br>'+
+      '<button onclick="mxUtils.alert(\'generate\');">Generate</button>',
+      'assets/mximages/icons48/keys.png');
+    addSidebarIcon(graph, sidebar,
+      '<h1 style="margin:0px;">New Mail</h1><br>'+
+      '<img src="assets/mximages/icons48/mail_new.png" width="48" height="48">'+
+      '<br><input type="checkbox"/>CC Archive',
+      'assets/mximages/icons48/mail_new.png');
+    addSidebarIcon(graph, sidebar,
+      '<h1 style="margin:0px;">Server</h1><br>'+
+      '<img src="assets/mximages/icons48/server.png" width="48" height="48">'+
+      '<br>'+
+      '<input type="text" size="12" value="127.0.0.1"/>',
+      'assets/mximages/icons48/server.png');
+    */
+    // Displays useful hints in a small semi-transparent box.
+//          var hints = document.createElement('div');
+//          hints.style.position = 'absolute';
+//          hints.style.overflow = 'hidden';
+//          hints.style.width = '230px';
+//          hints.style.bottom = '56px';
+//          hints.style.height = '76px';
+//          hints.style.right = '20px';
+//
+//          hints.style.background = 'black';
+//          hints.style.color = 'white';
+//          hints.style.fontFamily = 'Arial';
+//          hints.style.fontSize = '10px';
+//          hints.style.padding = '4px';
+//
+//          mxUtils.setOpacity(hints, 50);
+//
+//          mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
+//          mxUtils.writeln(hints, '- Doubleclick on a vertex or edge to edit');
+//          mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
+//          mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
+//          mxUtils.writeln(hints, '- Click and drag a vertex to move and connect');
+//          document.body.appendChild(hints);
+
+    // Creates a new DIV that is used as a toolbar and adds
+    // toolbar buttons.
+    var spacer = document.createElement('div');
+    spacer.style.display = 'inline';
+    spacer.style.padding = '8px';
+
+//          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
+//
+//          // Defines a new action for deleting or ungrouping
+//          editor.addAction('groupOrUngroup', function(editor, cell)
+//            {
+//              cell = cell || editor.graph.getSelectionCell();
+//              if (cell != null && editor.graph.isSwimlane(cell))
+//              {
+//                editor.execute('ungroup', cell);
+//              }
+//              else
+//              {
+//                editor.execute('group');
+//              }
+//            });
+//
+    addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
+    addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
+    addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
+    addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
+    toolbar.appendChild(spacer.cloneNode(true));
+    toolbar.appendChild(spacer.cloneNode(true));
+    //addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
+    //addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
+    toolbar.appendChild(spacer.cloneNode(true));
+    //addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');
+    toolbar.appendChild(spacer.cloneNode(true));
+
+    editor.addAction('save', function(editor, cell) {
+      var enc = new mxCodec(mxUtils.createXmlDocument());
+      var node = enc.encode(editor.graph.getModel());
+      var xml = mxUtils.getPrettyXml(node);
+      MX__SaveLab(xml);
+    });
+
+    // Defines a new export action
+    editor.addAction('view', function(editor, cell)
+      {
+        var textarea = document.createElement('textarea');
+        textarea.style.width = '400px';
+        textarea.style.height = '400px';
+//              var enc = new mxCodec(mxUtils.createXmlDocument());
+//              var node = enc.encode(editor.graph.getModel());
+        //textarea.value = mxUtils.getPrettyXml(node);
+        textarea.value = Model__AppScope.yamlfile;
+        showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
+      });
+    editor.addAction('export', function(editor, cell) {
+     Model__AppScope.exportDockerCompose();
+    });
+
+    editor.addAction('exit', function(editor, cell) {
+      MX__ExitLab();
+    });
+
+    for (i = 0; i < 14; i++)
+      toolbar.appendChild(spacer.cloneNode(true));
+    addToolbarButton(editor, toolbar, 'view', 'View docker-compose', 'assets/mximages/info.gif');
+    addToolbarButton(editor, toolbar, 'export', 'Get docker-compose', 'assets/mximages/export1.png');
+    addToolbarButton(editor, toolbar, 'save', 'Save Network', 'assets/mximages/save.gif');
+    toolbar.appendChild(spacer.cloneNode(true));
+    toolbar.appendChild(spacer.cloneNode(true));
+    addToolbarButton(editor, toolbar, 'exit', 'Exit from graph editor', 'assets/mximages/undo.png');
+
+    // ---
+
+    // Adds toolbar buttons into the status bar at the bottom
+    // of the window.
+//          addToolbarButton(editor, status, 'collapseAll', 'Collapse All', 'assets/mximages/navigate_minus.png', true);
+//          addToolbarButton(editor, status, 'expandAll', 'Expand All', 'assets/mximages/navigate_plus.png', true);
+//
+//          status.appendChild(spacer.cloneNode(true));
+//
+//          addToolbarButton(editor, status, 'enterGroup', 'Enter', 'assets/mximages/view_next.png', true);
+//          addToolbarButton(editor, status, 'exitGroup', 'Exit', 'assets/mximages/view_previous.png', true);
+//
+//          status.appendChild(spacer.cloneNode(true));
+
+    addToolbarButton(editor, status, 'zoomIn', '', 'assets/mximages/zoom_in.png', true);
+    addToolbarButton(editor, status, 'zoomOut', '', 'assets/mximages/zoom_out.png', true);
+    addToolbarButton(editor, status, 'actualSize', '', 'assets/mximages/view_1_1.png', true);
+//          addToolbarButton(editor, status, 'fit', '', 'assets/mximages/fit_to_size.png', true);
+
+    // Creates the outline (navigator, overview) for moving
+    // around the graph in the top, right corner of the window.
+    var outln = new mxOutline(graph, outline);
+    // <div ng-include=viewToInclude> </div>
+
+
+    // To show the assets/mximages in the outline, uncomment the following code
+    //outln.outline.labelsVisible = true;
+    //outln.outline.setHtmlLabels(true);
+
+    // Fades-out the splash screen after the UI has been loaded.
+    var splash = document.getElementById('splash');
+    if (splash != null)
+    {
+      try
+      {
+        mxEvent.release(splash);
+        mxEffects.fadeOut(splash, 100, true);
+      }
+      catch (e)
+      {
+
+        // mxUtils is not available (library not loaded)
+        splash.parentNode.removeChild(splash);
+      }
+    }
+  }
+  $('html').keyup(function(e){
+    if(e.keyCode == 46 || e.keyCode == 8) {
+      console.log("Delete action");
+      editor.execute('delete');
+  }
+});
+};
