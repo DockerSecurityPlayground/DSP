@@ -41,6 +41,7 @@ vm.labels=[],
 vm.previewSolution = '';
 vm.previewGoal = '';
 vm.isRunning;
+vm.exists = true;
 vm.isGoalEditShowed = true;
 vm.isSolutionEditShowed = true;
 vm.isSolutionPreviewOpen = false;
@@ -123,25 +124,26 @@ $scope.init = function() {
     var rname = $routeParams.repo;
     var username = AjaxService.config.name;
     CurrentLabService.updateLab(rname, labname);
-   //  AjaxService.checkExistenceLab(rname, labname)
-   //        .then(function successCallback(response) {
-   //          var exists = response.data.data
-  /// /					console.log("EXISTS?")
-  /// /					console.log(exists)
-   //          //If doesn't exists create new network button
-   //          if(!exists)  {
-   //            vm.buttonAction = buttonCreateProto
-   //            vm.editVisible = false
-   //          }
-   //          //Else go button
-   //          else	{
-   //            vm.buttonAction = buttonGoProto
-   //            vm.editVisible = true
-   //          }
-   //        },
-   //        function errorCallback(response) {
+    AjaxService.checkExistenceLab(rname, labname)
+    .then(function successCallback(response) {
+      var exists = response.data.data
+      console.log("EXISTS?")
+      console.log(exists)
+      //If doesn't exists create new network button
+      if(!exists)  {
+         vm.buttonAction = buttonCreateProto
+         vm.editVisible = false
+         vm.exists = false;
+       }
+       //Else go button
+       // else	{
+       //   vm.buttonAction = buttonGoProto
+       //   vm.editVisible = true
+       // }
+     },
+           function errorCallback(response) {
 
-   //        })
+           })
   //If username = repo name it's the user repo and it' possible to edit
   if(username === rname)
   {
@@ -312,7 +314,8 @@ else if($scope.lab_action_form === 'editlab') {
 
 
 function goToCreateNetwork() {
-window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&action=new'
+ $location.url('/network/'+vm.lab.name);
+// window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&action=new'
 }
 
 function goToImages() {

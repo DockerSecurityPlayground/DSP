@@ -51,7 +51,12 @@ appScope.init();
       <h2 class="text-center" > Goal </h2>
       <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
     </div>
-    <div class="row">
+    <div ng-show="!ctrl.exists" class="text-center row">
+      <button ng-click="ctrl.buttonAction.action(ctrl.lab.name)" class="{{ctrl.buttonAction.class}}"> {{ctrl.buttonAction.label}} </button>
+    </div>
+
+    </div>
+    <div ng-show="ctrl.exists" class="row">
               <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
                 <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
               </button> 
