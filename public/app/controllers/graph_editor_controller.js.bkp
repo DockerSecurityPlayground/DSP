@@ -49,18 +49,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         // Edit a lab
         if(params.action === 'edit')
         {
-<<<<<<< HEAD
           console.log("SONO QUI");
 
           //When imageList it's loded load lab
           dockerAPIService.loadLab($scope.labName, true, function(data) {
             $scope.canvas = data.canvasJSON;
-=======
-
-          //When imageList it's loded load lab
-          dockerAPIService.loadLab($scope.repoName, $scope.labName, true, function(data) {
-            var canvasJSON = data.canvasJSON;
->>>>>>> Init network graph
             //TOREFACT gh.loadGraphicJSON(canvasJSON)
             containerManager.loadContainers(data, {imageList : $scope.imageList})
 
@@ -76,13 +69,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
             // Set isComposeVisible
             if (data.isComposeVisible == false)
               $scope.isComposeVisible = false
-<<<<<<< HEAD
             var networkNames = $scope.networkList.map(a => a.name)
             var containerNames = containerManager.containerListToDraw.map( c => c.name);
             // Container created, update canvas
             $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
-=======
->>>>>>> Init network graph
           })
 
 
@@ -101,19 +91,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         Notification({message:"Sorry,  error in loading docker images"}, 'error');
       })
 
-<<<<<<< HEAD
-=======
-
-
-  /** GRAPH INFOS **/
-  /**
-   * Initialize the callbacks to call when the angular events terminate
-   *
-   */
-  $scope.initGraphCallbacks = function(callbacks) {
-    $scope.graphEditTerminatedCallback = callbacks[0];
-  }
->>>>>>> Init network graph
 
 
   /** GRAPH INFOS **/
@@ -127,10 +104,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   }
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> Init network graph
   /************************** NETWORK INFO  **********************/
   //Current network view
   $scope.n = {
@@ -155,17 +129,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
    */
 
 
-<<<<<<< HEAD
   $scope.isNetworkAttached = function(name) {
     return containerManager.checkNetworkInToDraw(name)
   }
   $scope.deleteNetwork = function(name) {
     if($scope.isNetworkAttached(name))
-=======
-  $scope.deleteNetwork = function(name) {
-    var containersName = containerManager.checkNetworkInToDraw(name)
-    if(containersName)
->>>>>>> Init network graph
       Notification({message:"Cannot delete an used network pls delete first the associated containers:"+containersName}, 'error');
     else {
       NetworkManagerService.removeNetwork(name)
@@ -190,28 +158,19 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     //Update subnet
     $log.warn("TODO UPDATE NAME")
     //Reset n
-<<<<<<< HEAD
     $scope.n.name = networkName
-=======
-    $scope.n.name = ""
->>>>>>> Init network graph
     //Update informations network of containers
     containerManager.newNetworkOccurred(network)
     console.log($scope.networkList);
   };
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
-<<<<<<< HEAD
   var networkInEditing = null;
   // Called when the edit is finished
-=======
-  var networkInEditing = '';
->>>>>>> Init network graph
   $scope.editNetworkElement = function() {
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
     console.log($scope.n);
     console.log(networkInEditing);
-<<<<<<< HEAD
 
     // Update network in network list
     var networkToEdit = NetworkManagerService.getNetwork(networkInEditing.name);
@@ -221,17 +180,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
     // Callback to graphedit
     $scope.graphEditTerminatedCallback(networkInEditing.name, $scope.n.name);
-=======
-    // Callback to graphedit
-    $scope.graphEditTerminatedCallback(networkInEditing, $scope.n.name);
->>>>>>> Init network graph
     // Reset current container
 
     // Don't show the network panel
     $scope.showEditNetwork = false;
     console.log($scope.networkList);
   }
-<<<<<<< HEAD
 
   //PORTS
   portService.init()
@@ -281,57 +235,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
   }
 
-=======
-
-  //PORTS
-  portService.init()
-  $scope.hostPorts =  portService
-  // ERROR HANDLERS
-  $scope.networkErrors = {
-    someError : false,
-    message : ""
-  }
-  //Check network duplicates on change text input
-  $scope.checkNetworkDuplicates = function checkNetworkDuplicates(event)
-  {
-    var found=false
-    var networkVal = formnetwork.nameNetwork.value
-    console.log(networkVal);
-
-    var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
-
-
-    if(NetworkManagerService.hasNetwork(networkVal))
-    {
-      console.log("ERROR");
-      $scope.networkErrors.someError= true
-      $scope.networkErrors.message="Network name already present"
-      //Disable form network with hidden field
-      $scope.n.more_validation=""
-    }
-
-    //Check subnet
-    else if(NetworkManagerService.hasSubnet(s))
-    {
-
-      $scope.networkErrors.someError= true
-      $scope.networkErrors.message="Subnet  already present"
-      //Disable form network with hidden field
-      $scope.n.more_validation=""
-    }
-
-    else
-    {
-      $scope.networkErrors.someError=false
-      $scope.networkErrors.message=""
-      //Enable form network with hidden field
-      $scope.n.more_validation="###"
-    }
-
-
-  }
-
->>>>>>> Init network graph
 
 
   /********************* END NETWORK DESCR  ********************/
@@ -394,7 +297,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         });
       }
     });
-<<<<<<< HEAD
 
   }
 
@@ -487,131 +389,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
     var c = {
       name:$scope.currentContainer.name,
-=======
-
-  }
-
-  //Containers  method
-  $scope.containerErrors = {
-    someError : false,
-    message : "" ,
-    more_validation:"###"
-  }
-
-  $scope.checkContainerChange = function checkContainerChange() {
-    var found = containerManager.hasContainer()
-    console.log("found?"+found)
-
-    //If there already is a container with this name  and new
-
-    if(found && $scope.isAddContainer)
-    {
-      $scope.containerErrors.someError= true
-      $scope.containerErrors.message= "Container already present"
-      //Disable form container with hidden field
-      $scope.containerErrors.more_validation=""
-    }
-    else {
-      $scope.containerErrors.someError= false
-      $scope.containerErrors.message= ""
-      //Disable form container with hidden field
-      $scope.containerErrors.more_validation="###"
-
-    }
-  }
-
-  /* Called when the container is edit
-   *
-   */
-  $scope.editContainer = function editContainer() {
-    //Add to current container infos about container list not drawed selected
-    $scope.optionalPorts = [];
-    $scope.optPort = { container: '', host: ''};
-
-    var containerToEdit = _.findWhere($scope.containerListToDraw, {name: $scope.editContainerName});
-    var oldName = containerToEdit.name;
-    containerManager.setContainer($scope.currentContainer, containerToEdit);
-    // Callback to graphedit
-    $scope.graphEditTerminatedCallback(oldName, $scope.currentContainer.name);
-    // Reset current container
-    containerManager.resetCurrent($scope.imageList, $scope.networkList);
-    $scope.isAddContainer = true;
-    $scope.currentAction = protoAddAction;
-    // Don't show the container panel
-    $scope.showEditContainer = false;
-    Notification({message: containerToEdit.name+ " modified!"}, 'success');
-  }
-
-  $scope.cancelEditContainer = function cancelEditContainer() {
-    //Add
-    $scope.optPort = { container: '', host: ''};
-    $scope.optionalPorts = [];
-    containerManager.resetCurrent($scope.imageList, $scope.networkList)
-    $scope.isAddContainer = true
-
-  }
-
-  $scope.newContainer = function newContainer(nameContainer) {
-    console.log("New Container");
-    $scope.optionalPorts = [];
-    $scope.optPort = { container: '', host: ''};
-    var c = {
-      name: nameContainer,
->>>>>>> Init network graph
-      selectedImage: $scope.currentContainer.selectedImage,
-      ports : $scope.currentContainer.ports,
-      actions : angular.copy($scope.currentContainer.actions),
-      volumes : angular.copy($scope.currentContainer.volumes),
-      filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
-    };
-    $
-    var env = [];
-<<<<<<< HEAD
-    //Load environment
-    _.each($scope.currentContainer.environments, function(e)
-      {
-        if(e.name && e.value && e.name !== '' && e.value !== '')
-        {
-          env.push(e)
-        }
-      })
-    c.environments = env
-    //	//Add currentIP  to resolve the problem of ng-change in select
-    //	_.each(c.networks, function(e) {
-    //		e.currentIP = e.ip
-    //	})
-
-
-    //Add to not drawed new container
-    containerManager.addToNotToDraw(c)
-
-
-
-    //Use network  address
-    var networksSetted = _.where(c.networks, {isChecked:true})
-    _.each(networksSetted, function(n) {
-      NetworkManagerService.useAddress(n.ip)})
-    //Zeroes currentContainer
-    containerManager.resetCurrent($scope.imageList, $scope.networkList)
-    Notification({message: c.name+ " created!"}, 'success');
-
-
-=======
-    c.environments = env
-
-    ////Add to not drawed new container
-    containerManager.addToDraw(c)
-    Notification({message: c.name+ " created!"}, 'success');
-  }
-
-  // to update container list  when  submit clicked in form_add_container
-  $scope.loadContainer = function loadContainer() {
-    $scope.optionalPorts = [];
-    $scope.optPort = { container: '', host: ''};
-
-    var c = {
-      name:$scope.currentContainer.name,
       selectedImage: $scope.currentContainer.selectedImage,
       ports : $scope.currentContainer.ports,
       actions : angular.copy($scope.currentContainer.actions),
@@ -650,7 +427,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     Notification({message: c.name+ " created!"}, 'success');
 
 
->>>>>>> Init network graph
   }
   $scope.copyContainer = function copyContainer($index) {
     //Free networks
@@ -666,17 +442,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
 
   }
   //Delete a container from containerNotToDraw list
-<<<<<<< HEAD
   $scope.deleteContainer = function deleteContainer(containerName) {
 
     //Free networks
     var container=  containerManager.getContainer(containerName);
-=======
-  $scope.deleteContainer = function deleteContainer($index) {
-
-    //Free networks
-    var container=  $scope.containerListNotToDraw[$index]
->>>>>>> Init network graph
     var networks = container.networks
     // IF is equl to removed container, delete selection
     if ($scope.containerDescription === container)
@@ -686,11 +455,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       NetworkManagerService.freeAddress(n.ip)
     })
 
-<<<<<<< HEAD
     containerManager.deleteFromToDraw(container.name)
-=======
-    containerManager.deleteFromNotToDraw(container.name)
->>>>>>> Init network graph
     //containerToDraw
     if($scope.containerToDraw)
       //if is selected must be deleted!
@@ -698,7 +463,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       {
         $scope.containerToDraw = null
       }
-<<<<<<< HEAD
   }
 
   $scope.attachNetwork = function attachNetwork(nameNetwork, containerName) {
@@ -788,147 +552,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         networkList : networkToDraw,
         ports : eSelected.ports
 
-=======
-
-
-  }
-
-  $scope.checkNetworkClicked = function checkNewtorkClicked(nameNetwork, container) {
-
-    var isChecked = container.networks[nameNetwork].isChecked
-    console.log("in checkNetwork")
-    //If currentContainer network is unchecked , delete firstIP
-    if(isChecked)
-    {
-
-      var ip = NetworkManagerService.getFirst(nameNetwork)
-      container.networks[nameNetwork].ip = ip
-      container.networks[nameNetwork].position = 'right'
-      container.networks[nameNetwork].isVisible = true
-      NetworkManagerService.useAddress(ip)
-    }
-    //If isn't checked delete
-    else
-    {
-      var ip = container.networks[nameNetwork].ip
-      NetworkManagerService.freeAddress(ip)
-      container.networks[nameNetwork].ip = ""
-    }
-  }
-
-  //Select a container to draw
-  $scope.selectContainerAction = function selectContainerAction(e)
-  {
-    var nameSelected = e.currentTarget.id;
-    var eSelected =_.where($scope.containerListNotToDraw, {name:nameSelected})[0];
-    //Get networks
-    var networks = eSelected.networks;
-    var networkToDraw = [];
-    _.each(networks, function(e)  {
-      //Only if isChecked
-      if(e.isChecked)
-      {
-        //Find color
-        var subnet = NetworkManagerService.subnetOf(e.ip);
-        var n=NetworkManagerService.getNetworkBySubnet(subnet);
-        networkToDraw.push({
-          nameNetwork : n.name,
-          // Draw only if is visible
-          name: (e.isVisible == false) ?  '' : e.ip,
-          color:n.color,
-          position:e.position,
-          isDynamic: e.isDynamic
-        })
-      }
-
-
-    }) // End fill network list
-    //Graph networkList : {name,color , position}
-    if(eSelected)
-    {
-      console.log(eSelected)
-      $scope.containerToDraw = {
-        name : eSelected.name,
-        icon : eSelected.selectedImage.icon,
-        networkList : networkToDraw,
-        ports : eSelected.ports
-
->>>>>>> Init network graph
       }
       //UPDATE CONTAINER TO DRAW
       $scope.containerDescription = eSelected;
     }
-<<<<<<< HEAD
-
-  }
-  $scope.changeContainerIP = function changeContainerIP(e,c, networkName) {
-    //Ip in option
-    var ipSelected = e.currentTarget.value
-    //Free ip used in form container
-    console.log("in changeCOntainer")
-    console.log(networkName)
-    var network = c.networks[networkName]
-    //Only if it's defined free
-    if(network && network.ip)
-    {
-      NetworkManagerService.freeAddress(network.ip)
-      console.log("equality: "+network.ip === $scope.currentContainer.networks[networkName].ip)
-    }
-    //Else define network
-    else {
-      //if it's not defined
-      if(!network)
-      {
-        c.networks = { position:"right"}
-        network = c.networks
-      }
-
-    }
-    //now update the network ip of the container
-    network.ip = ipSelected
-    //and use this ip
-    NetworkManagerService.useAddress(network.ip)
-  }
-  $scope.addEnvironment = function() {
-    containerManager.addEnvironment()
-
-  }
-  $scope.removeEnvironment = function() {
-    containerManager.removeEnvironment()
-
-  }
-
-  $scope.volumeHost = ''
-  $scope.volumeContainer = ''
-  //True if no empty volumes
-
-  $scope.removeVolume = function(index) {
-    $scope.currentContainer.volumes.splice(index, 1)
-  }
-  //Volume host , volume container
-  $scope.addVolume = function(vh, vc) {
-    if (!$scope.currentContainer.volumes)
-      $scope.currentContainer.volumes = []
-    //Verify if exists and no errors
-    if (vh && vc) {
-      // Add / if doesn't contain it
-      if (vc.charAt(0) !== '/') {
-        vc = '/'+vc
-      }
-
-      var toInsert = {
-        host: vh,
-        container: vc
-      };
-      if(!_.contains($scope.currentContainer.volumes, toInsert))
-        $scope.currentContainer.volumes.push(toInsert);
-      else Notification('Path already setted!', 'error')
-    }
-    else Notification('No correct host and container volume', 'error')
-
-  }
-=======
->>>>>>> Init network graph
 
   }
   $scope.changeContainerIP = function changeContainerIP(e,c, networkName) {
@@ -999,14 +626,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   }
 
 
-<<<<<<< HEAD
-  /********************* END CONTAINER ********************/
-
-=======
 
   /********************* END CONTAINER ********************/
 
->>>>>>> Init network graph
   /********************** IMAGE ACTIONS ******************/
   $scope.selectedArgs = {}
   $scope.selectedAction = {}
@@ -1164,7 +786,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   }
   /** TEST **/
   function test(ctrl) {
-<<<<<<< HEAD
 
   }
 
@@ -1179,43 +800,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   $scope.isCurrentContainer = function isCurrentContainer(item) {
 
     return item.name !== $scope.currentContainer.name
-=======
-
-  }
-
-  //test($scope.
-
-
-  /********************* COMMAND ACTION MENU HANDLING ********************/
-
-  $scope.isAddContainer = true;
-
-
-  $scope.isCurrentContainer = function isCurrentContainer(item) {
-
-    return item.name !== $scope.currentContainer.name
-
-  }
-
-  //When click edit button show edit buttons and set name editContainer
-  $scope.onClickEditContainer =  function(containerName) {
-    safeApplyService.exec($scope, function() {
-      $scope.isAddContainer = false;
-      // Fix filtered image
-      //	console.log($scope.containerListNotToDraw)
-      //Eventually redirect to edit
-
-
-      var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
-      // THe OLD NAME
-      $scope.editContainerName = containerToEdit.name;
-
-      // It' the string EDIT LAB , no action of docker !
-      $scope.currentAction = protoEditAction+ $scope.editContainerName;
-      // Set the default
-
-      //Update currentContainer
->>>>>>> Init network graph
 
   }
 
@@ -1237,12 +821,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       $scope.currentAction = protoEditAction+ $scope.editContainerName;
       // Set the default
 
-<<<<<<< HEAD
       //Update currentContainer
 
 
-=======
->>>>>>> Init network graph
       containerManager.setContainer(containerToEdit, $scope.currentContainer);
       $scope.filterImage = ""
       setDefaultAction($scope.currentContainer.selectedImage);
@@ -1259,7 +840,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       if (NetworkManagerService.hasNetwork(networkName)) {
         var theNetwork = NetworkManagerService.getNetwork(networkName);
         // Save the name before that the user edit it
-<<<<<<< HEAD
         networkInEditing = _.clone(theNetwork);
         $scope.n = _.clone(theNetwork);
         // Set subnet dotted
@@ -1272,10 +852,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
         }
         console.log($scope.n);
         $scope.n.more_validation = "###";
-=======
-        networkInEditing = theNetwork.name;
-        $scope.n = theNetwork;
->>>>>>> Init network graph
       } else {
         console.log("ERROR: why no network?" + networkName);
       }
@@ -1413,11 +989,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
     }
   }
 
-<<<<<<< HEAD
   $scope.saveLab = function saveLab(xmlGraphModel) {
-=======
-  $scope.saveLab = function saveLab() {
->>>>>>> Init network graph
     //	console.log("info to save:")
     //	console.log($scope.containerListToDraw)
     //	console.log($scope.containerListNotToDraw)
@@ -1427,10 +999,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       $scope.containerListToDraw,
       $scope.containerListNotToDraw,
       $scope.networkList,
-<<<<<<< HEAD
       xmlGraphModel,
-=======
->>>>>>> Init network graph
       //				gh.getGraphicJSON(),
       $scope.isComposeVisible
     )
@@ -1534,7 +1103,6 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
 
   }
   /* END CONTROLLER  */
-<<<<<<< HEAD
   $scope.goToImageRepository = function() {
     window.open('/images', '_blank');
   }
@@ -1558,6 +1126,4 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
                         downloadLink.attr('download', 'docker-compose.yml');
 			downloadLink[0].click();
 		};
-=======
->>>>>>> Init network graph
 }

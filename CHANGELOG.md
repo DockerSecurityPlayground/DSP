@@ -11,7 +11,18 @@ Versioning of Docker Security Playground
  Fix the .data bug (delete when .data is empty)
  Different vertical size image canvas
  New terminal on a new tab in visual editor
- If the user have not a Docker image he should be notified (no docker pull)
+
+
+## [3.1.0] - 2019-04-01
+### Added
+Alignment of toolbar
+### Changed
+Integrated the lab graph inside the single page application (no graph_editor / graph_action pages)
+
+## [3.0.0] - 2019 - 03 -27
+New Graph editor created
+
+
 ## [2.3] - 2019-03-12
 Image checking added and progress bar for images implemented
 Added anchor to images

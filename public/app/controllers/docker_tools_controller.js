@@ -1,15 +1,19 @@
 var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService) {
-	console.log("DOCKER TOOLS CONTROLLER");
   $scope.listServices = [];
   $scope.optPort = { container: 0, host: 0};
   $scope.optionalPorts = [];
   $scope.currentEnvironment = {name: '', value: ''};
 
 
-  $scope.currentContainer
+  $scope.currentContainer = {};
   $scope.t = {
     name: 'red'
   };
+  $scope.initController = function () {
+    dockerAPIService.setServices($scope.listServices);
+    initCurrentContainer();
+    dockerAPIService.initServices();
+  }
 
 
   function initCurrentContainer() {
@@ -28,9 +32,6 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService) {
     $scope.optPort = { container: 0, host: 0};
 }
 
-  dockerAPIService.setServices($scope.listServices);
-  initCurrentContainer();
-  dockerAPIService.initServices();
 
 $scope.addEnvironment = function addEnvironment() {
   console.log("ADD ENV");

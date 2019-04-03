@@ -1,9 +1,10 @@
-DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $scope,$log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification ) {
+DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification ) {
 
   $scope.labName= '';
   $scope.showEditContainer = false;
   $scope.showEditNetwork   = false;
   $scope.yamlfile='';
+  $scope.showYamlFile = false;
 
   $scope.isComposeVisible = true;
   const protoAddAction = 'New container',
@@ -17,12 +18,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
   $scope.nameContainerRegex = RegexService.nameContainerRegex;
 
   //Param analysis
-  var params = $location.search()
-  if(params.namelab && params.nameRepo)
+  if($routeParams.namelab)
   {
-    $scope.repoName = params.nameRepo;
-    $scope.labName= params.namelab;
-    console.log('Received'+ $scope.repoName+ " "+ $scope.labName)
+    $scope.labName = $routeParams.namelab;
   }
   //Redirect to managment projects
   else redirectToMain()
@@ -45,10 +43,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
       //Init container manager
       containerManager.init($scope.imageList)
       $scope.changedImage($scope.imageList[0])
-      if(params.action && (params.action==='edit' || params.action ==='new')) {
+      // if(params.action && (params.action==='edit' || params.action ==='new')) {
         // Edit a lab
-        if(params.action === 'edit')
-        {
+        // if(params.action === 'edit')
+        // {
           console.log("SONO QUI");
 
           //When imageList it's loded load lab
@@ -76,16 +74,16 @@ DSP_GraphEditorController : function DSP_GraphEditorController(RegexService, $sc
           })
 
 
-        }
-        else if(params.action === 'new')
-        {
-          $scope.networkList =  NetworkManagerService.getNetworks()
-        }
-      }
+        // }
+        // else if(params.action === 'new')
+        // {
+        //   $scope.networkList =  NetworkManagerService.getNetworks()
+        // }
+      // }
       //If params are not correct
-      else {
-        redirectToMain()
-      }
+      // else {
+      //   redirectToMain()
+      // }
     },
       function errorCallback(response) {
         Notification({message:"Sorry,  error in loading docker images"}, 'error');
@@ -1126,4 +1124,17 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
                         downloadLink.attr('download', 'docker-compose.yml');
 			downloadLink[0].click();
 		};
+
+  $scope.viewCompose = function() {
+    safeApplyService.exec($scope, function() {
+    $scope.showYamlFile = !$scope.showYamlFile;
+    var closeNode = document.createTextNode("Close");
+    var viewNode = document.createTextNode("View");
+    var item = document.getElementById("view");
+    item.childNodes[1].nodeValue == "Close" ?
+        item.replaceChild(viewNode, item.childNodes[1])
+      :
+        item.replaceChild(closeNode, item.childNodes[1]) ;
+    });
+  }
 }

@@ -110,6 +110,17 @@ var api = '/dsp_v1/docker_network/' ;
 						Notification({message:"Error loading lab!"}, 'error');
 				})
 		},
+		loadGeneralLab: function loadLab(repoName, labName, isEdit, successCB) {
+                        isEditing = (isEdit) ? 1 : 0;
+                        sendReq = api+repoName + "/" + labName+"?isEditing="+isEditing
+			$http.get(sendReq)
+				.then(function successCallback(response) {
+					successCB(response.data.data)
+				},
+					function errorCallback(response) {
+						Notification({message:"Error loading lab!"}, 'error');
+				})
+		},
 		loadLab : function loadLab(labName, isEdit, successCB) {
                         isEditing = (isEdit) ? 1 : 0;
                         sendReq = api+labName+"?isEditing="+isEditing

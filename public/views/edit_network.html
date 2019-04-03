@@ -1,0 +1,125 @@
+﻿<style>
+.wrapper {
+  display: flex;
+}
+/*.graph-container, .side-container {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    display: inline-block;
+    cursor:default;
+    border: none;
+}
+*/
+.yaml-container {
+  width: 80%;
+}
+.graph-container {
+    width: 80%;
+ /*   overflow:hidden;*/
+    border-style:solid;
+    border-color:black;
+    border-width:1px;
+    height:600px
+}
+.side-container {
+    width: 20%;
+    background-image:url('images/sidebar_bg.gif');
+}
+
+</style>
+<script src="assets/mxgraph/utils.js"></script>
+<script charset="utf-8">
+  $( document ).ready(function() {
+    var appScope = angular.element(document.getElementById("page-wrapper")).scope()
+    MX__Main(document.getElementById('graphContainer'),
+      document.getElementById('outlineContainer'),
+      document.getElementById('toolbarContainer'),
+      document.getElementById('sidebarContainer'),
+      document.getElementById('statusContainer'), 
+      appScope);
+  });
+</script>
+<div id="page-wrapper" >
+    <div 
+      id="page-inner">
+      <div>
+        <h1 class="text-center"> {{labName}} </h1>
+      </div>
+	<div class="row">
+	    <div class="col-md-12">
+	     <h1 id="lab_action">{{lab_action}}</h1>   
+		<h4 id="description_lab"></h4>
+	    </div>
+	</div>              
+	 <!-- /. ROW  -->
+	  <hr />
+
+      <!-- Creates a container for the toolboox -->
+          <!-- style="position:relative;overflow:hidden;top:96px;left:0px;bottom:36px;width:30%;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');" -->
+      <div class="wrapper">
+      <div class="side-container"> </div>
+        <!-- Creates a container for the sidebar -->
+          <div id="toolbarContainer"
+               class="yaml-container"
+            > 
+          </div>
+      </div>
+    <div class="wrapper">
+        <section 
+          class="side-container"
+          >
+          <div id="sidebarContainer">
+            <h3 class="text-center"> Elements </h3>
+            <hr>
+          </div>
+          <hr>
+          
+        </section>
+        <!-- Creates a container for the graph -->
+        <!-- style="position:relative;overflow:hidden;width:70%;height:600px;cursor:default;border-width:1px;border-style:solid;border-color:black;" -->
+        <section ng-show="!showEditContainer && !showYamlFile" 
+             id="graphContainer" 
+             class="graph-container"
+          >
+        </section>
+      <div 
+           ng-show="showEditContainer"
+           id="networkElementDescription"
+           style="border-style: groove; position:relative;overflow:hidden;background-image:url('editors/images/grid.gif');cursor:default;">
+        <div ng-include="'views/add_element.html'"> </div> 
+      </div>
+      <div 
+           ng-show="showEditNetwork"
+           id="networkElement"
+           style="border-style: groove; position:relative;overflow:hidden;background-image:url('editors/images/grid.gif');cursor:default;">
+        <div ng-include="'views/add_network.html'"> </div> 
+      </div>
+      <!-- docker-compose file -->
+      <div class="yaml-container" ng-show="showYamlFile"> 
+                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+        </div>
+      <!-- End compose file -->
+
+      <!-- <div id="graphContainer" -->
+      <!--      style="position:absolute;overflow:hidden;top:96px;left:60px;bottom:36px;right:0px;background-image:url('editors/images/grid.gif');cursor:default;"> -->
+      <!-- </div> -->
+
+      <!-- <1!-- Creates a container for the outline --1> -->
+      <!-- <div id="outlineContainer" -->
+      <!--      style="position:relative;overflow:hidden;background:transparent;border-style:solid;border-color:black;"> -->
+      <!-- </div> -->
+
+      <!-- <1!-- Creates a container for the sidebar --1> -->
+      <!-- <div id="statusContainer" -->
+      <!--      style="text-align:right;position:relative;overflow:hidden;max-height:24px;height:36px;right:0px;color:white;padding:6px;background-image:url('images/toolbar_bg.gif');"> -->
+      <!-- </div> -->
+		
+
+
+<!-- 	Selected labels : {{ctrl.labels}} -->
+
+ <!-- /. PAGE WRAPPER  -->
+</div>	
+</div>

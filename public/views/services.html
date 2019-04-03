@@ -1,4 +1,11 @@
-<div ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
+<script>
+  $( document ).ready(function() {
+  var appScope = angular.element(document.getElementById("services_tools")).scope()
+  appScope.initController();
+});
+
+</script>
+<div id="services_tools" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
   <h3 class="text-center" > <a href="#" ng-click="showServices = !showServices"> Hack Tools </a> </h3>
   <div ng-show="showServices">
   <hr>	

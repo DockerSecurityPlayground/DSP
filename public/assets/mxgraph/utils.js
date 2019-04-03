@@ -105,9 +105,11 @@ function graphEditCallback(oldName, newName) {
 }
 
 function _incrementID(id, names, stringBase) {
-  _.each(names, function(c) {
+  _.each(names.sort(), function(c) {
+    console.log("name: "+c);
     if(c.startsWith(stringBase)) {
       var n = c.replace(stringBase, "");
+      console.log("N:"+n);
       if(!isNaN(n)) {
         if (id<= n)
           id++;
@@ -136,16 +138,16 @@ function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, o
 
 function Graph__addFirstPort(graph, v1, name) {
   // Graph__addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
 }
 function Graph__addSecondPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
 }
 function Graph__addThirdPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -8);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -8);
 }
 function Graph__addFourthPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=editors/images/ethernet.png;spacingLeft=18', -8, -4);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -4);
 }
 
 
@@ -277,11 +279,11 @@ function addSidebarElementIcon(graph, sidebar) {
   dragContainer.style.marginLeft = "40px";
   dragContainer.appendChild(img);
   dragContainer.appendChild(ele);
-  // sidebar.appendChild(dragContainer);
+  sidebar.appendChild(dragContainer);
 
 
-   sidebar.appendChild(img);
-   sidebar.appendChild(ele);
+   // sidebar.appendChild(img);
+   // sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -317,10 +319,10 @@ function addSidebarNetworkIcon(graph, sidebar) {
   dragContainer.style.marginLeft = "40px";
   dragContainer.appendChild(img);
   dragContainer.appendChild(ele);
-  // sidebar.appendChild(dragContainer);
+  sidebar.appendChild(dragContainer);
 
-   sidebar.appendChild(img);
-   sidebar.appendChild(ele);
+   // sidebar.appendChild(img);
+   // sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -412,6 +414,7 @@ function configureStylesheet(graph) {
 function addToolbarButton(editor, toolbar, action, label, image, isTransparent) {
   var button = document.createElement('button');
   button.style.fontSize = '10';
+  button.id=action;
   if (image != null)
   {
     var img = document.createElement('img');
@@ -921,15 +924,13 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
 //              }
 //            });
 //
+
     addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
     addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
     addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
     addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
-    toolbar.appendChild(spacer.cloneNode(true));
-    toolbar.appendChild(spacer.cloneNode(true));
     //addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
     //addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
-    toolbar.appendChild(spacer.cloneNode(true));
     //addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');
     toolbar.appendChild(spacer.cloneNode(true));
 
@@ -943,14 +944,15 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     // Defines a new export action
     editor.addAction('view', function(editor, cell)
       {
-        var textarea = document.createElement('textarea');
-        textarea.style.width = '400px';
-        textarea.style.height = '400px';
-//              var enc = new mxCodec(mxUtils.createXmlDocument());
-//              var node = enc.encode(editor.graph.getModel());
-        //textarea.value = mxUtils.getPrettyXml(node);
-        textarea.value = Model__AppScope.yamlfile;
-        showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
+        Model__AppScope.viewCompose();
+        //var textarea = document.createElement('textarea');
+        //textarea.style.width = '400px';
+        //textarea.style.height = '400px';
+////              var enc = new mxCodec(mxUtils.createXmlDocument());
+////              var node = enc.encode(editor.graph.getModel());
+        ////textarea.value = mxUtils.getPrettyXml(node);
+        //textarea.value = Model__AppScope.yamlfile;
+        //showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
       });
     editor.addAction('export', function(editor, cell) {
      Model__AppScope.exportDockerCompose();
@@ -960,14 +962,12 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
       MX__ExitLab();
     });
 
-    for (i = 0; i < 14; i++)
-      toolbar.appendChild(spacer.cloneNode(true));
-    addToolbarButton(editor, toolbar, 'view', 'View docker-compose', 'assets/mximages/info.gif');
-    addToolbarButton(editor, toolbar, 'export', 'Get docker-compose', 'assets/mximages/export1.png');
-    addToolbarButton(editor, toolbar, 'save', 'Save Network', 'assets/mximages/save.gif');
     toolbar.appendChild(spacer.cloneNode(true));
     toolbar.appendChild(spacer.cloneNode(true));
-    addToolbarButton(editor, toolbar, 'exit', 'Exit from graph editor', 'assets/mximages/undo.png');
+    addToolbarButton(editor, toolbar, 'view', 'View', 'assets/mximages/info.gif');
+    addToolbarButton(editor, toolbar, 'export', 'Download', 'assets/mximages/export1.png');
+    addToolbarButton(editor, toolbar, 'save', 'Save', 'assets/mximages/save.gif');
+    addToolbarButton(editor, toolbar, 'exit', 'Exit', 'assets/mximages/undo.png');
 
     // ---
 
@@ -983,9 +983,9 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
 //
 //          status.appendChild(spacer.cloneNode(true));
 
-    addToolbarButton(editor, status, 'zoomIn', '', 'assets/mximages/zoom_in.png', true);
-    addToolbarButton(editor, status, 'zoomOut', '', 'assets/mximages/zoom_out.png', true);
-    addToolbarButton(editor, status, 'actualSize', '', 'assets/mximages/view_1_1.png', true);
+    // addToolbarButton(editor, status, 'zoomIn', '', 'assets/mximages/zoom_in.png', true);
+    // addToolbarButton(editor, status, 'zoomOut', '', 'assets/mximages/zoom_out.png', true);
+    // addToolbarButton(editor, status, 'actualSize', '', 'assets/mximages/view_1_1.png', true);
 //          addToolbarButton(editor, status, 'fit', '', 'assets/mximages/fit_to_size.png', true);
 
     // Creates the outline (navigator, overview) for moving

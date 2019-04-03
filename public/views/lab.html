@@ -1,58 +1,121 @@
 ﻿<div id="page-wrapper" >
+  <script src="assets/mxgraph/use_utils.js"> </script>
+  <script>
+$( document ).ready(function() {
+main(document.getElementById("graphContainer"));
+var appScope = angular.element(document.getElementById("page-wrapper")).scope()
+appScope.registerCallback(function(canvasXML) {
+var doc = mxUtils.parseXml(canvasXML);
+var codec = new mxCodec(doc);
+codec.decode(doc.documentElement, theGraph.getModel());
+});
+appScope.init();
+});
+  </script>
   <div id="page-inner">
     <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div>
     <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div>
     <div class="row">
       <div class="col-sm-4"> 
         <button ng-show="ctrl.actionVisible" 
-          class="btn btn-primary"
-          ng-click="ctrl.copyLab()"
-          > 
-          Copy 
+                class="btn btn-primary"
+                ng-click="ctrl.copyLab()"
+                > 
+                Copy 
         </button>
-        <button 
-        class="{{ctrl.deleteImportButton.class}}"
-        ng-click="ctrl.deleteImportButton.action()"
-        >
-        {{ctrl.deleteImportButton.label}}
-        </button> 
+          <button 
+                class="{{ctrl.deleteImportButton.class}}"
+                ng-click="ctrl.deleteImportButton.action()"
+                >
+                {{ctrl.deleteImportButton.label}}
+          </button> 
 
       </div>	
-    <div style="margin-top:20px" class="col-sm-4">
-      <h1 class="text-lg" id="name_lab">{{ctrl.lab.name}}</h1>   
-      <h4 id="description_lab">{{ctrl.lab.description}}</h4>
-    </div>
-    <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
-      <!-- Panel edit options -->
-      <div class="row lateral_options">
-      <div class="col-sm-6" > <a ng-click="ctrl.goToEditNetwork()" class="fa fa-pencil-square btn btn-warning"> Edit infos </a> </div>
-      <div class="col-sm-6" ng-show="ctrl.editVisible"> <a href="#" ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)"  class="fa fa-cloud btn btn-warning"> Edit Network  </a> </div>
+      <div style="margin-top:20px" class="col-sm-4">
+        <h1 class="text-lg" id="name_lab">{{ctrl.lab.name}}</h1>   
+        <h4 id="description_lab">{{ctrl.lab.description}}</h4>
       </div>
-    </div>
-          
-    <!-- Endo panel edit options -->
+      <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
+        <!-- Panel edit options -->
+        <div class="row lateral_options">
+          <div class="col-sm-6" > <a ng-click="ctrl.goToEditNetwork()" class="fa fa-pencil-square btn btn-warning"> Edit infos </a> </div>
+          <div class="col-sm-6" ng-show="ctrl.editVisible"> <a href="#" ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)"  class="fa fa-cloud btn btn-warning"> Edit Network  </a> </div>
+        </div>
+      </div>
+
+      <!-- Endo panel edit options -->
 
     </div>
-  <hr>
-  <div> 
-    <h2 class="text-center" > Goal </h2>
-    <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
-  </div>
+    <hr>
+    <div> 
+      <h2 class="text-center" > Goal </h2>
+      <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
+    </div>
+    <div class="row">
+              <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
+                <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+              </button> 
+              </p>
+    </div>
+    <uib-tabset active="active">
+    <uib-tab index="0" heading="Graph">
+      <br>
+      <!-- GRAPH CANVAS -->
+      <div id="graphContainer"
+           style="position:relative;overflow:hidden;width:95%;height:500px;cursor:default; border-width:1px;border-style:solid;border-color:black;">
+      </div>
+      <br>
+      <br>
+      <br>
+      <!-- END GRAPH CANVAS -->
+    </uib-tab>
+    <uib-tab index="1" heading="Docker-Compose"> 
+      <br>
+      <div ng-show="yamlfile !== ''" class="row">
+        <div class="col-sm-offset-1 col-sm-10" > 
+        <!-- <h4 class="text-center"> JSON Docker Compose </h4> -->
+                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+        </div>
+      </div>
+    </uib-tab>
+    <uib-tab index="2" heading="Hack Tools">
+        <div ng-include="'views/services.html'"> </div>
+    </uib-tab>
+  </uib-tabset>
+
+  
+    <div class="row">
+      <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">  
+
+        <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
+
+        </div>
+      </div>
+    </div>
+    <div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
+    <div class="row">
+      <p class="col-sm-1 "><button class="btn btn-default" ng-click="clearLogs()">
+        Clear Logs
+      </button> 
+
+      </p>
+    </div>
+
 
 
     <h2 class="text-center" ><a  ng-click="isSolutionShowed = !isSolutionShowed" href="#"> Solution</a> </h2>
 
-  <div ng-show="isSolutionShowed" 
-    class="large_div"
-    ng-bind-html="ctrl.tinymceHtmlSolution"
-    
-    ></div>
-    <br>
-    <br>
-    <br>
-    <div class="text-center row"> 
-    <button ng-click="ctrl.buttonAction.action(ctrl.lab.name)" class="{{ctrl.buttonAction.class}}"> {{ctrl.buttonAction.label}} </button>	
+    <div ng-show="isSolutionShowed" 
+         class="large_div"
+         ng-bind-html="ctrl.tinymceHtmlSolution"
 
-  </div>              
-<!-- /. PAGE INNER  -->
-</div>
+         ></div>
+      
+
+    </div>              
+    <!-- /. PAGE INNER  -->
+  </div>

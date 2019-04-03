@@ -1,4 +1,10 @@
-﻿<div id="page-wrapper" >
+﻿<script charset="utf-8">
+  $( document ).ready(function() {
+    var appScope = angular.element(document.getElementById("page-wrapper")).scope()
+    appScope.init();
+  });
+  </script>
+<div id="page-wrapper" >
     <div 
       id="page-inner">
 	<div class="row">
@@ -12,6 +18,10 @@
 	<div class=""> 
 	<form name="{{lab_action_form}}" 
 		ng-submit="ctrl.labAction()"  class="form-horizontal">
+    <div class="row form-group"> 
+            <button type="submit" style="float:right; margin-right:15px" class="{{lab_action_btn.class}}">{{lab_action_btn.text}}</button>
+            <button type="button" style="float:right; margin-right:15px" ng-click="ctrl.goBack()" class="btn btn-default">Back</button>
+        </div>
 	  <div class="row form-group">
 	    <label class="control-label col-sm-2" for="name">* Name:</label>
 	    <div class="col-sm-10">
@@ -114,7 +124,7 @@
                   <div 
                     class="col-sm-12">
                   <textarea ui-tinymce="tinymceOptions"
-                    ng-attr-rows="40"
+                    ng-attr-rows="20"
                     ng-change="ctrl.updatePreviewSolution()"
                     ng-model="ctrl.lab.solution">
                   </textarea>
@@ -133,9 +143,7 @@
           <hr>
       </div>
   </div>
-	  <div class="row form-group"> 
-	      <button type="submit" style="float:right; margin-right:15px" class="{{lab_action_btn.class}}">{{lab_action_btn.text}}</button>
-	  </div>	
+	  	
 	</form>	
 
 
