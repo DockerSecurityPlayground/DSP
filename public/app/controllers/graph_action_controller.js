@@ -10,7 +10,6 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   $scope.responseError = "";
   $scope.networkList = [];
 
-
   const warningMessageHeader = 'WARNING: ';
   const networkEmptyMessage =  'Network is empty! Have you drawn the containers?';
 

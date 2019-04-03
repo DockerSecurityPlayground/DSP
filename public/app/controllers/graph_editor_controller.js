@@ -43,12 +43,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       //Init container manager
       containerManager.init($scope.imageList)
       $scope.changedImage($scope.imageList[0])
+      var createNew = $location.search().create ? true : false;
+      console.log(createNew);
       // if(params.action && (params.action==='edit' || params.action ==='new')) {
         // Edit a lab
-        // if(params.action === 'edit')
-        // {
-          console.log("SONO QUI");
-
+        if(!createNew) {
           //When imageList it's loded load lab
           dockerAPIService.loadLab($scope.labName, true, function(data) {
             $scope.canvas = data.canvasJSON;
@@ -74,11 +73,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           })
 
 
-        // }
-        // else if(params.action === 'new')
-        // {
-        //   $scope.networkList =  NetworkManagerService.getNetworks()
-        // }
+         }
+        else {
+           $scope.networkList =  NetworkManagerService.getNetworks()
+        }
       // }
       //If params are not correct
       // else {

@@ -314,7 +314,7 @@ else if($scope.lab_action_form === 'editlab') {
 
 
 function goToCreateNetwork() {
- $location.url('/network/'+vm.lab.name);
+ $location.url('/network/'+vm.lab.name + "?create=1");
 // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&action=new'
 }
 
