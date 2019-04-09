@@ -1,5 +1,5 @@
 var dsp_LabCtrl = function($scope, ServerResponse, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
-  console.log("LAB CTRL");
+  console.log("=== INIT LAB CONTROLLER ===");
 var userDir;
 var vm = this;
 var buttonDeleteProto = { action:openConfirmDelete, label:"Delete Lab" , class: "btn btn-danger"}
@@ -48,6 +48,7 @@ vm.isSolutionPreviewOpen = false;
 vm.isGoalPreviewOpen= false;
 vm.noImages = false;
 vm.actionVisible = true,
+$scope.pippozzo = "pippozzo";
 toEditName = ''	;
 $scope.init = function() {
   console.log("DSP_INIT");
@@ -133,6 +134,17 @@ $scope.init = function() {
          vm.buttonAction = buttonCreateProto
          vm.editVisible = false
          vm.exists = false;
+       } else {
+        dockerImagesService.areImagesInstalled(vm.repoName, vm.lab.name)
+          .then(function success(data) {
+            var areInstalled = data.data.data.areInstalled;
+            if (!areInstalled) {
+              console.log("NOT INSTALLED");
+              $location.url("/images#"+vm.lab.name);
+            }
+          }, function error(err) {
+              console.log(err);
+          });
        }
        //Else go button
        // else	{
@@ -204,13 +216,6 @@ $scope.init = function() {
         vm.tinymceHtmlSolution = '';
       }
     }
-    dockerImagesService.areImagesInstalled(vm.repoName, vm.lab.name)
-      .then(function success(data) {
-        console.log("ARE INSTALLED");
-        console.log(data);
-      }, function error(err) {
-          console.log(err);
-      });
     // dockerImagesService.getByLab(function(images) {
     //   if (images) {
     //     labsImages = images[repo.name].lab_images

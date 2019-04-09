@@ -256,8 +256,11 @@ function getImagesAllLabs(namerepo, callback) {
     });
   }
 function areImagesInstalled(labImages, callback) {
-  console.log("IN ARE IMAGES INSTALLED");
-  dockerImages.areImagesInstalled(labImages, callback);
+  let images = []
+  _.each(labImages, (li) => {
+    images.push(li.name);
+  });
+  dockerImages.areImagesInstalled(images, callback);
 }
 function getImagesAllRepos(callback) {
   let repoImages = {};

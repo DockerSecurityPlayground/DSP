@@ -42,13 +42,13 @@ function getImagesAllRepos(req, res) {
 
 function areImagesInstalled(req, res) {
   async.waterfall([
-  // (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
-  // (cb) => Checker.checkString(req.params.reponame, cb),
-  // (cb) => Checker.checkString(req.params.labname, cb),
+  (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
+  (cb) => Checker.checkString(req.params.reponame, cb),
+  (cb) => Checker.checkString(req.params.labname, cb),
   (cb) => dockerImages.getListImages(cb),
   (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, cb),
-  (labImages, cb) => dockerImages.areImagesInstalled(labImages, cb) ], (results, err) => {
-     httpHelper.response(res, err, { images: results });
+  (labImages, cb) => dockerImages.areImagesInstalled(labImages, cb) ], (err, results) => {
+     httpHelper.response(res, err, { areInstalled: results.areInstalled });
   })
 }
 

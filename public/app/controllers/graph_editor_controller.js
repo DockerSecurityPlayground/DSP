@@ -1,4 +1,5 @@
 DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification ) {
+  console.log("=== INIT GRAPH EDITOR ===");
 
   $scope.labName= '';
   $scope.showEditContainer = false;

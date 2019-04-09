@@ -1,6 +1,6 @@
 var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService, dockerImagesService) {
   $scope.init = function init() {
-    console.log("DOCKER TOOLS CONTROLLER");
+    console.log("=== INIT DOCKER TOOLS CONTROLLER ===");
     $scope.listServices = [];
     $scope.showPorts = false;
     $scope.showEnv = false;
@@ -9,9 +9,9 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService, dock
     $scope.optionalPorts = [];
     $scope.currentEnvironment = {name: '', value: ''};
     $scope.currentContainer = {};
-    dockerImagesService.get(function(images) {
-      $scope.imageList = images
-    });
+    // dockerImagesService.get(function(images) {
+    //   $scope.imageList = images
+    // });
     $scope.t = {
       name: 'red'
     };
