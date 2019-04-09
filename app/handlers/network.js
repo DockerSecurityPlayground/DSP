@@ -124,6 +124,8 @@ function getUser(req, res) {
       }
     },
     (response, cb) => {
+      // Add reponame for local lab
+      response.repoName = namerepo;
       if (req.query.isEditing == '0' && response.isComposeVisible == false) {
         response.yamlfile = "";
       }

@@ -64,6 +64,13 @@ function manageInstallation(ws, jsonMessage) {
   );
 }
 
+// function manageAreImagesInstalled(ws, jsonMessage) {
+//   const params = jsonMessage.params;
+//   dockerActions.areImagesInstalled(params, (err) => {
+//     sendResponse(ws, err);
+//     sendProgressMessage(ws, dataline);
+//   });
+// }
 
 function manageDockerUp(ws, jsonMessage) {
   const body = jsonMessage.body;
@@ -172,6 +179,8 @@ exports.init = function init(server) {
         case 'installation':
           manageInstallation(ws, jsonMessage);
           break;
+        // case 'are_images_installed':
+        //   manageAreImagesInstalled(wc, jsonMessage);
         case 'docker_up':
           manageDockerUp(ws, jsonMessage);
           break;

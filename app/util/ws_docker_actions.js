@@ -21,6 +21,15 @@ const log = appUtils.getLogger();
 const downloadPath = 'public/downloads';
 
 
+exports.areImagesInstalled = function areImgesInstalled(params, callback) {
+  async.waterfall([
+    (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    // Check if all images exists
+    (cb) => dockerImages.getImagesLabNames(params.namerepo, params.namelab, cb),
+    (imagesLab, cb) => imageMgr.areImagesInstalled(imagesLab, cb)],
+    // End function , return correct or error
+    (err, areInstalled) => callback(err, areInstalled));
+}
 // Start compose up and execute commands in body there are cListToDraw containers
 exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let networkInfo;

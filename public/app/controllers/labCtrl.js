@@ -1,4 +1,5 @@
-var dsp_LabCtrl = function($scope, ServerResponse, SocketService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
+var dsp_LabCtrl = function($scope, ServerResponse, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
+  console.log("LAB CTRL");
 var userDir;
 var vm = this;
 var buttonDeleteProto = { action:openConfirmDelete, label:"Delete Lab" , class: "btn btn-danger"}
@@ -12,7 +13,6 @@ const warningMessageHeader = 'WARNING: ';
 const networkEmptyMessage =  'Network is empty! Have you drawn the containers?';
 
 $scope.registerCallback = function (cb) {
-  console.log("ONLOADCANVAS");
   onLoadCanvas = cb;
 }
 
@@ -50,6 +50,7 @@ vm.noImages = false;
 vm.actionVisible = true,
 toEditName = ''	;
 $scope.init = function() {
+  console.log("DSP_INIT");
 
   AjaxService.init()
     .dLabel
@@ -127,8 +128,6 @@ $scope.init = function() {
     AjaxService.checkExistenceLab(rname, labname)
     .then(function successCallback(response) {
       var exists = response.data.data
-      console.log("EXISTS?")
-      console.log(exists)
       //If doesn't exists create new network button
       if(!exists)  {
          vm.buttonAction = buttonCreateProto
@@ -205,26 +204,42 @@ $scope.init = function() {
         vm.tinymceHtmlSolution = '';
       }
     }
-    dockerAPIService.getDSPImages()
-      .then(function successCallback(response) {
-      var images = response.data.data.images;
-      labsImages = images[repo.name].lab_images
-      console.log(repo)
-      console.log(labToUse)
-      labImages = _.findWhere(labsImages, {nameLab:labToUse.name})
-      console.log(labImages);
-      var imagesToInstall = _.where(labImages.images, {contains:false});
-      console.log(imagesToInstall);
-
-      if(imagesToInstall.length > 0) {
-        vm.noImages = true;
-        vm.buttonAction = buttonGoDisabledProto;
-      }
-        //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
-      },
-      function errorCallback(error) {
-        Notification({message:"Sorry,  error in loading docker images"}, 'error');
+    dockerImagesService.areImagesInstalled(vm.repoName, vm.lab.name)
+      .then(function success(data) {
+        console.log("ARE INSTALLED");
+        console.log(data);
+      }, function error(err) {
+          console.log(err);
       });
+    // dockerImagesService.getByLab(function(images) {
+    //   if (images) {
+    //     labsImages = images[repo.name].lab_images
+    //     labImages = _.findWhere(labsImages, {nameLab:labToUse.name})
+    //     var imagesToInstall = _.where(labImages.images, {contains:false});
+    //       if(imagesToInstall.length > 0) {
+    //         vm.noImages = true;
+    //         vm.buttonAction = buttonGoDisabledProto;
+    //       }
+    //   }
+    // });
+      //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
+
+    // dockerAPIService.getDSPImages()
+      //.then(function successCallback(response) {
+      //var images = response.data.data.images;
+      //labsImages = images[repo.name].lab_images
+      //labImages = _.findWhere(labsImages, {nameLab:labToUse.name})
+      //var imagesToInstall = _.where(labImages.images, {contains:false});
+
+      //if(imagesToInstall.length > 0) {
+      //  vm.noImages = true;
+      //  vm.buttonAction = buttonGoDisabledProto;
+      //}
+      //  //Notification({message: "Some images are not installed. Go to the Image Manager"},'error');
+      //},
+      //function errorCallback(error) {
+      //  Notification({message:"Sorry,  error in loading docker images"}, 'error');
+      //});
   }
   },
   function(err) {
@@ -415,10 +430,18 @@ function updateNotify(data) {
   else $scope.notify += data.message;
 }
 
+function _initNetworkList() {
+  console.log("INIT NETWORK LIST");
+  dockerAPIService.getNetworkList(vm.repoName, vm.lab.name)
+    .then(function successCallback(response) {
+      $scope.networkList = response.data.data;
+    }, function errorCallback(error) {
+      Notification({message:"Server error: "+error}, 'error');
+  });
+}
 //Start the lab
 $scope.startLab = function startLab()
 {
-  console.log("We 're stating lab"  )
   //On start loading
   $scope.labState = loadingProto
   startLoad()
@@ -434,17 +457,15 @@ $scope.startLab = function startLab()
   }), function(event) {
   var data = JSON.parse(event.data);
   if(data.status === 'success')  {
-    console.log("Success")
     //Set state on stop
     $scope.labState = stopProto
     $scope.action = $scope.stopLab
-    initNetworkList();
+    _initNetworkList();
     //End load action
     completeLoad()
   }
   else if(data.status === 'error') {
           Notification('Some error in docker-compose up command', 'error');
-          console.log(data)
           $scope.responseError = $scope.responseErrorHeader + data.message;
           $scope.labState = playProto
           $scope.action = $scope.startLab
@@ -458,7 +479,6 @@ $scope.clearLogs = function() {
 }
   //Stop the lab
   $scope.stopLab = function stopLab() {
-    console.log("We're stopping lab")
     //Temp state of loading
     $scope.labState = loadingProto
     startLoad()
@@ -476,8 +496,6 @@ $scope.clearLogs = function() {
     function(event) {
       var data = JSON.parse(event.data);
       if(data.status === 'success')  {
-        console.log("Success")
-        console.log($scope.listServices);
         dockerAPIService.detachAllServices();
         //Complete spinner
         completeLoad()

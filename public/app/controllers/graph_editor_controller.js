@@ -51,6 +51,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           //When imageList it's loded load lab
           dockerAPIService.loadLab($scope.labName, true, function(data) {
             $scope.canvas = data.canvasJSON;
+            $scope.repoName = data.repoName;
             //TOREFACT gh.loadGraphicJSON(canvasJSON)
             containerManager.loadContainers(data, {imageList : $scope.imageList})
 
@@ -157,7 +158,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     $scope.n.name = networkName
     //Update informations network of containers
     containerManager.newNetworkOccurred(network)
-    console.log($scope.networkList);
   };
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
@@ -165,12 +165,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   // Called when the edit is finished
   $scope.editNetworkElement = function() {
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
-    console.log($scope.n);
-    console.log(networkInEditing);
 
     // Update network in network list
     var networkToEdit = NetworkManagerService.getNetwork(networkInEditing.name);
-    console.log(networkToEdit);
     networkToEdit.name = $scope.n.name;
     networkToEdit.subnet = s;
 
@@ -180,7 +177,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
 
     // Don't show the network panel
     $scope.showEditNetwork = false;
-    console.log($scope.networkList);
   }
 
   //PORTS
@@ -196,14 +192,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   {
     var found=false
     var networkVal = formnetwork.nameNetwork.value
-    console.log(networkVal);
 
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
 
 
     if(networkVal != networkInEditing.name && NetworkManagerService.hasNetwork(networkVal))
     {
-      console.log("ERROR");
       $scope.networkErrors.someError= true
       $scope.networkErrors.message="Network name already present"
       //Disable form network with hidden field
@@ -284,9 +278,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     var exposedPorts = selectedImage.exposedPorts;
     _.each(ports, function(k, v) {
       // If no port of image (required ports) add to optional ports
-      console.log('check '+v+' in '+exposedPorts);
       if(!_.contains(exposedPorts, v) && v != exposedPorts) {
-        console.log('adding new');
         $scope.optionalPorts.push({
           container:v,
           host:k
@@ -305,7 +297,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
 
   $scope.checkContainerChange = function checkContainerChange() {
     var found = containerManager.hasContainer()
-    console.log("found?"+found)
 
     //If there already is a container with this name  and new
 
@@ -357,7 +348,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
 
   $scope.newContainer = function newContainer(nameContainer) {
-    console.log("New Container");
     $scope.optionalPorts = [];
     $scope.optPort = { container: '', host: ''};
     var c = {
@@ -479,7 +469,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.detachNetwork = function detachNetwork(nameNetwork, containerName) {
       var container = containerManager.getContainer(containerName);
       if (container && container.networks && container.networks[nameNetwork]) {
-        console.log("DELETE NETWOK");
         var ip = container.networks[nameNetwork].ip
         NetworkManagerService.freeAddress(ip)
         delete container.networks[nameNetwork];
@@ -491,7 +480,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.checkNetworkClicked = function checkNewtorkClicked(nameNetwork, container) {
 
     var isChecked = container.networks[nameNetwork].isChecked
-    console.log("in checkNetwork")
     //If currentContainer network is unchecked , delete firstIP
     if(isChecked)
     {
@@ -541,7 +529,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     //Graph networkList : {name,color , position}
     if(eSelected)
     {
-      console.log(eSelected)
       $scope.containerToDraw = {
         name : eSelected.name,
         icon : eSelected.selectedImage.icon,
@@ -558,14 +545,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     //Ip in option
     var ipSelected = e.currentTarget.value
     //Free ip used in form container
-    console.log("in changeCOntainer")
-    console.log(networkName)
     var network = c.networks[networkName]
     //Only if it's defined free
     if(network && network.ip)
     {
       NetworkManagerService.freeAddress(network.ip)
-      console.log("equality: "+network.ip === $scope.currentContainer.networks[networkName].ip)
     }
     //Else define network
     else {
@@ -640,7 +624,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.imageHasActions = function(i) {
     if(i)
     {
-      console.log(i);
       var hasAction = (i.actions && !_.isEmpty(i.actions))
       return 	hasAction
     }
@@ -648,26 +631,19 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
   function setDefaultAction(image) {
 
-    console.log(' in set default action');
     if($scope.imageHasActions(image))
     {
       // Get action
       $scope.selectedAction = image.actions[_.keys(image.actions)[0]]
-      console.log(' selectd action:');
-      console.log($scope.selectedAction);
       $scope.defaultArgs($scope.selectedAction)
 
     }
   }
   $scope.changedImage = function(image) {
-    console.log('in changed image');
-    console.log(image);
     //Every time delete actions form currentContainer
     var oldActions = $scope.currentContainer.actions;
     $scope.currentContainer.actions = [];
     $scope.currentContainer.ports = {};
-    console.log('old actions:');
-    console.log(oldActions);
     var imageActions = image.actions;
     // If contains the same action name copy in new image
     _.each(oldActions, function(act) {
@@ -677,7 +653,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           var oldActionArgs = _.keys(act.args);
           // Check all args are equal
           if (_.isEqual(imageActionArgs, oldActionArgs)) {
-            console.log('action '+key+' will be copied!');
             $scope.currentContainer.actions.push(act);
           }
         }
@@ -685,8 +660,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
 
     });
 
-    console.log('new actions:');
-    console.log($scope.currentContainer.actions);
     // $scope.currentContainer.ports
     //Set a selected image
     setDefaultAction($scope.currentContainer.selectedImage);
@@ -694,8 +667,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
   //Set argument of action to default
   $scope.defaultArgs = function(action) {
-    console.log('in default args:');
-    console.log(action);
     if (action && action.args)
       $scope.selectedArgs = angular.copy(action.args)
     else $scope.selectedArgs = null;
@@ -728,8 +699,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     $scope.showEdit= false;
   }
   $scope.checkArgs = function(args) {
-    console.log('IN ARGSS');
-    console.log(args);
     // var rule = {
     //       email: true
     // };
@@ -739,8 +708,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     _.each(args, function(e, k) {
       // If there is a rule
       if(allChecked && e.rule)  {
-        console.log('Checking for rule');
-        console.log(e.rule);
         // Get the rule
         var rule = RegexService.searchDockerWrapperImageRule(e.rule);
         // === THIS IS FOR TESTING SET !== REAL CHECK
@@ -811,8 +778,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
       // THe OLD NAME
       $scope.editContainerName = containerToEdit.name;
-      console.log("EDITONTAINTER " + $scope.editContainerName);
-
       // It' the string EDIT LAB , no action of docker !
       $scope.currentAction = protoEditAction+ $scope.editContainerName;
       // Set the default
@@ -846,7 +811,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           three: ss[2],
           four: ss[3]
         }
-        console.log($scope.n);
         $scope.n.more_validation = "###";
       } else {
         console.log("ERROR: why no network?" + networkName);
@@ -912,7 +876,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       //Which button presseed ?
       switch(idElement) {
         case "collapsedButton" :
-          console.log("collapsed")
           $scope.command_buttons.collapsed.class="element-active"
           $scope.command_buttons.addC.class=""
           $scope.command_buttons.addN.class=""
@@ -1012,12 +975,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
         function errorCallback(response) {
 
           Notification("Sorry some error")
-          console.log("error save")
         })
   }
 
   $scope.exitLab = function exitLab() {
-    console.log("exit")
     $window.location.href="/lab/use/"+$scope.repoName+"/"+$scope.labName;
 
   }
@@ -1029,7 +990,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     if(Object.keys($scope.containerListNotToDraw).length == 0)
     {
       infoService.updateNeedCreateContainer()
-      console.log()
       Notification({message:infoService.currentState.current_state.message}, 'error');
 
 
@@ -1052,8 +1012,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     }
     else
     {
-      console.log(currentFileToUpload)
-      console.log($scope.currentFileInContainer.data)
       Notification('Incorrect values ', 'error')
 
 

@@ -38,9 +38,40 @@ function getImagesAllRepos(req, res) {
     dockerImages.getImagesAllRepos((err, images) => {
       httpHelper.response(res, err, { images} );
     });
+}
 
+function areImagesInstalled(req, res) {
+  async.waterfall([
+  // (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
+  // (cb) => Checker.checkString(req.params.reponame, cb),
+  // (cb) => Checker.checkString(req.params.labname, cb),
+  (cb) => dockerImages.getListImages(cb),
+  (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, cb),
+  (labImages, cb) => dockerImages.areImagesInstalled(labImages, cb) ], (results, err) => {
+     httpHelper.response(res, err, { images: results });
+  })
+}
+
+function getImagesLab(req, res) {
+  if (req.query.checkInstallation) {
+    areImagesInstalled(req, res);
+    } else {
+      async.waterfall([
+      (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
+      (cb) => Checker.checkString(req.params.reponame, cb),
+      (cb) => Checker.checkString(req.params.labname, cb),
+      (cb) => dockerImages.getListImages(cb),
+      (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, cb),
+      (images, cb) => {
+        cb(images);
+      }], (results, err) => {
+        httpHelper.response(res, err, { images: results });
+      });
+  }
 }
 
 
 exports.getImagesRepo = getImagesRepo;
+exports.getImagesLab= getImagesLab;
 exports.getImagesAllRepos = getImagesAllRepos;
+// exports.areImagesInstalled = areImagesInstalled;

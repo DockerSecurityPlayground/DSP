@@ -796,7 +796,8 @@ function createHints() {
 
 }
 function MX__ExitLab() {
-  window.location.href='/lab/use/'+Model__AppScope.repoName+'/'+Model__AppScope.labName
+  Model__AppScope.exitLab();
+  // window.location.href='/lab/use/'+Model__AppScope.repoName+'/'+Model__AppScope.labName
 }
 
 
@@ -967,7 +968,7 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     addToolbarButton(editor, toolbar, 'view', 'View', 'assets/mximages/info.gif');
     addToolbarButton(editor, toolbar, 'export', 'Download', 'assets/mximages/export1.png');
     addToolbarButton(editor, toolbar, 'save', 'Save', 'assets/mximages/save.gif');
-    addToolbarButton(editor, toolbar, 'exit', 'Exit', 'assets/mximages/undo.png');
+    addToolbarButton(editor, toolbar, 'exit', 'Back', 'assets/mximages/undo.png');
 
     // ---
 

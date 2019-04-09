@@ -7,6 +7,8 @@ var api = '/dsp_v1/docker_network/' ;
 	var dsp_service_network = '/dsp_v1/networkservices' ;
   var url = 'http://' + location.host + '/';
 
+  var i=0;
+
   const runButton = "<button type='button' class='btn btn-success'>Run</button>";
 
   const successStatus = "<b class='text-success'>Running </b>";
@@ -20,7 +22,6 @@ var api = '/dsp_v1/docker_network/' ;
 
   function _initServices(listServ) {
     listServices.length = 0;
-    console.log(listServ);
     _.each(listServ, function(s) {
       var o = {}
       o.name = s.name;
@@ -140,6 +141,9 @@ var api = '/dsp_v1/docker_network/' ;
 			return $http.get(api_docker+"?completeDescription="+completeDescription);
 			//return stubImages()
 		},
+    areImagesInstalled : function areImagesInstalled(repoName, labName) {
+      return $http.get(dsp_images_docker + repoName + "/" + labName + "?checkInstallation=true")
+    },
     getDSPImages : function getDSPImages() {
             return $http.get(dsp_images_docker)
     },
@@ -212,7 +216,6 @@ var api = '/dsp_v1/docker_network/' ;
     initServices : function initServices() {
       getServices()
         .then(function successCallback(response) {
-          console.log("RUNNING SERVICES");
           _initServices(response.data.data)
 
         }, function errorCallback(error) {

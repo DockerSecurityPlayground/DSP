@@ -49,6 +49,7 @@
   <script src="app/services/regex_service.js"> </script>
   <script src="app/services/walker_service.js"> </script>
   <script src="app/services/current_lab.js"> </script>
+  <script src="app/services/images_service.js"> </script>
   <script src="app/services/socket_service.js"> </script>
   <script src="app/services/safe_apply_service.js"> </script>
   <script src="app/services/statemanager.js"> </script>
@@ -86,7 +87,7 @@
         <!-- PRISM CSS -->
     <link rel='stylesheet' href='assets/css/prism.css'>
      <!-- GOOGLE FONTS-->
-   <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' >
+   <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' > -->
     <link href="assets/css/colorpicker.css" rel="stylesheet prefetch" type='text/css' />
     <link href="assets/css/build.css" rel="stylesheet" type='text/css' />
     <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
@@ -134,6 +135,7 @@
           .service("SafeApply", SafeApply)
           .service("CleanerService", dsp_cleanerService)
           .service('dockerAPIService', DockerAPIService) 
+          .service('dockerImagesService', dsp_imagesService) 
           .service('containerManager',dsp_ContainerManagerService) 
           .service('safeApplyService', SafeApply) 
           .controller("MainCtrl", dsp_MainCtrl)

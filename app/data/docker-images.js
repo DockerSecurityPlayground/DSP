@@ -97,7 +97,7 @@ function buildImage(namerepo, nameimage, callback, notifyCallback) {
         else {
           image = imageName[0]
           pathDockerfile = path.join(imagePath, image.image_path)
-          imageMgr.buildImage(pathDockerfile, image.image_name, cb, notifyCallback)
+          dockerImages.buildImage(pathDockerfile, image.image_name, cb, notifyCallback)
         }
       }
   ], (err) => { callback(err); })
@@ -255,6 +255,10 @@ function getImagesAllLabs(namerepo, callback) {
       }
     });
   }
+function areImagesInstalled(labImages, callback) {
+  console.log("IN ARE IMAGES INSTALLED");
+  dockerImages.areImagesInstalled(labImages, callback);
+}
 function getImagesAllRepos(callback) {
   let repoImages = {};
   let repoPaths = [];
@@ -378,6 +382,7 @@ module.exports = {
   getImagesLabNames,
   getImagesAllLabs,
   getImagesAllRepos,
+  areImagesInstalled,
   // Change from data - err to err, data
   // Set icon if labels doesn't contains a correct path
   getListImages

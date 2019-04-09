@@ -1,16 +1,21 @@
-<script>
-  $( document ).ready(function() {
-  var appScope = angular.element(document.getElementById("services_tools")).scope()
-  appScope.initController();
+<script> 
+$( document ).ready(function() {
+  console.log("INIT SERVICE");
+  var appScope = angular.element(document.getElementById("serviceComponent")).scope()
+  appScope.init();
 });
 
 </script>
-<div id="services_tools" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
-  <h3 class="text-center" > <a href="#" ng-click="showServices = !showServices"> Hack Tools </a> </h3>
-  <div ng-show="showServices">
-  <hr>	
+
+<div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
+  <!-- <br> -->
+  <!-- currentContainer : {{currentContainer.name}} -->
+  <!-- <br> -->
+  <!-- <h3 class="text-center" > <a href="#" ng-click="showServices = !showServices"> Hack Tools </a> </h3> -->
+  <div> 
+  <hr ng-show=showTools>	
   <!-- Table sevices -->
-  <table class="table">
+  <table class="table" ng-show=showTools>
   <thead>
     <tr>
       <th scope="col">Name </th>
@@ -96,10 +101,21 @@
 <!--       <uib-tab index="0" heading="Re"> -->
   <div> <!-- Start add container -->
   <h3 class="text-center">{{currentAction}} </h3>
-  <hr>
+  <hr ng-show=showTools>
+  <md-content class="md-padding">
+    <md-nav-bar md-selected-nav-item="selectedItem" nav-bar-aria-label="navigation links">
+      <md-nav-item md-nav-sref="cname" name="cname" ng-click="changeTab(0,'cname')">Container Name</md-nav-item>
+      <md-nav-item md-nav-sref="image" name="image" ng-click="changeTab(1,'image')">Image</md-nav-item>
+      <md-nav-item md-nav-sref="options" name="options" ng-click="changeTab(2,'options')">Options</md-nav-item>
+      <md-nav-item md-nav-sref="command" name="command" ng-click="changeTab(3,'command')">Command</md-nav-item>
+      <md-nav-item md-nav-sref="ports" name="ports" ng-click="changeTab(4,'ports')">Ports</md-nav-item>
+      <md-nav-item md-nav-sref="environments" name="environments" ng-click="changeTab(5,'environments')">Environment Variables</md-nav-item>
+    </md-nav-bar>
 
+    <ui-view></ui-view>
+  </md-content>
   <ng-form name="form_add_container" id="form_add_container" class="form-horizontal" novalidate>
-          <div class="form-group"> 
+          <div class="form-group" ng-show=checked[0]> 
       <!-- NAME CONTAINER -->
           <label class="control-label col-sm-2" for="container_name">Name: </label>
           
@@ -126,9 +142,9 @@
         {{containerErrors.message}}	
       </div>
       
-          <div class="form-group"> 
-          <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
-            <div class="col-sm-5"> 
+          <div class="form-group" ng-show=checked[1]> 
+            <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
+            <div class="col-sm-4"> 
             <select 
           ng-model="currentContainer.selectedImage" 
           ng-change="changedImage(currentContainer.selectedImage)" 
@@ -140,19 +156,26 @@
             <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
             </input>
             </div>
+
+            <div class="col-sm-2">
+              <button class="btn btn-default" ng-click="updateImages()"> 
+                <i class="glyphicon glyphicon-refresh" > </i>
+              </button>
+            </div>
+
           </div>
-          <div class="row form-group">
+          <div class="row form-group" ng-show=checked[2]>
             <label class="control-label col-sm-2" for="container_flags">Options: </label>
            <div class="form-check col-sm-1">
             <input class="form-check-input" type="checkbox" id="interactive" ng-model="currentContainer.isInteractive">
             <label class="form-check-label" for="inlineCheckbox1">Interactive</label>
           </div>
-          <div class="form-check col-sm-1">
+          <div class="form-check col-sm-1"ng-show=checked[2]>
             <input class="form-check-input" type="checkbox" id="daemonize" ng-model="currentContainer.isDaemonized">
             <label class="form-check-label" for="inlineCheckbox2">Daemonize</label>
           </div>
           </div>
-          <div class="row">
+          <div class="row" ng-show=checked[3]>
             <label class="control-label col-sm-2" for="container_command">Command: </label>
             <div class="col-sm-9" >
             <input type="text" class="form-control"  
@@ -170,8 +193,8 @@
 
 
       <!--- PORT INPUT SELECT -->
-   <div class="text-center" style="margin-right:40px"> 
-                  <table class="table table-reduced-width col-sm-offset-1">
+   <div class="text-center" style="margin-right:40px" ng-show=checked[4]> 
+                  <table class="table table-reduced-width col-sm-offset-1" ng-show=showPorts>
                     <thead>
                       <tr>
                         <th class="text-center"> Container Port => Host Port  </th>
@@ -188,7 +211,7 @@
                   </table>
         </div>
                   
-          <div class="optionalPorts form-group"> 
+          <div class="optionalPorts form-group" ng-show=checked[4]> 
             <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="optional_ports"> Ports</label>
             <form name="optionalPortForm">
               <div class="col-sm-2">
@@ -230,25 +253,38 @@
           </div>
       <!-- ENVIRONMENTS -->
 
-
-          <div class="row">
-            <label class="control-label col-sm-2" >Environments: </div>
+          <!-- <div class="row" ng-show=checked[5]>
+            <label class="control-label col-sm-2" >Environments: </label>
           </div>
-            <br/>
+          <br/> -->
     
     <!-- Start Env -->
-      <div class="row" ng-repeat="env in currentContainer.environments">
-          <div class="col-sm-2 col-sm-offset-2">
+      <div class="row" ng-show=checked[5]>
+          <table class="table table-reduced-width col-sm-offset-1" ng-show=showEnv>
+              <thead>
+                  <tr>
+                      <th class="text-center"> Name | Value </th> 
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="env in currentContainer.environments">
+                  <td class="text-center">  {{env.name}} | {{env.value}} </td>
+                  <td> <button type="button" class="btn btn-sm btn-danger" ng-click="deleteEnvironment(env.name)">   Del </button> </td>
+                  </tr>
+              </tbody>
+          </table>
+          <!--<div class="col-sm-2 col-sm-offset-2">
           {{env.name}} 
           </div>
           <div class="col-sm-2"> 
             {{env.value}}
           </div>
-            <button type="button" class="btn btn-sm btn-danger" ng-click="deleteEnvironment(env.name)">   Del </button>
+          <button type="button" class="btn btn-sm btn-danger" ng-click="deleteEnvironment(env.name)">   Del </button> -->
       </div>
 
-      <div class="row">
-            <div class="col-sm-2 col-sm-offset-2">
+      <div class="row" ng-show=checked[5]>
+          <label class="control-label col-sm-2" >Environments: </label>
+            <div class="col-sm-2">
               <input class="form-control" type="text" ng-model="currentEnvironment.name"> </input>
             </div>
 
@@ -257,7 +293,6 @@
             </div>
             <button type="button" class="btn btn-sm btn-primary" ng-click="addEnvironment()">   Add </button>
     </div>
-
 
 
         <br>
@@ -304,12 +339,45 @@
         <div class="col-sm-offset-10 col-sm-1"> <button ng-click="addVolume(volumeHost, volumeContainer)" class="btn btn-success"> + </button> </div>
       </div>
     -->
-  <br>			
-
-      <div class="form-group" > 
-         <div class="col-sm-offset-2 col-sm-10">
+  <br>
+      <div class="form-group" ng-show=checked[0]> 
+         <div class="text-center">
               <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
-              <button type="submit" class="btn btn-success" ng-click="runService()">Run</button>
+              <button type="submit" class="btn btn-info" ng-click="changeTab(1,'image')">Choose Image</button>
+            </div>
+      </div>
+
+      <div class="form-group" ng-show=checked[1]> 
+         <div class="text-center">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
+              <button type="submit" class="btn btn-info" ng-click="changeTab(2,'options')">Set Options</button>
+            </div>
+      </div>
+
+      <div class="form-group" ng-show=checked[2]> 
+         <div class="text-center">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
+              <button type="submit" class="btn btn-info" ng-click="changeTab(3,'command')">Specify Command</button>
+            </div>
+      </div>
+
+      <div class="form-group" ng-show=checked[3]> 
+         <div class="text-center">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
+              <button type="submit" class="btn btn-info" ng-click="changeTab(4,'ports')">Forward Ports</button>
+            </div>
+      </div>
+
+      <div class="form-group" ng-show=checked[4]> 
+         <div class="text-center">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
+              <button type="submit" class="btn btn-info" ng-click="changeTab(5,'environments')">Set Env Vars</button>
+            </div>
+      </div>
+
+      <div class="form-group" ng-show=checked[5]> 
+         <div class="text-center">
+              <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
             </div>
       </div>
         <!-- more validation in controller -->
@@ -320,7 +388,10 @@
         ng-required="true" 
         value="###"> 
           </form>
-        
+        <hr>
+        <p class="text-center">
+            <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runService()">Run</button>
+        </p>    
     </div> <!-- END DIV CONTAINER ADD -->
 <!-- </uib-tab> -->
 <!--   <uib-tab index="1" heading="Static title">Static content -->

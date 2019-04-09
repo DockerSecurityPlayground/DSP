@@ -14,6 +14,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
           console.log($scope.allImages)
           $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
           /* DODCKER API INIT  : load docker images */
+          console.log("IMAGESCTRL GETDSPIMAGES");
           dockerAPIService.getDSPImages(true)
             .then(function successCallback(response) {
               var images = response.data.data.images

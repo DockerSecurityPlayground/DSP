@@ -9,11 +9,12 @@ var doc = mxUtils.parseXml(canvasXML);
 var codec = new mxCodec(doc);
 codec.decode(doc.documentElement, theGraph.getModel());
 });
+console.log("INIT LAB");
 appScope.init();
 });
   </script>
   <div id="page-inner">
-    <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div>
+    <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->
     <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div>
     <div class="row">
       <div class="col-sm-4"> 
@@ -33,6 +34,9 @@ appScope.init();
       </div>	
       <div style="margin-top:20px" class="col-sm-4">
         <h1 class="text-lg" id="name_lab">{{ctrl.lab.name}}</h1>   
+    <div class="row">
+      <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
+    </div>
         <h4 id="description_lab">{{ctrl.lab.description}}</h4>
       </div>
       <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
@@ -54,15 +58,7 @@ appScope.init();
     <div ng-show="!ctrl.exists" class="text-center row">
       <button ng-click="ctrl.buttonAction.action(ctrl.lab.name)" class="{{ctrl.buttonAction.class}}"> {{ctrl.buttonAction.label}} </button>
     </div>
-
-    </div>
-    <div ng-show="ctrl.exists" class="row">
-              <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
-                <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
-              </button> 
-              </p>
-    </div>
-    <uib-tabset active="active">
+<uib-tabset active="active">
     <uib-tab index="0" heading="Graph">
       <br>
       <!-- GRAPH CANVAS -->
@@ -87,11 +83,13 @@ appScope.init();
         <div ng-include="'views/services.html'"> </div>
     </uib-tab>
   </uib-tabset>
+   <div ng-show="ctrl.exists" class="row">
+              <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
+                <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+              </button> 
+              </p>
+    </div> 
 
-  
-    <div class="row">
-      <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
-    </div>
 
     <div class="row">
       <div class="col-sm-12">  
@@ -109,6 +107,7 @@ appScope.init();
 
       </p>
     </div>
+    <!-- /. PAGE INNER  -->
 
 
 
@@ -121,6 +120,12 @@ appScope.init();
          ></div>
       
 
+  </div>
+
+    
+    
+
+  
+    
     </div>              
-    <!-- /. PAGE INNER  -->
   </div>

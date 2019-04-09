@@ -1,4 +1,5 @@
 var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, SocketService, CleanerService, $uibModal, $log,$http, $location,  $window, cfpLoadingBar, dockerAPIService, containerManager, Notification) {
+  console.log("ACTION CONTROLLER");
   $scope.labName= '';
   $scope.labInfos = {} ;
   $scope.yamlfile='';
