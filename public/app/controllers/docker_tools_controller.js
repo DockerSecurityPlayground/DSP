@@ -28,7 +28,11 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService, dock
     }
     dockerAPIService.setServices($scope.listServices);
     initCurrentContainer();
-    dockerAPIService.initServices();
+      dockerAPIService.initServices(function(services) {
+      if(services.length > 0) {
+        $scope.showTools = true;
+      }
+    });
   }
   $scope.updateImages = function() {
     dockerImagesService.get(function(images) {

@@ -980,6 +980,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
 
   $scope.exitLab = function exitLab() {
+    console.log("EXIT");
+    var urlExit = "/lab/use/"+$scope.repoName+"/"+$scope.labName;
+    // console.log(urlExit);
     $window.location.href="/lab/use/"+$scope.repoName+"/"+$scope.labName;
 
   }

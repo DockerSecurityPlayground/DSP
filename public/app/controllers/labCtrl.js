@@ -48,7 +48,7 @@ vm.isSolutionPreviewOpen = false;
 vm.isGoalPreviewOpen= false;
 vm.noImages = false;
 vm.actionVisible = true,
-$scope.pippozzo = "pippozzo";
+$scope.imageList = [];
 toEditName = ''	;
 $scope.init = function() {
   console.log("DSP_INIT");
@@ -140,7 +140,10 @@ $scope.init = function() {
             var areInstalled = data.data.data.areInstalled;
             if (!areInstalled) {
               console.log("NOT INSTALLED");
-              $location.url("/images#"+vm.lab.name);
+            } else {
+              dockerImagesService.get(function(images) {
+                $scope.imageList = images
+              });
             }
           }, function error(err) {
               console.log(err);
@@ -253,6 +256,48 @@ $scope.init = function() {
 
   }
 }
+$scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
+  console.log(nameContainer)
+  console.log(dc)
+   $http.post('/dsp_v1/dockershell', {
+      namerepo : vm.repoName,
+      namelab : vm.lab.name,
+      dockername: nameContainer,
+      dockercompose : dc
+   })
+  .then(
+          function success(response) {
+            console.log("SUCCESS");
+            var windowReference = window.open();
+            windowReference.location = "docker_socket.html";
+           // window.open('docker_socket.html', '_blank');
+          },
+          function error(err) {
+            // Lab running error
+            Notification({message:"Server error: "+err.data.message}, 'error');
+          });
+  }
+
+$scope.copyFromContainer = function (nameContainer, dc="true") {
+  var modalInstance = $uibModal.open({
+          animation: true,
+          component: 'copyFromContainerComponent',
+          resolve: {
+            lab: function () {
+            return  {
+              namerepo : vm.repoName,
+              namelab : vm.lab.name,
+              namecontainer: nameContainer,
+              dockercompose : dc
+              };
+            }
+          }
+      });
+
+  modalInstance.result.then(function () {}, function () { $log.info('modal-component dismissed at: ' + new Date());});
+  }
+
+
 vm.copyLab = function copyLab() {
   AjaxService.copyLab(vm.lab.name)
   .then(function successCallback(response) {
@@ -339,7 +384,7 @@ function goToCreateNetwork() {
 }
 
 function goToImages() {
-  window.location.href='images.html'
+  $location.url("/images#"+vm.lab.name);
 }
 
 function goToUseNetwork() {

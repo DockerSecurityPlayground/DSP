@@ -213,10 +213,11 @@ var api = '/dsp_v1/docker_network/' ;
       });
     },
     getServices :     getServices,
-    initServices : function initServices() {
+    initServices : function initServices(cb) {
       getServices()
         .then(function successCallback(response) {
           _initServices(response.data.data)
+          cb(response.data.data);
 
         }, function errorCallback(error) {
           Notification({message:"Sorry,  error in loading docker services"}, 'error');
