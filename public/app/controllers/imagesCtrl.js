@@ -147,6 +147,13 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
      });
     }
 
+    $scope.downloadNewImage = function downloadNewImage(i) {
+      var ni = {}
+      ni.name = i;
+      ni.disabled = false;
+      $scope.downloadImage(ni);
+    }
+
     $scope.downloadImage = function downloadImage(p) {
         if (p.disabled == true) {
           console.log(p.name + " already in downloading")

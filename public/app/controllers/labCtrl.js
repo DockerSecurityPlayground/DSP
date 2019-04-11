@@ -278,24 +278,24 @@ $scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
           });
   }
 
-$scope.copyFromContainer = function (nameContainer, dc="true") {
-  var modalInstance = $uibModal.open({
-          animation: true,
-          component: 'copyFromContainerComponent',
-          resolve: {
-            lab: function () {
-            return  {
-              namerepo : vm.repoName,
-              namelab : vm.lab.name,
-              namecontainer: nameContainer,
-              dockercompose : dc
-              };
-            }
-          }
-      });
+// $scope.copyFromContainer = function (nameContainer, dc="true") {
+//   var modalInstance = $uibModal.open({
+//           animation: true,
+//           component: 'copyFromContainerComponent',
+//           resolve: {
+//             lab: function () {
+//             return  {
+//               namerepo : vm.repoName,
+//               namelab : vm.lab.name,
+//               namecontainer: nameContainer,
+//               dockercompose : dc
+//               };
+//             }
+//           }
+//       });
 
-  modalInstance.result.then(function () {}, function () { $log.info('modal-component dismissed at: ' + new Date());});
-  }
+//   modalInstance.result.then(function () {}, function () { $log.info('modal-component dismissed at: ' + new Date());});
+//   }
 
 
 vm.copyLab = function copyLab() {
