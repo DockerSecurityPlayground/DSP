@@ -8,7 +8,7 @@ const NETWORK_ELEMENT_TYPE = "NetworkElement";
 const NETWORK_TYPE = 'Network';
 const Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
-  contentHTML : '<h5 id="toptitle" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
+  contentHTML : '<h5 id="toptitle" class="no-selection" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
   '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
 };
 var elementToEdit = '';
@@ -74,8 +74,50 @@ function getCellsByName(name) {
   return _.filter(cells, {name: name});
 }
 
+mxCellRemove= mxGraphModel.prototype.remove;
+var MX__CanRemove = true;
+function _setRemove(cell) {
+  if (cell.edge) {
+    var containerName = cell.source.name;
+    var networkName = cell.target.name;
+    Model__AppScope.detachNetwork(networkName, containerName);
+
+  } else if(cell.type == NETWORK_ELEMENT_TYPE) {
+    console.log("Delete container from model");
+    Model__AppScope.deleteContainer(cell.name);
+  } else if(cell.type == NETWORK_TYPE) {
+    console.log("Delete network from model (only if no attached element)");
+    if(!Model__AppScope.isNetworkAttached(cell.name)) {
+        Model__AppScope.deleteNetwork(cell.name);
+    } else {
+      alert("Cannot delete a network with attached elements");
+      MX__CanRemove = false;
+      // Set can remoe after 2 seconds in order to enable remove mode after that all ports have been processed
+      setTimeout(function() {
+        MX__CanRemove = true;
+      }, 2000);
+    }
+  }
+  if (MX__CanRemove) {
+    console.log("CAN REMOVE");
+    return mxCellRemove.apply(this, arguments);
+  } else {
+    console.log("CANNOTREMOVE");
+    return false;
+  }
+}
+
+function Graph__setRemoveHandler(canRemove) {
+  if (canRemove) {
+    mxGraphModel.prototype.remove = _setRemove;
+  } else {
+    mxGraphModel.prototype.remove = function(cell) {console.log("No remove");};
+  }
+}
+
 function Graph__update(cell, newName, oldName) {
   var label = cell.value;
+  console.log("Name:")
   console.log(label);
   var $html = $('<div />',{html:label});
   // replace "Headline" with "whatever" => Doesn't work
@@ -178,9 +220,14 @@ function Graph__addPorts(graph, v1, numPorts) {
 }
 
 // Create a new element and update angular model
-function Model__ElementCreate() {
+function Model__ElementCreate(nameContainer) {
   var nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
   console.log("add new element");
+  // Update elementID
+  while (Model__AppScope.containerExists(nameContainer)) {
+    Model__currentElementID++;
+    nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
+  }
   Model__AppScope.newContainer(nameContainer);
   Model__currentElementID++;
   return nameContainer;
@@ -236,7 +283,7 @@ function Graph__NetworkCreate(graph, nameNetwork, x, y) {
       // pt.x, pt.y, 120, 120, 'image=' + image);
       v1 = graph.insertVertex(parent, nameNetwork, {
         type: NETWORK_TYPE,
-        contentHTML : '<h5>'+nameNetwork+'</h5>',
+        contentHTML : '<h5 class="no-selection">'+nameNetwork+'</h5>',
         name: nameNetwork
       }, x, y, 120, 120, 'shape=cloud');
 
@@ -251,6 +298,54 @@ function Graph__NetworkCreate(graph, nameNetwork, x, y) {
       model.endUpdate();
       // Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
     }
+}
+
+
+function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCreateGraph) {
+  // Function that is executed when the image is dropped on
+  // the graph. The cell argument points to the cell under
+  // the mousepointer if there is one.
+  var funct = function(graph, evt, cell, x, y) {
+    var nameContainer = fnCreateModel();
+    fnCreateGraph(graph, nameContainer, x, y);
+  }
+
+  const Graph__NetworkElementImage = icon;
+  // Creates the image which is used as the sidebar icon (drag source)
+  var img = document.createElement('img');
+  img.setAttribute('src', Graph__NetworkElementImage);
+  // img.style.width = '48px';
+  // img.style.height = '48px';
+  img.title = 'Drag this to the diagram to create a new vertex';
+  var ele = document.createElement('div');
+  ele.innerHTML = labelText;
+  var dragContainer = document.createElement('div');
+  dragContainer.className = "row sidebar-element";
+  // dragContainer.style.marginLeft = "40px";
+  // CLass settings
+  img.classList.add("col-sm-4")
+  img.classList.add("no-selection")
+  ele.classList.add("col-sm-8")
+  ele.classList.add("sidebar-inner")
+  ele.classList.add("no-selection")
+  dragContainer.appendChild(img);
+  dragContainer.appendChild(ele);
+  sidebar.appendChild(dragContainer);
+  sidebar.appendChild(document.createElement("hr"))
+
+
+   // sidebar.appendChild(img);
+   // sidebar.appendChild(ele);
+
+  var dragElt = document.createElement('div');
+  dragElt.style.border = 'dashed black 1px';
+  dragElt.style.width = '120px';
+  dragElt.style.height = '120px';
+
+  // Creates the image which is used as the drag icon (preview)
+  var ds = mxUtils.makeDraggable(img, graph, funct, dragElt, 0, 0, true, true);
+  ds.setGuidesEnabled(true);
+
 }
 
 /*
@@ -269,17 +364,22 @@ function addSidebarElementIcon(graph, sidebar) {
   // Creates the image which is used as the sidebar icon (drag source)
   var img = document.createElement('img');
   img.setAttribute('src', Graph__NetworkElementImage);
-  img.style.width = '48px';
-  img.style.height = '48px';
+  // img.style.width = '48px';
+  // img.style.height = '48px';
   img.title = 'Drag this to the diagram to create a new vertex';
-  var ele = document.createElement('span');
-  ele.innerHTML = "   Host";
+  var ele = document.createElement('div');
+  ele.innerHTML = "Host";
   var dragContainer = document.createElement('div');
-  dragContainer.className = "row";
-  dragContainer.style.marginLeft = "40px";
+  dragContainer.className = "row sidebar-element";
+  // dragContainer.style.marginLeft = "40px";
+  // CLass settings
+  img.classList.add("col-sm-4")
+  ele.classList.add("col-sm-8")
+  ele.classList.add("sidebar-inner")
   dragContainer.appendChild(img);
   dragContainer.appendChild(ele);
   sidebar.appendChild(dragContainer);
+  sidebar.appendChild(document.createElement("hr"))
 
 
    // sidebar.appendChild(img);
@@ -413,6 +513,9 @@ function configureStylesheet(graph) {
 
 function addToolbarButton(editor, toolbar, action, label, image, isTransparent) {
   var button = document.createElement('button');
+  button.classList.add("btn")
+  button.classList.add("btn-default")
+  button.classList.add("btn-sm")
   button.style.fontSize = '10';
   button.id=action;
   if (image != null)
@@ -555,38 +658,10 @@ function mxInitGraph(graph, appScope) {
     return mxGetEdgeValidationError.apply(this, arguments);
   }
 
-  mxCellRemove= mxGraphModel.prototype.remove;
-  var MX__CanRemove = true;
-  mxGraphModel.prototype.remove = function(cell) {
-    if (cell.edge) {
-      var containerName = cell.source.name;
-      var networkName = cell.target.name;
-      Model__AppScope.detachNetwork(networkName, containerName);
 
-    } else if(cell.type == NETWORK_ELEMENT_TYPE) {
-      console.log("Delete container from model");
-      Model__AppScope.deleteContainer(cell.name);
-    } else if(cell.type == NETWORK_TYPE) {
-      console.log("Delete network from model (only if no attached element)");
-      if(!Model__AppScope.isNetworkAttached(cell.name)) {
-          Model__AppScope.deleteNetwork(cell.name);
-      } else {
-        alert("Cannot delete a network with attached elements");
-        MX__CanRemove = false;
-        // Set can remoe after 2 seconds in order to enable remove mode after that all ports have been processed
-        setTimeout(function() {
-          MX__CanRemove = true;
-        }, 2000);
-      }
-    }
-    if (MX__CanRemove) {
-      console.log("CAN REMOVE");
-      return mxCellRemove.apply(this, arguments);
-    } else {
-      console.log("CANNOTREMOVE");
-      return false;
-    }
-  }
+  Graph__setRemoveHandler(true)
+
+
   mxPaste = mxClipboard.paste;
   mxClipboard.paste = function(graph) {
     if (!mxClipboard.isEmpty()) {
@@ -733,12 +808,20 @@ function mxInitGraph(graph, appScope) {
         else
         {
           Popup(cell, Model__AppScope).show();
+          graph.selectionModel.clear();
         }
       }
 
       // Disables any default behaviour for the double click
       mxEvent.consume(evt);
     };
+
+
+  // Disable double click
+  graph.dblClick = function(evt, cell) {
+  }
+
+
 
   // graph.dblClick = function(evt, cell) {
   //   // Do not fire a DOUBLE_CLICK event here as mxEditor will
@@ -806,10 +889,12 @@ function MX__SaveLab(xml) {
 }
 
 function mxAddNetworkElement(graph, sidebar) {
-  addSidebarElementIcon(graph, sidebar);
+  // addSidebarElementIcon(graph, sidebar);
+  _addSidebarElment(graph, sidebar, 'assets/docker_image_icons/host.png', "Host", Model__ElementCreate, Graph__ElementCreate);
 }
 function mxAddNetwork(graph, sidebar) {
-  addSidebarNetworkIcon(graph, sidebar,);
+  _addSidebarElment(graph, sidebar, 'assets/docker_image_icons/network_icon.png', "Network", Model__NetworkCreate, Graph__NetworkCreate);
+  // addSidebarNetworkIcon(graph, sidebar,);
 }
 
 function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
@@ -943,18 +1028,18 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     });
 
     // Defines a new export action
-    editor.addAction('view', function(editor, cell)
-      {
-        Model__AppScope.viewCompose();
-        //var textarea = document.createElement('textarea');
-        //textarea.style.width = '400px';
-        //textarea.style.height = '400px';
-////              var enc = new mxCodec(mxUtils.createXmlDocument());
-////              var node = enc.encode(editor.graph.getModel());
-        ////textarea.value = mxUtils.getPrettyXml(node);
-        //textarea.value = Model__AppScope.yamlfile;
-        //showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
-      });
+    //editor.addAction('view', function(editor, cell)
+    //  {
+    //    Model__AppScope.viewCompose();
+    //    //var textarea = document.createElement('textarea');
+    //    //textarea.style.width = '400px';
+    //    //textarea.style.height = '400px';
+//////              var enc = new mxCodec(mxUtils.createXmlDocument());
+//////              var node = enc.encode(editor.graph.getModel());
+    //    ////textarea.value = mxUtils.getPrettyXml(node);
+    //    //textarea.value = Model__AppScope.yamlfile;
+    //    //showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
+    //  });
     editor.addAction('export', function(editor, cell) {
      Model__AppScope.exportDockerCompose();
     });
@@ -965,10 +1050,10 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
 
     toolbar.appendChild(spacer.cloneNode(true));
     toolbar.appendChild(spacer.cloneNode(true));
-    addToolbarButton(editor, toolbar, 'view', 'View', 'assets/mximages/info.gif');
-    addToolbarButton(editor, toolbar, 'export', 'Download', 'assets/mximages/export1.png');
+    // addToolbarButton(editor, toolbar, 'view', 'View', 'assets/mximages/info.gif');
+    // addToolbarButton(editor, toolbar, 'export', 'Download', 'assets/mximages/export1.png');
     addToolbarButton(editor, toolbar, 'save', 'Save', 'assets/mximages/save.gif');
-    addToolbarButton(editor, toolbar, 'exit', 'Back', 'assets/mximages/undo.png');
+    // addToolbarButton(editor, toolbar, 'exit', 'Back', 'assets/mximages/undo.png');
 
     // ---
 

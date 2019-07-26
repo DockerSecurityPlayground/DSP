@@ -109,7 +109,7 @@
           </div>
 
           <div class="col-sm-4">
-            <div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
+            <div ng-repeat="cnd in containerListToDrawFiltered" class="checkbox">
               <label><input type="checkbox" ng-model="currentContainer.dependsOn[cnd.name]"  value="{{cnd.name}}">{{cnd.name}}</label>
             </div>
           </div>
@@ -124,7 +124,7 @@
           </div>
 
           <div class="col-sm-4">
-            <div ng-repeat="cnd in containerListToDraw | filter:isCurrentContainer" class="checkbox">
+            <div ng-repeat="cnd in containerListToDrawFiltered" class="checkbox">
               <label><input type="checkbox" ng-model="currentContainer.links[cnd.name]" value="{{cnd.name}}">{{cnd.name}}</label>
             </div>
 

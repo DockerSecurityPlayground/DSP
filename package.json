@@ -38,7 +38,7 @@
     "errors": "^0.3.0",
     "express": "^4.16.4",
     "express-error-handler": "^1.1.0",
-    "forever": "^0.15.3",
+    "forever": "^1.0.0",
     "help-nodejs": "^0.6.0",
     "homedir": "^0.6.0",
     "is-valid-path": "^0.1.1",
@@ -80,7 +80,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "gulp": "^4.0.0",
     "jshint": "^2.9.7",
-    "nyc": "^11.2.1",
+    "nyc": "^14.1.1",
     "prompt": "^1.0.0",
     "ws": "3.3.2",
     "zombie": "^6.1.4"

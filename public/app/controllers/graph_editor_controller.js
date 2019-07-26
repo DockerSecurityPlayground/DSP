@@ -1,4 +1,4 @@
-DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification ) {
+DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
   console.log("=== INIT GRAPH EDITOR ===");
 
   $scope.labName= '';
@@ -47,38 +47,38 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       var createNew = $location.search().create ? true : false;
       console.log(createNew);
       // if(params.action && (params.action==='edit' || params.action ==='new')) {
-        // Edit a lab
-        if(!createNew) {
-          //When imageList it's loded load lab
-          dockerAPIService.loadLab($scope.labName, true, function(data) {
-            $scope.canvas = data.canvasJSON;
-            $scope.repoName = data.repoName;
-            //TOREFACT gh.loadGraphicJSON(canvasJSON)
-            containerManager.loadContainers(data, {imageList : $scope.imageList})
+      // Edit a lab
+      if(!createNew) {
+        //When imageList it's loded load lab
+        dockerAPIService.loadLab($scope.labName, true, function(data) {
+          $scope.canvas = data.canvasJSON;
+          $scope.repoName = data.repoName;
+          //TOREFACT gh.loadGraphicJSON(canvasJSON)
+          containerManager.loadContainers(data, {imageList : $scope.imageList})
 
-            var yamlcode = angular.element('#code_yaml')
+          var yamlcode = angular.element('#code_yaml')
 
-            yamlcode.text(data.yamlfile)
-            Prism.highlightAll();
-            $scope.yamlfile = data.yamlfile;
-            // If exists a networkList add the netwokr list
-            if(data.networkList)
-              NetworkManagerService.setNetworkList(data.networkList)
-            $scope.networkList =  NetworkManagerService.getNetworks()
-            // Set isComposeVisible
-            if (data.isComposeVisible == false)
-              $scope.isComposeVisible = false
-            var networkNames = $scope.networkList.map(a => a.name)
-            var containerNames = containerManager.containerListToDraw.map( c => c.name);
-            // Container created, update canvas
-            $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
-          })
+          yamlcode.text(data.yamlfile)
+          Prism.highlightAll();
+          $scope.yamlfile = data.yamlfile;
+          // If exists a networkList add the netwokr list
+          if(data.networkList)
+            NetworkManagerService.setNetworkList(data.networkList)
+          $scope.networkList =  NetworkManagerService.getNetworks()
+          // Set isComposeVisible
+          if (data.isComposeVisible == false)
+            $scope.isComposeVisible = false
+          var networkNames = $scope.networkList.map(a => a.name)
+          var containerNames = containerManager.containerListToDraw.map( c => c.name);
+          // Container created, update canvas
+          $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
+        })
 
 
-         }
-        else {
-           $scope.networkList =  NetworkManagerService.getNetworks()
-        }
+      }
+      else {
+        $scope.networkList =  NetworkManagerService.getNetworks()
+      }
       // }
       //If params are not correct
       // else {
@@ -245,6 +245,8 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.containerToDraw = containerManager.containerToDraw
 
   $scope.editContainerName = ''
+  // $scope.containerListToDrawFiltered = dependsFilter($scope.containerListToDraw, $scope.editContainerName)
+  $scope.containerListToDrawFiltered = containerManager.containerToDraw;
 
   $scope.optPort = { container: '', host: ''};
   $scope.optionalPorts = [];
@@ -297,6 +299,13 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
 
   $scope.checkContainerChange = function checkContainerChange() {
+    $scope.containerListToDrawFiltered = [];
+    // Set depends on array
+    _.each($scope.containerListToDraw, (c) => {
+      if (c.name != $scope.editContainerName)
+        $scope.containerListToDrawFiltered.push(c);
+    });
+
     var found = containerManager.hasContainer()
 
     //If there already is a container with this name  and new
@@ -322,51 +331,68 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
    */
   $scope.editContainer = function editContainer() {
     //Add to current container infos about container list not drawed selected
+    console.log("EDITCONTAINER")
     $scope.optionalPorts = [];
     $scope.optPort = { container: '', host: ''};
 
     var containerToEdit = _.findWhere($scope.containerListToDraw, {name: $scope.editContainerName});
     var oldName = containerToEdit.name;
-    containerManager.setContainer($scope.currentContainer, containerToEdit);
-    // Callback to graphedit
-    $scope.graphEditTerminatedCallback(oldName, $scope.currentContainer.name);
-    // Reset current container
-    containerManager.resetCurrent($scope.imageList, $scope.networkList);
-    $scope.isAddContainer = true;
-    $scope.currentAction = protoAddAction;
-    // Don't show the container panel
-    $scope.showEditContainer = false;
-    Notification({message: containerToEdit.name+ " modified!"}, 'success');
+    // If the name has been changed check if already exists
+    if (oldName != $scope.currentContainer.name && _.findWhere($scope.containerListToDraw, {name: $scope.currentContainer.name})) {
+      Notification({message:"Sorry, network element with this name already present"}, 'error');
+    } else {
+      containerManager.setContainer($scope.currentContainer, containerToEdit);
+      // Callback to graphedit
+      $scope.graphEditTerminatedCallback(oldName, $scope.currentContainer.name);
+      // Reset current container
+      containerManager.resetCurrent($scope.imageList, $scope.networkList);
+      $scope.isAddContainer = true;
+      $scope.currentAction = protoAddAction;
+      // Don't show the container panel
+      $scope.showEditContainer = false;
+      Notification({message: containerToEdit.name+ " modified!"}, 'success');
+    }
+
+    $scope.cancelEditContainer = function cancelEditContainer() {
+      //Add
+      $scope.optPort = { container: '', host: ''};
+      $scope.optionalPorts = [];
+      containerManager.resetCurrent($scope.imageList, $scope.networkList)
+      $scope.isAddContainer = true
+    }
+
   }
-
-  $scope.cancelEditContainer = function cancelEditContainer() {
-    //Add
-    $scope.optPort = { container: '', host: ''};
-    $scope.optionalPorts = [];
-    containerManager.resetCurrent($scope.imageList, $scope.networkList)
-    $scope.isAddContainer = true
-
+  $scope.containerExists = function elementExists(nameContainer) {
+    if(_.findWhere($scope.containerListToDraw, {name: nameContainer})) {
+      return  true;
+    } else {
+      return false;
+    }
   }
 
   $scope.newContainer = function newContainer(nameContainer) {
-    $scope.optionalPorts = [];
-    $scope.optPort = { container: '', host: ''};
-    var c = {
-      name: nameContainer,
-      selectedImage: $scope.currentContainer.selectedImage,
-      ports : $scope.currentContainer.ports,
-      actions : angular.copy($scope.currentContainer.actions),
-      volumes : angular.copy($scope.currentContainer.volumes),
-      filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
-    };
-    $
-    var env = [];
-    c.environments = env
+    if(_.findWhere($scope.containerListToDraw, {name: nameContainer})) {
+      Notification({message:"Sorry, network element with this name already present"}, 'error');
+    } else {
+      $scope.optionalPorts = [];
+      $scope.optPort = { container: '', host: ''};
+      var c = {
+        name: nameContainer,
+        selectedImage: $scope.currentContainer.selectedImage,
+        ports : $scope.currentContainer.ports,
+        actions : angular.copy($scope.currentContainer.actions),
+        volumes : angular.copy($scope.currentContainer.volumes),
+        filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
+        networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
+      };
+      $
+      var env = [];
+      c.environments = env
 
-    ////Add to not drawed new container
-    containerManager.addToDraw(c)
-    Notification({message: c.name+ " created!"}, 'success');
+      ////Add to not drawed new container
+      containerManager.addToDraw(c)
+      Notification({message: c.name+ " created!"}, 'success');
+    }
   }
 
   // to update container list  when  submit clicked in form_add_container
@@ -456,11 +482,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     var ip = NetworkManagerService.getFirst(nameNetwork)
     var container = containerManager.getContainer(containerName);
     container.networks[nameNetwork] = {
-        ip: '',
-        position: '',
-        isVisible: '',
-        isDynamic: true
-      }
+      ip: '',
+      position: '',
+      isVisible: '',
+      isDynamic: true
+    }
 
     container.networks[nameNetwork].ip = ip
     container.networks[nameNetwork].isChecked = true
@@ -468,14 +494,14 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     NetworkManagerService.useAddress(ip)
   }
   $scope.detachNetwork = function detachNetwork(nameNetwork, containerName) {
-      var container = containerManager.getContainer(containerName);
-      if (container && container.networks && container.networks[nameNetwork]) {
-        var ip = container.networks[nameNetwork].ip
-        NetworkManagerService.freeAddress(ip)
-        delete container.networks[nameNetwork];
-        // container.networks[nameNetwork].ip = ""
-        // container.networks[nameNetwork].isChecked = false;
-      }
+    var container = containerManager.getContainer(containerName);
+    if (container && container.networks && container.networks[nameNetwork]) {
+      var ip = container.networks[nameNetwork].ip
+      NetworkManagerService.freeAddress(ip)
+      delete container.networks[nameNetwork];
+      // container.networks[nameNetwork].ip = ""
+      // container.networks[nameNetwork].isChecked = false;
+    }
   }
 
   $scope.checkNetworkClicked = function checkNewtorkClicked(nameNetwork, container) {
@@ -769,6 +795,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
 
   //When click edit button show edit buttons and set name editContainer
   $scope.onClickEditContainer =  function(containerName) {
+    $scope.containerListToDrawFiltered = [];
+    _.each($scope.containerListToDraw, (c) => {
+      if (containerName != c.name) {
+        $scope.containerListToDrawFiltered.push(c);
+      }
+    })
     safeApplyService.exec($scope, function() {
       $scope.isAddContainer = false;
       // Fix filtered image
@@ -1066,34 +1098,34 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
   }
   $scope.updateImages = function() {
     dockerAPIService.getDockerImages()
-    .then(function successCallback(response) {
+      .then(function successCallback(response) {
         var imageList = response.data.data
         $scope.imageList = imageList
         containerManager.init($scope.imageList)
-      Notification("Images updated", 'success');
+        Notification("Images updated", 'success');
 
       }, function errorCallback(response) {
         Notification({message:"Sorry,  error in loading docker images"}, 'error');
       })
   }
   $scope.exportDockerCompose = function() {
-			$scope.toJSON = $scope.yamlfile;
-			var blob = new Blob([$scope.toJSON], { type:"application/json;charset=utf-8;" });
-			var downloadLink = angular.element('<a></a>');
-                        downloadLink.attr('href',window.URL.createObjectURL(blob));
-                        downloadLink.attr('download', 'docker-compose.yml');
-			downloadLink[0].click();
-		};
+    $scope.toJSON = $scope.yamlfile;
+    var blob = new Blob([$scope.toJSON], { type:"application/json;charset=utf-8;" });
+    var downloadLink = angular.element('<a></a>');
+    downloadLink.attr('href',window.URL.createObjectURL(blob));
+    downloadLink.attr('download', 'docker-compose.yml');
+    downloadLink[0].click();
+  };
 
   $scope.viewCompose = function() {
     safeApplyService.exec($scope, function() {
-    $scope.showYamlFile = !$scope.showYamlFile;
-    var closeNode = document.createTextNode("Close");
-    var viewNode = document.createTextNode("View");
-    var item = document.getElementById("view");
-    item.childNodes[1].nodeValue == "Close" ?
+      $scope.showYamlFile = !$scope.showYamlFile;
+      var closeNode = document.createTextNode("Close");
+      var viewNode = document.createTextNode("View");
+      var item = document.getElementById("view");
+      item.childNodes[1].nodeValue == "Close" ?
         item.replaceChild(viewNode, item.childNodes[1])
-      :
+        :
         item.replaceChild(closeNode, item.childNodes[1]) ;
     });
   }

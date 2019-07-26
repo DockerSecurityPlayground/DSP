@@ -42,7 +42,6 @@ function setContainer(container, dest) {
 			}
 		})
 		dest.environments = env
-		console.log(dest)
 }
 function resetCurrent(imageList, networkList)
 {
