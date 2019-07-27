@@ -291,7 +291,6 @@
     </div>
   </div>
   <br>
-
   <div class="row">
     <div class="col-sm-offset-3 col-sm-3"> 
       <input type="text" class="form-control" ng-model="volumeHost"> </input> 
@@ -331,7 +330,7 @@
 
       <div class="row">
         <div class="col-sm-offset-1 col-sm-4">
-          <h4>Data repo </h4>
+          <h4><a href="/configuration"> Data repo </a></h4>
           <js-tree 
              tree-events="select_node:nodeSelected" 
              tree-ajax="/api/tree/repo"
@@ -523,25 +522,45 @@
 
     <div ng-repeat="(key,env) in currentContainer.environments">
       <div class="row" >
-        <div class="col-sm-offset-2 col-sm-4">
-          <input type="text" class="form-control"  
-                             placeholder="Name"
-                             ng-model="currentContainer.environments[key].name" 
-                             >	
-
-        </div>
-          <div class="col-sm-4">
-            <input type="text" class="form-control"  
-                               placeholder="Value"
-                               ng-model="currentContainer.environments[key].value" 
-                               >	
-
+        <!-- <div class="col-sm-offset-2 col-sm-4"> -->
+          <div class="col-sm-offset-2 col-sm-4"> {{currentContainer.environments[key].name}} = {{currentContainer.environments[key].value}} 
           </div>
+          <div class="col-sm-4"> <button ng-click="removeEnvironment(key)" class="btn btn-danger"> x </button></div>
+          <!-- <input type="text" class="form-control" -->  
+          <!--                    placeholder="Name" -->
+          <!--                    ng-model="currentContainer.environments[key].name" --> 
+          <!--                    > -->	
+
+        <!-- </div> -->
+          <!-- <div class="col-sm-4"> -->
+          <!--   <input type="text" class="form-control" -->  
+          <!--                      placeholder="Value" -->
+          <!--                      ng-model="currentContainer.environments[key].value" --> 
+          <!--                      > -->	
+
+          <!-- </div> -->
       </div>
         <br>
     </div>
+<div class="row">
+    <div class="col-sm-3 col-sm-offset-2 text-center"> 
+      <label class="control-label " for="environment_name">Name</label>	 
+    </div>
+    <div class="col-sm-3 text-center"> 
+      <label class="control-label " for="environment_variable"> Value </label>	 	 
+    </div>
+  </div>
+  <br>
+<div class="row">
+    <div class="col-sm-offset-3 col-sm-3"> 
+      <input type="text" class="form-control" ng-model="environment.name"> </input> 
+    </div><div class="col-sm-3"> 
+      <input type="text" class="form-control" ng-model="environment.value"> </input> 
+    </div>
+  </div>
     <div class="row">
-      <div class="col-sm-offset-9 col-sm-2"> <button ng-click="addEnvironment()" class="btn btn-success"> + </button> <button ng-click="removeEnvironment()" class="btn btn-danger"> x </button></div>
+      <div class="col-sm-offset-9 col-sm-2"> <button ng-click="addEnvironment()" class="btn btn-success"> + </button> 
+        <button ng-click="removeEnvironment()" class="btn btn-danger"> x </button></div>
     </div>
   </div><!-- END PANEL ENVIRONMENT -->	
   <br>			

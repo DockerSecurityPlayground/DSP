@@ -1,4 +1,4 @@
-DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
+DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, AjaxService, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
   console.log("=== INIT GRAPH EDITOR ===");
 
   $scope.labName= '';
@@ -6,6 +6,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.showEditNetwork   = false;
   $scope.yamlfile='';
   $scope.showYamlFile = false;
+  $scope.environment = {name: "Name",
+  value: "Value"
+  };
 
   $scope.isComposeVisible = true;
   const protoAddAction = 'New container',
@@ -25,7 +28,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
   //Redirect to managment projects
   else redirectToMain()
-
 
 
   function redirectToMain() {
@@ -160,6 +162,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     //Update informations network of containers
     containerManager.newNetworkOccurred(network)
   };
+
+  $scope.goBack = function() {
+    console.log("GOBACK");
+    var urlToGo = '/lab/use/'+ AjaxService.config.name +'/'+ $scope.labName;
+    $location.url(urlToGo);
+  }
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
   var networkInEditing = null;
@@ -594,11 +602,11 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     NetworkManagerService.useAddress(network.ip)
   }
   $scope.addEnvironment = function() {
-    containerManager.addEnvironment()
+    containerManager.addEnvironment($scope.environment.name, $scope.environment.value)
 
   }
-  $scope.removeEnvironment = function() {
-    containerManager.removeEnvironment()
+  $scope.removeEnvironment = function(key) {
+    containerManager.removeEnvironment(key)
 
   }
 
@@ -1107,6 +1115,29 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
       }, function errorCallback(response) {
         Notification({message:"Sorry,  error in loading docker images"}, 'error');
       })
+  }
+
+
+
+
+  // COMPOSE MANAGEMENT
+  $scope.uploadCompose = function() {
+    var file = document.getElementById('composeFile').files[0];
+    r = new FileReader();
+
+    r.onloadend = function(e) {
+      var data = e.target.result;
+      var yamlObj = YAML.parse(data);
+      var yamlcode = angular.element('#code_yaml')
+      yamlcode.text(data)
+      Prism.highlightAll();
+      $scope.yamlfile = data;
+      NetworkManagerService.parseYaml(yamlObj);
+      // containerManager.parseYaml(yamlObj);
+      //send your binary data via $http or $resource or do anything else with it
+    }
+
+    r.readAsBinaryString(file);
   }
   $scope.exportDockerCompose = function() {
     $scope.toJSON = $scope.yamlfile;

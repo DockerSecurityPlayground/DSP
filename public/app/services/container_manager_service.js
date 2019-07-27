@@ -205,13 +205,14 @@ return {
 
 
 	},
-	addEnvironment: function newEnvironment() {
-		currentContainer.environments.push({name:'', value:''})
+	addEnvironment: function newEnvironment(name, value) {
+		currentContainer.environments.push({name, value})
 	},
-	removeEnvironment: function removeEnvironment() {
-		var length = currentContainer.environments.length
-		if(length > 0)
-			currentContainer.environments.splice(length-1, 1)
+	removeEnvironment: function removeEnvironment(key) {
+    currentContainer.environments.splice(key, 1);
+		// var length = currentContainer.environments.length
+		// if(length > 0)
+		// 	currentContainer.environments.splice(length-1, 1)
 	},
 	deleteNetworkFromContainers : function(name) { 
 
@@ -269,6 +270,29 @@ return {
     },
   getContainer : function getContainer(e) {
       return _.findWhere(cld, {name: e});
-   }
+   },
+  parseYaml : function parseYaml(yamlFile) {
+    console.log(this.containerListToDraw);
+    var newContainerList = [];
+    // Take services
+    _.each(yamlFile.services, function(s, id) {
+      var newService = {}
+      newService.actions = []
+      newService.dependsOn = {}
+      newService.links = {}
+      newService.networks = {}
+      newService.ports = {}
+      newService.volumes = []
+      newService.name = id;
+      // newService.selectedImage = s.image;
+      _.each(s.links, function(l) {
+        newService.links[l] = true
+      })
+      _.each(s.depends_on, function(l) {
+        newService.dependsOn[l] = true
+      })
+      // var name = s.
+    });
+  }
   } //End return
 }

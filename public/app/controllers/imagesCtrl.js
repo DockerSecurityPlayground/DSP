@@ -189,6 +189,8 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
               }
             // Notify
             else {
+              console.log("IMAGES");
+              console.log(data.message);
               var message = JSON.parse(data.message);
               if(message.status == 'Pulling fs layer'){
 			    var obj = {'id': message.id,'percentage': 0};

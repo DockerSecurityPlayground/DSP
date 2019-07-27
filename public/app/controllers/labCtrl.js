@@ -401,7 +401,8 @@ vm.goToNetwork = function goToNetwork() {
   if (vm.isRunning)
     Notification('Cannot edit a running lab! Pls stop first', 'warning');
   else {
-     $location.url('/network/'+vm.lab.name);
+     // $location.url('/network/'+vm.lab.name);
+     window.location.href = '/network/'+vm.lab.name;
     // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
     // window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
   }

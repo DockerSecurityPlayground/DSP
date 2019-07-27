@@ -16,6 +16,7 @@
       mxBasePath = 'assets/mxgraph/';
     </script>
     <script type="text/javascript" src="assets/js/mxClient.js"></script>
+    <script type="text/javascript" src="assets/js/js-yaml.js"></script>
     <!-- JS Libraries --> 
     <script src="assets/js/underscore-min.js"> </script>
     <!-- -->
@@ -109,6 +110,21 @@ underscore.factory('_', function() {
 });
 //ANGULAR COMPONENT REGISTRATION 
 angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache'] )
+   .directive('fileModel', ['$parse', function ($parse) {
+            return {
+               restrict: 'A',
+               link: function(scope, element, attrs) {
+                  var model = $parse(attrs.fileModel);
+                  var modelSetter = model.assign;
+                  
+                  element.bind('change', function() {
+                     scope.$apply(function() {
+                        modelSetter(scope, element[0].files[0]);
+                     });
+                  });
+               }
+            };
+    }])
   .filter('depends', function() {
       return function(input, currentContainerName) {
         console.log("IN FILTER");

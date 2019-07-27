@@ -2,7 +2,7 @@
 .panel-details {
   border-style: groove; 
   border-width: 1px;
-  width:80%;
+  width:100%;
   position:relative;
   overflow:hidden;
   cursor:default;
@@ -12,29 +12,29 @@
   display: flex;
 }
 .graph-container {
-    /*width: 78%;*/
- /*   overflow:hidden;*/
-    border-style:solid;
-    border-color:black;
-    border-width:1px;
-    height:600px
+  /*width: 78%;*/
+  /*   overflow:hidden;*/
+  border-style:solid;
+  border-color:black;
+  border-width:1px;
+  height:600px
 }
 .tabset {
-    width: 78%;
+  width: 78%;
 }
 .side-container {
- /*   width: 22%; */
-    background-image:url('images/sidebar_bg.gif');
+  /*   width: 22%; */
+  background-image:url('images/sidebar_bg.gif');
 }
 .sidebar-element {
   display: flex;
   align-items: center;
   width: 100%;
   margin-left: 2px;
-/*  border-radius: 10px;
-  border-style: solid;
-  border-width: 3px
-    */
+  /*  border-radius: 10px;
+      border-style: solid;
+      border-width: 3px
+   */
 }
 .no-selection {
   -webkit-touch-callout: none;
@@ -62,7 +62,7 @@
 </style>
 <script src="assets/mxgraph/utils.js"></script>
 <script charset="utf-8">
-  $( document ).ready(function() {
+$( document ).ready(function() {
     var appScope = angular.element(document.getElementById("page-wrapper")).scope()
     MX__Main(document.getElementById('graphContainer'),
       document.getElementById('outlineContainer'),
@@ -73,86 +73,105 @@
   });
 </script>
 <div id="page-wrapper" >
-    <div 
-      id="page-inner">
-      <div>
-        <h1 class="text-center"> {{labName}} </h1>
-        <!-- {{ editContainerName }} -->
-        <!-- {{ containerListToDraw }} -->
-        <!-- {{ networkList }} -->
-      </div>
-	<div class="row">
-	    <div class="col-md-12">
-	     <h1 id="lab_action">{{lab_action}}</h1>   
-		<h4 id="description_lab"></h4>
-	    </div>
-	</div>              
-	 <!-- /. ROW  -->
-	  <hr />
 
-      <!-- Creates a container for the toolboox -->
-          <!-- style="position:relative;overflow:hidden;top:96px;left:0px;bottom:36px;width:30%;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');" -->
-      
+  <div 
+     id="page-inner">
+    <div>
+
+      <h1 class="text-center"> {{labName}} </h1>
+      <!-- {{ editContainerName }} -->
+      <!-- {{ containerListToDraw }} -->
+      <!-- {{ networkList }} -->
+    </div>
+    <div class="row">
+      <div class="col-sm-4 col-sm-offset-8">
+        <div class="row lateral_options">
+          <div class="col-sm-3" > <a ng-click="goBack()" class="btn btn-primary">   <span class="glyphicon glyphicon-arrow-left"></span> Back</a> </div>
+          <div class="col-sm-3" > <a onclick="MX__Save()" class="btn btn-default">   <span class="glyphicon glyphicon-floppy-save"></span> Save</a> </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h1 id="lab_action">{{lab_action}}</h1>   
+        <h4 id="description_lab"></h4>
+      </div>
+    </div>
+    <!-- /. ROW  -->
+    <hr />
+
+
+    <!-- Creates a container for the toolboox -->
+    <!-- style="position:relative;overflow:hidden;top:96px;left:0px;bottom:36px;width:30%;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');" -->
+
     <div class="wrapper">
-        <section 
-          class="side-container"
-          >
-          <div id="sidebarContainer">
-            <h3 class="text-center"> Elements </h3>
-            <hr>
+      <section 
+         class="side-container"
+         >
+         <div id="sidebarContainer">
+           <h3 class="text-center"> Elements </h3>
+           <hr>
+         </div>
+         <hr>
+
+      </section>
+      <!-- Creates a container for the graph -->
+      <!-- style="position:relative;overflow:hidden;width:70%;height:600px;cursor:default;border-width:1px;border-style:solid;border-color:black;" -->
+      <uib-tabset class="tabset" active="active">
+        <uib-tab index="0" heading="Graph">
+          <br>
+          <div class="wrapper">
+            <div class="side-container"> </div>
+            <!-- Creates a container for the sidebar -->
+            <div id="toolbarContainer"
+                 > 
+            </div>
           </div>
-          <hr>
-          
-        </section>
-        <!-- Creates a container for the graph -->
-        <!-- style="position:relative;overflow:hidden;width:70%;height:600px;cursor:default;border-width:1px;border-style:solid;border-color:black;" -->
-  <uib-tabset class="tabset" active="active">
-    <uib-tab index="0" heading="Graph">
-      <br>
-<div class="wrapper">
-      <div class="side-container"> </div>
-        <!-- Creates a container for the sidebar -->
-          <div id="toolbarContainer"
-            > 
+          <section ng-show="!showEditNetwork && !showEditContainer && !showYamlFile" 
+                   id="graphContainer" 
+                   class="graph-container"
+                   >
+          </section>
+            <div 
+                   ng-show="showEditContainer"
+                   id="networkElementDescription"
+                   class="panel-details"
+                   >
+                   <!-- style="border-style: groove; position:relative;overflow:hidden;background-image:url('editors/images/grid.gif');cursor:default;" -->
+              <div ng-include="'views/add_element.html'"> </div> 
+            </div>
+            <div 
+                   ng-show="showEditNetwork"
+                   class="panel-details"
+                   id="networkElement"
+                   >
+                   <div ng-include="'views/add_network.html'"> </div> 
+            </div>
+        </uib-tab>
+        <uib-tab index="1" heading="Docker-Compose"> 
+          <br>
+          <br>
+          <h4 class="text-center"> Docker Compose </h4>
+          <!-- <1!-- docker-compose file --1> -->
+          <!-- <div class="yaml-container" ng-show="showYamlFile"> --> 
+          <div class="row">
+            <div class="col-sm-3">
+              <button ng-click="exportDockerCompose()" class="btn btn-default"> <img src="assets/mximages/export1.png" > </img> Download </button>
+            </div>
+            <!-- <div class="col-sm-3"> -->
+            <!--   <button ng-click="uploadCompose()" class="btn btn-default"> <img src="assets/mximages/export1.png" > </img> Upload </button> -->
+            <!-- </div> -->
+            <!-- <div class="col-sm-6"> -->
+            <!--   <input type="file" id="composeFile"/> -->
+            <!-- </div> -->
           </div>
-      </div>
-        <section ng-show="!showEditNetwork && !showEditContainer && !showYamlFile" 
-             id="graphContainer" 
-             class="graph-container"
-          >
-        </section>
-      <div 
-           ng-show="showEditContainer"
-           id="networkElementDescription"
-           class="panel-details"
-           >
-           <!-- style="border-style: groove; position:relative;overflow:hidden;background-image:url('editors/images/grid.gif');cursor:default;" -->
-        <div ng-include="'views/add_element.html'"> </div> 
-      </div>
-      <div 
-           ng-show="showEditNetwork"
-           class="panel-details"
-           id="networkElement"
-           >
-        <div ng-include="'views/add_network.html'"> </div> 
-      </div>
-    </uib-tab>
-    <uib-tab index="1" heading="Docker-Compose"> 
-      <br>
-      <br>
-      <!-- <1!-- docker-compose file --1> -->
-      <!-- <div class="yaml-container" ng-show="showYamlFile"> --> 
-      <div class="row">
-        <div class="col-sm-3 col-sm-offset-9">
-      <button ng-click="exportDockerCompose()" class="btn btn-default"> <img src="assets/mximages/export1.png" > </img> Download </button>
-        </div>
-      </div>
-      <div class="yaml-container" > 
-                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
-        </div>
-    </uib-tab>
-  </uib-tabset>
+          <div class="yaml-container" > 
+            <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+          </div>
+          </div>
+        </uib-tab>
+      </uib-tabset>
       <!-- End compose file -->
- <!-- /. PAGE WRAPPER  -->
-</div>	
-</div>
+      <!-- /. PAGE WRAPPER  -->
+    </div>	
+  </div>

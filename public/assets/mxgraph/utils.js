@@ -882,6 +882,12 @@ function MX__ExitLab() {
   Model__AppScope.exitLab();
   // window.location.href='/lab/use/'+Model__AppScope.repoName+'/'+Model__AppScope.labName
 }
+function MX__Save() {
+  var enc = new mxCodec(mxUtils.createXmlDocument());
+  var node = enc.encode(theGraph.getModel());
+  var xml = mxUtils.getPrettyXml(node);
+  MX__SaveLab(xml);
+}
 
 
 function MX__SaveLab(xml) {
@@ -1052,7 +1058,7 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     toolbar.appendChild(spacer.cloneNode(true));
     // addToolbarButton(editor, toolbar, 'view', 'View', 'assets/mximages/info.gif');
     // addToolbarButton(editor, toolbar, 'export', 'Download', 'assets/mximages/export1.png');
-    addToolbarButton(editor, toolbar, 'save', 'Save', 'assets/mximages/save.gif');
+    // addToolbarButton(editor, toolbar, 'save', 'Save', 'assets/mximages/save.gif');
     // addToolbarButton(editor, toolbar, 'exit', 'Back', 'assets/mximages/undo.png');
 
     // ---
