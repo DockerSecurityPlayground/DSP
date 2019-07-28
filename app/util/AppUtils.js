@@ -136,7 +136,9 @@ module.exports = {
     fs.stat(srcPath, (err, stats) => {
       if (err) cb(err);
       else if (stats.isDirectory()) copyDir(srcPath, dstPath, cb);
-      else if (stats.isFile()) copyFile(srcPath, dstPath, cb);
+      else if (stats.isFile()) {
+        copyFile(srcPath, dstPath, cb);
+      }
       else cb(new Error('Unknown file type'));
     });
   },

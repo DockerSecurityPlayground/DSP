@@ -1,4 +1,3 @@
-var theGraph;
 function configureStylesheet(theGraph) {
 var style = new Object();
 style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;

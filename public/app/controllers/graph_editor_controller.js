@@ -7,7 +7,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.yamlfile='';
   $scope.showYamlFile = false;
   $scope.environment = {name: "Name",
-  value: "Value"
+    value: "Value"
   };
 
   $scope.isComposeVisible = true;
@@ -47,13 +47,13 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       containerManager.init($scope.imageList)
       $scope.changedImage($scope.imageList[0])
       var createNew = $location.search().create ? true : false;
-      console.log(createNew);
       // if(params.action && (params.action==='edit' || params.action ==='new')) {
       // Edit a lab
       if(!createNew) {
-        //When imageList it's loded load lab
+        ////When imageList it's loded load lab
         dockerAPIService.loadLab($scope.labName, true, function(data) {
           $scope.canvas = data.canvasJSON;
+
           $scope.repoName = data.repoName;
           //TOREFACT gh.loadGraphicJSON(canvasJSON)
           containerManager.loadContainers(data, {imageList : $scope.imageList})
@@ -70,14 +70,38 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           // Set isComposeVisible
           if (data.isComposeVisible == false)
             $scope.isComposeVisible = false
-          var networkNames = $scope.networkList.map(a => a.name)
-          var containerNames = containerManager.containerListToDraw.map( c => c.name);
           // Container created, update canvas
-          $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
+          if (Graph__isValidXML($scope.canvas)) {
+            var networkNames = $scope.networkList.map(a => a.name)
+            var containerNames = containerManager.containerListToDraw.map( c => c.name);
+            $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
+          }
+          // Try to create the structure
+          else {
+            Graph__CreateGraphFromStructure(data)
+          }
         })
-
-
       }
+            // // Create networks
+            // for (var i = 0; i < networkNames.length; i++) {
+            //    Graph__NetworkCreate(theGraph, networkNames[i], 200, i*100);
+            // }
+            // // Create elements
+            // for (var i = 0; i < containerNames.length; i++) {
+            //    Graph__ElementCreate(theGraph, containerNames[i], 1, i*100);
+            //   var createdElement = Graph__getElement(containerNames[i]);
+            //   var children = createdElement.children;
+            //   var currentAttachedNetwork = 0;
+            //   var MAX_NETWORK_ATTACHMENTS = 4;
+            //   // Get networks
+            //   var c = _.findWhere(containerManager.containerListToDraw, {name: containerNames[i]});
+            //   _.each(c.networks, (n, networkName) => {
+            //     Graph__AddConnection(containerNames[i], networkName, currentAttachedNetwork++);
+
+
+              // })
+            // }
+          // }
       else {
         $scope.networkList =  NetworkManagerService.getNetworks()
       }
@@ -803,6 +827,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
 
   //When click edit button show edit buttons and set name editContainer
   $scope.onClickEditContainer =  function(containerName) {
+
     $scope.containerListToDrawFiltered = [];
     _.each($scope.containerListToDraw, (c) => {
       if (containerName != c.name) {

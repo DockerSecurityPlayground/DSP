@@ -190,7 +190,7 @@ $scope.init = function() {
         dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function(data) {
           $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
           $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
-          onLoadCanvas(data.canvasJSON)
+          onLoadCanvas(data)
           var yamlcode = angular.element('#code_yaml')
 
           yamlcode.text(data.yamlfile)

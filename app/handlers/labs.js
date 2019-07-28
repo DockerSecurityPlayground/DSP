@@ -64,7 +64,7 @@ function getLabs(req, res) {
     // Check if repo dir parameter exists
     (cb) => AppConditions.check(req, 'getLabsCheck', cb),
     (cb) => configData.getConfig(cb),
-      // get labels
+    // get labels
     (config, cb) => {
       // label file path
       const mainDir = config.mainDir;
@@ -72,15 +72,15 @@ function getLabs(req, res) {
       labsData.getLabs(repoPath, cb);
     },
   ],
-  // Returns { labs: [] }
-(err, results) => {
-  httpHelper.response(res, err, { labs: results });
-});
+    // Returns { labs: [] }
+    (err, results) => {
+      httpHelper.response(res, err, { labs: results });
+    });
 }
 function deleteLab(req, res) {
   log.info('[DELETE LAB]');
   async.waterfall([
-  // Check if repo dir parameter exists
+    // Check if repo dir parameter exists
     (cb) => Checker.checkParams(req.params, ['labname'], cb),
     (cb) => configData.getConfig(cb),
     (theConfig, cb) => {
@@ -98,8 +98,8 @@ function deleteLab(req, res) {
       labsData.deleteLab(req.params.labname, cb);
     },
   ],
-  // Returns { labels: [] }
-  (err) => appUtils.response('DELETE LAB', res, err));
+    // Returns { labels: [] }
+    (err) => appUtils.response('DELETE LAB', res, err));
 }
 
 
@@ -109,7 +109,7 @@ function getInformation(req, res) {
     (cb) => Checker.checkParams(req.params, ['labname', 'repo'], cb),
     (cb) => labsData.getInformation(req.params.repo, req.params.labname, cb),
   ],
-  (err, results) => appUtils.response('GET INFORMATION', res, err, results));// End waterfall
+    (err, results) => appUtils.response('GET INFORMATION', res, err, results));// End waterfall
 }
 
 
@@ -245,7 +245,7 @@ function copyLab(req, res) {
       }
     }
   ],
-  (err) => appUtils.response('COPY LAB', res, err, path.basename(newLabName)));
+    (err) => appUtils.response('COPY LAB', res, err, path.basename(newLabName)));
 }
 
 function importLab(req, res) {
@@ -255,6 +255,7 @@ function importLab(req, res) {
   let labelsOfImportedLab;
   let labelsUser;
   let userPath;
+  let networkInfo;
   const labelsToInsert = [];
   let configJSON;
   async.waterfall([
@@ -271,12 +272,43 @@ function importLab(req, res) {
       srcPath = path.join(homedir(), config.mainDir, req.body.repoName, req.body.labName);
       userPath = path.join(homedir(), configJSON.mainDir, configJSON.name);
       pathExists(destPath)
-      .then(exists => cb(null, exists));
+        .then(exists => {
+          cb(null, exists)}
+        );
     },
     (exists, cb) => {
       // Error if already exists
       if (exists) cb(new Error('Lab already exists'));
-      else LabStates.getState(req.body.repoName, req.body.labName, cb);
+      //CHECK STATE
+      // else cb(null)
+      else cb(null)
+    },
+    // Get networkData informations
+    (cb) => networkData.get(req.body.repoName, req.body.labName, cb),
+    (ni, cb) => {
+      networkInfo = ni;
+      cb(null)
+    },
+    // Check if all files can be saved
+    (cb) => {
+      const allFiles = dockerFiles.getAllFiles(networkInfo);
+      log.info(`Check files to copy: ${allFiles}`);
+      async.eachSeries(allFiles, (f, cin) => {
+        const src = path.join(homedir(), configJSON.mainDir, req.body.repoName, '.data', f);
+        const dst = path.join(homedir(), configJSON.mainDir, configJSON.name, '.data', f);
+        pathExists(dst)
+          .then(exists => {
+            if (exists) {
+              cin(new Error(`File ${f} already exists`));
+            }
+            else {
+              cin(null)
+            }
+          });
+      }, (err) => cb(err));
+    },
+    (cb) => {
+      LabStates.getState(req.body.repoName, req.body.labName, cb);
     },
     // Verify if is NO_NETWORK State (shouldn't be )
     (state, cb) => {
@@ -285,22 +317,23 @@ function importLab(req, res) {
       // Copy recursive of directory
       else ncp(srcPath, destPath, cb);
     },
-    // Get networkData informations
-    (cb) => networkData.get(req.body.repoName, req.body.labName, cb),
     // Copy all files inside the repo of user
-    (networkInfos, cb) => {
-      const allFiles = dockerFiles.getAllFiles(networkInfos);
+    (cb) => {
+      const allFiles = dockerFiles.getAllFiles(networkInfo);
       log.info(`Files to copy: ${allFiles}`);
       async.eachSeries(allFiles, (f, cin) => {
         const src = path.join(homedir(), configJSON.mainDir, req.body.repoName, '.data', f);
         const dst = path.join(homedir(), configJSON.mainDir, configJSON.name, '.data', f);
         pathExists(dst)
-        .then(exists => {
-          if (exists) cin(new Error('File already exists'));
-          else {
-            appUtils.copy(src, dst, cin);
-          }
-        });
+          .then(exists => {
+            if (exists) {
+              cin(new Error('File already exists'));
+            }
+            else {
+              log.info(`Copy ${f} `);
+              appUtils.copy(src, dst, cin);
+            }
+          });
       }, (err) => cb(err));
     },
     // get all labels of lab to import
@@ -316,7 +349,7 @@ function importLab(req, res) {
       labelsUser = jsonRet.labels;
       _.each(labelsOfImportedLab, (oneLabel) => {
         const userLabel = _.findWhere(labelsUser, { name: oneLabel.name });
-          // If doesn't exists
+        // If doesn't exists
         if (!userLabel) {
           // Add label in list to create
           labelsToInsert.push(oneLabel);
@@ -333,6 +366,8 @@ function importLab(req, res) {
       LabStates.newState(configJSON.name, req.body.labName, 'STOPPED', cb);
     }
   ], (err) => {
+    console.log("ERROR");
+    console.log(err);
     appUtils.response('IMPORT LAB', res, err);
   });
 }

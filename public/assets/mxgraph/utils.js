@@ -1,18 +1,4 @@
-var Model__currentElementID = 0;
-var Model__networkID = 0;
-const Model__CONTAINER_BASENAME = "element_";
-const Model__NETWORK_BASENAME = "network_";
-// Angular scope variable
-var Model__AppScope = null;
-const NETWORK_ELEMENT_TYPE = "NetworkElement";
-const NETWORK_TYPE = 'Network';
-const Graph__NetworkElementLabel = {
-  type : NETWORK_ELEMENT_TYPE,
-  contentHTML : '<h5 id="toptitle" class="no-selection" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
-  '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
-};
-var elementToEdit = '';
-var theGraph;
+// var theGraph;
 
 var Popup = function Popup(cell, Model__AppScope) {
   var popupContainer ;
@@ -21,7 +7,7 @@ var Popup = function Popup(cell, Model__AppScope) {
       var content = document.createElement('div');
       var networkName = cell.id;
       if(cell.edges && cell.edges.length != 0) {
-      alert("Cannot change a network with attached elements");
+        alert("Cannot change a network with attached elements");
       } else {
         Model__AppScope.onClickEditNetwork(networkName);
       }
@@ -42,15 +28,15 @@ var Popup = function Popup(cell, Model__AppScope) {
 // Is already connected the cell?
 function isAlreadyConnected(networkCell, elementCell) {
   for (var i = 0; i < networkCell.getEdgeCount(); i++)  {
-   var source = ( networkCell.edges[i]).source;
-   var target = ( networkCell.edges[i]).target;
+    var source = ( networkCell.edges[i]).source;
+    var target = ( networkCell.edges[i]).target;
     console.log(source);
     console.log(target);
     console.log(elementCell);
-   if (source.name == elementCell.name || target.name == elementCell.name)
-       return true;
-   else
-       return false;
+    if (source.name == elementCell.name || target.name == elementCell.name)
+      return true;
+    else
+      return false;
   }
   return false;
 }
@@ -88,7 +74,7 @@ function _setRemove(cell) {
   } else if(cell.type == NETWORK_TYPE) {
     console.log("Delete network from model (only if no attached element)");
     if(!Model__AppScope.isNetworkAttached(cell.name)) {
-        Model__AppScope.deleteNetwork(cell.name);
+      Model__AppScope.deleteNetwork(cell.name);
     } else {
       alert("Cannot delete a network with attached elements");
       MX__CanRemove = false;
@@ -107,6 +93,11 @@ function _setRemove(cell) {
   }
 }
 
+function Graph__getElement(e) {
+  return theGraph.model.cells[e];
+}
+
+
 function Graph__setRemoveHandler(canRemove) {
   if (canRemove) {
     mxGraphModel.prototype.remove = _setRemove;
@@ -115,10 +106,9 @@ function Graph__setRemoveHandler(canRemove) {
   }
 }
 
+// Update the name of the cell
 function Graph__update(cell, newName, oldName) {
   var label = cell.value;
-  console.log("Name:")
-  console.log(label);
   var $html = $('<div />',{html:label});
   // replace "Headline" with "whatever" => Doesn't work
   $html.find('h5').html(newName);
@@ -132,7 +122,6 @@ function Graph__update(cell, newName, oldName) {
   graphRenameProperty(cells, oldName, newName);
   var cellWithOldName = getCellsByName(oldName);
   _.each(cellWithOldName, function(e) {
-    console.log("Update "+e.name);
     e.name= newName;
   });
   // cells.remove(oldName);
@@ -140,7 +129,6 @@ function Graph__update(cell, newName, oldName) {
 }
 
 function graphEditCallback(oldName, newName) {
-  console.log("Oldname"+ oldName);
   var theCell = theGraph.getModel().getCell(oldName);
   // Update the cell name
   Graph__update(theCell, newName, oldName);
@@ -161,64 +149,6 @@ function _incrementID(id, names, stringBase) {
   return id;
 }
 
-function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
-  var doc = mxUtils.parseXml(canvasXML);
-  var codec = new mxCodec(doc);
-  codec.decode(doc.documentElement, theGraph.getModel());
-  Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
-  Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
-  }
-
-
-
-function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
-  var port = graph.insertVertex(v1, null, value , x, y, width, height, style, relative);
-  port.setConnectable(true);
-  // Adds the ports at various relative locations
-  port.geometry.offset = new mxPoint(offsetX, offsetY);
-}
-
-function Graph__addFirstPort(graph, v1, name) {
-  // Graph__addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-}
-function Graph__addSecondPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
-}
-function Graph__addThirdPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -8);
-}
-function Graph__addFourthPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -4);
-}
-
-
-function Graph__addPorts(graph, v1, numPorts) {
-  switch(numPorts) {
-    case 1:
-      Graph__addFirstPort(graph, v1);
-      break;
-    case 2:
-      Graph__addFirstPort(graph, v1);
-      Graph__addSecondPort(graph, v1);
-      break;
-    case 3:
-      Graph__addFirstPort(graph, v1);
-      Graph__addSecondPort(graph, v1);
-      Graph__addThirdPort(graph, v1);
-      break;
-    case 4:
-      Graph__addFirstPort(graph, v1);
-      Graph__addSecondPort(graph, v1);
-      Graph__addThirdPort(graph, v1);
-      Graph__addFourthPort(graph, v1);
-      break;
-    default:
-      console.log("Strange number");
-      break;
-  }
-}
-
 // Create a new element and update angular model
 function Model__ElementCreate(nameContainer) {
   var nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
@@ -233,72 +163,24 @@ function Model__ElementCreate(nameContainer) {
   return nameContainer;
 }
 function Model__NetworkCreate() {
-    var nameNetwork = Model__NETWORK_BASENAME + Model__networkID;
-    // Model__AppScope.newContainer(nameContainer);
-    Model__networkID++;
-    Model__AppScope.addNetworkElement(nameNetwork);
-    return nameNetwork;
+  var nameNetwork = Model__NETWORK_BASENAME + Model__networkID;
+  // Model__AppScope.newContainer(nameContainer);
+  Model__networkID++;
+  Model__AppScope.addNetworkElement(nameNetwork);
+  return nameNetwork;
 }
 
 
-function Graph__ElementCreate(graph, nameContainer, x, y) {
-  var parent = graph.getDefaultParent();
-  var model = graph.getModel();
-  var v1 = null;
-  var label = Graph__NetworkElementLabel;
-
-  label.name = nameContainer;
-  model.beginUpdate();
-  try {
-    // NOTE: For non-HTML labels the image must be displayed via the style
-    // rather than the label markup, so use 'image=' + image for the style.
-    // as follows: v1 = graph.insertVertex(parent, null, label,
-    // pt.x, pt.y, 120, 120, 'image=' + image);
-    v1 = graph.insertVertex(parent, nameContainer, label, x, y, 120, 120);
-    v1.setConnectable(false);
-
-    // Presets the collapsed size
-    v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-    Graph__addFirstPort(graph, v1, nameContainer);
-    Graph__addSecondPort(graph, v1, nameContainer);
-    Graph__addThirdPort(graph, v1, nameContainer);
-    Graph__addFourthPort(graph, v1, nameContainer);
-  }
-  finally {
-    graph.setSelectionCell(v1);
-    model.endUpdate();
-    Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
-  }
+function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
+  var doc = mxUtils.parseXml(canvasXML);
+  var codec = new mxCodec(doc);
+  codec.decode(doc.documentElement, theGraph.getModel());
+  Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
+  Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
 }
 
-function Graph__NetworkCreate(graph, nameNetwork, x, y) {
-  var parent = graph.getDefaultParent();
-    var model = graph.getModel();
-    var v1 = null;
-    model.beginUpdate();
-    try {
-      // NOTE: For non-HTML labels the image must be displayed via the style
-      // rather than the label markup, so use 'image=' + image for the style.
-      // as follows: v1 = graph.insertVertex(parent, null, label,
-      // pt.x, pt.y, 120, 120, 'image=' + image);
-      v1 = graph.insertVertex(parent, nameNetwork, {
-        type: NETWORK_TYPE,
-        contentHTML : '<h5 class="no-selection">'+nameNetwork+'</h5>',
-        name: nameNetwork
-      }, x, y, 120, 120, 'shape=cloud');
 
 
-      v1.setConnectable(true);
-
-      // Presets the collapsed size
-      v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-    }
-    finally {
-      graph.setSelectionCell(v1);
-      model.endUpdate();
-      // Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
-    }
-}
 
 
 function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCreateGraph) {
@@ -334,8 +216,8 @@ function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCre
   sidebar.appendChild(document.createElement("hr"))
 
 
-   // sidebar.appendChild(img);
-   // sidebar.appendChild(ele);
+  // sidebar.appendChild(img);
+  // sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -382,8 +264,8 @@ function addSidebarElementIcon(graph, sidebar) {
   sidebar.appendChild(document.createElement("hr"))
 
 
-   // sidebar.appendChild(img);
-   // sidebar.appendChild(ele);
+  // sidebar.appendChild(img);
+  // sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -421,8 +303,8 @@ function addSidebarNetworkIcon(graph, sidebar) {
   dragContainer.appendChild(ele);
   sidebar.appendChild(dragContainer);
 
-   // sidebar.appendChild(img);
-   // sidebar.appendChild(ele);
+  // sidebar.appendChild(img);
+  // sidebar.appendChild(ele);
 
   var dragElt = document.createElement('div');
   dragElt.style.border = 'dashed black 1px';
@@ -534,8 +416,8 @@ function addToolbarButton(editor, toolbar, action, label, image, isTransparent) 
     button.style.color = '#FFFFFF';
     button.style.border = 'none';
   }
-    mxEvent.addListener(button, 'click', function(evt) {
-        editor.execute(action);
+  mxEvent.addListener(button, 'click', function(evt) {
+    editor.execute(action);
   });
   mxUtils.write(button, label);
   toolbar.appendChild(button);
@@ -682,9 +564,9 @@ function mxInitGraph(graph, appScope) {
         }
       });
 
+    }
+    // return mxPaste.apply(this, arguments);
   }
-  // return mxPaste.apply(this, arguments);
-}
 
 
 
@@ -786,35 +668,35 @@ function mxInitGraph(graph, appScope) {
   }
   */
 
-    /* Called from angular when the edit is closed
-     *
-     */
+  /* Called from angular when the edit is closed
+   *
+   */
 
-    /* Event for right click
-     *
-     */
-    graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
-      // Do not fire an event here as mxEditor will
-      // consume the event and start the in-place editor.
-      if (graph.isEnabled() &&
-        !mxEvent.isConsumed(evt) &&
-        cell != null &&
-        graph.isCellEditable(cell))
-      {
-        if (graph.model.isEdge(cell) ||
-          !graph.isHtmlLabel(cell)) {
-          graph.startEditingAtCell(cell);
-        }
-        else
-        {
-          Popup(cell, Model__AppScope).show();
-          graph.selectionModel.clear();
-        }
+  /* Event for right click
+   *
+   */
+  graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
+    // Do not fire an event here as mxEditor will
+    // consume the event and start the in-place editor.
+    if (graph.isEnabled() &&
+      !mxEvent.isConsumed(evt) &&
+      cell != null &&
+      graph.isCellEditable(cell))
+    {
+      if (graph.model.isEdge(cell) ||
+        !graph.isHtmlLabel(cell)) {
+        graph.startEditingAtCell(cell);
       }
+      else
+      {
+        Popup(cell, Model__AppScope).show();
+        graph.selectionModel.clear();
+      }
+    }
 
-      // Disables any default behaviour for the double click
-      mxEvent.consume(evt);
-    };
+    // Disables any default behaviour for the double click
+    mxEvent.consume(evt);
+  };
 
 
   // Disable double click
@@ -969,30 +851,30 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
       '<br>'+
       '<input type="text" size="12" value="127.0.0.1"/>',
       'assets/mximages/icons48/server.png');
-    */
+      */
     // Displays useful hints in a small semi-transparent box.
-//          var hints = document.createElement('div');
-//          hints.style.position = 'absolute';
-//          hints.style.overflow = 'hidden';
-//          hints.style.width = '230px';
-//          hints.style.bottom = '56px';
-//          hints.style.height = '76px';
-//          hints.style.right = '20px';
-//
-//          hints.style.background = 'black';
-//          hints.style.color = 'white';
-//          hints.style.fontFamily = 'Arial';
-//          hints.style.fontSize = '10px';
-//          hints.style.padding = '4px';
-//
-//          mxUtils.setOpacity(hints, 50);
-//
-//          mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
-//          mxUtils.writeln(hints, '- Doubleclick on a vertex or edge to edit');
-//          mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
-//          mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
-//          mxUtils.writeln(hints, '- Click and drag a vertex to move and connect');
-//          document.body.appendChild(hints);
+    //          var hints = document.createElement('div');
+    //          hints.style.position = 'absolute';
+    //          hints.style.overflow = 'hidden';
+    //          hints.style.width = '230px';
+    //          hints.style.bottom = '56px';
+    //          hints.style.height = '76px';
+    //          hints.style.right = '20px';
+    //
+    //          hints.style.background = 'black';
+    //          hints.style.color = 'white';
+    //          hints.style.fontFamily = 'Arial';
+    //          hints.style.fontSize = '10px';
+    //          hints.style.padding = '4px';
+    //
+    //          mxUtils.setOpacity(hints, 50);
+    //
+    //          mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
+    //          mxUtils.writeln(hints, '- Doubleclick on a vertex or edge to edit');
+    //          mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
+    //          mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
+    //          mxUtils.writeln(hints, '- Click and drag a vertex to move and connect');
+    //          document.body.appendChild(hints);
 
     // Creates a new DIV that is used as a toolbar and adds
     // toolbar buttons.
@@ -1000,22 +882,22 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     spacer.style.display = 'inline';
     spacer.style.padding = '8px';
 
-//          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
-//
-//          // Defines a new action for deleting or ungrouping
-//          editor.addAction('groupOrUngroup', function(editor, cell)
-//            {
-//              cell = cell || editor.graph.getSelectionCell();
-//              if (cell != null && editor.graph.isSwimlane(cell))
-//              {
-//                editor.execute('ungroup', cell);
-//              }
-//              else
-//              {
-//                editor.execute('group');
-//              }
-//            });
-//
+    //          addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'assets/mximages/group.png');
+    //
+    //          // Defines a new action for deleting or ungrouping
+    //          editor.addAction('groupOrUngroup', function(editor, cell)
+    //            {
+    //              cell = cell || editor.graph.getSelectionCell();
+    //              if (cell != null && editor.graph.isSwimlane(cell))
+    //              {
+    //                editor.execute('ungroup', cell);
+    //              }
+    //              else
+    //              {
+    //                editor.execute('group');
+    //              }
+    //            });
+    //
 
     addToolbarButton(editor, toolbar, 'delete', 'Delete', 'assets/mximages/delete2.png');
     addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
@@ -1040,14 +922,14 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     //    //var textarea = document.createElement('textarea');
     //    //textarea.style.width = '400px';
     //    //textarea.style.height = '400px';
-//////              var enc = new mxCodec(mxUtils.createXmlDocument());
-//////              var node = enc.encode(editor.graph.getModel());
+    //////              var enc = new mxCodec(mxUtils.createXmlDocument());
+    //////              var node = enc.encode(editor.graph.getModel());
     //    ////textarea.value = mxUtils.getPrettyXml(node);
     //    //textarea.value = Model__AppScope.yamlfile;
     //    //showModalWindow(graph, 'Docker Compose', textarea, 410, 440);
     //  });
     editor.addAction('export', function(editor, cell) {
-     Model__AppScope.exportDockerCompose();
+      Model__AppScope.exportDockerCompose();
     });
 
     editor.addAction('exit', function(editor, cell) {
@@ -1065,20 +947,20 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
 
     // Adds toolbar buttons into the status bar at the bottom
     // of the window.
-//          addToolbarButton(editor, status, 'collapseAll', 'Collapse All', 'assets/mximages/navigate_minus.png', true);
-//          addToolbarButton(editor, status, 'expandAll', 'Expand All', 'assets/mximages/navigate_plus.png', true);
-//
-//          status.appendChild(spacer.cloneNode(true));
-//
-//          addToolbarButton(editor, status, 'enterGroup', 'Enter', 'assets/mximages/view_next.png', true);
-//          addToolbarButton(editor, status, 'exitGroup', 'Exit', 'assets/mximages/view_previous.png', true);
-//
-//          status.appendChild(spacer.cloneNode(true));
+    //          addToolbarButton(editor, status, 'collapseAll', 'Collapse All', 'assets/mximages/navigate_minus.png', true);
+    //          addToolbarButton(editor, status, 'expandAll', 'Expand All', 'assets/mximages/navigate_plus.png', true);
+    //
+    //          status.appendChild(spacer.cloneNode(true));
+    //
+    //          addToolbarButton(editor, status, 'enterGroup', 'Enter', 'assets/mximages/view_next.png', true);
+    //          addToolbarButton(editor, status, 'exitGroup', 'Exit', 'assets/mximages/view_previous.png', true);
+    //
+    //          status.appendChild(spacer.cloneNode(true));
 
     // addToolbarButton(editor, status, 'zoomIn', '', 'assets/mximages/zoom_in.png', true);
     // addToolbarButton(editor, status, 'zoomOut', '', 'assets/mximages/zoom_out.png', true);
     // addToolbarButton(editor, status, 'actualSize', '', 'assets/mximages/view_1_1.png', true);
-//          addToolbarButton(editor, status, 'fit', '', 'assets/mximages/fit_to_size.png', true);
+    //          addToolbarButton(editor, status, 'fit', '', 'assets/mximages/fit_to_size.png', true);
 
     // Creates the outline (navigator, overview) for moving
     // around the graph in the top, right corner of the window.
@@ -1111,6 +993,6 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     if(e.keyCode == 46 || e.keyCode == 8) {
       console.log("Delete action");
       editor.execute('delete');
-  }
-});
+    }
+  });
 };

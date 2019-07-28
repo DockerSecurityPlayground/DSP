@@ -1,15 +1,20 @@
 ﻿<div id="page-wrapper" >
+  <script src="assets/mxgraph/common.js"> </script>
   <script src="assets/mxgraph/use_utils.js"> </script>
   <script>
 $( document ).ready(function() {
 main(document.getElementById("graphContainer"));
 var appScope = angular.element(document.getElementById("page-wrapper")).scope()
-appScope.registerCallback(function(canvasXML) {
-var doc = mxUtils.parseXml(canvasXML);
-var codec = new mxCodec(doc);
-codec.decode(doc.documentElement, theGraph.getModel());
+appScope.registerCallback(function(data) {
+  var canvasXML = data.canvasJSON;
+  if (Graph__isValidXML(canvasXML)) {
+    var doc = mxUtils.parseXml(canvasXML);
+    var codec = new mxCodec(doc);
+    codec.decode(doc.documentElement, theGraph.getModel());
+  } else {
+    Graph__CreateGraphFromStructure(data);
+  }
 });
-console.log("INIT LAB");
 appScope.init();
 });
   </script>
