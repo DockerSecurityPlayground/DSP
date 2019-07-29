@@ -41,24 +41,8 @@ function isAlreadyConnected(networkCell, elementCell) {
   return false;
 }
 
-function graphRenameProperty(cells, oldName, newName) {
-  // Do nothing if the names are the same
-  if (oldName == newName) {
-    return cells;
-  }
-  // Check for the old property name to avoid a ReferenceError in strict mode.
-  if (cells.hasOwnProperty(oldName)) {
-    cells[newName] = cells[oldName];
-    delete cells[oldName];
-  }
-  return cells;
-};
 
 
-function getCellsByName(name) {
-  var cells = theGraph.model.cells;
-  return _.filter(cells, {name: name});
-}
 
 mxCellRemove= mxGraphModel.prototype.remove;
 var MX__CanRemove = true;
@@ -93,9 +77,6 @@ function _setRemove(cell) {
   }
 }
 
-function Graph__getElement(e) {
-  return theGraph.model.cells[e];
-}
 
 
 function Graph__setRemoveHandler(canRemove) {
@@ -106,27 +87,6 @@ function Graph__setRemoveHandler(canRemove) {
   }
 }
 
-// Update the name of the cell
-function Graph__update(cell, newName, oldName) {
-  var label = cell.value;
-  var $html = $('<div />',{html:label});
-  // replace "Headline" with "whatever" => Doesn't work
-  $html.find('h5').html(newName);
-  var newValue = $html.html();
-  theGraph.model.setValue(cell, newValue)
-
-  // Update the cell id
-  cell.setId(newName);
-  var cells = theGraph.model.cells
-  // Rename cell in id
-  graphRenameProperty(cells, oldName, newName);
-  var cellWithOldName = getCellsByName(oldName);
-  _.each(cellWithOldName, function(e) {
-    e.name= newName;
-  });
-  // cells.remove(oldName);
-  // cells.put(newName, cell);
-}
 
 function graphEditCallback(oldName, newName) {
   var theCell = theGraph.getModel().getCell(oldName);
