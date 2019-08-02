@@ -136,59 +136,20 @@ function main(container) {
       return !this.isSwimlane(cell);
     }
 
-    // To disable the folding icon, use the following code:
-    /*theGraph.isCellFoldable = function(cell)
-    {
-      return false;
+  // Override the insertVertex in order to use toDraw property
+  var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
+  if (mxGraphInsertVertex.name != "myInsertVertex")
+    mxGraph.prototype.insertVertex = function myInsertVertex(parent, id, value, x, y, width, height, style, relative) {
+      var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
+      // Add type in cell
+      v1.type = value.type;
+      v1.name = value.name;
+      return v1;
     }
-    */
 
-    /* Called from angular when the edit is closed
-     *
-     */
-
-    /* Event for right click
-     *
-     */
-    theGraph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
-      // Do not fire an event here as mxEditor will
-      // consume the event and start the in-place editor.
-      if (theGraph.isEnabled() &&
-        !mxEvent.isConsumed(evt) &&
-        cell != null &&
-        theGraph.isCellEditable(cell))
-      {
-        if (theGraph.model.isEdge(cell) ||
-          !theGraph.isHtmlLabel(cell)) {
-          theGraph.startEditingAtCell(cell);
-        }
-        else
-        {
-          Popup(cell, Model__AppScope).show();
-        }
-      }
-
-      // Disables any default behaviour for the double click
-      mxEvent.consume(evt);
-    };
-
-    configureStylesheet(theGraph);
-
-    // Gets the default parent for inserting new cells. This
-    // is normally the first child of the root (ie. layer 0).
-    theParent = theGraph.getDefaultParent();
-    // Override the insertVertex in order to use toDraw property
-    var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
-    var nameInsert = mxGraphInsertVertex.name
-    if (nameInsert != "myInsert") {
-      mxGraph.prototype.insertVertex = function myInsert(theParent, id, value, x, y, width, height, style, relative) {
-        var v1 =  mxGraphInsertVertex.apply(this, [theParent, id, value.contentHTML, x, y, width, height, style, relative]);
-        // Add type in cell
-        v1.type = value.type;
-        v1.name = value.name;
-        return v1;
-      }
-    }
+  // Gets the default parent for inserting new cells. This
+  // is normally the first child of the root (ie. layer 0).
+  var parent = theGraph.getDefaultParent();
   }
 
 }

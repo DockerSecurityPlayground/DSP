@@ -1,26 +1,22 @@
 ﻿<div id="page-wrapper" >
-  <script defer src="assets/mxgraph/common.js"> </script>
-  <script defer src="assets/mxgraph/use_utils.js"> </script>
-  <script defer>
-function loadPage() {
-var appScope = angular.element(document.getElementById("page-wrapper")).scope()
-appScope.registerCallback(function(data) {
-  var canvasXML = data.canvasJSON;
-  if (Graph__isValidXML(canvasXML)) {
-    var doc = mxUtils.parseXml(canvasXML);
-    var codec = new mxCodec(doc);
-    codec.decode(doc.documentElement, theGraph.getModel());
-  } else {
-    Graph__CreateGraphFromStructure(data);
-  }
-});
-appScope.init();
-  var gid = document.getElementById("graphContainer")
-main(gid);
-}
-$(document).ready(function() {
-  loadPage();
-})
+  <script src="assets/mxgraph/common.js"> </script>
+  <script src="assets/mxgraph/use_utils.js"> </script>
+  <script>
+    $( document ).ready(function() {
+      main(document.getElementById("graphContainer"));
+      var appScope = angular.element(document.getElementById("page-wrapper")).scope()
+      appScope.registerCallback(function(data) {
+        var canvasXML = data.canvasJSON;
+        if (Graph__isValidXML(canvasXML)) {
+          var doc = mxUtils.parseXml(canvasXML);
+          var codec = new mxCodec(doc);
+          codec.decode(doc.documentElement, theGraph.getModel());
+        } else {
+          Graph__CreateGraphFromStructure(data);
+        }
+      });
+      appScope.init();
+    });
   </script>
   <div id="page-inner">
     <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->
@@ -43,9 +39,9 @@ $(document).ready(function() {
       </div>	
       <div style="margin-top:20px" class="col-sm-4">
         <h1 class="text-lg" id="name_lab">{{ctrl.lab.name}}</h1>   
-    <div class="row">
-      <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
-    </div>
+        <div class="row">
+          <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
+        </div>
         <h4 id="description_lab">{{ctrl.lab.description}}</h4>
       </div>
       <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
@@ -67,45 +63,44 @@ $(document).ready(function() {
     <div ng-show="!ctrl.exists" class="text-center row">
       <button ng-click="ctrl.buttonAction.action(ctrl.lab.name)" class="{{ctrl.buttonAction.class}}"> {{ctrl.buttonAction.label}} </button>
     </div>
-<uib-tabset active="active">
-    <uib-tab index="0" heading="Graph">
-      <br>
-      <!-- GRAPH CANVAS -->
-      <div id="graphContainer"
-           style="position:relative;overflow:hidden;width:95%;height:500px;cursor:default; border-width:1px;border-style:solid;border-color:black;">
-      </div>
-      <br>
-      <br>
-      <br>
-      <!-- END GRAPH CANVAS -->
-    </uib-tab>
-    <uib-tab index="1" heading="Docker-Compose"> 
-      <br>
-      <h4 class="text-center"> Docker Compose </h4>
-      <div ng-show="yamlfile !== ''" class="row">
-        <div class="col-sm-offset-1 col-sm-10" > 
-        <!-- <h4 class="text-center"> JSON Docker Compose </h4> -->
-                <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+    <div ng-show="ctrl.exists" class="row">
+      <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
+        <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+      </button> 
+      </p>
+    </div>
+    <uib-tabset active="active">
+      <uib-tab index="0" heading="Graph">
+        <br>
+        <!-- GRAPH CANVAS -->
+        <div id="graphContainer"
+             style="position:relative;overflow:hidden;width:95%;height:500px;cursor:default; border-width:1px;border-style:solid;border-color:black;">
         </div>
-      </div>
-    </uib-tab>
-    <uib-tab index="2" heading="Hack Tools">
+        <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
+        <br>
+        <br>
+        <br>
+        <!-- END GRAPH CANVAS -->
+      </uib-tab>
+      <uib-tab index="1" heading="Docker-Compose"> 
+        <br>
+        <h4 class="text-center"> Docker Compose </h4>
+        <div ng-show="yamlfile !== ''" class="row">
+          <div class="col-sm-offset-1 col-sm-10" > 
+            <!-- <h4 class="text-center"> JSON Docker Compose </h4> -->
+            <pre> <code id="code_yaml" class="language-yaml"></code></pre>
+          </div>
+        </div>
+      </uib-tab>
+      <uib-tab index="2" heading="Hack Tools">
         <div ng-include="'views/services.html'"> </div>
-    </uib-tab>
-  </uib-tabset>
-   <div ng-show="ctrl.exists" class="row">
-              <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
-                <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
-              </button> 
-              </p>
-    </div> 
+      </uib-tab>
+    </uib-tabset>
 
 
     <div class="row">
       <div class="col-sm-12">  
-
         <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
-
         </div>
       </div>
     </div>
@@ -114,12 +109,9 @@ $(document).ready(function() {
       <p class="col-sm-1 "><button class="btn btn-default" ng-click="clearLogs()">
         Clear Logs
       </button> 
-
       </p>
     </div>
     <!-- /. PAGE INNER  -->
-
-
 
     <h2 class="text-center" ><a  ng-click="isSolutionShowed = !isSolutionShowed" href="#"> Solution</a> </h2>
 
@@ -128,14 +120,6 @@ $(document).ready(function() {
          ng-bind-html="ctrl.tinymceHtmlSolution"
 
          ></div>
-      
-
   </div>
-
-    
-    
-
-  
-    
-    </div>              
-  </div>
+</div>              
+</div>

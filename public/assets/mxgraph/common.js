@@ -13,7 +13,52 @@ var Graph__NetworkElementLabel = {
   '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
 };
 var elementToEdit = '';
-var theGraph = "";
+var theGraph;
+
+function Graph__getElement(e) {
+  return theGraph.model.cells[e];
+}
+
+function getCellsByName(name) {
+  var cells = theGraph.model.cells;
+  return _.filter(cells, {name: name});
+}
+
+function graphRenameProperty(cells, oldName, newName) {
+  // Do nothing if the names are the same
+  if (oldName == newName) {
+    return cells;
+  }
+  // Check for the old property name to avoid a ReferenceError in strict mode.
+  if (cells.hasOwnProperty(oldName)) {
+    cells[newName] = cells[oldName];
+    delete cells[oldName];
+  }
+  return cells;
+};
+
+// Update the name of the cell
+function Graph__update(cell, newName, oldName) {
+  var label = cell.value;
+  var $html = $('<div />',{html:label});
+  // replace "Headline" with "whatever" => Doesn't work
+  $html.find('h5').html(newName);
+  var newValue = $html.html();
+  theGraph.model.setValue(cell, newValue)
+
+  // Update the cell id
+  cell.setId(newName);
+  var cells = theGraph.model.cells
+  // Rename cell in id
+  graphRenameProperty(cells, oldName, newName);
+  var cellWithOldName = getCellsByName(oldName);
+  _.each(cellWithOldName, function(e) {
+    e.name= newName;
+  });
+  // cells.remove(oldName);
+  // cells.put(newName, cell);
+}
+
 function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
   var port = graph.insertVertex(v1, null, value , x, y, width, height, style, relative);
   port.setConnectable(true);
@@ -133,7 +178,15 @@ function Graph__ElementCreate(graph, nameContainer, x, y) {
 // If error create html tag
 function Graph__isValidXML(canvasXML) {
   var doc = mxUtils.parseXml(canvasXML);
-  return doc.documentElement.tagName != "html";
+  // In some browser the error occurs in html tag
+  if (doc.documentElement.tagName == "html")  {
+    return false;
+    // In other browser the library returns an error inside activeElement tag
+  } else if (doc.activeElement.tagName == "parsererror") {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 function Graph__NetworkCreate(graph, nameNetwork, x, y) {
