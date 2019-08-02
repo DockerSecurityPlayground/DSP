@@ -1,9 +1,8 @@
 ﻿<div id="page-wrapper" >
-  <script src="assets/mxgraph/common.js"> </script>
-  <script src="assets/mxgraph/use_utils.js"> </script>
-  <script>
-$( document ).ready(function() {
-main(document.getElementById("graphContainer"));
+  <script defer src="assets/mxgraph/common.js"> </script>
+  <script defer src="assets/mxgraph/use_utils.js"> </script>
+  <script defer>
+function loadPage() {
 var appScope = angular.element(document.getElementById("page-wrapper")).scope()
 appScope.registerCallback(function(data) {
   var canvasXML = data.canvasJSON;
@@ -16,7 +15,12 @@ appScope.registerCallback(function(data) {
   }
 });
 appScope.init();
-});
+  var gid = document.getElementById("graphContainer")
+main(gid);
+}
+$(document).ready(function() {
+  loadPage();
+})
   </script>
   <div id="page-inner">
     <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->

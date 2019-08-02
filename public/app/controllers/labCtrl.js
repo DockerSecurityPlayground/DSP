@@ -190,6 +190,7 @@ $scope.init = function() {
         dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function(data) {
           $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
           $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
+          console.log("ONLOAD");
           onLoadCanvas(data)
           var yamlcode = angular.element('#code_yaml')
 
@@ -379,7 +380,7 @@ else if($scope.lab_action_form === 'editlab') {
 
 
 function goToCreateNetwork() {
- $location.url('/network/'+vm.lab.name + "?create=1");
+window.location.href = '/network/'+vm.lab.name+ "?create=1";
 // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&action=new'
 }
 
@@ -389,7 +390,7 @@ function goToImages() {
 
 function goToUseNetwork() {
 
-window.location.href='docker_graph_action.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&reponame='+vm.repoName
+window.location.href='/lab/use/'+vm.lab.name;
 
 }
 vm.goToEditNetwork = function goToEditNetwork() {

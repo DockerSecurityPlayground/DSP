@@ -41,24 +41,8 @@ function isAlreadyConnected(networkCell, elementCell) {
   return false;
 }
 
-function graphRenameProperty(cells, oldName, newName) {
-  // Do nothing if the names are the same
-  if (oldName == newName) {
-    return cells;
-  }
-  // Check for the old property name to avoid a ReferenceError in strict mode.
-  if (cells.hasOwnProperty(oldName)) {
-    cells[newName] = cells[oldName];
-    delete cells[oldName];
-  }
-  return cells;
-};
 
 
-function getCellsByName(name) {
-  var cells = theGraph.model.cells;
-  return _.filter(cells, {name: name});
-}
 
 mxCellRemove= mxGraphModel.prototype.remove;
 var MX__CanRemove = true;
@@ -93,9 +77,6 @@ function _setRemove(cell) {
   }
 }
 
-function Graph__getElement(e) {
-  return theGraph.model.cells[e];
-}
 
 
 function Graph__setRemoveHandler(canRemove) {
@@ -106,27 +87,6 @@ function Graph__setRemoveHandler(canRemove) {
   }
 }
 
-// Update the name of the cell
-function Graph__update(cell, newName, oldName) {
-  var label = cell.value;
-  var $html = $('<div />',{html:label});
-  // replace "Headline" with "whatever" => Doesn't work
-  $html.find('h5').html(newName);
-  var newValue = $html.html();
-  theGraph.model.setValue(cell, newValue)
-
-  // Update the cell id
-  cell.setId(newName);
-  var cells = theGraph.model.cells
-  // Rename cell in id
-  graphRenameProperty(cells, oldName, newName);
-  var cellWithOldName = getCellsByName(oldName);
-  _.each(cellWithOldName, function(e) {
-    e.name= newName;
-  });
-  // cells.remove(oldName);
-  // cells.put(newName, cell);
-}
 
 function graphEditCallback(oldName, newName) {
   var theCell = theGraph.getModel().getCell(oldName);
@@ -316,82 +276,6 @@ function addSidebarNetworkIcon(graph, sidebar) {
   ds.setGuidesEnabled(true);
 }
 
-function configureStylesheet(graph) {
-  var style = new Object();
-  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
-  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-  style[mxConstants.STYLE_GRADIENTCOLOR] = '#FFFFFF';
-  style[mxConstants.STYLE_FILLCOLOR] = '#FFFFFF';
-  style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
-  style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-  style[mxConstants.STYLE_ROUNDED] = true;
-  style[mxConstants.STYLE_OPACITY] = '80';
-  style[mxConstants.STYLE_FONTSIZE] = '10';
-  style[mxConstants.STYLE_FONTSTYLE] = 0;
-  style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-  style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-  graph.getStylesheet().putDefaultVertexStyle(style);
-
-  // NOTE: Alternative vertex style for non-HTML labels should be as
-  // follows. This repaces the above style for HTML labels.
-  /*var style = new Object();
-  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_LABEL;
-  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-  style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
-  style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-  style[mxConstants.STYLE_SPACING_TOP] = '56';
-  style[mxConstants.STYLE_GRADIENTCOLOR] = '#7d85df';
-  style[mxConstants.STYLE_STROKECOLOR] = '#5d65df';
-  style[mxConstants.STYLE_FILLCOLOR] = '#adc5ff';
-  style[mxConstants.STYLE_FONTCOLOR] = '#1d258f';
-  style[mxConstants.STYLE_FONTFAMILY] = 'Verdana';
-  style[mxConstants.STYLE_FONTSIZE] = '12';
-  style[mxConstants.STYLE_FONTSTYLE] = '1';
-  style[mxConstants.STYLE_ROUNDED] = '1';
-  style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-  style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-  style[mxConstants.STYLE_OPACITY] = '80';
-  graph.getStylesheet().putDefaultVertexStyle(style);*/
-
-  style = new Object();
-  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
-  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-  style[mxConstants.STYLE_FILLCOLOR] = '#FF9103';
-  style[mxConstants.STYLE_GRADIENTCOLOR] = '#F8C48B';
-  style[mxConstants.STYLE_STROKECOLOR] = '#E86A00';
-  style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-  style[mxConstants.STYLE_ROUNDED] = true;
-  style[mxConstants.STYLE_OPACITY] = '80';
-  style[mxConstants.STYLE_STARTSIZE] = '30';
-  style[mxConstants.STYLE_FONTSIZE] = '16';
-  style[mxConstants.STYLE_FONTSTYLE] = 1;
-  graph.getStylesheet().putCellStyle('group', style);
-
-  style = new Object();
-  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
-  style[mxConstants.STYLE_FONTCOLOR] = '#774400';
-  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-  style[mxConstants.STYLE_PERIMETER_SPACING] = '6';
-  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-  style[mxConstants.STYLE_FONTSIZE] = '10';
-  style[mxConstants.STYLE_FONTSTYLE] = 2;
-  style[mxConstants.STYLE_IMAGE_WIDTH] = '16';
-  style[mxConstants.STYLE_IMAGE_HEIGHT] = '16';
-  graph.getStylesheet().putCellStyle('port', style);
-
-  style = graph.getStylesheet().getDefaultEdgeStyle();
-  style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
-  style[mxConstants.STYLE_STROKEWIDTH] = '2';
-  style[mxConstants.STYLE_ROUNDED] = true;
-  style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
-};
 
 function addToolbarButton(editor, toolbar, action, label, image, isTransparent) {
   var button = document.createElement('button');

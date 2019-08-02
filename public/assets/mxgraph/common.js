@@ -6,13 +6,14 @@ var Model__NETWORK_BASENAME = "network_";
 var Model__AppScope = null;
 var NETWORK_ELEMENT_TYPE = "NetworkElement";
 var NETWORK_TYPE = 'Network';
+var theParent = null;
 var Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
   contentHTML : '<h5 id="toptitle" class="no-selection" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
   '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
 };
 var elementToEdit = '';
-var theGraph;
+var theGraph = "";
 function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, offsetY, relative = true) {
   var port = graph.insertVertex(v1, null, value , x, y, width, height, style, relative);
   port.setConnectable(true);
@@ -60,6 +61,46 @@ function Graph__addPorts(graph, v1, numPorts) {
       break;
   }
 }
+function graphRenameProperty(cells, oldName, newName) {
+  // Do nothing if the names are the same
+  if (oldName == newName) {
+    return cells;
+  }
+  // Check for the old property name to avoid a ReferenceError in strict mode.
+  if (cells.hasOwnProperty(oldName)) {
+    cells[newName] = cells[oldName];
+    delete cells[oldName];
+  }
+  return cells;
+};
+function getCellsByName(name) {
+  var cells = theGraph.model.cells;
+  return _.filter(cells, {name: name});
+}
+function Graph__getElement(e) {
+  return theGraph.model.cells[e];
+}
+// Update the name of the cell
+function Graph__update(cell, newName, oldName) {
+  var label = cell.value;
+  var $html = $('<div />',{html:label});
+  // replace "Headline" with "whatever" => Doesn't work
+  $html.find('h5').html(newName);
+  var newValue = $html.html();
+  theGraph.model.setValue(cell, newValue)
+
+  // Update the cell id
+  cell.setId(newName);
+  var cells = theGraph.model.cells
+  // Rename cell in id
+  graphRenameProperty(cells, oldName, newName);
+  var cellWithOldName = getCellsByName(oldName);
+  _.each(cellWithOldName, function(e) {
+    e.name= newName;
+  });
+  // cells.remove(oldName);
+  // cells.put(newName, cell);
+}
 function Graph__ElementCreate(graph, nameContainer, x, y) {
   var parent = graph.getDefaultParent();
   var model = graph.getModel();
@@ -97,6 +138,7 @@ function Graph__isValidXML(canvasXML) {
 
 function Graph__NetworkCreate(graph, nameNetwork, x, y) {
   var parent = graph.getDefaultParent();
+  console.log(parent);
   var model = graph.getModel();
   var v1 = null;
   model.beginUpdate();
@@ -105,11 +147,13 @@ function Graph__NetworkCreate(graph, nameNetwork, x, y) {
     // rather than the label markup, so use 'image=' + image for the style.
     // as follows: v1 = graph.insertVertex(parent, null, label,
     // pt.x, pt.y, 120, 120, 'image=' + image);
-    v1 = graph.insertVertex(parent, nameNetwork, {
+    //
+var ne = {
       type: NETWORK_TYPE,
       contentHTML : '<h5 class="no-selection">'+nameNetwork+'</h5>',
       name: nameNetwork
-    }, x, y, 120, 120, 'shape=cloud');
+    }
+    v1 = graph.insertVertex(parent, nameNetwork, ne, x, y, 120, 120, 'shape=cloud');
 
 
     v1.setConnectable(true);
@@ -137,10 +181,13 @@ function Graph__AddConnection(name1, name2, index) {
   }
 }
 function Graph__CreateGraphFromStructure(data) {
+  console.log("FROM STRUCTURE")
   var networkList = data.networkList;
   var containerListToDraw = data.clistToDraw
   var networkNames = networkList.map(a => a.name)
   var containerNames = containerListToDraw.map( c => c.name);
+  console.log(containerNames);
+  console.log(networkNames);
   // Create networks
   for (var i = 0; i < networkNames.length; i++) {
     Graph__NetworkCreate(theGraph, networkNames[i], 200, i*100);
@@ -159,3 +206,81 @@ function Graph__CreateGraphFromStructure(data) {
     })
   }
 }
+
+
+function configureStylesheet(graph) {
+  var style = new Object();
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
+  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+  style[mxConstants.STYLE_GRADIENTCOLOR] = '#FFFFFF';
+  style[mxConstants.STYLE_FILLCOLOR] = '#FFFFFF';
+  style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
+  style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+  style[mxConstants.STYLE_ROUNDED] = true;
+  style[mxConstants.STYLE_OPACITY] = '80';
+  style[mxConstants.STYLE_FONTSIZE] = '10';
+  style[mxConstants.STYLE_FONTSTYLE] = 0;
+  style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
+  style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+  graph.getStylesheet().putDefaultVertexStyle(style);
+
+  // NOTE: Alternative vertex style for non-HTML labels should be as
+  // follows. This repaces the above style for HTML labels.
+  /*var style = new Object();
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_LABEL;
+  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+  style[mxConstants.STYLE_SPACING_TOP] = '56';
+  style[mxConstants.STYLE_GRADIENTCOLOR] = '#7d85df';
+  style[mxConstants.STYLE_STROKECOLOR] = '#5d65df';
+  style[mxConstants.STYLE_FILLCOLOR] = '#adc5ff';
+  style[mxConstants.STYLE_FONTCOLOR] = '#1d258f';
+  style[mxConstants.STYLE_FONTFAMILY] = 'Verdana';
+  style[mxConstants.STYLE_FONTSIZE] = '12';
+  style[mxConstants.STYLE_FONTSTYLE] = '1';
+  style[mxConstants.STYLE_ROUNDED] = '1';
+  style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
+  style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+  style[mxConstants.STYLE_OPACITY] = '80';
+  graph.getStylesheet().putDefaultVertexStyle(style);*/
+
+  style = new Object();
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
+  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+  style[mxConstants.STYLE_FILLCOLOR] = '#FF9103';
+  style[mxConstants.STYLE_GRADIENTCOLOR] = '#F8C48B';
+  style[mxConstants.STYLE_STROKECOLOR] = '#E86A00';
+  style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+  style[mxConstants.STYLE_ROUNDED] = true;
+  style[mxConstants.STYLE_OPACITY] = '80';
+  style[mxConstants.STYLE_STARTSIZE] = '30';
+  style[mxConstants.STYLE_FONTSIZE] = '16';
+  style[mxConstants.STYLE_FONTSTYLE] = 1;
+  graph.getStylesheet().putCellStyle('group', style);
+
+  style = new Object();
+  style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
+  style[mxConstants.STYLE_FONTCOLOR] = '#774400';
+  style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+  style[mxConstants.STYLE_PERIMETER_SPACING] = '6';
+  style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+  style[mxConstants.STYLE_FONTSIZE] = '10';
+  style[mxConstants.STYLE_FONTSTYLE] = 2;
+  style[mxConstants.STYLE_IMAGE_WIDTH] = '16';
+  style[mxConstants.STYLE_IMAGE_HEIGHT] = '16';
+  graph.getStylesheet().putCellStyle('port', style);
+
+  style = graph.getStylesheet().getDefaultEdgeStyle();
+  style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
+  style[mxConstants.STYLE_STROKEWIDTH] = '2';
+  style[mxConstants.STYLE_ROUNDED] = true;
+  style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
+};

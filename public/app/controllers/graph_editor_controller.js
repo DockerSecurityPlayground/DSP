@@ -188,9 +188,9 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   };
 
   $scope.goBack = function() {
-    console.log("GOBACK");
     var urlToGo = '/lab/use/'+ AjaxService.config.name +'/'+ $scope.labName;
-    $location.url(urlToGo);
+window.location.href = urlToGo;
+    // $location.url(urlToGo);
   }
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
