@@ -670,7 +670,6 @@ function mxAddNetwork(graph, sidebar) {
 }
 
 function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
-  console.log("IN MXMAIN");
   // Checks if the browser is supported
   if (!mxClient.isBrowserSupported()) {
     // Displays an error message if the browser is not supported.

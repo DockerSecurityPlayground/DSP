@@ -1,56 +1,3 @@
-// function configureStylesheet(theGraph) {
-// var style = new Object();
-// style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
-// style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-// style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-// style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-// style[mxConstants.STYLE_GRADIENTCOLOR] = '#FFFFFF';
-// style[mxConstants.STYLE_FILLCOLOR] = '#FFFFFF';
-// style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
-// style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-// style[mxConstants.STYLE_ROUNDED] = true;
-// style[mxConstants.STYLE_OPACITY] = '80';
-// style[mxConstants.STYLE_FONTSIZE] = '10';
-// style[mxConstants.STYLE_FONTSTYLE] = 0;
-// style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-// style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-// theGraph.getStylesheet().putDefaultVertexStyle(style);
-
-// style = new Object();
-// style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
-// style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-// style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-// style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-// style[mxConstants.STYLE_FILLCOLOR] = '#FF9103';
-// style[mxConstants.STYLE_GRADIENTCOLOR] = '#F8C48B';
-// style[mxConstants.STYLE_STROKECOLOR] = '#E86A00';
-// style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-// style[mxConstants.STYLE_ROUNDED] = true;
-// style[mxConstants.STYLE_OPACITY] = '80';
-// style[mxConstants.STYLE_STARTSIZE] = '30';
-// style[mxConstants.STYLE_FONTSIZE] = '16';
-// style[mxConstants.STYLE_FONTSTYLE] = 1;
-// theGraph.getStylesheet().putCellStyle('group', style);
-
-// style = new Object();
-// style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
-// style[mxConstants.STYLE_FONTCOLOR] = '#774400';
-// style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-// style[mxConstants.STYLE_PERIMETER_SPACING] = '6';
-// style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-// style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-// style[mxConstants.STYLE_FONTSIZE] = '10';
-// style[mxConstants.STYLE_FONTSTYLE] = 2;
-// style[mxConstants.STYLE_IMAGE_WIDTH] = '16';
-// style[mxConstants.STYLE_IMAGE_HEIGHT] = '16';
-// theGraph.getStylesheet().putCellStyle('port', style);
-
-// style = theGraph.getStylesheet().getDefaultEdgeStyle();
-// style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
-// style[mxConstants.STYLE_STROKEWIDTH] = '2';
-// style[mxConstants.STYLE_ROUNDED] = true;
-// style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
-// };
 function main(container) {
   // Checks if the browser is supported
   if (!mxClient.isBrowserSupported()) {
@@ -74,6 +21,7 @@ function main(container) {
     // Centers the port icon on the target port
     theGraph.connectionHandler.targetConnectImage = true;
     theGraph.setEnabled(false);
+    theGraph.setDropEnabled(false);
 
 
     // Does not allow dangling edges
@@ -136,20 +84,21 @@ function main(container) {
       return !this.isSwimlane(cell);
     }
 
+  configureStylesheet(theGraph)
+
   // Override the insertVertex in order to use toDraw property
   var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
-  if (mxGraphInsertVertex.name != "myInsertVertex")
-    mxGraph.prototype.insertVertex = function myInsertVertex(parent, id, value, x, y, width, height, style, relative) {
-      var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
-      // Add type in cell
-      v1.type = value.type;
-      v1.name = value.name;
-      return v1;
-    }
-
   // Gets the default parent for inserting new cells. This
   // is normally the first child of the root (ie. layer 0).
   var parent = theGraph.getDefaultParent();
+  if (mxGraphInsertVertex.name != "myInsertVertex")
+  mxGraph.prototype.insertVertex = function myInsertVertex(parent, id, value, x, y, width, height, style, relative) {
+    var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
+    // Add type in cell
+    v1.type = value.type;
+    v1.name = value.name;
+    return v1;
+  }
   }
 
 }
