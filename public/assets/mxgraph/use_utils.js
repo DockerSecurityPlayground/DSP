@@ -174,6 +174,17 @@ else {
 
   configureStylesheet(theGraph);
 
+  // Override the insertVertex in order to use toDraw property
+  var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
+  if (mxGraphInsertVertex.name != "myInsertVertex")
+    mxGraph.prototype.insertVertex = function myInsertVertex(parent, id, value, x, y, width, height, style, relative) {
+      var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
+      // Add type in cell
+      v1.type = value.type;
+      v1.name = value.name;
+      return v1;
+    }
+
   // Gets the default parent for inserting new cells. This
   // is normally the first child of the root (ie. layer 0).
   var parent = theGraph.getDefaultParent();
