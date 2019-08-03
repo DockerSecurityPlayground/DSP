@@ -388,7 +388,7 @@ function mxInitGraph(graph, appScope) {
 
   // Override the insertVertex in order to use toDraw property
   var mxGraphInsertVertex = mxGraph.prototype.insertVertex;
-  mxGraph.prototype.insertVertex = function(parent, id, value, x, y, width, height, style, relative) {
+  mxGraph.prototype.insertVertex = function myInsertVertex(parent, id, value, x, y, width, height, style, relative) {
     var v1 =  mxGraphInsertVertex.apply(this, [parent, id, value.contentHTML, x, y, width, height, style, relative]);
     // Add type in cell
     v1.type = value.type;

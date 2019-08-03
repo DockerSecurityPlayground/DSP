@@ -135,7 +135,7 @@ app.get('/dsp_v1/services', serviceHandler.getServices);
 app.post('/dsp_v1/services/:nameservice', serviceHandler.runService);
 app.put('/dsp_v1/services/start/:nameservice', serviceHandler.startService);
 app.put('/dsp_v1/services/stop/:nameservice', serviceHandler.stopService);
-app.put('/dsp_v1/services/defaultnetwork/:nameservice', serviceHandler.setAsDefault);
+app.post('/dsp_v1/services/defaultnetwork/:nameservice', serviceHandler.setAsDefault);
 app.delete('/dsp_v1/services/:nameservice', serviceHandler.removeService);
 
 

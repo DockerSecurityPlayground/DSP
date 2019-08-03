@@ -182,7 +182,7 @@ function Graph__isValidXML(canvasXML) {
   if (doc.documentElement.tagName == "html")  {
     return false;
     // In other browser the library returns an error inside activeElement tag
-  } else if (doc.activeElement.tagName == "parsererror") {
+  } else if (doc.documentElement.tagName == "parsererror") {
     return false;
   } else {
     return true;

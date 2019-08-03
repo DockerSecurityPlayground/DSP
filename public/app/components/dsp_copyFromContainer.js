@@ -12,6 +12,7 @@ var dsp_copyFromContainer =
       $ctrl.fileDownload = ""
 
       $ctrl.$onInit = function () {
+        console.log("INIZIALIZAT");
         $ctrl.lab = $ctrl.resolve.lab;
       };
 

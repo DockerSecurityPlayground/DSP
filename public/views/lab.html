@@ -44,6 +44,7 @@
         </div>
         <h4 id="description_lab">{{ctrl.lab.description}}</h4>
       </div>
+
       <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
         <!-- Panel edit options -->
         <div class="row lateral_options">
@@ -66,6 +67,19 @@
     <div ng-show="ctrl.exists" class="row">
       <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
         <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+      </button> 
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">  
+        <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
+        </div>
+      </div>
+    </div>
+    <div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
+    <div class="row">
+      <p class="col-sm-1 col-sm-offset-9"><button class="btn btn-default" ng-click="clearLogs()">
+        Clear Logs
       </button> 
       </p>
     </div>
@@ -98,19 +112,7 @@
     </uib-tabset>
 
 
-    <div class="row">
-      <div class="col-sm-12">  
-        <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
-        </div>
-      </div>
-    </div>
-    <div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
-    <div class="row">
-      <p class="col-sm-1 "><button class="btn btn-default" ng-click="clearLogs()">
-        Clear Logs
-      </button> 
-      </p>
-    </div>
+
     <!-- /. PAGE INNER  -->
 
     <h2 class="text-center" ><a  ng-click="isSolutionShowed = !isSolutionShowed" href="#"> Solution</a> </h2>

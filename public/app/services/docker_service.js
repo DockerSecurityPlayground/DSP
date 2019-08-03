@@ -224,7 +224,9 @@ var api = '/dsp_v1/docker_network/' ;
         });
     },
     serviceDefaultNetwork(containerName, networkName) {
-      return $http.put(dsp_running_services+"defaultnetwork/"+containerName, {
+      console.log(networkName);
+      console.log("NETWORKNAME");
+      return $http.post(dsp_running_services+"defaultnetwork/"+containerName, {
         networkname: networkName
       });
     },
