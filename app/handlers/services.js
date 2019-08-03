@@ -305,7 +305,6 @@ function setAsDefault(req, res) {
   log.info("Set Default Network");
   let networkName;
   let nameService;
-  console.log(req.body);
   async.waterfall([
     (cb) => Checker.checkParams(req.body, ['networkname'], cb),
     (cb) => Checker.checkParams(req.params, ['nameservice'], cb),

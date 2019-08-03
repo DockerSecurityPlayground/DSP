@@ -180,6 +180,9 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
               // Repo name
               vm.repoName = rname
               vm.lab.name= labToUse.name;
+              if (vm.isRunning) {
+                _initNetworkList();
+              }
               // Check the state
               if(labToUse.state === 'NO_NETWORK') {
                 vm.buttonAction = buttonCreateProto
@@ -577,6 +580,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
           //labState to play proto
           $scope.labState = playProto
           $scope.action = $scope.startLab
+          _initNetworkList()
         }
         else if(data.status === 'error') {
           Notification('Some error in docker-compose down command', 'error');

@@ -7,7 +7,8 @@ $( document ).ready(function() {
 
 </script>
 
-<div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl">
+<!-- <div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl"> -->
+<div id="serviceComponent" ng-controller="DockerToolsCtrl">
   <!-- <br> -->
   <!-- currentContainer : {{currentContainer.name}} -->
   <!-- <br> -->
@@ -19,7 +20,7 @@ $( document ).ready(function() {
       <thead>
         <tr>
           <th scope="col">Main </th>
-          <!-- <th scope="col">Image </th> -->
+          <th scope="col">Image </th>
           <th scope="col">Ports (container port => host port) </th>
           <th scope="col">Status</th>
           <th scope="col">Networks (click on name to change default network routing) </th>
@@ -42,8 +43,7 @@ $( document ).ready(function() {
           <td> 
             <form>
               <div ng-repeat="n in networkList">
-                <!-- <i ng-if="n.isDefault"> {{n.name}} </i> -->
-
+                <i> {{n.name}} </i>
                 <button type="button" class="btn btn-sm btn-primary" ng-if="!containerHasNetwork(c,n)" ng-click="attachNetwork(c,n)">   Attach</button>
                 <button type="button" class="btn btn-sm btn-warning" ng-if="containerHasNetwork(c,n)" ng-click="detachNetwork(c,n)">   Detach</button>
               </div>

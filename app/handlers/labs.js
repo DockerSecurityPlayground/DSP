@@ -366,8 +366,6 @@ function importLab(req, res) {
       LabStates.newState(configJSON.name, req.body.labName, 'STOPPED', cb);
     }
   ], (err) => {
-    console.log("ERROR");
-    console.log(err);
     appUtils.response('IMPORT LAB', res, err);
   });
 }
