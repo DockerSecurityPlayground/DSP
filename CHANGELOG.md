@@ -13,14 +13,16 @@ Versioning of Docker Security Playground
  New terminal on a new tab in visual editor
 
 
-## [3.1.0] - 2019-04-01
-### Added
+## [3.0.0] - 2019 - 08 -03
+### Added  
+New Graph editor created  
 Alignment of toolbar
 ### Changed
-Integrated the lab graph inside the single page application (no graph_editor / graph_action pages)
+Integrated the lab graph inside the single page application (no graph_editor / graph_action pages)  
+Refactored HackTools 
+### Removed   
+Old graph pages 
 
-## [3.0.0] - 2019 - 03 -27
-New Graph editor created
 
 
 ## [2.3] - 2019-03-12
