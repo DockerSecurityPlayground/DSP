@@ -16,7 +16,7 @@ labs**. For more information look at the [Labs Managment]() page.
 -  Graphic Editor of docker-compose  
 -  Docker Image Management  
 -  GIT Integration  
--  Default Network Labs  
+-  DSP Repository with a set of network sescurity scenarios  
 
 ## How can I **share my labs with the world** ?
    
@@ -124,7 +124,10 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 - [![Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.toolswatch.org/2018/05/black-hat-arsenal-usa-2018-the-w0w-lineup/)  
 - [DSP Vagrant Box used in Blackhat Session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
 - [Blackhat scenario in Gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git) 
-
+## Relevant DSP Repositories  
+- https://github.com/giper45/DSP_Projects.git : Official DSP Repository  
+- https://github.com/giper45/DSP_Repo.git  : DSP Template to create another repository: fork it to start creating your personal remote environment  
+- https://github.com/NS-unina/DSP_Repo.git  : Repository created for Network Security Course of Simon Pietro Romano in University of the Study in Naples, Federico II
 ## Contributors   
 
 
