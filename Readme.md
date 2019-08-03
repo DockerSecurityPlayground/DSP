@@ -10,8 +10,31 @@ rules, and security issues by installing DSP in your PC.
 -  **Manage a set of docker-compose project** . Main goal of DSP is to learn 
 in penetration testing and network security, but its flexibility allows you the 
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
-labs**. For more information look at the [Labs Managment]() page. 
+labs**. For more information look at the [Labs Managment]() page.   
 
+## DSP Features  
+-  Graphic Editor of docker-compose  
+-  Docker Image Management  
+-  GIT Integration  
+-  Default Network Labs  
+
+## How can I **share my labs with the world** ?
+   
+During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
+DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
+So, the easiest way to share labs is the following:    
+
+1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
+2. During the installation set github directory param to your forked repository.     
+3.  Now create your labs and share it!   
+
+It is important that all images that you use should be available to other users, so:   
+- You can publish on docker hub so other users can pull your images in order to use your labs.   
+- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
+
+If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
+
+In DSP you can manage multiple user repositories (Repositories tab) 
 ## Prerequisites
 * Nodejs (v 7 or later)
 * git
@@ -60,24 +83,7 @@ Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygrou
 
 
  
-## Q&A  
-- How can I **share my labs with the world** ?
-   
-During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
-DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
-So, the easiest way to share labs is the following:    
 
-1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
-2. During the installation set github directory param to your forked repository.     
-3.  Now create your labs and share it!   
-
-It is important that all images that you use should be available to other users, so:   
-- You can publish on docker hub so other users can pull your images in order to use your labs.   
-- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
-
-If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
-
-In DSP you can manage multiple user repositories (Repositories tab) 
 ## Error Debug
 
 
