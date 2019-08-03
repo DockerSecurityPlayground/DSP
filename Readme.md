@@ -1,5 +1,5 @@
 # DockerSecurityPlayground
-![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/dsp_logo.png)
+![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/DSP_Example.png)
 
 
 
