@@ -1,4 +1,4 @@
-DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, AjaxService, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
+DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, AjaxService, $uibModal, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
   console.log("=== INIT GRAPH EDITOR ===");
 
   $scope.labName= '';
@@ -1185,4 +1185,22 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
         item.replaceChild(closeNode, item.childNodes[1]) ;
     });
   }
+  $scope.addCustomImage = function (nameContainer, dc="true") {
+    var modalInstance = $uibModal.open({
+      animation: true,
+      component: 'dockerfileComponent',
+      resolve: {
+        lab: function () {
+          return  {
+            namerepo : $scope.nameRepo,
+            namelab : $scope.labName,
+            namecontainer: nameContainer,
+            dockercompose : dc
+          };
+        }
+      }
+    });
+  }
+
+
 }

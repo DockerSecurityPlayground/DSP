@@ -235,9 +235,4 @@ $scope.removeOptionalPort = function removeOptionalPort($index) {
   if($scope.optionalPorts.length === 0)
     $scope.showPorts = false;
 }
-
-
-
-
-
 }

@@ -5,6 +5,7 @@ const appUtils = require('../util/AppUtils');
 const path = require('path');
 const c = require('../../config/local.config.json').config;
 const repoData = require('../data/repos.js');
+const dockerActions = require('./ws_docker_actions.js')
 
 const JoiAppConditions = Checker.JoiAppConditions;
 const AppConditions = Checker.AppConditions;
@@ -35,7 +36,12 @@ function installation(config, callback, notifyCallback) {
       log.info('Create dsp directories ');
       projectInit.createDSP(path.basename(appUtils.path_userconfig()), cb, notifyCallback);
     },
+    // Download a single docker image
     (cb) => {
+      log.info('Download single docker image');
+      dockerActions.downloadImages({name: 'dockersecplayground/alpine', tag: 'latest'}, null, cb, notifyCallback)
+    },
+    (data, cb) => {
         const repos = c.repos;
         repoData.create(repos, cb);
     },
