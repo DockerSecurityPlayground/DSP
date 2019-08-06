@@ -47,7 +47,13 @@ Install prerequisites and run:
 
 ```
 npm install
-```
+```   
+### Troubleshooting during installation   
+If you have error regarding **node-pty** module, try to:   
+- Install build-essentials : (In Ubuntu: apt install -y build-essentials)  
+- Use nodejs LTS (note-pty has some isseus, as shown [here](https://github.com/microsoft/node-pty/issues/319) 
+
+
 
 ## Update the application: 
 When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
