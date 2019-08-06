@@ -140,6 +140,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                     var areInstalled = data.data.data.areInstalled;
                     if (!areInstalled) {
                       console.log("NOT INSTALLED");
+                      $scope.noImages = true;
                     } else {
                       dockerImagesService.get(function(images) {
                         $scope.imageList = images
