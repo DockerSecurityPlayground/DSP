@@ -23,13 +23,13 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
         $scope.networkList = response.data.data;
       }, function errorCallback(error) {
         Notification({message:"Server error: "+error}, 'error');
-    });
+      });
   }
   function openInNewTab(url) {
-        var a = document.createElement("a");
-        a.target = "_blank";
-        a.href = url;
-        a.click();
+    var a = document.createElement("a");
+    a.target = "_blank";
+    a.href = url;
+    a.click();
   }
   $scope.warningMessage = '';
   //Proto actions
@@ -38,9 +38,9 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   const stopProto = { actionLabel:"Stop lab",  actionButton:"btn btn-danger", actionClass:"glyphicon glyphicon-stop", statusLabel: "Lab is active", state:'active', statusClass:"alert alert-success text-center"}
   function updateNotify(data) {
     if(!$scope.$$phase) {
-        $scope.$apply(function() {
-          $scope.notify+= data.message+"<br>";
-        });
+      $scope.$apply(function() {
+        $scope.notify+= data.message+"<br>";
+      });
       //$digest or $apply
     }
     else $scope.notify += data.message;
@@ -59,29 +59,29 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
     SocketService.manage(JSON.stringify({
       action : 'docker_up',
       params : {
-      namerepo : $scope.nameRepo,
-      namelab : $scope.labName
+        namerepo : $scope.nameRepo,
+        namelab : $scope.labName
       }
     }), function(event) {
-    var data = JSON.parse(event.data);
-    if(data.status === 'success')  {
-      console.log("Success")
-      //Set state on stop
-      $scope.labState = stopProto
-      $scope.action = $scope.stopLab
-      initNetworkList();
-      //End load action
-      completeLoad()
-    }
-    else if(data.status === 'error') {
-            Notification('Some error in docker-compose up command', 'error');
-            console.log(data)
-            $scope.responseError = $scope.responseErrorHeader + data.message;
-            $scope.labState = playProto
-            $scope.action = $scope.startLab
+      var data = JSON.parse(event.data);
+      if(data.status === 'success')  {
+        console.log("Success")
+        //Set state on stop
+        $scope.labState = stopProto
+        $scope.action = $scope.stopLab
+        initNetworkList();
+        //End load action
+        completeLoad()
       }
-    else updateNotify(data);
-  });
+      else if(data.status === 'error') {
+        Notification('Some error in docker-compose up command', 'error');
+        console.log(data)
+        $scope.responseError = $scope.responseErrorHeader + data.message;
+        $scope.labState = playProto
+        $scope.action = $scope.startLab
+      }
+      else updateNotify(data);
+    });
 
 
 
@@ -89,72 +89,72 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
   } //End startlab
 
   $scope.copyFromContainer = function (nameContainer, dc="true") {
-var modalInstance = $uibModal.open({
-        animation: true,
-        component: 'copyFromContainerComponent',
-        resolve: {
-          lab: function () {
+    var modalInstance = $uibModal.open({
+      animation: true,
+      component: 'copyFromContainerComponent',
+      resolve: {
+        lab: function () {
           return  {
             namerepo : $scope.nameRepo,
             namelab : $scope.labName,
             namecontainer: nameContainer,
             dockercompose : dc
-            };
-          }
+          };
         }
+      }
     });
 
     modalInstance.result.then(function () {
-      console.log("responso modalInstance")
-                }, function () {
-                        $log.info('modal-component dismissed at: ' + new Date());
-                            });
+      console.log("respone modalInstance")
+    }, function () {
+      $log.info('modal-component dismissed at: ' + new Date());
+    });
   }
 
-$scope.copyInContainer = function (nameContainer, dc="false") {
-  var modalInstance = $uibModal.open({
-        animation: true,
-        component: 'copyInContainerComponent',
-        resolve: {
-          lab: function () {
+  $scope.copyInContainer = function (nameContainer, dc="false") {
+    var modalInstance = $uibModal.open({
+      animation: true,
+      component: 'copyInContainerComponent',
+      resolve: {
+        lab: function () {
           return  {
             namerepo : $scope.nameRepo,
             namelab : $scope.labName,
             namecontainer: nameContainer,
             dockercompose : dc
-            };
-          }
+          };
         }
+      }
     });
 
     modalInstance.result.then(function () {
       console.log("responso modalInstance")
-                }, function () {
-                        $log.info('modal-component dismissed at: ' + new Date());
-                            });
+    }, function () {
+      $log.info('modal-component dismissed at: ' + new Date());
+    });
   }
   // Container go to shell
   $scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
     console.log(nameContainer)
     console.log(dc)
-     $http.post('/dsp_v1/dockershell', {
-        namerepo : $scope.nameRepo,
-        namelab : $scope.labName,
-        dockername: nameContainer,
-        dockercompose : dc
-     })
-    .then(
-            function success(response) {
-              console.log("SUCCESS");
-              var windowReference = window.open();
-              windowReference.location = "docker_socket.html";
-             // window.open('docker_socket.html', '_blank');
-            },
-            function error(err) {
-              // Lab running error
-              Notification({message:"Server error: "+err.data.message}, 'error');
-            });
-    }
+    $http.post('/dsp_v1/dockershell', {
+      namerepo : $scope.nameRepo,
+      namelab : $scope.labName,
+      dockername: nameContainer,
+      dockercompose : dc
+    })
+      .then(
+        function success(response) {
+          console.log("SUCCESS");
+          var windowReference = window.open();
+          windowReference.location = "docker_socket.html";
+          // window.open('docker_socket.html', '_blank');
+        },
+        function error(err) {
+          // Lab running error
+          Notification({message:"Server error: "+err.data.message}, 'error');
+        });
+  }
 
   //Stop the lab
   $scope.stopLab = function stopLab() {
@@ -173,24 +173,24 @@ $scope.copyInContainer = function (nameContainer, dc="false") {
         namelab : $scope.labName
       }
     }),
-    function(event) {
-      var data = JSON.parse(event.data);
-      if(data.status === 'success')  {
-        console.log("Success")
-        console.log($scope.listServices);
-        dockerAPIService.detachAllServices();
-        //Complete spinner
-        completeLoad()
-        //labState to play proto
-        $scope.labState = playProto
-        $scope.action = $scope.startLab
-      }
-      else if(data.status === 'error') {
-              Notification('Some error in docker-compose down command', 'error');
-        //	$scope.labState = playProto
-        //	$scope.action = $scope.startLab
-      }
-      else updateNotify(data);
+      function(event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          console.log("Success")
+          console.log($scope.listServices);
+          dockerAPIService.detachAllServices();
+          //Complete spinner
+          completeLoad()
+          //labState to play proto
+          $scope.labState = playProto
+          $scope.action = $scope.startLab
+        }
+        else if(data.status === 'error') {
+          Notification('Some error in docker-compose down command', 'error');
+          //	$scope.labState = playProto
+          //	$scope.action = $scope.startLab
+        }
+        else updateNotify(data);
       });
   }
 
@@ -214,30 +214,30 @@ $scope.copyInContainer = function (nameContainer, dc="false") {
 
 
 
-//   $window.onbeforeunload = function(evt) {
-//     if ($scope.labState.state !== 'inactive') {
-//       $scope.stopLab();
-//     }
-//   };
-//
+  //   $window.onbeforeunload = function(evt) {
+  //     if ($scope.labState.state !== 'inactive') {
+  //       $scope.stopLab();
+  //     }
+  //   };
+  //
   $scope.goToImages = function goToImages() {
-     if($scope.labState.state === 'loading') {
-       Notification('Pls wait the end of operation', 'warning');
-     }
-      // Only if it's been defined
-       else {
-         window.location.href='/images';
-      }
+    if($scope.labState.state === 'loading') {
+      Notification('Pls wait the end of operation', 'warning');
+    }
+    // Only if it's been defined
+    else {
+      window.location.href='/images';
+    }
   }
   $scope.exitLab = function exitLab() { 
-     if($scope.labState.state === 'loading') {
-       Notification('Pls wait the end of operation', 'warning');
-     }
-      // Only if it's been defined
-       else {
-         window.location.href='/lab/use/'+$scope.nameRepo+'/'+$scope.labName
-      }
-  }
+if($scope.labState.state === 'loading') {
+  Notification('Pls wait the end of operation', 'warning');
+}
+// Only if it's been defined
+else {
+  window.location.href='/lab/use/'+$scope.nameRepo+'/'+$scope.labName
+}
+}
 
 
 /** LOAD INFO ABOUT LAB **/
@@ -250,134 +250,134 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
     $scope.labInfos.solution = CleanerService.parse($scope.labInfos.solution)
     $scope.tinymceSolution = $sce.trustAsHtml($scope.labInfos.solution)
     $scope.tinymceGoal = $sce.trustAsHtml($scope.labInfos.goal)
-    },
+  },
     function errorCallback(response) {
-    console.log("Error")
-  })
+      console.log("Error")
+    })
 
 
 
-  /** GRAPH INFOS **/
-  var gh = GraphHandler()
-  //Called when an element is called
-  var graphOkCallback = function graphErrorCallback(currentToDraw) {
+/** GRAPH INFOS **/
+var gh = GraphHandler()
+//Called when an element is called
+var graphOkCallback = function graphErrorCallback(currentToDraw) {
 
-    containerManager.updateWhenToDraw(currentToDraw)
-    console.log(JSON.stringify($scope.containerListToDraw))
-    //Delete current container drawer element , it cannot be more used
-    gh.setCurrent(null)
-    $scope.containerToDraw = null
-  }
+  containerManager.updateWhenToDraw(currentToDraw)
+  console.log(JSON.stringify($scope.containerListToDraw))
+  //Delete current container drawer element , it cannot be more used
+  gh.setCurrent(null)
+  $scope.containerToDraw = null
+}
 
-  var graphErrorCallback = function graphErrorCallback(message) {
-    $scope.$apply(canvasClick())
-  }
+var graphErrorCallback = function graphErrorCallback(message) {
+  $scope.$apply(canvasClick())
+}
 
-  gh.registerErrorCallback(graphErrorCallback)
-  gh.registerOkCallback(graphOkCallback)
-  gh.canDrag(false)
-  gh.setEditMode()
+gh.registerErrorCallback(graphErrorCallback)
+gh.registerOkCallback(graphOkCallback)
+gh.canDrag(false)
+gh.setEditMode()
 
-  /* DODCKER API INIT  : load docker images */
-  dockerAPIService.getDockerImages()
-    .then(function successCallback(response) {
-      var imageList = response.data.data
-      $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
-      console.log(imageList)
-      $scope.imageList = imageList
+/* DODCKER API INIT  : load docker images */
+dockerAPIService.getDockerImages()
+  .then(function successCallback(response) {
+    var imageList = response.data.data
+    $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
+    console.log(imageList)
+    $scope.imageList = imageList
 
 
-      //When imageList it's loded LOAD LAB (network.json)
-      dockerAPIService.useLab($scope.nameRepo, $scope.labName, false, function(data) {
-        //Current labState : if stopped play actions else stop actions
-        $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
-        $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
-        // If is empty clistToDraw set warning
-        if(_.isEmpty(data.clistToDraw))
-          $scope.warningMessage = warningMessageHeader+ networkEmptyMessage;
+    //When imageList it's loded LOAD LAB (network.json)
+    dockerAPIService.useLab($scope.nameRepo, $scope.labName, false, function(data) {
+      //Current labState : if stopped play actions else stop actions
+      $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
+      $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
+      // If is empty clistToDraw set warning
+      if(_.isEmpty(data.clistToDraw))
+        $scope.warningMessage = warningMessageHeader+ networkEmptyMessage;
 
-        $scope.listContainers = data.clistToDraw;
-        var canvasJSON = data.canvasJSON;
-        gh.loadGraphicJSON(canvasJSON)
-        containerManager.loadContainers(data, {imageList : $scope.imageList})
+      $scope.listContainers = data.clistToDraw;
+      var canvasJSON = data.canvasJSON;
+      gh.loadGraphicJSON(canvasJSON)
+      containerManager.loadContainers(data, {imageList : $scope.imageList})
 
-        // Load yamlfile
-        var yamlcode = angular.element('#code_yaml')
+      // Load yamlfile
+      var yamlcode = angular.element('#code_yaml')
 
-        yamlcode.text(data.yamlfile)
-        Prism.highlightAll();
-        $scope.yamlfile = data.yamlfile;
-        //console.log(NetworkManagerService)
-        //  if(data.networkList)
-        //  NetworkManagerService.setNetworkList(data.networkList)
-        //$scope.networkList =  NetworkManagerService.getNetworks()
+      yamlcode.text(data.yamlfile)
+      Prism.highlightAll();
+      $scope.yamlfile = data.yamlfile;
+      //console.log(NetworkManagerService)
+      //  if(data.networkList)
+      //  NetworkManagerService.setNetworkList(data.networkList)
+      //$scope.networkList =  NetworkManagerService.getNetworks()
 
-        // Init Network List if the lab is running
-        if(data.state === 'RUNNING') {
-          initNetworkList();
-        }
-      });
+      // Init Network List if the lab is running
+      if(data.state === 'RUNNING') {
+        initNetworkList();
+      }
+    });
 
-    },function errorCallback(response) {})
+  },function errorCallback(response) {})
 
-    $scope.clearLogs = function() {
-      $scope.notify = "";
-      $scope.responseError = "";
-  }
+$scope.clearLogs = function() {
+  $scope.notify = "";
+  $scope.responseError = "";
+}
 
-  /************************** NETWORK INFO  **********************/
-  //Current network view
+/************************** NETWORK INFO  **********************/
+//Current network view
 
-  $scope.n = {
-    name : "", subnet:"192.168.1.1/24", color:"black",
-    more_validation : "###"
-  };
+$scope.n = {
+  name : "", subnet:"192.168.1.1/24", color:"black",
+  more_validation : "###"
+};
 
-  $scope.subnet = {
-    first:"192",
-    two:"168",
-    three:"1",
-    four:"1"
-  };
+$scope.subnet = {
+  first:"192",
+  two:"168",
+  three:"1",
+  four:"1"
+};
 /* Array of
-*
-*	var networkPrototype = {
-*		name : "" ,
-*		subnet : "",
-*		color : "black"
-*	},
-*
-*
-*/
+ *
+ *	var networkPrototype = {
+ *		name : "" ,
+ *		subnet : "",
+ *		color : "black"
+ *	},
+ *
+ *
+ */
 
 
 
 
-  /********************* CONTAINER  ********************/
-  //This is the container in the form used to add new container templates
+/********************* CONTAINER  ********************/
+//This is the container in the form used to add new container templates
 
-  //Load image list
-  $scope.currentContainer = containerManager.currentContainer
-  //The list of possible contaier choices to draw
-  $scope.containerListNotToDraw =  containerManager.containerListNotToDraw
-  //The list already created
-  $scope.containerListToDraw = containerManager.containerListToDraw
-  //This is the container to draw
-  $scope.containerToDraw = containerManager.containerToDraw
+//Load image list
+$scope.currentContainer = containerManager.currentContainer
+//The list of possible contaier choices to draw
+$scope.containerListNotToDraw =  containerManager.containerListNotToDraw
+//The list already created
+$scope.containerListToDraw = containerManager.containerListToDraw
+//This is the container to draw
+$scope.containerToDraw = containerManager.containerToDraw
 
-  $scope.editContainerName = ''
+$scope.editContainerName = ''
 
-  function startLoad() {
-    cfpLoadingBar.start();
-  };
+function startLoad() {
+  cfpLoadingBar.start();
+};
 
-  function completeLoad() {
-    cfpLoadingBar.complete();
-  }
+function completeLoad() {
+  cfpLoadingBar.complete();
+}
 
 
-  function canvasClick() {
-  }
+function canvasClick() {
+}
 /** END MENU COMMAND ACTIONS HANDLING ****/
 
 

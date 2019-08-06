@@ -65,6 +65,7 @@
     <script src="app/components/dsp_changeGithub.js"> </script>
     <script src="app/components/dsp_copyFromContainer.js"> </script>
     <script src="app/components/dsp_copyInContainer.js"> </script>
+    <script src="app/components/dsp_dockerfileComponent.js"> </script>
 
 
     <!--CUSTOMS ANGULAR COMPONENTS --> 
@@ -188,6 +189,7 @@ angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loa
         .component('changeGithubComponent', dsp_changeGithub)  
         .component('copyFromContainerComponent', dsp_copyFromContainer)  
         .component('copyInContainerComponent', dsp_copyInContainer)  
+        .component('dockerfileComponent', dsp_dockerfileComponent)  
         .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) { 
           NotificationProvider.setOptions({
             delay: 3500,
