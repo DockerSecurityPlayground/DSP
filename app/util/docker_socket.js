@@ -45,7 +45,7 @@ exports.init = function init(httpserv) {
         term.on('exit', function(code) {
             log.info((new Date()) + " PID=" + term.pid + " ENDED");
           //docker_graph_action.html?nameRepo=giper&namelab=pppp&reponame=giper
-            socket.emit('exit', `docker_graph_action.html?reponame=${dockerShell.nameRepo}&namelab=${dockerShell.labName}`)
+socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`)
         });
         socket.on('resize', function(data) {
             term.resize(data.col, data.row);
