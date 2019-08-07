@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <title>Docker Security Playground </title>
     <!-- <script type="text/javascript"> -->
-      <!-- mxBasePath = 'assets/mxgraph/'; -->
+<!-- mxBasePath = 'assets/mxgraph/'; -->
 <!-- </script> -->
 
 
@@ -13,17 +13,21 @@
 
     <base href="/">
     <script async type="text/javascript">
-      mxBasePath = 'assets/mxgraph/';
+mxBasePath = 'assets/mxgraph/';
     </script>
     <script type="text/javascript" src="assets/js/mxClient.js"></script>
     <script type="text/javascript" src="assets/js/js-yaml.js"></script>
     <!-- JS Libraries --> 
     <script src="assets/js/underscore-min.js"> </script>
+    <script src="assets/ace/ace.js"> </script>
     <!-- -->
     <!-- ANGULAR DEPENDENCIES --> 
     <script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
     <script src="assets/js/jquery-min.js"> </script>
-    <script src="assets/js/angular.min.js"></script>
+    <!-- <script src="assets/js/angular.min.js"></script> -->
+     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <script src="assets/ace/ui-ace.js"> </script>
     <script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
     <script src="assets/js/prism.js"></script>
 
@@ -64,6 +68,7 @@
     <script src="app/components/dsp_deleteConfirm.js"> </script>
     <script src="app/components/dsp_changeGithub.js"> </script>
     <script src="app/components/dsp_copyFromContainer.js"> </script>
+    <script src="app/components/dsp_dockerfileComponent.js"> </script>
     <script src="app/components/dsp_copyInContainer.js"> </script>
 
 
@@ -107,154 +112,176 @@
 
 
     <script>
-      var underscore = angular.module('underscore', []);
+var underscore = angular.module('underscore', []);
 underscore.factory('_', function() {
-  return window._; //Underscore must already be loaded on the page
+return window._; //Underscore must already be loaded on the page
 });
 //ANGULAR COMPONENT REGISTRATION 
-angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache'] )
-   .directive('fileModel', ['$parse', function ($parse) {
-            return {
-               restrict: 'A',
-               link: function(scope, element, attrs) {
-                  var model = $parse(attrs.fileModel);
-                  var modelSetter = model.assign;
-                  
-                  element.bind('change', function() {
-                     scope.$apply(function() {
-                        modelSetter(scope, element[0].files[0]);
-                     });
-                  });
-               }
-            };
-    }])
+angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ui.ace', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache'] )
+  .directive('fileModel', ['$parse', function ($parse) {
+return {
+restrict: 'A',
+  link: function(scope, element, attrs) {
+var model = $parse(attrs.fileModel);
+var modelSetter = model.assign;
+
+element.bind('change', function() {
+scope.$apply(function() {
+modelSetter(scope, element[0].files[0]);
+});
+});
+}
+};
+}])
   .filter('depends', function() {
-      return function(input, currentContainerName) {
-        console.log("IN FILTER");
-        console.log(input);
-        console.log(currentContainerName);
-        var out = [];
-        for (var i = 0; i < input.length; i++) {
-          if(input[i].name != currentContainerName){
-            out.push(input[i]);
-          }
-        }
-        return out;
-      }
-  })
-        .factory('FetchFileFactory', ['$http',
-          function($http) {
-            var _factory = {};
+return function(input, currentContainerName) {
+console.log("IN FILTER");
+console.log(input);
+console.log(currentContainerName);
+var out = [];
+for (var i = 0; i < input.length; i++) {
+if(input[i].name != currentContainerName){
+out.push(input[i]);
+}
+}
+return out;
+}
+})
+  .factory('FetchFileFactory', ['$http',
+  function($http) {
+var _factory = {};
 
-            _factory.fetchFile = function(file) {
-              return $http.get('/api/resource?resource=' + encodeURIComponent(file));
-            };
+_factory.fetchFile = function(file) {
+return $http.get('/api/resource?resource=' + encodeURIComponent(file));
+};
 
-            return _factory;
-          }
-        ])
-        .service("BreadCrumbs", dsp_BreadCrumbs) 
-        .service("AjaxService", dsp_AjaxService) 
-        .service("ServerResponse", dsp_server_response)
-        .service("WalkerService", dsp_WalkerService) 
-        .service("CurrentLabService", dsp_currentLab) 
-        .service("RegexService", dsp_regex_service) 
-        .service("NetworkManagerService", dsp_networkManagerService) 
-        .service('portService', dsp_portService) 
-        .service('infoService', DSP_infoService) 
-        .service("Constants", dsp_Constants) 
-        .service("SocketService", SocketService) 
-        .service("SafeApply", SafeApply)
-        .service("CleanerService", dsp_cleanerService)
-        .service('dockerAPIService', DockerAPIService) 
-        .service('dockerImagesService', dsp_imagesService) 
-        .service('containerManager',dsp_ContainerManagerService) 
-        .service('safeApplyService', SafeApply) 
-        .controller("MainCtrl", dsp_MainCtrl)
-        .controller("labelsCtrl", dsp_LabelsCtrl) 
-        .controller("labsCtrl",  dsp_LabsCtrl) 
-        .controller("labCtrl",  dsp_LabCtrl) 
-        .controller("configCtrl", dsp_ConfigCtrl)
-        .controller("imagesCtrl", dsp_ImagesCtrl)
-        .controller('actionController', DSP_GraphEditorController)
-        .controller('DockerToolsCtrl', DSP_DockerToolsCtrl)
-        .controller("repoCtrl", dsp_RepoCtrl)
-        .run(['$anchorScroll', function($anchorScroll) {
-          $anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
-        }])
+return _factory;
+}
+])
+  .service("BreadCrumbs", dsp_BreadCrumbs) 
+  .service("AjaxService", dsp_AjaxService) 
+  .service("ServerResponse", dsp_server_response)
+  .service("WalkerService", dsp_WalkerService) 
+  .service("CurrentLabService", dsp_currentLab) 
+  .service("RegexService", dsp_regex_service) 
+  .service("NetworkManagerService", dsp_networkManagerService) 
+  .service('portService', dsp_portService) 
+  .service('infoService', DSP_infoService) 
+  .service("Constants", dsp_Constants) 
+  .service("SocketService", SocketService) 
+  .service("SafeApply", SafeApply)
+  .service("CleanerService", dsp_cleanerService)
+  .service('dockerAPIService', DockerAPIService) 
+  .service('dockerImagesService', dsp_imagesService) 
+  .service('containerManager',dsp_ContainerManagerService) 
+  .service('safeApplyService', SafeApply) 
+  .controller("MainCtrl", dsp_MainCtrl)
+  .controller("labelsCtrl", dsp_LabelsCtrl) 
+  .controller("labsCtrl",  dsp_LabsCtrl) 
+  .controller("labCtrl",  dsp_LabCtrl) 
+  .controller("configCtrl", dsp_ConfigCtrl)
+  .controller("imagesCtrl", dsp_ImagesCtrl)
+  .controller('actionController', DSP_GraphEditorController)
+  .controller('DockerToolsCtrl', DSP_DockerToolsCtrl)
+  .controller("repoCtrl", dsp_RepoCtrl)
+  .run(['$anchorScroll', function($anchorScroll) {
+$anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
+}])
 
-      //Delete confirm component 
-        .component('modalComponent', dsp_deleteConfirmComponent)  
-        .component('changeGithubComponent', dsp_changeGithub)  
-        .component('copyFromContainerComponent', dsp_copyFromContainer)  
-        .component('copyInContainerComponent', dsp_copyInContainer)  
-        .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) { 
-          NotificationProvider.setOptions({
-            delay: 3500,
-            startTop: 20,
-            startRight: 10,
-            verticalSpacing: 20,
-            horizontalSpacing: 20,
-            positionX: 'center',
-            positionY: 'bottom'
-          })
-          cfpLoadingBarProvider.includeSpinner = true;
-          cfpLoadingBarProvider.includeBar = false;
-          cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
+//Delete confirm component 
+  .component('modalComponent', dsp_deleteConfirmComponent)  
+  .component('changeGithubComponent', dsp_changeGithub)  
+  .component('copyFromContainerComponent', dsp_copyFromContainer)  
+  .component('copyInContainerComponent', dsp_copyInContainer)  
+  .component('dockerfileComponent', dsp_dockerfileComponent)  
+  .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) { 
+NotificationProvider.setOptions({
+delay: 3500,
+  startTop: 20,
+  startRight: 10,
+  verticalSpacing: 20,
+  horizontalSpacing: 20,
+  positionX: 'center',
+  positionY: 'bottom'
+})
+cfpLoadingBarProvider.includeSpinner = true;
+cfpLoadingBarProvider.includeBar = false;
+cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
 
-          $routeProvider 
-            .when('/', { 
-              templateUrl: "views/labs.html" ,
-              controller: "labsCtrl as ctrl"
-            }) 
-            .when("/labs", {
-              templateUrl: "views/labs.html" ,
-              controller: "labsCtrl as ctrl"
-            }) 
-            .when("/lab/:action/:repo/:namelab", {
-              templateUrl: "views/lab.html" ,
-              controller: "labCtrl as ctrl"
-            }) 
-            .when("/lab/:action/", {
-              templateUrl: "views/edit_lab.html" ,
-              controller: "labCtrl as ctrl"
-            }) 
-            .when("/lab/:action/:namelab", {
-              templateUrl: "views/edit_lab.html" ,
-              controller: "labCtrl as ctrl"
-            }) 
-            .when("/network/:namelab", {
-              templateUrl: "views/edit_network.html" ,
-              controller: "actionController"
-            }) 
-            .when("/labels", {
-              templateUrl: "views/labels.html" ,
-              controller: "labelsCtrl",
-              //Don't reload ctrl when anchor scrolling
-              reloadOnSearch: false
-            }) 
-            .when("/configuration", {
-              templateUrl: "views/configuration.html" ,
-              controller: "configCtrl"
-            })
-            .when("/images", {
-              templateUrl: "views/images.html" ,
-              controller: "imagesCtrl"
-            })
-            .when("/repositories", {
-              templateUrl: "views/repositories.html" ,
-              controller: "repoCtrl"
-            })
-            .otherwise(
-              {redirectTo: "/labs"} 
-            );
+$routeProvider 
+  .when('/', { 
+templateUrl: "views/labs.html" ,
+  controller: "labsCtrl as ctrl"
+}) 
+  .when("/labs", {
+templateUrl: "views/labs.html" ,
+  controller: "labsCtrl as ctrl"
+}) 
+  .when("/lab/:action/:repo/:namelab", {
+templateUrl: "views/lab.html" ,
+  controller: "labCtrl as ctrl"
+}) 
+  .when("/lab/:action/", {
+templateUrl: "views/edit_lab.html" ,
+  controller: "labCtrl as ctrl"
+}) 
+  .when("/lab/:action/:namelab", {
+templateUrl: "views/edit_lab.html" ,
+  controller: "labCtrl as ctrl"
+}) 
+  .when("/network/:namelab", {
+templateUrl: "views/edit_network.html" ,
+  controller: "actionController"
+}) 
+  .when("/labels", {
+templateUrl: "views/labels.html" ,
+  controller: "labelsCtrl",
+  //Don't reload ctrl when anchor scrolling
+  reloadOnSearch: false
+}) 
+  .when("/configuration", {
+templateUrl: "views/configuration.html" ,
+  controller: "configCtrl"
+})
+  .when("/images", {
+templateUrl: "views/images.html" ,
+  controller: "imagesCtrl"
+})
+  .when("/repositories", {
+templateUrl: "views/repositories.html" ,
+  controller: "repoCtrl"
+})
+  .otherwise(
+{redirectTo: "/labs"} 
+);
 
-          $locationProvider.html5Mode(true)
-          //Add x http methods to fully support methods
-          $httpProvider.defaults.headers.put = { 'X-HTTP-Method-Override': 'PUT'};
-          $httpProvider.defaults.headers.delete = { 'X-HTTP-Method-Override': 'DELETE'};
-        })
+$locationProvider.html5Mode(true)
+//Add x http methods to fully support methods
+$httpProvider.defaults.headers.put = { 'X-HTTP-Method-Override': 'PUT'};
+$httpProvider.defaults.headers.delete = { 'X-HTTP-Method-Override': 'DELETE'};
+})
 
+var setOptions = function(acee, session, opts) {
+
+// sets the ace worker path, if running from concatenated
+// or minified source
+if (angular.isDefined(opts.workerPath)) {
+var config = window.ace.require('ace/config');
+config.set('workerPath', opts.workerPath);
+}
+if (angular.isDefined(opts.modePath)) {
+var config = window.ace.require('ace/config');
+config.set('modePath', opts.modePath);
+}
+if (angular.isDefined(opts.themePath)) {
+var config = window.ace.require('ace/config');
+config.set('themePath', opts.themePath);
+}
+if (angular.isDefined(opts.basePath)) {
+var config = window.ace.require('ace/config');
+config.set('basePath', opts.basePath);
+}
+}
 
 
 
