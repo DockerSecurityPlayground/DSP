@@ -11,6 +11,7 @@
                                         "url": "https://github.com/giper45/DSP_Projects.git"
                               }
                     ],
-                    "test": false
+                    "test": false,
+                    "tmpDir" : "/tmp"
           }
 }

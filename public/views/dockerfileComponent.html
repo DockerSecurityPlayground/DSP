@@ -1,4 +1,16 @@
-<style>
+<style id="compiled-css" type="text/css">
+.drop-box {
+  background: #F8F8F8;
+  border: 5px dashed #DDD;
+  width: 200px;
+  height: 65px;
+  text-align: center;
+  padding-top: 25px;
+  margin: 10px;
+}
+.dragover {
+  border: 5px dashed blue;
+}
 .ace_editor { height: 500px; }
 
 </style>
@@ -10,10 +22,10 @@
   <div class="row">
     <div class="col-sm-3">
       <js-tree 
-        tree-data="scope" 
-        tree-model="treeModel"
-        tree-events="select_node:nodeSelected"
-        ></js-tree>
+         tree-data="scope" 
+         tree-model="treeModel"
+         tree-events="select_node:nodeSelected"
+         ></js-tree>
     </div>
     <div class="col-sm-9" ui-ace="{
     theme: 'terminal',
@@ -22,7 +34,19 @@
                           ng-model=dockerfile
                           >
     </div>
-
+      <br/><br/>
+      <div class="btn btn-default" ngf-select="upload($files)" ngf-multiple="true">Select File</div>
+      Drop File:
+      <div ngf-drop ngf-select ng-model="files" class="drop-box" 
+                                                ngf-drag-over-class="'dragover'" ngf-multiple="true" ngf-include-dir="true" ngf-allow-dir="true"
+                                                                                                                            >Drop pdfs or images here or click to upload</div>
+      <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
+      Files:
+      <ul>
+        <li ng-repeat="f in files" style="font:smaller">{{f.name}} {{f.$error}} {{f.$errorParam}}</li>
+      </ul>
+      Upload Log:
+      <pre>{{log}}</pre>
 
       <!-- <p class="row"> -->
       <!--   <div class="col-sm-6"><label> Select File From Host </label> </div> -->
