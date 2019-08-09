@@ -6,8 +6,51 @@ var dsp_dockerfileComponent  =
       close: '&',
       dismiss: '&'
     },
-    controller: function ($http, $scope, Notification) {
+    controller: function ($http, $scope, Notification, Upload, $timeout) {
       $scope.dockerfile = "test";
+      $scope.log = '';
+      $scope.$watch('files', function () {
+        $scope.upload($scope.files);
+      });
+
+      $scope.$watch('file', function () {
+        if ($scope.file != null) {
+          $scope.files = [$scope.file];
+        }
+      });
+      $scope.upload = function (files) {
+        if (files && files.length) {
+          for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            console.log("FILE");
+            console.log(file);
+            // if (!file.$error) {
+            //   Upload.upload({
+            //     url: 'dockupload',
+            //     data: {
+            //       username: $scope.username,
+            //       file: file
+            //     }
+            //   }).then(function (resp) {
+            //     $timeout(function() {
+            //       $scope.log = 'file: ' +
+            //         resp.config.data.file.name +
+            //         ', Response: ' + JSON.stringify(resp.data) +
+            //         '\n' + $scope.log;
+            //     });
+            //   }, null, function (evt) {
+            //     var progressPercentage = parseInt(100.0 *
+            //       evt.loaded / evt.total);
+            //     $scope.log = 'progress: ' + progressPercentage +
+            //       '% ' + evt.config.data.file.name + '\n' +
+            //       $scope.log;
+            //   });
+            }
+          }
+        }
+
+
+
       $scope.nodeSelected = function(e, data) {
         var _l = data.node.li_attr;
         alert(_l.id)
@@ -51,29 +94,12 @@ var dsp_dockerfileComponent  =
       };
 
       $scope.ok = function () {
-        $ctrl.close();
+        $scope.close();
       };
 
       $scope.cancel = function () {
-        $ctrl.dismiss();
+        $scope.dismiss();
       };
 
-      $scope.upload = function() {
-        var body = {
-          dockername: $ctrl.lab.namecontainer,
-          hostPath :  $ctrl.hostPath,
-          containerPath: $ctrl.containerPath,
-        }
-        $http.post('/dsp_v1/dockerupload', body)
-          .then(
-            function success(response) {
-              Notification("File Uploaded");
-            },
-            function error(err) {
-              // Lab running error
-              Notification({message:"Server error: "+err.data.message,
-                delay: 5000}, 'error');
-            });
-      }
     }
   }

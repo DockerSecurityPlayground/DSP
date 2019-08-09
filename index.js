@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const path = require('path');
+const multipart = require('connect-multiparty');
 
 const app = express();
 const http = require('http');
@@ -51,6 +52,14 @@ Checker.isInstalled((isInstalled) => {
   }
 });
 
+app.use(multipart({
+	uploadDir: localConfig.tmpDir
+}));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 // Parse application/x-www-form-urlencoded & JSON
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

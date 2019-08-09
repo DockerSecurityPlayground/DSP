@@ -45,6 +45,9 @@ mxBasePath = 'assets/mxgraph/';
     <script src="assets/js/angular-material.min.js"></script>
     <script src="assets/js/angular-aria.min.js"></script>
     <script src="assets/js/loading-bar.js"></script>
+    <script type="text/javascript" src="assets/js/ng-file-upload-shim.js"></script>
+    <script type="text/javascript" src="assets/js/ng-file-upload.js"></script>
+
     <link href='assets/css/loading-bar.css' rel='stylesheet' />
 
     <link href="assets/css/select.css" rel="stylesheet" type='text/css' >
@@ -118,7 +121,7 @@ underscore.factory('_', function() {
 return window._; //Underscore must already be loaded on the page
 });
 //ANGULAR COMPONENT REGISTRATION 
-angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ui.ace', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache'] )
+angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ui.ace', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache', 'ngFileUpload'] )
   .directive('fileModel', ['$parse', function ($parse) {
 return {
 restrict: 'A',
