@@ -40,11 +40,7 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-  if (c.config.test) {
-    return `${appRoot.path}/config/test_user.json`;
-  } else {
     return `${appRoot.path}/config/config_user.json`;
-  }
 }
 function getConfigSync() {
   return jsonfile.readFileSync(pathUserConfig());
