@@ -1,4 +1,4 @@
-﻿<div id="page-wrapper" >
+﻿﻿<div id="page-wrapper" >
   <script src="assets/mxgraph/common.js"> </script>
   <script src="assets/mxgraph/use_utils.js"> </script>
   <script>
@@ -62,6 +62,12 @@
       <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
     </div>
       <div ng-show="noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div>
+    <div ng-show="!ctrl.exists" class="row">
+      <p class="text-center"><button class={{ctrl.buttonAction.class}} id="labState" href="" ng-click="ctrl.buttonAction.action()">
+        <span class="{{ctrl.labState.actionClass}}"></span> {{ctrl.buttonAction.label}}
+      </button> 
+      </p>
+    </div>
     <div ng-show="ctrl.exists && !noImages" class="row">
       <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
         <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
