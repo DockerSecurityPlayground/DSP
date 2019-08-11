@@ -59,6 +59,7 @@
     "rimraf": "^2.6.3",
     "simple-git": "^1.110.0",
     "socket.io": "^2.2.0",
+    "spyfs": "^1.0.2",
     "stampit": "^3.1.2",
     "underscore": "^1.8.3",
     "walker": "^1.0.7",
@@ -82,9 +83,11 @@
     "eslint-plugin-standard": "^3.0.1",
     "gulp": "^4.0.0",
     "jshint": "^2.9.7",
+    "mock-fs": "^4.10.1",
     "nyc": "^14.1.1",
     "prompt": "^1.0.0",
-    "riteway": "^6.1.0",
+    "proxyquire": "^2.1.2",
+    "sinon": "^7.4.1",
     "ws": "3.3.2",
     "zombie": "^6.1.4"
   }

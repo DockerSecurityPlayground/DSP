@@ -1,5 +1,4 @@
 const path = require('path');
-const homedir = require('homedir');
 const repogitData = require('../util/repogitData.js');
 const configData = require('../data/config.js');
 const repoData = require('../data/repos.js');
@@ -34,14 +33,14 @@ const api = {
       // Move directory temporanealy
       (config, cb) => {
         oldConfig = config;
-        userPath = path.join(homedir(), config.mainDir, config.name);
+        userPath = path.join(AppUtils.getHome(), config.mainDir, config.name);
         username = config.name;
         const random = randomstring.generate({
           length: 5,
           charset: 'alphabetic'
         });
         const tmpRandom = `.tempUserDir${random}`;
-        tmpUserDir = path.join(homedir(), config.mainDir, tmpRandom);
+        tmpUserDir = path.join(AppUtils.getHome(), config.mainDir, tmpRandom);
         log.info(' delete local username dir');
         fs.rename(userPath, tmpUserDir, cb);
       },
@@ -108,7 +107,7 @@ const api = {
     }),
     (cb) => {
       log.info(' All stopped, pulling repo ');
-      repogitData.pullRepo(path.join(homedir(), rootDir, repo.name), cb);
+      repogitData.pullRepo(path.join(AppUtils.getHome(), rootDir, repo.name), cb);
     },
     (summary, cb) => {
       log.info("Update state table");
@@ -162,7 +161,7 @@ const api = {
           async.eachSeries(repos, (item, c) => {
             log.info(`PULLING ${item}...`);
             // Pull repo and update the table state
-            repogitData.pullRepo(path.join(homedir(), rootDir, item.name), (err) => {
+            repogitData.pullRepo(path.join(AppUtils.getHome(), rootDir, item.name), (err) => {
               if (err) c(err);
               // If no error  it's been pulled, update the state file
               else {

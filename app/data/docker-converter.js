@@ -133,7 +133,7 @@ function JDCGetServices(containers) {
     const caps = JDCgetCapabilities(containerImage);
     if (!_.isEmpty(caps)) service.cap_add = caps;
     // Privileged
-    if (containerImage.labels.privileged) {
+    if (containerImage.labels && containerImage.labels.privileged) {
       service.privileged = true;
     }
     // Add service

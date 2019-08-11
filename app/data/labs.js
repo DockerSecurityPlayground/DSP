@@ -8,7 +8,6 @@ const config = require('./config.js');
 const rimraf = require('rimraf');
 const _ = require('underscore');
 const appUtils = require('../util/AppUtils');
-const homedir = require('homedir');
 const LabStates = require('../util/LabStates.js');
 const c = require('../../config/local.config.json');
 
@@ -48,6 +47,8 @@ function newLab(name, information, callback) {
 
     // Check if a directory exists
     (userPath, cb) => {
+      console.log("GEtUSER");
+      console.log(userPath);
       up = userPath;
       userName = path.basename(userPath);
       pathExists(path.join(userPath, name))
@@ -106,12 +107,20 @@ function deleteLab(name, callback) {
     (cb) => { config.getUserPath(cb); },
     (up, cb) => {
       userPath = up;
-      rimraf(path.join(userPath, name), cb);
+      const toDelete = path.join(userPath, name);
+      console.log(toDelete);
+      rimraf(toDelete, cb);
     },
-    (cb) => LabStates.exists(path.basename(userPath), name, cb),
+    (cb) => {
+      LabStates.exists(path.basename(userPath), name, cb);
+    },
     // Remove from table of states only if exists
     (exists, cb) => {
-      if (exists) LabStates.removeState(path.basename(userPath), name, cb);
+      if (exists) {
+        LabStates.removeState(path.basename(userPath), name, cb);
+      } else {
+        cb(new Error("Lab not exists in state"));
+      }
     }
   ],
   (err) => {
@@ -227,7 +236,7 @@ function getInformation(nameRepo, nameLab, callback) {
     (cb) => config.getConfig(cb),
     // Read json information file
     (cfile, cb) => {
-      const informationFile = path.join(homedir(), cfile.mainDir, nameRepo, nameLab, 'information.json');
+      const informationFile = path.join(appUtils.getHome(), cfile.mainDir, nameRepo, nameLab, 'information.json');
       jsonfile.readFile(informationFile, cb);
     }],
     (err, jsonDescription) => {

@@ -2,7 +2,6 @@ const _ = require('underscore');
 const dockerComposer = require('mydockerjs').dockerComposer;
 const path = require('path');
 const async = require('async');
-const homedir = require('homedir');
 const appUtils = require('../util/AppUtils');
 
 const log = appUtils.getLogger();
@@ -78,12 +77,12 @@ exports.getAllFiles = function getAllFiles(network) {
 
 exports.copyBeforeActions = function copyBeforeActions(mainDir, repoName,
   thePath, clistToDraw, cb) {
-  const pathMainDir = path.join(homedir(), mainDir, repoName, '.data');
+  const pathMainDir = path.join(appUtils.getHome(), mainDir, repoName, '.data');
   const files = getFilesToCopy(pathMainDir, clistToDraw, false);
   copyFiles(thePath, files, cb);
 };
 exports.copyAfterActions = function copyAfterActions(mainDir, repoName, thePath, clistToDraw, cb) {
-  const pathMainDir = path.join(homedir(), mainDir, repoName, '.data');
+  const pathMainDir = path.join(appUtils.getHome(), mainDir, repoName, '.data');
   const files = getFilesToCopy(pathMainDir, clistToDraw, true);
   copyFiles(thePath, files, cb);
 };

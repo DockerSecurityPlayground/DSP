@@ -5,7 +5,6 @@ const networkData = require('../data/network.js');
 const walker = require('../data/labs_walker');
 const async = require('async');
 const fs = require('fs');
-const homedir = require('homedir');
 const httpHelper = require('help-nodejs').httpHelper;
 const path = require('path');
 const jsonfile = require('jsonfile');
@@ -68,7 +67,7 @@ function getLabs(req, res) {
     (config, cb) => {
       // label file path
       const mainDir = config.mainDir;
-      const repoPath = path.join(homedir(), mainDir, req.params.repo);
+      const repoPath = path.join(appUtils.getHome(), mainDir, req.params.repo);
       labsData.getLabs(repoPath, cb);
     },
   ],
@@ -268,9 +267,9 @@ function importLab(req, res) {
     (config, cb) => {
       log.info(' Parameters ok , check if already exists');
       configJSON = config;
-      destPath = path.join(homedir(), config.mainDir, config.name, req.body.labName);
-      srcPath = path.join(homedir(), config.mainDir, req.body.repoName, req.body.labName);
-      userPath = path.join(homedir(), configJSON.mainDir, configJSON.name);
+      destPath = path.join(appUtils.getHome(), config.mainDir, config.name, req.body.labName);
+      srcPath = path.join(appUtils.getHome(), config.mainDir, req.body.repoName, req.body.labName);
+      userPath = path.join(appUtils.getHome(), configJSON.mainDir, configJSON.name);
       pathExists(destPath)
         .then(exists => {
           cb(null, exists)}
@@ -294,8 +293,8 @@ function importLab(req, res) {
       const allFiles = dockerFiles.getAllFiles(networkInfo);
       log.info(`Check files to copy: ${allFiles}`);
       async.eachSeries(allFiles, (f, cin) => {
-        const src = path.join(homedir(), configJSON.mainDir, req.body.repoName, '.data', f);
-        const dst = path.join(homedir(), configJSON.mainDir, configJSON.name, '.data', f);
+        const src = path.join(appUtils.getHome(), configJSON.mainDir, req.body.repoName, '.data', f);
+        const dst = path.join(appUtils.getHome(), configJSON.mainDir, configJSON.name, '.data', f);
         pathExists(dst)
           .then(exists => {
             if (exists) {
@@ -322,8 +321,8 @@ function importLab(req, res) {
       const allFiles = dockerFiles.getAllFiles(networkInfo);
       log.info(`Files to copy: ${allFiles}`);
       async.eachSeries(allFiles, (f, cin) => {
-        const src = path.join(homedir(), configJSON.mainDir, req.body.repoName, '.data', f);
-        const dst = path.join(homedir(), configJSON.mainDir, configJSON.name, '.data', f);
+        const src = path.join(appUtils.getHome(), configJSON.mainDir, req.body.repoName, '.data', f);
+        const dst = path.join(appUtils.getHome(), configJSON.mainDir, configJSON.name, '.data', f);
         pathExists(dst)
           .then(exists => {
             if (exists) {

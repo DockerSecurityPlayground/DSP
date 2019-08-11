@@ -1,6 +1,5 @@
 const appRoot = require('app-root-path');
 const path = require('path');
-const homedir = require('homedir');
 const jsonfile = require('jsonfile');
 const fs = require('fs');
 const os = require('os');
@@ -34,7 +33,7 @@ function buildImages(repoName, callback, notifyCallback) {
   log.info('Build images');
   let dataLine = '';
   const configJSON = jsonfile.readFileSync(path.join(appRoot.toString(), 'config', configurationName));
-  const repoPath = path.normalize(path.join(homedir(), configJSON.mainDir, repoName, '.docker-images'));
+  const repoPath = path.normalize(path.join(appUtils.getHome(), configJSON.mainDir, repoName, '.docker-images'));
   let command;
   let updateCmd;
   // Look at OS to select update script (Windows not yet implemented)

@@ -1,0 +1,7 @@
+version: '2'
+services:
+  element_0:
+    image: 'wordpress:cli'
+    stdin_open: true
+    tty: true
+networks: {}

@@ -2,7 +2,6 @@ const fs = require('fs');
 const appRoot = require('app-root-path');
 const jsonfile = require('jsonfile');
 const path = require('path');
-const homedir = require('homedir');
 const appUtils = require('../util/AppUtils');
 const gitUtils = require('../util/GitUtils');
 const async = require('async');
@@ -42,7 +41,7 @@ exports.createDSP = (nameConfig, callback, notifyCallback) => {
   try {
     const configDir = path.join(appRoot.toString(), 'config', nameConfig);
     const config = jsonfile.readFileSync(configDir);
-    const homeDSP = path.join(homedir(), config.mainDir);
+    const homeDSP = path.join(appUtils.getHome(), config.mainDir);
     // Create main directory
     fs.mkdirSync(homeDSP);
     // Create json file labStates

@@ -10,22 +10,16 @@ const appChecker = require(`${appRoot}/app/util/appChecker`);
 const testLab = 'existentLab';
 const noNetworkTest = 'newTestLab';
 const helper = require('../helper');
+const repoName = helper.userRepoName();
 
 const testObj = jsonfile.readFileSync(`${appRoot}/test/data/files/network_data.json`);
 
 
 describe('Data Network Test', () => {
-  before(function d(done) {
-    appChecker.init((err) => {
-      expect(err).to.be.null;
-      if (!helper.isTestEnabled()) {
-        console.log('Have to skip, test on first');
-        this.skip();
-      }
-      helper.createDSP();
+  beforeEach(function d(done) {
+      helper.start();
       done();
     });
-  });
   // Get original configuration
   it('should save data', (done) => {
     networkData.save(testLab, testObj, null, (err) => {
@@ -35,8 +29,6 @@ describe('Data Network Test', () => {
   });
 
   it('should read correct network description', (done) => {
-    const configData = jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
-    const repoName = configData.name;
     networkData.get(repoName, testLab, (err, results) => {
       expect(err).to.be.null;
       expect(results.clistDrawed).to.be.eql(testObj.clistDrawed);
@@ -47,8 +39,6 @@ describe('Data Network Test', () => {
   });
 
   it('should check if a network exists', (done) => {
-    const configData = jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
-    const repoName = configData.name;
     networkData.networkExists(repoName, testLab, (err, exists) => {
       expect(err).to.be.null;
       expect(exists).to.be.ok;
@@ -56,8 +46,6 @@ describe('Data Network Test', () => {
     });
   });
   it('Should gives false for a non existent network', (done) => {
-    const configData = jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
-    const repoName = configData.name;
     networkData.networkExists(repoName, noNetworkTest, (err, exists) => {
       expect(err).to.be.null;
       expect(exists).not.to.be.ok;
@@ -87,5 +75,9 @@ describe('Data Network Test', () => {
        done();
      });
   });
-  
+  afterEach((done) => {
+    helper.end();
+    done();
+  })
+
 });
