@@ -2,7 +2,6 @@ const configData = require('../data/config.js');
 const Checker = require('../util/AppChecker');
 const async = require('async');
 const path = require('path');
-const homedir = require('homedir');
 const httpHelper = require('help-nodejs').httpHelper;
 const appUtils = require('../util/AppUtils.js');
 const LabStates = require('../util/LabStates');
@@ -50,8 +49,8 @@ function updateConfig(req, res) {
     // Rename the root directory
     (cd, cb) => {
       oldConfig = cd; // Set oldConfig for further elaboration
-      oldPath = path.join(homedir(), oldConfig.mainDir);
-      newPath = path.join(homedir(), req.body.config.mainDir);
+      oldPath = path.join(appUtils.getHome(), oldConfig.mainDir);
+      newPath = path.join(appUtils.getHome(), req.body.config.mainDir);
       appUtils.renameDir(oldPath, newPath, cb);
     },
     // Rename the user directory

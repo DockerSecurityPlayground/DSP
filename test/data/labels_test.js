@@ -8,9 +8,10 @@ const helper = require('../helper');
 
 describe('labelsTest', () => {
   // Get original configuration
-  before((done) => {
+  beforeEach((done) => {
     this.labelPath = path.join(appRoot.toString(), 'test', 'data', 'labels_data', 'labels.json');
     jsonfile.writeFileSync(this.labelPath, { labels: [] });
+    helper.start();
     done();
   });  // End before
 
@@ -32,7 +33,7 @@ describe('labelsTest', () => {
       testName: 'A string in input'
     }
   ];
-  // Testing with change 
+  // Testing with change
   invalidTests.forEach((item) => {
     it(item.testName, (done) => {
       const self = this;
@@ -46,7 +47,6 @@ describe('labelsTest', () => {
       jsonfile.writeFileSync(self.labelPath, { labels: [example, exampleTwo] });
       labelsPath.changeLabel(self.labelPath, 'anotherLabel', item.labTest, (err) => {
         const newLabel = jsonfile.readFileSync(self.labelPath);
-        console.log(newLabel);
         expect(err).to.not.be.null;
         // Read labels
         // Should have save old labels
@@ -57,7 +57,7 @@ describe('labelsTest', () => {
 
 
   });
-  // Testing with add 
+  // Testing with add
   invalidTests.forEach((item) => {
     it(item.testName, (done) => {
       const self = this;
@@ -71,7 +71,6 @@ describe('labelsTest', () => {
       jsonfile.writeFileSync(self.labelPath, { labels: [example, exampleTwo] });
       labelsPath.createLabel(self.labelPath, item.labTest, (err) => {
         const newLabel = jsonfile.readFileSync(self.labelPath);
-        console.log(newLabel);
         expect(err).to.not.be.null;
         // Read labels
         // Should have save old labels
@@ -186,5 +185,10 @@ describe('labelsTest', () => {
       expect(err).not.be.null;
       done();
     });
+  });
+  // Clean
+  afterEach((done) => {
+    helper.end();
+    done();
   });
 });

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const configData = require('../data/config.js');
 const copyDir = require('copy-dir');
-const homedir = require('homedir');
 const pathExists = require('path-exists');
 const cpFile = require('cp-file');
 const path = require('path');
@@ -94,7 +93,7 @@ function projectTreeSearch(req, res) {
 
 function treeSearch(req, res) {
   //log.info('sono in treeSearch');
-  const pSaved = homedir();
+  const pSaved = appUtils.getHome();
   manageTree(pSaved, req, res);
 }
 

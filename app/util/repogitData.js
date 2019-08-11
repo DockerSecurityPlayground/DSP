@@ -4,7 +4,7 @@ const path = require('path');
 const configData = require('../data/config.js');
 const simpleGit = require('simple-git');
 const strings = require('help-nodejs').strings;
-const homedir = require('homedir');
+const AppUtils = require('./AppUtils.js');
 const _ = require('underscore');
 const appRoot = require('app-root-path');
 
@@ -27,7 +27,7 @@ module.exports = {
         callback(err);
       }
       else {
-        const thePath = path.join(homedir(), c.mainDir);
+        const thePath = path.join(AppUtils.getHome(), c.mainDir);
         simpleGit(thePath).silent(false).clone(url, params.reponame, ['-q'], callback);
       }
     });

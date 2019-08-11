@@ -1,6 +1,5 @@
 const labelsData = require('../data/labels.js');
 const configData = require('../data/config.js');
-const homedir = require('homedir');
 const httpHelper = require('help-nodejs').httpHelper;
 const async = require('async');
 const path = require('path');
@@ -26,7 +25,7 @@ function labelsOfLab(req, res) {
       const mainDir = config.mainDir;
       // label file path
       const labelFile =
-        path.join(homedir(), mainDir, req.params.repo, req.params.nameLab, c.config.name_labelfile);
+        path.join(AppUtils.getHome(), mainDir, req.params.repo, req.params.nameLab, c.config.name_labelfile);
       labelsData.getLabels(labelFile, cb);
     },
   ],
@@ -43,7 +42,7 @@ function allLabels(req, res) {
     (config, cb) => {
       const mainDir = config.mainDir;
       // label file path
-      const labelFile = path.join(homedir(), mainDir, req.params.repo, c.config.name_labelfile);
+      const labelFile = path.join(AppUtils.getHome(), mainDir, req.params.repo, c.config.name_labelfile);
       labelsData.getLabels(labelFile, cb);
     },
   ],
@@ -64,7 +63,7 @@ function deleteLabel(req, res) {
     (config, cb) => {
       const mainDir = config.mainDir;
       // label file path
-      const labelFile = path.join(homedir(), mainDir, req.params.repo, c.config.name_labelfile);
+      const labelFile = path.join(AppUtils.getHome(), mainDir, req.params.repo, c.config.name_labelfile);
       const labelname = req.params.labelname;
       // It's a repo label so it's true
       labelsData.deleteLabel(labelFile, labelname, true, cb);
@@ -84,7 +83,7 @@ function addLabelToLab(req, res) {
       const mainDir = config.mainDir;
       // label file path
       const labelFile =
-        path.join(homedir(), mainDir, req.params.repo, req.params.nameLab, c.config.name_labelfile);
+        path.join(AppUtils.getHome(), mainDir, req.params.repo, req.params.nameLab, c.config.name_labelfile);
       labelsData.getLabels(labelFile, cb);
     },
   ],
@@ -103,7 +102,7 @@ function updateLabel(req, res) {
     (config, cb) => {
       const mainDir = config.mainDir;
       // label file path of repository
-      const labelFile = path.join(homedir(), mainDir, req.params.repo, c.config.name_labelfile);
+      const labelFile = path.join(AppUtils.getHome(), mainDir, req.params.repo, c.config.name_labelfile);
       // function changeLabel(labelfile, labelname, newLabel, callback)  in dataLabel
       labelsData.changeLabel(labelFile,
       req.body.oldName, // old name
@@ -130,7 +129,7 @@ function addLabel(req, res) {
     (config, cb) => {
       const mainDir = config.mainDir;
       // label file path of repository
-      const labelFile = path.join(homedir(), mainDir, req.params.repo, c.config.name_labelfile);
+      const labelFile = path.join(AppUtils.getHome(), mainDir, req.params.repo, c.config.name_labelfile);
       labelsData.createLabel(labelFile, req.body, cb);
     },
   ],

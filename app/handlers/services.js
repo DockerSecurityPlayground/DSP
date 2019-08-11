@@ -4,7 +4,6 @@ const async = require('async');
 const dockerVolumes = require('../data/dockerVolumes.js');
 const configData = require('../data/config.js');
 const path = require('path');
-const homedir = require('homedir');
 const httpHelper = require('help-nodejs').httpHelper;
 const LabStates = require('../util/LabStates.js');
 const AppUtils = require('../util/AppUtils');
@@ -162,7 +161,7 @@ function removeService(req, res) {
 //     (theConfig, cb) => {
 //       config = theConfig;
 //       mainDir = config.mainDir;
-//       thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
+//       thePath = path.join((), mainDir, params.namerepo, params.namelab);
 
 
 //     }
@@ -197,7 +196,7 @@ function dockercopy(req, res) {
     (config, cb) => {
       mainDir = config.mainDir;
       const dockerInfos = {
-      mainPath : path.join(homedir(), mainDir),
+      mainPath : path.join(AppUtils.getHome(), mainDir),
       nameRepo : req.body.namerepo,
       labName : req.body.namelab,
       dockerName : req.body.dockername,
@@ -254,7 +253,7 @@ function dockershell(req, res) {
     (config, cb) => {
       mainDir = config.mainDir;
       const dockerInfos = {
-      mainPath : path.join(homedir(), mainDir),
+      mainPath : path.join(AppUtils.getHome(), mainDir),
       nameRepo : req.body.namerepo,
       labName : req.body.namelab,
       dockerName : req.body.dockername

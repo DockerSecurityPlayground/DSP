@@ -6,7 +6,6 @@ const pathExists = require('path-exists');
 const rimraf = require('rimraf');
 const _ = require('underscore');
 const appUtils = require('../util/AppUtils');
-const homedir = require('homedir');
 const LabStates = require('../util/LabStates.js');
 const httpHelper = require('help-nodejs').httpHelper;
 const Checker = require('../util/AppChecker');
