@@ -7,7 +7,7 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 const jsonfile = require('jsonfile');
 
-describe.only('DockerAPIService test', () => {
+describe('DockerAPIService test', () => {
   before(() => {
    // Object to testing
     this.obj = dockerConverter;

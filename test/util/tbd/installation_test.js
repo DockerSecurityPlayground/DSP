@@ -7,6 +7,7 @@ const jsonfile = require('jsonfile');
 const chaiFS = require('chai-fs');
 const rimraf = require('rimraf');
 const projectInit = require(`${appRoot}/app/util/project_init.js`);
+const helper = require('../helper.js');
 
 const expect = chai.expect;
 let nameTestConfig;
@@ -19,7 +20,7 @@ let testUserRepoCloned;
 describe('INSTALLATION LOW LEVEL', () => {
   before((done) => {
     chai.use(chaiFS);
-    nameTestConfig = 'test_user.json';
+    helper.start();
     pathConfig = path.join(appRoot.toString(), 'config', nameTestConfig);
 
     testConfig = {
@@ -31,7 +32,6 @@ describe('INSTALLATION LOW LEVEL', () => {
     projectTestDir = path.join(homedir(), testConfig.mainDir);
     testUserPath = path.join(projectTestDir, testConfig.name);
     testUserRepoCloned = path.join(testUserPath, 'MITM');
-    console.log(testUserRepoCloned);
     // Destroy before test
     if (fs.existsSync(pathConfig)) { fs.unlinkSync(pathConfig); }
     if (fs.existsSync(projectTestDir)) {
