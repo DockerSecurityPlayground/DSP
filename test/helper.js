@@ -11,9 +11,8 @@ const appUtils  = require('../app/util/AppUtils.js');
 const dspProjects = 'DSP_Projects';
 const localhost = 'http://localhost:8080';
 const api = '/dsp_v1';
-let isStubbed = false;
-
-
+let pathStub;
+let pathHome;
 
 const mkdir = (dir) => {
   // making directory without exception if exists
@@ -34,12 +33,12 @@ const rmdir = (dir) => {
       const stat = fs.statSync(filename);
 
       if (filename === '.' || filename === '..') {
-        // pass these files
+      // pass these files
       } else if (stat.isDirectory()) {
-        // rmdir recursively
+      // rmdir recursively
         rmdir(filename);
       } else {
-        // rm fiilename
+      // rm fiilename
         fs.unlinkSync(filename);
       }
     }
@@ -140,7 +139,15 @@ module.exports = {
   removePath(testPath) {
     if (fs.existsSync(testPath)) rmdir(testPath);
   },
-
+  initStubs() {
+    // Create file config
+    const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
+    // Stub path_userconfig
+    pathStub = stub(appUtils, 'path_userconfig')
+    pathStub.callsFake(() => jsonPath)
+    pathHome = stub(appUtils, 'getHome')
+    pathHome.callsFake(() => path.join(appRoot.toString(), 'test'))
+  },
   start() {
     const testConfig = {
       name: 'test',
@@ -148,17 +155,14 @@ module.exports = {
       githubURL: 'https://github.com/giper45/DSP_Repo.git',
     };
     // Create file config
-    if (!isStubbed) {
-      const proxy = proxyquire('module', {
-        'hd' : homedir
-      });
-      // Stub path_userconfig
-      stub(appUtils, 'path_userconfig').callsFake(() => jsonPath)
-      stub(appUtils, 'getHome').callsFake(() => path.join(appRoot.toString(), 'test'))
-      isStubbed = true;
-    }
     const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
     jsonfile.writeFileSync(jsonPath, testConfig);
+    const proxy = proxyquire('module', {
+      'hd' : homedir
+    });
+    if (!pathStub) {
+      this.initStubs()
+    }
     const projectTestOrig = path.join(appRoot.toString(), 'test', 'testDSPDir_orig');
     const projectTestDir = path.join(appRoot.toString(), 'test', 'testDSPDir');
     copyDir(projectTestOrig, projectTestDir)

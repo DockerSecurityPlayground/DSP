@@ -5,7 +5,7 @@ const chaiFS = require('chai-fs');
 const path = require('path');
 const fs = require('fs');
 const homedir = require('homedir');
-const helper = require('../helper.js');
+const helper = require('../helper');
 
 
 const testPath = path.join(homedir(), 'DSP_TESTING_NEW');
@@ -20,33 +20,31 @@ const configTest = {
 
 const api = `${helper.api}/config`;
 
-describe.only('config test', () => {
-  before(function d() {
+describe('config test', () => {
+  before((d) => {
     chai.use(chaiHTTP);
     chai.use(chaiFS);
+    d();
+  })
+  beforeEach((done) => {
+    helper.start();
     // helper.testInit();
       // READ USERNAME
-    helper.testInit();
-    if (!helper.isTestEnabled()) {
-      console.error('Pls set test to true before');
-      this.skip();
-    }
-    console.log('create DSP');
-    helper.createDSP();
+    done();
   });
 
-  it('Should get configuration file', (done) => {
+  it.skip('Should get configuration file', (done) => {
     chai.request(helper.localhost)
     .get(api)
     .end((err, res) => {
       expect(err).to.be.null;
-      expect(helper.testConfig()).to.be.eql(res.body.data.config);
+      expect(res.body.data.config).to.be.eql(helper.testConfig());
       done();
     });
   });
 
   // GET LABELS REPO
-  it('Should change configuration file', (done) => {
+  it.only('Should change configuration file', (done) => {
     // DSP_TESTING_DIR Exists as assumption
     expect(helper.projectTestDir()).to.be.a.path();
     const oldProjectDir = helper.projectTestDir();
@@ -183,4 +181,8 @@ describe.only('config test', () => {
       });
     });
   }());
+ after((d) => {
+   helper.end();
+   d();
+ })
 });

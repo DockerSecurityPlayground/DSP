@@ -37,7 +37,6 @@ describe('DOCKER TEST', () => {
 
   it.skip('Checking actions sync', (done) => {
     const data = jsonfile.readFileSync(path.join(appRoot.path, 'test', 'data', 'files', 'test_actions.json'));
-    console.log(dockerActions.getActionsSync(data.clistDrawed));
     done();
   });
 });

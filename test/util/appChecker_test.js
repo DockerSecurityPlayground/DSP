@@ -70,7 +70,6 @@ describe('AppChecker test', () => {
   it('Check URL wrong', (done) => {
     JoiAppConditions.check('rete://git:rtrt@httpd.apache.org', 'url', (err) => {
       expect(err).not.to.be.null;
-      console.log(err);
       done();
     });
   });
@@ -123,7 +122,6 @@ describe('AppChecker test', () => {
     fs.renameSync(configPath, newPath);
 
     Checker.isInstalled((err, ex) => {
-      console.log('SONO QUI');
       expect(err).to.be.null;
       expect(ex).not.to.be.ok;
       fs.renameSync(newPath, configPath);

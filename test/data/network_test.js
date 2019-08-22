@@ -16,10 +16,15 @@ const testObj = jsonfile.readFileSync(`${appRoot}/test/data/files/network_data.j
 
 
 describe('Data Network Test', () => {
+  before((d) => {
+    appChecker.initErrors();
+    appChecker.initConditions();
+    d();
+  })
   beforeEach(function d(done) {
-      helper.start();
-      done();
-    });
+    helper.start();
+    done();
+  });
   // Get original configuration
   it('should save data', (done) => {
     networkData.save(testLab, testObj, null, (err) => {
@@ -62,18 +67,17 @@ describe('Data Network Test', () => {
 
   // test_hello.sh is inside a container the CompleteSimpleExample
   it('Cannot delete file test', (done) => {
-     networkData.canDeleteFile('test_hello.sh', (err) => {
-       expect(err).not.to.be.null;
-       expect(err.code).to.be.eql(1007);
-       console.log(err.message);
-       done();
-     });
+    networkData.canDeleteFile('test_hello.sh', (err) => {
+      expect(err).not.to.be.null;
+      expect(err.code).to.be.eql(1007);
+      done();
+    });
   });
   it('Can delete file test', (done) => {
-     networkData.canDeleteFile('filename', (err) => {
-       expect(err).to.be.null;
-       done();
-     });
+    networkData.canDeleteFile('filename', (err) => {
+      expect(err).to.be.null;
+      done();
+    });
   });
   afterEach((done) => {
     helper.end();

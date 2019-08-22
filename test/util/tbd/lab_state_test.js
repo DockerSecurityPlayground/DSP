@@ -58,14 +58,7 @@ function _init() {
 
 describe('LAB STATE TEST', () => {
   beforeEach(function d(done) {
-    console.log('Test states:');
-    if (!helper.isTestEnabled()) {
-      console.error('Test is not enabled');
-      this.skip();
-    }
-    chai.use(chaiFS);
-    helper.createDSP();
-    _init();
+    helper.start();
     done();
   });
 
@@ -282,4 +275,8 @@ describe('LAB STATE TEST', () => {
       done();
     });
   });
+  afterEach((d) => {
+    helper.end();
+    d();
+  })
 });

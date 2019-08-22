@@ -14,6 +14,7 @@ describe('configTest', () => {
   before((done) => {
     appChecker.initErrors();
     appChecker.initConditions();
+    helper.initStubs();
     done();
   })
   // Get original configuration
