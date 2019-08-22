@@ -5,7 +5,6 @@ const path = require('path');
 const jsonfile = require('jsonfile');
 const async = require('async');
 const Walker = require('walker');
-const homedir = require('homedir');
 const configData = require('./config.js');
 const pathIcons = 'assets/docker_image_icons/';
 const pathExists = require('path-exists');
@@ -18,7 +17,7 @@ function getRepoImagePath(namerepo, callback) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (config, cb) => {
-      const ps = path.join(homedir(), config.mainDir, namerepo, '.docker-images')
+      const ps = path.join(AppUtils.getHome(), config.mainDir, namerepo, '.docker-images')
       pathExists(ps)
         .then((exists) => {
           if (exists) {
@@ -192,7 +191,7 @@ function getImagesAllLabs(namerepo, callback) {
       configData.getConfig(cb)
     },
     (config, cb) => {
-      const ps = path.join(homedir(), config.mainDir, namerepo);
+      const ps = path.join(AppUtils.getHome(), config.mainDir, namerepo);
       cb(null, ps);
     },
     (pathRepo, cb) => {
@@ -269,7 +268,7 @@ function getImagesAllRepos(callback) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (config, cb) => {
-      const ps = path.join(homedir(), config.mainDir);
+      const ps = path.join(AppUtils.getHome(), config.mainDir);
       cb(null, ps);
     },
     (mainDirPath, cb) => {

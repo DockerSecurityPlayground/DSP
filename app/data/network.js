@@ -3,7 +3,6 @@ const configData = require('./config');
 const path = require('path');
 const async = require('async');
 const pathExists = require('path-exists');
-const homedir = require('homedir');
 const dockerFiles = require('./docker_filesToCopy');
 const Checker = require('../util/AppChecker');
 const LabStates = require('../util/LabStates');
@@ -14,7 +13,7 @@ function networkExists(namerepo, namelab, callback) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (config, cb) => {
-      const pathToSearch = path.join(homedir(), config.mainDir, namerepo, namelab, 'network.json');
+      const pathToSearch = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'network.json');
       pathExists(pathToSearch)
   .then((exists) => {
     cb(null, exists);
@@ -56,8 +55,8 @@ function get(namerepo, namelab, callback) {
     (cb) => configData.getConfig(cb),
     // save
     (config, cb) => {
-      const networkfile = path.join(homedir(), config.mainDir, namerepo, namelab, 'network.json');
-      yamlFile = path.join(homedir(), config.mainDir, namerepo, namelab, 'docker-compose.yml');
+      const networkfile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'network.json');
+      yamlFile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'docker-compose.yml');
 
       jsonfile.readFile(networkfile, cb);
     },

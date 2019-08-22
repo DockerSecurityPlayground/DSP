@@ -1,7 +1,6 @@
 const configData = require('../data/config.js');
 const async = require('async');
 const fs = require('fs');
-const homedir = require('homedir');
 const path = require('path');
 const jsonfile = require('jsonfile');
 const ncp = require('ncp').ncp;
@@ -20,7 +19,7 @@ function get(cb) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      const repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      const repoFile = path.join(appUtils.getHome(), conf.mainDir, 'repos.json');
       cb(null, repoFile);
     }, (repoFile, cb) => jsonfile.readFile(repoFile, cb)
     ], (err, jsonRepos) => {
@@ -31,7 +30,7 @@ function exists(cb) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      const repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      const repoFile = path.join(appUtils.getHome(), conf.mainDir, 'repos.json');
       cb(null, repoFile);
     }], (err, repoFile) => {
       if (err) {
@@ -50,7 +49,7 @@ function create(repos, cb) {
     // Update repos.json file
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      repoFile = path.join(appUtils.getHome(), conf.mainDir, 'repos.json');
       cb(null);
     },
     (cb) => {
@@ -66,7 +65,7 @@ function post(repo, cb) {
     // Update repos.json file
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      repoFile = path.join(homedir(), conf.mainDir, 'repos.json');
+      repoFile = path.join(appUtils.getHome(), conf.mainDir, 'repos.json');
       cb(null);
     },
     (cb) => get(cb),
@@ -88,7 +87,7 @@ function remove(reponame, cb) {
   async.waterfall([
     (cb) => configData.getConfig(cb),
     (conf, cb) => {
-      mainDir = path.join(homedir(), conf.mainDir);
+      mainDir = path.join(appUtils.getHome(), conf.mainDir);
       repoFile = path.join(mainDir, "repos.json");
       cb(null);
     },

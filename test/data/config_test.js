@@ -1,7 +1,6 @@
 const expect = require('chai').expect;
 const configData = require('../../app/data/config.js');
 const path = require('path');
-const homedir = require('homedir');
 
 const appRoot = require('app-root-path');
 
@@ -10,20 +9,18 @@ const helper = require('../helper');
 
 
 const obj = { name: 'usertest', mainDir: 'dsp', githubURL: 'http://eoifnaeoinefo.com' };
-const testPath = path.join(homedir(), 'dsp', 'usertest');
+const testPath = path.join(appRoot.toString(), 'test', 'testDSPDir', 'test');
 describe('configTest', () => {
+  before((done) => {
+    appChecker.initErrors();
+    appChecker.initConditions();
+    helper.initStubs();
+    done();
+  })
   // Get original configuration
-  before(function d(done) {
-    appChecker.init((err) => {
-      if (err) {
-        this.skip();
-      }
-      if (!helper.isTestEnabled()) {
-        this.skip();
-      }
-      helper.bkupTestConfig();
-      done();
-    });
+  beforeEach((done) => {
+    helper.start();
+    done();
   });
 
   // End before
@@ -49,13 +46,11 @@ describe('configTest', () => {
   // mainDir/userName_repo
   it('should give user path ', (done) => {
     // set original config
-    configData.updateConfig(obj, () => {
       configData.getUserPath((otherErr, userPath) => {
         expect(otherErr).to.be.null;
-        expect(testPath).to.be.eql(userPath);
+        expect(userPath).to.be.eql(testPath);
         done();
       });
-    });
   });
   // mainDir/userName_repo/labels.json
   it('should give user label ', (done) => {
@@ -116,8 +111,8 @@ describe('configTest', () => {
   });
 
   // Recover  configuration
-  after((done) => {
-    helper.restoreTestConfig();
+  afterEach((done) => {
+    helper.end();
     done();
   });
 });

@@ -7,12 +7,23 @@ const AppUtils = require('../../app/util/AppUtils.js');
 const path = require('path');
 
 
-const basePath = path.join(appRoot.path, 'test', 'util');
+// const basePath = path.join(appRoot.path, 'test', 'util');
+const basePath = "/basePath";
 const expect = chai.expect;
+
+
 
 describe('Test Util ', () => {
   before((done) => {
     chai.use(chaiFS);
+    const mock = require('mock-fs');
+
+    mock({
+      '/basePath': {
+        'helloworld.txt': 'filecontent',
+        'helloDir': {/** empty directory */}
+      }
+    });
     const dst = path.join(basePath, 'twoHello.txt');
     const dstDir = path.join(basePath, 'twoHelloDir');
     if (fs.existsSync(dst)) fs.unlinkSync(dst);
@@ -22,7 +33,7 @@ describe('Test Util ', () => {
         done();
       });
     }
-      else  done();
+    else  done();
   });
   it('Should copy file', (done) => {
     const src = path.join(basePath, 'helloworld.txt');

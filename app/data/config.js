@@ -1,7 +1,6 @@
 const jsonfile = require('jsonfile');
 const async = require('async');
 const path = require('path');
-const homedir = require('homedir');
 const appUtil = require('../util/AppUtils');
 const Checker = require('../util/AppChecker');
 
@@ -21,7 +20,7 @@ const getUserPath = function getUserPath(callback) {
   getConfig((err, obj) => {
     if (err) callback(err);
     else {
-      const userPath = path.join(homedir(), obj.mainDir, obj.name);
+      const userPath = path.join(appUtil.getHome(), obj.mainDir, obj.name);
       callback(null, userPath);
     }
   });

@@ -40,14 +40,7 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-  if (c.config.test) {
-    return `${appRoot.path}/config/test_user.json`;
-  } else {
     return `${appRoot.path}/config/config_user.json`;
-  }
-}
-function getConfigSync() {
-  return jsonfile.readFileSync(pathUserConfig());
 }
 function getRealLogger() {
     const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
@@ -143,7 +136,9 @@ module.exports = {
     });
   },
   path_userconfig: pathUserConfig,
-  getConfigSync,
+  getConfigSync() {
+  return jsonfile.readFileSync(this.path_userconfig());
+  },
 
   getLogger() {
     if (localConfig.enableLogin)
@@ -152,7 +147,7 @@ module.exports = {
   },
   // It works only for labs (repoName is a repository )
   getDSPDirs: function getDSPDirs(repoName, callback) {
-    const srcpath = path.join(homedir(), getConfigSync().mainDir, repoName);
+    const srcpath = path.join(this.getHome(), this.getConfigSync().mainDir, repoName);
     const dirs = [];
     let error;
     Walker(srcpath)
@@ -176,7 +171,7 @@ module.exports = {
 
   // Return the labs of all
   getAllDSPDirsSync: function getAllDSPDirsSync() {
-    const rootDir = path.join(homedir(), getConfigSync().mainDir);
+    const rootDir = path.join(this.getHome(), this.getConfigSync().mainDir);
     const repos = getDirs(rootDir);
     const returnRepos = [];
     repos.forEach((r) => {
@@ -192,11 +187,11 @@ module.exports = {
     return returnRepos;
   },
   getUserDSPDirsSync: function getUserDSPDirsSync() {
-    const conf = getConfigSync();
-    return getDirs(path.join(homedir(), conf.mainDir, conf.name));
+    const conf = this.getConfigSync();
+    return getDirs(path.join(this.getHome(), conf.mainDir, conf.name));
   },
   getDSPDirsSync: function getDSPDirsSync(repoName) {
-    const srcpath = path.join(homedir(), getConfigSync().mainDir, repoName);
+    const srcpath = path.join(this.getHome(), this.getConfigSync().mainDir, repoName);
     return getDirs(srcpath);
   },
   response: function response(nameService, res, err, respo) {
@@ -216,6 +211,10 @@ module.exports = {
     pathExists(filename).then((exists) => {
       callback(exists);
     });
+  },
+  //Returns home of the user
+  getHome() {
+    return homedir();
   }
 };
 

@@ -6,7 +6,6 @@ const Joi = require('joi');
 const du = require('mydockerjs').dockerUtils;
 const path = require('path');
 const fs = require('fs');
-const homedir = require('homedir');
 const isValidPath = require('is-valid-path');
 const commandExistsSync = require('command-exists').sync;
 const async = require('async');
@@ -205,7 +204,7 @@ module.exports = {
               configData.getConfig((err, config) => {
                 if (err) cb(err);
                 else {
-                  const userPath = path.join(homedir(), config.mainDir, config.name);
+                  const userPath = path.join(appUtils.getHome(), config.mainDir, config.name);
                   if (!fs.existsSync(userPath)) { cb(new Error(`${userPath} dir not found! Pls delete config_user.json and reinstall `)); }
                   // Update repogitData
                   cb(null);

@@ -2,11 +2,18 @@ const appRoot = require('app-root-path');
 const path = require('path');
 const jsonfile = require('jsonfile');
 const fs = require('fs');
+const proxyquire = require('proxyquire')
 const homedir = require('homedir');
+const sinon = require ('sinon');
+const stub = sinon.stub;
 
+const appUtils  = require('../app/util/AppUtils.js');
 const dspProjects = 'DSP_Projects';
 const localhost = 'http://localhost:8080';
 const api = '/dsp_v1';
+let pathStub;
+let pathHome;
+
 const mkdir = (dir) => {
   // making directory without exception if exists
   try {
@@ -69,10 +76,10 @@ module.exports = {
     return jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
   },
   userRepoName() {
-    return this.testConfig().name;
+    return 'test';
   },
   projectTestDir() {
-    return path.join(homedir(), this.testConfig().mainDir);
+    return path.join(appRoot.toString(), 'test', 'testDSPDir');
   },
   userRepo() {
     return path.join(this.projectTestDir(), this.userRepoName());
@@ -91,22 +98,6 @@ module.exports = {
   //   configurationFile.config.test = false;
   //   jsonfile.writeFileSync(localConfigPath, configurationFile);
   // },
-  isTestEnabled() {
-    const localConfigPath = path.join(appRoot.path, 'config', 'local.config.json');
-    const configurationFile = jsonfile.readFileSync(localConfigPath);
-    return configurationFile.config.test;
-  },
-  deleteDSP() {
-    if (fs.existsSync(this.projectTestDir())) { rmdir(this.projectTestDir()); }
-  },
-  bkupTestConfig() {
-    const oldPath = path.join(appRoot.toString(), 'config', 'test_user.json');
-    const newPath = path.join(appRoot.toString(), 'config', 'test_bkup.json');
-    if (fs.existsSync(oldPath)) {
-      const data = fs.readFileSync(oldPath, 'utf-8');
-      fs.writeFileSync(newPath, data);
-    }
-  },
   getStates() {
     const thePath = path.join(this.projectTestDir(), 'lab_states.json');
     return jsonfile.readFileSync(thePath);
@@ -135,7 +126,7 @@ module.exports = {
     return jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'config_user.json'));
   },
   readTestConfig() {
-    return jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
+    return jsonfile.readFileSync(path.join(appRoot.toString(), 'test', 'test_user.json'));
   },
   existsTestConfig() {
     const ucp = path.join(appRoot.toString(), 'config', 'test_user.json');
@@ -148,24 +139,44 @@ module.exports = {
   removePath(testPath) {
     if (fs.existsSync(testPath)) rmdir(testPath);
   },
-
-  testInit() {
+  initStubs() {
+    // Create file config
+    const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
+    // Stub path_userconfig
+    pathStub = stub(appUtils, 'path_userconfig')
+    pathStub.callsFake(() => jsonPath)
+    pathHome = stub(appUtils, 'getHome')
+    pathHome.callsFake(() => path.join(appRoot.toString(), 'test'))
+  },
+  start() {
     const testConfig = {
-      name: 'test_repo',
-      mainDir: 'DSP_TESTING_INSTALLATION_DIRECTORY',
-      githubURL: 'https://github.com/giper45/personalTestRepo.git',
+      name: 'test',
+      mainDir: 'testDSPDir',
+      githubURL: 'https://github.com/giper45/DSP_Repo.git',
     };
-    const testConfigPath = path.join(appRoot.path, 'config', 'test_user.json');
-    jsonfile.writeFileSync(testConfigPath, testConfig);
+    // Create file config
+    const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
+    jsonfile.writeFileSync(jsonPath, testConfig);
+    const proxy = proxyquire('module', {
+      'hd' : homedir
+    });
+    if (!pathStub) {
+      this.initStubs()
+    }
+    const projectTestOrig = path.join(appRoot.toString(), 'test', 'testDSPDir_orig');
+    const projectTestDir = path.join(appRoot.toString(), 'test', 'testDSPDir');
+    copyDir(projectTestOrig, projectTestDir)
+    // const testConfigPath = path.join(appRoot.path, 'config', 'test_user.json');
+    // jsonfile.writeFileSync(testConfigPath, testConfig);
+    // simpleGit(testConfig.mainDir).silent(false).clone(testConfig.githubURL, testConfig.name, ['-q'], cb);
   },
-
-  createDSP() {
-    const srcPath = path.join(appRoot.toString(), 'test', 'api', 'test_project');
-    const dstPath = this.projectTestDir();
-    this.deleteDSP();
-    copyDir(srcPath, dstPath);
+  end() {
+    const projectTestDir = path.join(appRoot.toString(), 'test', 'testDSPDir');
+    if (fs.existsSync(projectTestDir)) {
+      rmdir(projectTestDir);
+      fs.unlinkSync(path.join(appRoot.toString(), 'test', 'test_user.json'));
+    }
   },
-
   resetUserLabels() {
     jsonfile.writeFileSync(path.join(this.userRepo(), 'labels.json'), { labels: [] });
   },

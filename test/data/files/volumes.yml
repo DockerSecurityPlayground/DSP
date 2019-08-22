@@ -19,5 +19,5 @@ services:
       - LabTest
       - NuovoContainer
     volumes:
-      - /Users/gaetanoperrone/dsp/giper/lab2/t/:/t
+      - ./dsp/giper/lab2/t/:/t
 networks: {}

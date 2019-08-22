@@ -4,7 +4,6 @@ const configData = require('../data/config.js');
 const dockerImages = require('../data/docker-images.js');
 const dockerComposer = require('mydockerjs').dockerComposer;
 const imageMgr = require('mydockerjs').imageMgr;
-const homedir = require('homedir');
 const path = require('path');
 const async = require('async');
 const Checker = require('./AppChecker');
@@ -74,7 +73,7 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
     // call docker compose up
     (cb) => {
       mainDir = config.mainDir;
-      thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
+      thePath = path.join(appUtils.getHome(), mainDir, params.namerepo, params.namelab);
       // Don't block if some action error is verified but notify to interface
 
       // Call docker-compose up
@@ -199,7 +198,7 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
     // build path
     (config, cb) => {
       const mainDir = config.mainDir;
-      const thePath = path.join(homedir(), mainDir, params.namerepo, params.namelab);
+      const thePath = path.join(appUtils.getHome(), mainDir, params.namerepo, params.namelab);
       // Remove download repository
       const toRemoveElement = `${params.namerepo}_${params.namelab}`;
       rimraf.sync(path.join(downloadPath, toRemoveElement));

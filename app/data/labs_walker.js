@@ -1,5 +1,4 @@
 const Walker = require('walker');
-const homedir = require('homedir');
 const AppUtils = require('../util/AppUtils');
 const path = require('path');
 const stampit = require('stampit');
@@ -25,7 +24,7 @@ const MyEmitter = stampit()
 
 
 const BaseWalker = stampit(MyEmitter).init(function init(obj) {
-  this.dir = path.join(homedir(), obj.dir);
+  this.dir = path.join(AppUtils.getHome(), obj.dir);
   this.basename = obj.dir;
   //  Those we'll be override
   this.haveToFilter = function haveToFilter() {

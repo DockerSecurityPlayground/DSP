@@ -1,7 +1,6 @@
 const async = require('async');
 const path = require('path');
 const configData = require('../data/config.js');
-const homedir = require('homedir');
 const jsonfile = require('jsonfile');
 const _ = require('underscore');
 const appUtils = require('./AppUtils');
@@ -15,7 +14,7 @@ function getStateFile(callback) {
   configData.getConfig((err, config) => {
     if (err) callback(err);
     else {
-      const lsf = path.join(homedir(), config.mainDir, 'lab_states.json');
+      const lsf = path.join(appUtils.getHome(), config.mainDir, 'lab_states.json');
       callback(null, lsf);
     }
   });
@@ -23,7 +22,7 @@ function getStateFile(callback) {
 
 function getStateFileSync() {
   const config = appUtils.getConfigSync();
-  const lsf = path.join(homedir(), config.mainDir, 'lab_states.json');
+  const lsf = path.join(appUtils.getHome(), config.mainDir, 'lab_states.json');
   return lsf;
 }
 
