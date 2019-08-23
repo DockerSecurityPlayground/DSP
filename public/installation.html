@@ -82,14 +82,14 @@
 			<div class="col-sm-8"> 
 				<form name="installation" ng-click="updateConfig()">
 				  <div class="form-group">
-				    <label for="name">Name:</label>
+				    <label for="name">Username:</label>
 				    <input type="text" class="form-control" 
 						name="name"
 						ng-required='true' 
 						ng-pattern=nameRegex
 						ng-style="{'border-color':installation.name.$invalid  === true ? 'red': ''}"
 						ng-model=config.name id="name">
-					<div class="text-muted small">Your name will be used as directory name to save your projects </div>
+					<div class="text-muted small">Your personal name: your name will be used as directory name to save your projects and as author during the creation of a lab</div>
 				  </div>
 
 <script>
