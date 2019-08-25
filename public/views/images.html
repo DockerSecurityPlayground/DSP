@@ -10,6 +10,7 @@
      <div class="btn-group">
         <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'repo_images'">Repo Images</label>
         <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'all_images'">All Images</label>
+        <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'dockerfiles'">Dockerfiles</label>
     </div>
     <div ng-if="imagePanel === 'repo_images'">
           <h2 class="text-center"> Repo Images </h2>
@@ -80,8 +81,6 @@
          </div>
       </div>  
     </form>
-    
-
     <ul class="list-group">
       <li class="list-group-item borderless" ng-repeat="ele in allImages"> 
         <div ng-if=ele.contains class="row"> 
@@ -97,6 +96,39 @@
 
 
     </div>   
+     <div ng-if="imagePanel === 'dockerfiles'">
+      <h2 class="text-center">Dockerfiles</h2>
+      <hr>
+      <form class="form-inline">
+        <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.name" placeholder="Image name" id="" >
+        <button type="button" class="btn btn-success" ng-click="createDockerFile()" >Create</button>
+      </form>
+      <br />
+             <form role="form">
+               <div class="form-group input-group">
+                 <input type="text" class="form-control" ng-model="dockerFilterName" placeholder="Name filter">
+                   <span class="input-group-btn">
+                     <div class="btn btn-default"><i class="fa fa-search"></i>
+                     </div>
+                   </span>
+                 </div>
+               </form>
+         <hr />
+         <table class="table table-hover ">
+           <tbody>
+             <tr ng-repeat="d in dockerFiles | filter :dockerFilterName">
+               <td class="text-center">{{d}}</td>
+              <td class="text-center">  
+                  <div class="row">
+                    <div class="col-sm-6 text-center" ><a class="editing-components" >  <span uib-popover="Edit" popover-trigger="'mouseenter'"  ng-click="editDockerFile(d)" class="fa fa-pencil"> </span> </a> </div>
+                    <div class="col-sm-6 text-center"><a class="editing-components" ><span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-remove" ng-click="deleteDockerFile(d)"> </span> </a> </div>
+                  </div>
+              </td> 
+             </tr>
+           </tbody>
+         </table>
+
+      </div>
     
     
           <!-- <a  id="addAction" href="" ng-click="graphAction($event)" > <div class="glyphicon glyphicon-plus"></div></a></span> -->

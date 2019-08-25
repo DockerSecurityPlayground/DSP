@@ -47,8 +47,6 @@ function newLab(name, information, callback) {
 
     // Check if a directory exists
     (userPath, cb) => {
-      console.log("GEtUSER");
-      console.log(userPath);
       up = userPath;
       userName = path.basename(userPath);
       pathExists(path.join(userPath, name))

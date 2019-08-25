@@ -3,6 +3,7 @@ const appRoot = require('app-root-path');
 const configData = require('../data/config.js');
 const dockerImages = require('../data/docker-images.js');
 const dockerComposer = require('mydockerjs').dockerComposer;
+const dockerManager = require('mydockerjs').docker;
 const imageMgr = require('mydockerjs').imageMgr;
 const path = require('path');
 const async = require('async');
@@ -28,6 +29,15 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
     (imagesLab, cb) => imageMgr.areImagesInstalled(imagesLab, cb)],
     // End function , return correct or error
     (err, areInstalled) => callback(err, areInstalled));
+}
+
+exports.build = function build(params, body, callback, notifyCallback) {
+  async.waterfall([
+    (cb) => Checker.checkParams(params, ['dockerfile'], cb),
+    (cb) => configData.getUserPath(cb),
+    (up, cb) => cb(null, path.join(up, '.dockerfiles', params.dockerfile)),
+    (dockerfilePath, cb) => dockerManager.build(dockerfilePath, params.dockerfile, cb, notifyCallback)
+  ], (err) => callback(err))
 }
 // Start compose up and execute commands in body there are cListToDraw containers
 exports.composeUp = function composeUp(params, body, callback, notifyCallback) {

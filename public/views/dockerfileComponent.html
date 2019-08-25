@@ -6,63 +6,99 @@
   height: 65px;
   text-align: center;
   padding-top: 25px;
-  margin: 10px;
+  margin: 11px;
 }
 .dragover {
   border: 5px dashed blue;
 }
 .ace_editor { height: 500px; }
+.ace-build { height: 500px; }
 
 </style>
-
 <div class="modal-header">
-  <h3 class="modal-title" id="modal-title">Dockerfile</h3>
-</div>
-<div class="modal-body" id="modal-body">
-  <div class="row">
-    <div class="col-sm-3">
-      <js-tree 
-         tree-data="scope" 
-         tree-model="treeModel"
-         tree-events="select_node:nodeSelected"
-         ></js-tree>
+  <!-- <h3 class="modal-title" id="modal-title">{{$ctrl.dockerfile.name}}</h3> -->
+
+  <div class="modal-body" id="modal-body">
+    <div class="btn btn-default" ngf-select="upload($files)" ngf-multiple="true">Add File</div>
+    Drop File:
+    <div ngf-drop ngf-select ng-model="files" class="drop-box" 
+                                              ngf-drag-over-class="'dragover'" ngf-multiple="true" ngf-include-dir="true" ngf-allow-dir="true"
+                                                                                                                          >Drag and Drop file</div>
+    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
+    Files:
+    <ul>
+      <li ng-repeat="f in files" style="font:smaller">{{f.name}} {{f.$error}} {{f.$errorParam}}</li>
+    </ul>
+    Upload Log:
+    <pre>{{log}}</pre>
+    <div class="row">
+      <div class="col col-sm-offset-3">
+        Selected element:  <b>{{selectedElement.selected}}   
+          <button type="button" ng-click="removeElement()" class="btn btn-default">
+            <span class="glyphicon glyphicon-remove-circle"></span>  Delete
+          </button>
+
+
+
+      </div>
     </div>
-    <div class="col-sm-9" ui-ace="{
-    theme: 'terminal',
-    mode: 'yaml'
-    }"
-                          ng-model=dockerfile
-                          >
+    <div class="row">
+      <div class="col-sm-3">
+
+        <br />
+        <js-tree 
+           tree-data="scope" 
+           tree-model="treeModel"
+           tree-events="select_node:nodeSelected"
+           ></js-tree>
+      </div>
+      <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{
+      theme: 'terminal',
+      mode: 'yaml'
+      }"
+                                                                          ng-model=selectedElement.content
+                                                                          >
+      </div>
     </div>
-      <br/><br/>
-      <div class="btn btn-default" ngf-select="upload($files)" ngf-multiple="true">Select File</div>
-      Drop File:
-      <div ngf-drop ngf-select ng-model="files" class="drop-box" 
-                                                ngf-drag-over-class="'dragover'" ngf-multiple="true" ngf-include-dir="true" ngf-allow-dir="true"
-                                                                                                                            >Drop pdfs or images here or click to upload</div>
-      <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
-      Files:
-      <ul>
-        <li ng-repeat="f in files" style="font:smaller">{{f.name}} {{f.$error}} {{f.$errorParam}}</li>
-      </ul>
-      Upload Log:
-      <pre>{{log}}</pre>
+        <br/>
 
-      <!-- <p class="row"> -->
-      <!--   <div class="col-sm-6"><label> Select File From Host </label> </div> -->
-      <!--   <div class="col-sm-6"><input text ng-model="$ctrl.hostPath" ></div> -->
-      <!-- </p> -->
-      <!-- <p class="row"> -->
-      <!--   <div class="col-sm-6"><label> Select Container Destination Dir</label> </div> -->
-      <!--   <div class="col-sm-6"><input text ng-model="$ctrl.containerPath" ></div> -->
-      <!-- </p> -->
+        <!-- <p class="row"> -->
+        <!--   <div class="col-sm-6"><label> Select File From Host </label> </div> -->
+        <!--   <div class="col-sm-6"><input text ng-model="$ctrl.hostPath" ></div> -->
+        <!-- </p> -->
+        <!-- <p class="row"> -->
+        <!--   <div class="col-sm-6"><label> Select Container Destination Dir</label> </div> -->
+        <!--   <div class="col-sm-6"><input text ng-model="$ctrl.containerPath" ></div> -->
+        <!-- </p> -->
 
-      <p class="row">
-      <div class="col-sm-6"> <label> Upload </label> </div>
-      <div class="col-sm-2"><input type="submit" class="btn btn-success" ng-click="$ctrl.save()" value="Save"></div>
-      <div class="col-sm-2"><button class="btn btn-danger" type="button" ng-click="$ctrl.cancel()">Cancel</button></div>
-      </p>
+        <div class="row">
+          <div class="col col-sm-6 col-sm-offset-3">
+            <button type="button" class="btn btn-success" ng-click="saveDockerfile()">
+              <span class="glyphicon glyphicon-floppy-save"></span> Save Image 
+            </button>
+            <button type="button" class="btn btn-primary" ng-click="build()">
+              <span class="glyphicon glyphicon-play"></span> Build
+            </button>
+          </div>
+          <!-- <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify"> -->
+          <div class="col col-sm-1 col-sm-offset-1">
+            <button type="button" class="btn btn-warning" ng-click="goToImages()">
+              Come Back
+            </button>
+          </div>
+          </div>
+          <br />
+          <div ng-show="notify" class="row">
+            <div class="col col-sm-offset-10">
+              <button class="btn btn-default" ng-click="clearBuild()"> <span class="glyphicon glyphicon-remove-circle"> </span>Close Panel </button>
+            </div>
 
-  </div>
-  <br>
-  <br>
+          </div>
+          <div class="ace-build" ng-show="notify" ui-ace="{
+          theme: 'terminal',
+          mode: 'yaml'
+          }"
+                                                  ng-model=notify
+                                                  >
+          </div>
+        </div>

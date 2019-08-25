@@ -126,8 +126,12 @@ function initErrors() {
       name: 'errorCannotDelete',
       defaultMessage: 'Cannot delete',
       code: 1007,
+    },
+    {
+      name: 'alphabetic',
+      defaultMessage: 'Only alphabetic name allowed',
+      code: 1008,
     }
-
   ];
 
 
@@ -266,6 +270,15 @@ module.exports = {
   checkString(data, callback) {
     const err = new Errors.find('stringErr');
     _handle(_.isString(data), new err(), callback);
+  },
+  checkAlphabetic(data, callback) {
+    const myRegEx  = /[^a-z\d]/i;
+    let isValid = !(myRegEx.test(data));
+    if(isValid) {
+      callback(null);
+    } else {
+      callback(new Errors.find('alphabetic'));
+    }
   },
   // if config/config_user.json is already created,returns true else false
   isInstalled(cb) {

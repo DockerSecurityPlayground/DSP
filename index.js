@@ -14,6 +14,7 @@ const networkHandler = require('./app/handlers/network');
 const repoHandler = require('./app/handlers/repos');
 const dockerImages = require('./app/handlers/docker-images');
 const serviceHandler = require('./app/handlers/services')
+const dockerfilesHandler = require('./app/handlers/dockerfiles')
 // const installationHandler = require('./app/handlers/installation.js');
 const treeRoutes = require('./app/handlers/tree_routes.js');
 const Checker = require('./app/util/AppChecker.js');
@@ -104,6 +105,12 @@ app.get('/dsp_v1/docker_images/', networkHandler.getListImages);
 app.get('/dsp_v1/dsp_images', dockerImages.getImagesAllRepos);
 app.get('/dsp_v1/dsp_images/:reponame', dockerImages.getImagesRepo);
 app.get('/dsp_v1/dsp_images/:reponame/:labname', dockerImages.getImagesLab);
+
+app.post('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.createDockerFile);
+app.put('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.editDockerFile);
+app.get('/dsp_v1/dockerfiles', dockerfilesHandler.getDockerFiles);
+app.get('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.getDockerFile);
+app.delete('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.deleteDockerFile);
 // Api labels
 app.get('/dsp_v1/labels/:repo', labels.allLabels);
 app.get('/dsp_v1/labels/:repo/:nameLab', labels.labelsOfLab);

@@ -40,6 +40,7 @@ function getImagesAllRepos(req, res) {
 }
 
 function areImagesInstalled(req, res) {
+
   async.waterfall([
   (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
   (cb) => Checker.checkString(req.params.reponame, cb),
@@ -69,8 +70,13 @@ function getImagesLab(req, res) {
   }
 }
 
+function saveTempDockerfile(req, res) {
+
+}
+
 
 exports.getImagesRepo = getImagesRepo;
 exports.getImagesLab= getImagesLab;
 exports.getImagesAllRepos = getImagesAllRepos;
+exports.saveTempDockerfile = saveTempDockerfile;
 // exports.areImagesInstalled = areImagesInstalled;
