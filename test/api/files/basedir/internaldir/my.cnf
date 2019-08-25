@@ -1,0 +1,111 @@
+[client]
+port    = 3306
+socket  = /var/run/mysqld/mysqld.sock
+
+# This was formally known as [safe_mysqld]. Both versions are currently parsed.
+[mysqld_safe]
+socket  = /var/run/mysqld/mysqld.sock
+nice    = 0
+syslog
+
+[mysqld]
+# Basic Settings
+user      = mysql
+pid-file  = /var/run/mysqld/mysqld.pid
+socket    = /var/run/mysqld/mysqld.sock
+port      = 3306
+basedir   = /usr
+datadir   = /var/lib/mysql
+tmpdir    = /tmp
+
+lc-messages-dir         = /usr/share/mysql
+skip-external-locking
+
+# Engine
+default-storage-engine  = InnoDB
+
+# Listening IP
+bind-address            = 0.0.0.0
+
+# Safety
+max-connect-errors      = 1000000
+max_allowed_packet      = 64M
+skip-name-resolve
+sysdate-is-now          = 1
+innodb                  = FORCE
+innodb-strict-mode      = 1
+
+wait_timeout            = 60
+interactive_timeout     = 60
+
+# Buffers
+sort_buffer_size        = 4M
+read_buffer_size        = 2M
+join_buffer_size        = 8M
+read_rnd_buffer_size    = 16M
+
+thread_concurrency      = 8 # Max CPU * 2
+
+# MyISAM
+key-buffer-size         = 32M
+myisam-recover          = FORCE,BACKUP
+myisam_sort_buffer_size = 64M
+
+# CACHES AND LIMITS #
+tmp-table-size          = 128M
+max-heap-table-size     = 128M
+query-cache-type        = 0
+query-cache-size        = 0
+query_cache_limit       = 1M
+max-connections         = 5000
+thread-cache-size       = 50
+thread_stack            = 192K
+open-files-limit        = 65535
+table-definition-cache  = 1024
+table-open-cache        = 2048
+
+# Bin logs
+binlog-format           = ROW
+log-bin                 = /var/lib/mysql/mysql-bin
+log-slave-updates       = 1
+expire-logs-days        = 5
+sync-binlog             = 1
+max_binlog_size         = 100M
+
+server-id = 1 # randomize it incase of multiple servers
+
+# InnoDB
+innodb-buffer-pool-size         = 2048M
+innodb_buffer_pool_instances    = 8
+innodb_additional_mem_pool_size = 20M
+innodb_log_buffer_size          = 8M
+innodb-log-files-in-group       = 2
+innodb-log-file-size            = 256M
+innodb-file-per-table           = 1
+innodb-flush-log-at-trx-commit  = 1
+innodb-flush-method             = O_DIRECT
+
+# With virtual synchrony redundancy, make write queries faster
+innodb_doublewrite              = 1
+
+# This is a recommended tuning variable for performance
+innodb_locks_unsafe_for_binlog  = 1
+
+# LOGGING
+general_log_file                = /var/log/mysql/mysql.log
+log-error                       = /var/log/mysql/mysql-error.log
+log-queries-not-using-indexes   = 1
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet  = 16M
+
+[isamchk]
+key_buffer    = 16M
+
+#
+# * IMPORTANT: Additional settings that can override those from this file!
+#   The files must end with '.cnf', otherwise they'll be ignored.
+#
+!includedir /etc/mysql/conf.d/

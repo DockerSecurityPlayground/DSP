@@ -4,6 +4,7 @@ var api = '/dsp_v1/docker_network/' ;
 	var api_docker = '/dsp_v1/docker_images/' ;
 	var dsp_images_docker = '/dsp_v1/dsp_images/' ;
 	var dsp_running_services = '/dsp_v1/services/' ;
+	var dsp_dockerfile_service = '/dsp_v1/dockerfiles/' ;
 	var dsp_service_network = '/dsp_v1/networkservices' ;
   var url = 'http://' + location.host + '/';
 
@@ -245,6 +246,30 @@ var api = '/dsp_v1/docker_network/' ;
         servicename : c
       };
       return $http.delete(dsp_service_network+ "?networkname="+n+"&servicename="+c, data);
+    },
+    deleteDockerFile : function deleteDockerFile(imageName) {
+      return $http.delete(dsp_dockerfile_service + imageName)
+    },
+    // Dockerfile functions
+    createDockerFile : function createDockerFile(imageName) {
+      return $http.post(dsp_dockerfile_service + imageName)
+    },
+
+    getDockerfile : function getDockerfile(name) {
+      return $http.get(dsp_dockerfile_service + name);
+    },
+    editDockerfile : function editDockerfile(data) {
+      return $http(
+        {url: dsp_dockerfile_service + data.name,
+        method: 'PUT',
+        data: data,
+        headers: {
+          'Content-Type' :  'application/json; charset=UTF-8'
+        }
+        });
+    },
+    getDockerFiles : function getDockerImages() {
+      return $http.get(dsp_dockerfile_service);
     }
 	}
 }

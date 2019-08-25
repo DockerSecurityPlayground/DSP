@@ -172,9 +172,11 @@ function getImagesLab(reponame, labname, allImages, callback) {
       }
     })
   }
+// Exlude these dirs from the lab research
 function _isRepoPath(thePath) {
   return (path.basename(thePath) !== ".data" &&
           path.basename(thePath) !== ".docker-images" &&
+          path.basename(thePath) !== ".dockerfiles" &&
           path.basename(thePath) !== ".git"
       );
 }

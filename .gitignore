@@ -7,6 +7,7 @@ logs/**
 _MEI*
 *.log
 npm-debug.log*
+snippets
 
 # Runtime data
 pids

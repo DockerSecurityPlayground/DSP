@@ -2,47 +2,55 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
   console.log("in manage images")
   var imageList = [];
   $scope.imagePanel = "repo_images"
-  // All images if query string is allimages
-  if ($location.search().allimages && $location.search().allimages == 'true') {
-    $scope.imagePanel = "all_images";
-  }
-
-
-  dockerAPIService.getDockerImages()
-    .then(function successCallback(response) {
-          $scope.allImages = response.data.data
-          console.log($scope.allImages)
-          $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
-          /* DODCKER API INIT  : load docker images */
-          console.log("IMAGESCTRL GETDSPIMAGES");
-          dockerAPIService.getDSPImages(true)
-            .then(function successCallback(response) {
-              var images = response.data.data.images
-              console.log(images)
-              $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
-              Object.keys(images).forEach(function(e) {
-                // Get the key and assign it to `connector`
-                images[e].repoName = e;
-                // [ {lab, images}, {lab2, images2} ...
-                let labImages = images[e].lab_images;
-                _.each(labImages, function(li) {
-                   li.images = colorImages(li.images, $scope.allImages)
-                // images[e].lab_images= colorImages(images[e].lab_images, $scope.allImages)
-                })
-                imageList.push(images[e]);
+  $scope.dockerFilterName = "";
+  $scope.dockerFiles = [];
+  $scope.dockerFileToCreate = { name : "testdocker"};
+  function init() {
+    // All images if query string is allimages
+    if ($location.search().allimages && $location.search().allimages == 'true') {
+      $scope.imagePanel = "all_images";
+    }
+    dockerAPIService.getDockerImages()
+      .then(function successCallback(response) {
+        $scope.allImages = response.data.data
+        console.log($scope.allImages)
+        $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
+        /* DODCKER API INIT  : load docker images */
+        console.log("IMAGESCTRL GETDSPIMAGES");
+        dockerAPIService.getDSPImages(true)
+          .then(function successCallback(response) {
+            var images = response.data.data.images
+            console.log(images)
+            $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
+            Object.keys(images).forEach(function(e) {
+              // Get the key and assign it to `connector`
+              images[e].repoName = e;
+              let labImages = images[e].lab_images;
+              _.each(labImages, function(li) {
+                li.images = colorImages(li.images, $scope.allImages)
+              })
+              imageList.push(images[e]);
             });
-              $scope.imageList = imageList
-              initAllImages()
-              console.log($location.hash());
-              $timeout(function(){$anchorScroll()});
-            },
+            $scope.imageList = imageList
+            initAllImages()
+            console.log($location.hash());
+            $timeout(function(){$anchorScroll()});
+          },
             function errorCallback(response) {
-                Notification({message:"Sorry,  error in loading docker images"}, 'error');
+              Notification({message:"Sorry,  error in loading docker images"}, 'error');
             })
       },
-    function errorCallback(response) {
-        Notification({message:"Sorry,  error in loading docker images"}, 'error');
-    })
+        function errorCallback(response) {
+          Notification({message:"Sorry,  error in loading docker images"}, 'error');
+        })
+    dockerAPIService.getDockerFiles()
+    .then(function success(response) {
+      $scope.dockerFiles = response.data.data.dockerfiles;
+
+    }, function err(response) {
+      Notification({message: response.data.message}, 'error');
+    });
+  }
 
   function initAllImages() {
     console.log("IN INIT ALL IMAGES")
@@ -51,7 +59,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
       ims = il.images.map(i => i.name)
       dockerLabImages = _.union(dockerLabImages, ims)
     })
-      dockerLabImages = _.uniq(dockerLabImages)
+    dockerLabImages = _.uniq(dockerLabImages)
     _.each($scope.allImages, (image) => {
       image.contains = true
       if(_.contains(dockerLabImages, image.name)) {
@@ -62,194 +70,233 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
 
     })
   }
-
-
-    function disableAllImages(iName, status=true) {
-      _.each($scope.allImages, function (ims) {
-        if (ims.name === iName) {
-          console.log("CONTAINS")
-          console.log(ims.name)
-          ims.contains = status
-        }
-      })
-
-      for (li in $scope.imageList) {
-        labImages = $scope.imageList[li].lab_images
-        for (i in labImages) {
-          images = labImages[i].images
-          for (ii in images)
-            if (images[ii].name == iName)
+  function disableAllImages(iName, status=true) {
+    _.each($scope.allImages, function (ims) {
+      if (ims.name === iName) {
+        console.log("CONTAINS")
+        console.log(ims.name)
+        ims.contains = status
+      }
+    })
+    for (li in $scope.imageList) {
+      labImages = $scope.imageList[li].lab_images
+      for (i in labImages) {
+        images = labImages[i].images
+        for (ii in images)
+          if (images[ii].name == iName)
             images[ii].disabled = status
-        }
       }
     }
+  }
+
   function successAll(iName, success) {
-      for (li in $scope.imageList) {
-        labImages = $scope.imageList[li].lab_images
-        for (i in labImages) {
-          images = labImages[i].images
-          for (ii in images)
-            if (images[ii].name == iName) {
+    for (li in $scope.imageList) {
+      labImages = $scope.imageList[li].lab_images
+      for (i in labImages) {
+        images = labImages[i].images
+        for (ii in images)
+          if (images[ii].name == iName) {
             images[ii].textType = success ? "text-success" : "text-danger"
             images[ii].contains = success
           }
-        }
       }
+    }
+  }
+  function colorImages(labImages, images) {
+    retImages =  []
+    // ims = _.pluck(images, 'name')
+    // console.log(ims)
+    _.each(labImages, function(i) {
+      newI = {}
+      newI.name = i.name
+      newI.textType = i.contains ? "text-success" : "text-danger";
+      newI.contains = i.contains
+      newI.progress = ""
+      newI.disabled = false
+      retImages.push(newI);
+    })
+    return retImages
   }
 
 
+  // Initialization
+  init();
+  // End Initialization
 
-    $scope.delImage = function deleteImage(p) {
-      var modalInstance = $uibModal.open({
-        component: 'modalComponent',
-        resolve: {
+  /* Scope methods */
+  $scope.delImage = function deleteImage(p) {
+    var modalInstance = $uibModal.open({
+      component: 'modalComponent',
+      resolve: {
         lab: function () {
           return p;
-          }
         }
+      }
+    });
+    //Cancel image
+    modalInstance.result.then(function () {
+      var nameToDelete = p.name;
+      imageSep = nameToDelete.split(":")
+      nameToDownload = imageSep[0]
+      tagToDownload = imageSep[1]
+
+      SocketService.manage(JSON.stringify({
+        action : 'remove_image',
+        params : {
+          name : nameToDownload,
+          tag : tagToDownload
+        }
+      }), function(event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          console.log("Success")
+          disableAllImages(p.name, false)
+          successAll(p.name, false)
+          // Remove deleted image from allImages
+          // for (i in $scope.allImages) {
+          //   if ($scope.allImages[i].name === p.name)
+          //     delete $scope.allImages[i]
+          // }
+          // p.textType = "text-success"
+        }
+        else if(data.status === 'error') {
+          Notification(data.message, 'error');
+          console.log(data)
+          // $scope.responseError = $scope.responseErrorHeader + data.message;
+        }
+
       });
-      //Cancel image
-      modalInstance.result.then(function () {
-        var nameToDelete = p.name;
-        imageSep = nameToDelete.split(":")
-        nameToDownload = imageSep[0]
-        tagToDownload = imageSep[1]
+    },
+      function errorCallback(response) {
+        console.log("NO DELETE")
+      });
+  }
 
-        SocketService.manage(JSON.stringify({
-          action : 'remove_image',
-          params : {
+  $scope.downloadNewImage = function downloadNewImage(i) {
+    var ni = {}
+    ni.name = i;
+    ni.disabled = false;
+    $scope.downloadImage(ni);
+  }
+
+  $scope.downloadImage = function downloadImage(p) {
+    if (p.disabled == true) {
+      console.log(p.name + " already in downloading")
+    } else {
+      p.isVisible = true;
+      p.isExtracting = false;
+      var ids = [];
+      var total = 0;
+      imageSep = p.name.split(":")
+      nameToDownload = imageSep[0]
+      tagToDownload = imageSep[1]
+      // p.disabled = true
+      disableAllImages(p.name, true)
+      SocketService.manage(JSON.stringify({
+        action : 'download_images',
+        params : {
           name : nameToDownload,
           tag : tagToDownload
+        }
+      }), function(event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          console.log("Success")
+          p.progress=""
+          p.isVisible = false
+          successAll(p.name, true)
+          // p.textType = "text-success"
+        }
+        else if(data.status === 'error') {
+          Notification('Some error in download image', 'error');
+          console.log(data)
+          // $scope.responseError = $scope.responseErrorHeader + data.message;
+        }
+        // Notify
+        else {
+          console.log("IMAGES");
+          console.log(data.message);
+          var message = JSON.parse(data.message);
+          if(message.status == 'Pulling fs layer'){
+            var obj = {'id': message.id,'percentage': 0};
+            ids.push(obj);
           }
-        }), function(event) {
-            var data = JSON.parse(event.data);
-            if(data.status === 'success')  {
-              console.log("Success")
-              disableAllImages(p.name, false)
-              successAll(p.name, false)
-              // Remove deleted image from allImages
-              // for (i in $scope.allImages) {
-              //   if ($scope.allImages[i].name === p.name)
-              //     delete $scope.allImages[i]
-              // }
-              // p.textType = "text-success"
-            }
-            else if(data.status === 'error') {
-                    Notification(data.message, 'error');
-                    console.log(data)
-                    // $scope.responseError = $scope.responseErrorHeader + data.message;
+          if(message.status == 'Downloading'){
+            _.each(ids, function(element){
+              if(message.id == element.id){
+                var normalized = (100 / ids.length);
+                element.percentage = ((message.progressDetail.current * normalized) / message.progressDetail.total) - element.percentage;
+                total += element.percentage;
               }
-
-        });
-      },
-     function errorCallback(response) {
-       console.log("NO DELETE")
-     });
-    }
-
-    $scope.downloadNewImage = function downloadNewImage(i) {
-      var ni = {}
-      ni.name = i;
-      ni.disabled = false;
-      $scope.downloadImage(ni);
-    }
-
-    $scope.downloadImage = function downloadImage(p) {
-        if (p.disabled == true) {
-          console.log(p.name + " already in downloading")
-        } else {
-        p.isVisible = true;
-        p.isExtracting = false;
-        var ids = [];
-        var total = 0;
-        imageSep = p.name.split(":")
-        nameToDownload = imageSep[0]
-        tagToDownload = imageSep[1]
-        // p.disabled = true
-        disableAllImages(p.name, true)
-        SocketService.manage(JSON.stringify({
-          action : 'download_images',
-          params : {
-          name : nameToDownload,
-          tag : tagToDownload
+            })
           }
-        }), function(event) {
-            var data = JSON.parse(event.data);
-            if(data.status === 'success')  {
-              console.log("Success")
-              p.progress=""
-              p.isVisible = false
-              successAll(p.name, true)
-              // p.textType = "text-success"
-            }
-            else if(data.status === 'error') {
-                    Notification('Some error in download image', 'error');
-                    console.log(data)
-                    // $scope.responseError = $scope.responseErrorHeader + data.message;
-              }
-            // Notify
-            else {
-              console.log("IMAGES");
-              console.log(data.message);
-              var message = JSON.parse(data.message);
-              if(message.status == 'Pulling fs layer'){
-			    var obj = {'id': message.id,'percentage': 0};
-			    ids.push(obj);
-		      }
-		      if(message.status == 'Downloading'){
-			    _.each(ids, function(element){
-			      if(message.id == element.id){
-				    var normalized = (100 / ids.length);
-				    element.percentage = ((message.progressDetail.current * normalized) / message.progressDetail.total) - element.percentage;
-                    total += element.percentage;
-			      }
-                })
-		      }
-		      if(message.status == 'Download complete'){
+          if(message.status == 'Download complete'){
 
-		        _.each(ids, function(element){
-			      if(message.id == element.id){
-				    var normalized = (100 / ids.length)
-				    element.percentage = normalized - element.percentage;
-                    total += element.percentage;
-			      }
-                })
-		      }
-              if(total > 99)
-              {
-                p.isExtracting = true;
+            _.each(ids, function(element){
+              if(message.id == element.id){
+                var normalized = (100 / ids.length)
+                element.percentage = normalized - element.percentage;
+                total += element.percentage;
               }
-		      p.progress = total;
-              //p.progress = dockerAPIService.formatPullLog(data.message);
-            }
+            })
+          }
+          if(total > 99)
+          {
+            p.isExtracting = true;
+          }
+          p.progress = total;
+          //p.progress = dockerAPIService.formatPullLog(data.message);
+        }
       })
     }
   }
-    $scope.downloadAll = function downloadAll(lab) {
-      var images = lab.images
+  $scope.downloadAll = function downloadAll(lab) {
+    var images = lab.images
 
-      _.each(images, (i) => {
-        console.log("IMAGE")
-        console.log(i)
-        $scope.downloadImage(i)
-      })
+    _.each(images, (i) => {
+      console.log("IMAGE")
+      console.log(i)
+      $scope.downloadImage(i)
+    })
+  }
+  /** Dockerfiles scope methods  */
+  $scope.createDockerFile = function() {
+    // Function to create
+    dockerAPIService.createDockerFile($scope.dockerFileToCreate.name)
+    .then(function successCallback(response) {
+      Notification("Success");
+      $location.url('/dockerfile/' + $scope.dockerFileToCreate.name);
+    },function errorCallback(response) {
+      Notification({message: response.data.message}, 'error');
+    })
+  }
 
+  $scope.editDockerFile = function(d) {
+    $location.url('/dockerfile/' + d);
+  }
 
-    }
+  $scope.deleteDockerFile = function(d) {
+    var modalInstance = $uibModal.open({
+      component: 'modalComponent',
+      resolve: {
+        lab: function () {
+          return {name: d};
+        }
+      }
+    });
+    //Cancel lab
+    //Success
+    modalInstance.result.then(function () {
+      // Ok delete
+    dockerAPIService.deleteDockerFile(d)
+    .then(function successCallback(response) {
+      Notification("Deleted", 'success');
+      $scope.dockerFiles = _.without($scope.dockerFiles, d);
+      // TBD Remove
 
-    function colorImages(labImages, images) {
-         retImages =  []
-        // ims = _.pluck(images, 'name')
-        // console.log(ims)
-        _.each(labImages, function(i) {
-            newI = {}
-            newI.name = i.name
-            newI.textType = i.contains ? "text-success" : "text-danger";
-            newI.contains = i.contains
-            newI.progress = ""
-            newI.disabled = false
-            retImages.push(newI);
-        })
-        return retImages
-    }
+    }, function error(response) {
+      Notification({message: response.data.message}, 'error');
+    });
+    }, function() {console.log("No Delete");});
+  }
 }

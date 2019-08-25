@@ -72,6 +72,19 @@ function manageInstallation(ws, jsonMessage) {
 //   });
 // }
 
+function manageDockerBuild(ws, jsonMessage) {
+  console.log("MANAGE DOCKERBUILD");
+  console.log(jsonMessage);
+  const body = jsonMessage.body;
+  const params = jsonMessage.params;
+  dockerActions.build(params, body, (err) => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
+
+
 function manageDockerUp(ws, jsonMessage) {
   const body = jsonMessage.body;
   const params = jsonMessage.params;
@@ -183,6 +196,9 @@ exports.init = function init(server) {
         //   manageAreImagesInstalled(wc, jsonMessage);
         case 'docker_up':
           manageDockerUp(ws, jsonMessage);
+          break;
+        case 'docker_build':
+          manageDockerBuild(ws, jsonMessage);
           break;
         case 'docker_down':
           manageDockerDown(ws, jsonMessage);

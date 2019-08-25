@@ -1,14 +1,177 @@
+/*
+ * n
+ *
+        "id": "root",
+        "parent": "#",
+        "text": "testdockerfile",
+        "content": "#",
+        'state' : {
+          'opened' : true,
+          'selected' : true
+        }*/
+function _addDir(f) {
+}
 var dsp_dockerfileComponent  =
   {
     templateUrl: 'views/dockerfileComponent.html',
     bindings: {
-      resolve: '<',
-      close: '&',
-      dismiss: '&'
+      dockerfile: '='
     },
-    controller: function ($http, $scope, Notification, Upload, $timeout) {
-      $scope.dockerfile = "test";
+    // bindings: {
+    //   resolve: '<',
+    //   close: '&',
+    //   dismiss: '&',
+    //   dockerfile: '='
+    // },
+    controller: function ($http, $scope, $location, Notification, Upload, $timeout, safeApplyService, SocketService, dockerAPIService) {
+      var $ctrl = this;
+      $scope.notify = "";
+      this.$onInit = function() {
+        // Initialization: take the project
+        dockerAPIService.getDockerfile(this.dockerfile.name)
+          .then(function successCallback(response) {
+            $scope.treeModel = response.data.data;
+            console.log(response.data.data);
+            _selectDockerfile($scope.treeModel);
+
+          }, function error(response) {
+            Notification({message: response.data.message}, 'error');
+          });
+
+      };
+
+      // console.log(dockerfile);
+      $scope.selectedElement= {}
       $scope.log = '';
+      $scope.treeModel = [];
+
+      function _getFileContent(f, cb) {
+        var reader = new FileReader();
+        reader.readAsText(f, "UTF-8");
+        reader.onload = function (evt) {
+          cb(null, evt.target.result);
+        }
+        reader.onerror = function (evt) {
+          cb(new Error("error reading file"));
+        }
+      }
+      function _getTreeElement(treeModel, id) {
+        return _.findWhere(treeModel, {id: id});
+      }
+      function _getRoot(treeModel) {
+        return _getTreeElement(treeModel, '.');
+      }
+      function _removeElement(treeModel, id) {
+        // Remove current id
+        var treeModel =  _.without(treeModel, _.findWhere(treeModel, {
+          id: id}));
+        _.each(treeModel, function (e) {
+          console.log(e);
+          // Remove parents
+          if (e.parent === id) {
+            treeModel = _removeElement(treeModel, e.id);
+          }
+        })
+        return treeModel;
+      }
+      function _selectDockerfile(treeModel) {
+        treeModel.forEach(function (t) {
+          if (t.state && t.state.selected == true) {
+            t.state.selected = false;
+          }
+          if (t.id === "./Dockerfile") {
+            t.state = { selected : true }
+            $scope.selectedElement= {content: t.content, selected: "Dockerfile",
+              type: "textfile",
+              id: "./Dockerfile"};
+          }
+        });
+      }
+      function _editElement(treeModel, id, content) {
+        treeModel.forEach(function (m) {
+          if (m.id === id) {
+            m.content = content;
+          }
+        });
+        return treeModel;
+      }
+
+      function _containsTreeElement(treeModel, id) {
+        return _getTreeElement(treeModel, id) !== undefined
+      }
+      function _newNode(treeModel, parent, id, name, content, type) {
+        var toAppend = {
+          "id": id,
+          "parent": parent,
+          "text": name,
+          "content": content,
+          "type": type
+        };
+        if (type == 'textfile') toAppend.icon = 'jstree-file';
+        else toAppend.state= {
+          'opened' : true,
+          'selected' : false
+        };
+        treeModel.push(toAppend);
+        return treeModel;
+        // safeApplyService.exec($scope, function() {
+        //   console.log(toAppend);
+        // });
+      }
+      function _newDirNode(treeModel, parent, id, name) {
+        return _newNode(treeModel, parent, id, name, '#', 'dir');
+      }
+      function _newNodeToRoot(treeModel, id, name, content, type) {
+        return _newNode(treeModel, '.', id, name, content, type);
+      }
+      function _getDirs(thePath) {
+        var ret = thePath.split('/')
+        ret.pop()
+        return ret;
+      }
+      function _generateId(basePath, name) {
+        if (basePath == "") {
+          basePath = ".";
+        }
+        return basePath + "/" + name;
+      }
+      function _isComplexPath (p) {
+        return p && p.includes('/');
+      }
+      function _manageUpload(f) {
+        if (f.type === 'directory') {
+          console.log("avoid directories");
+        } else {
+          var currId = ".";
+          var newTreeModel = [];
+          angular.copy($scope.treeModel, newTreeModel);
+          // Get Path
+          if (_isComplexPath(f.path)) {
+            // Get dirs
+            var dirs = _getDirs(f.path);
+            // Iterative exploring of directories
+            _.each(dirs, function(d) {
+              let parentId = currId;
+              currId = _generateId(currId, d);
+              if (!_containsTreeElement(newTreeModel, currId))
+                newTreeModel = _newDirNode(newTreeModel, parentId, currId, d)
+            })
+          }
+          _getFileContent(f, function(err, data) {
+            if (err) {
+              console.log('ERROR');
+            } else {
+              var fileId = _generateId(currId, f.name);
+              // Parent, current id, name, content, type
+              newTreeModel =  _newNode(newTreeModel, currId, fileId, f.name, data, 'textfile');
+            }
+            safeApplyService.exec($scope, function() {
+              angular.copy(newTreeModel, $scope.treeModel);
+            });
+          });
+        }
+      }
+      var rootElement = _getRoot($scope.treeModel);
       $scope.$watch('files', function () {
         $scope.upload($scope.files);
       });
@@ -22,8 +185,8 @@ var dsp_dockerfileComponent  =
         if (files && files.length) {
           for (var i = 0; i < files.length; i++) {
             var file = files[i];
-            console.log("FILE");
-            console.log(file);
+
+            _manageUpload(file);
             // if (!file.$error) {
             //   Upload.upload({
             //     url: 'dockupload',
@@ -32,74 +195,109 @@ var dsp_dockerfileComponent  =
             //       file: file
             //     }
             //   }).then(function (resp) {
-            //     $timeout(function() {
-            //       $scope.log = 'file: ' +
-            //         resp.config.data.file.name +
-            //         ', Response: ' + JSON.stringify(resp.data) +
-            //         '\n' + $scope.log;
-            //     });
-            //   }, null, function (evt) {
-            //     var progressPercentage = parseInt(100.0 *
-            //       evt.loaded / evt.total);
-            //     $scope.log = 'progress: ' + progressPercentage +
-            //       '% ' + evt.config.data.file.name + '\n' +
-            //       $scope.log;
-            //   });
-            }
-          }
-        }
+              //     $timeout(function() {
+              //       $scope.log = 'file: ' +
+              //         resp.config.data.file.name +
+              //         ', Response: ' + JSON.stringify(resp.data) +
+              //         '\n' + $scope.log;
+              //     });
+//   }, null, function (evt) {
+  //     var progressPercentage = parseInt(100.0 *
+  //       evt.loaded / evt.total);
+  //     $scope.log = 'progress: ' + progressPercentage +
+  //       '% ' + evt.config.data.file.name + '\n' +
+  //       $scope.log;
+  //   });
+}
+}
+}
 
+$scope.removeElement = function() {
+  if ($scope.selectedElement.id == './Dockerfile' ||  $scope.selectedElement.id == '.') {
+    Notification('Cannot remove root or Dockerfile element', 'warning');
+  } else {
+    var newTreeModel = [];
+    angular.copy($scope.treeModel, newTreeModel)
+    $scope.treeModel = _removeElement($scope.treeModel, $scope.selectedElement.id);
+    // safeApplyService.exec($scope, function() {
+    // angular.copy(newTreeModel, $scope.treeModel);
+    // });
+  }
+}
 
+$scope.nodeSelected = function(e, data) {
+  var _l = data.node.li_attr;
+  var content = data.node.original.content
+  var type = data.node.original.type
+  safeApplyService.exec($scope, function() {
+    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content)
+    $scope.selectedElement.content = content;
+    $scope.selectedElement.type = type;
+    $scope.selectedElement.selected = data.node.original.text;
+    $scope.selectedElement.id = data.node.original.id;
+  })
+}
 
-      $scope.nodeSelected = function(e, data) {
-        var _l = data.node.li_attr;
-        alert(_l.id)
-      }
+$scope.goToImages = function() {
+  $location.url('/images');
+}
+$scope.saveDockerfile = function() {
+  if ($scope.selectedElement.type !== "dir") {
+    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content)
+  }
+  var toSend = {
+    name: $ctrl.dockerfile.name,
+    content: _.filter($scope.treeModel, function (e) {return e.id !== '.'})
+  }
+  console.log(toSend);
 
-      $scope.treeModel = [{
-        "id": "root",
-        "parent": "#",
-        "text": "root",
-        'state' : {
-          'opened' : true,
-          'selected' : true
-        }
-      },
-        {
-          "id": "dockerfile",
-          "parent": "root",
-          "text": "Dockerfile",
-          "icon": "jstree-file"
-        }
-      ]
-      // {
-      // "id": "ajson2",
-      // "parent": "#",
-      // "text": "Root node 2"
-      // }, {
-      // "id": "ajson3",
-      // "parent": "ajson2",
-      // "text": "Child 1"
-      // }, {
-      // "id": "ajson4",
-      // "parent": "ajson2",
-      // "text": "Child 2"
-      // }]
+  dockerAPIService.editDockerfile(toSend)
+    .then(function successCallback(response) {
+      Notification("Success");
+    },function errorCallback(response) {
+      Notification({message: response.data.message}, 'error');
+    });
+};
 
-      // $ctrl.hostPath = "/";
-      // $ctrl.containerPath = "/";
+$scope.clearBuild = function() {
+  $scope.notify = "";
+}
 
-      $scope.$onInit = function () {
-        // $ctrl.lab = $ctrl.resolve.lab;
-      };
-
-      $scope.ok = function () {
-        $scope.close();
-      };
-
-      $scope.cancel = function () {
-        $scope.dismiss();
-      };
+$scope.build = function() {
+  $scope.notify = "";
+  //Send
+  SocketService.manage(JSON.stringify({
+    action : 'docker_build',
+    params : {
+      dockerfile : $ctrl.dockerfile.name,
+    }
+  }), function(event) {
+    var data = JSON.parse(event.data);
+    switch (data.status) {
+      case 'success':
+        Notification("Build finished!", 'success');
+        console.log("SUCCESS");
+        break;
+      case 'error':
+        Notification({message: data.message}, 'error');
+        break;
+      default:
+        console.log("Update");
+        $scope.notify += data.message;
+        console.log(data.message);
+        break
 
     }
-  }
+  })
+}
+
+$scope.ok = function () {
+  $scope.close();
+};
+
+$scope.cancel = function () {
+  $scope.dismiss();
+};
+
+}
+}
