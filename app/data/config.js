@@ -15,6 +15,16 @@ const getConfig = function getConfig(callback) {
   });
 };
 
+const getMainDir = function getMainDir(callback) {
+  getConfig((err, obj) => {
+    if (err) callback(err);
+    else {
+      const mainDir = path.join(appUtil.getHome(), obj.mainDir);
+      callback(null, mainDir);
+    }
+  });
+};
+
 
 const getUserPath = function getUserPath(callback) {
   getConfig((err, obj) => {
@@ -59,6 +69,7 @@ const updateConfig = function updateConfig(data, callback) {
 
 
 exports.getUserPath = getUserPath;
+exports.getMainDir = getMainDir;
 exports.getLabelFile = getLabelFile;
 exports.getConfig = getConfig;
 exports.updateConfig = updateConfig;

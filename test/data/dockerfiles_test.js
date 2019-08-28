@@ -51,8 +51,6 @@ const complexObj = { name: 'existent',
 describe('Dockerfile test', () => {
   before((done) => {
     chai.use(require('chai-fs'));
-    appChecker.initErrors();
-    appChecker.initConditions();
     done();
   });
   beforeEach((done) => {

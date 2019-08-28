@@ -147,8 +147,18 @@ function getDockerfile(name, callback) {
   }], (err, data) => callback(err, data))
 }
 
+function getImageNames(callback) {
+  async.waterfall([
+    (cb) => getDockerfiles(cb),
+    (dockerfiles, cb) => {
+      let imagesToBuild = dockerfiles.map((d) => d + ":latest");
+      cb(null, imagesToBuild);
+    }], (err, imagesToBuild) => callback(err, imagesToBuild));
+}
+
 exports.createDockerfile = createDockerfile;
 exports.getDockerfiles = getDockerfiles;
+exports.getImageNames = getImageNames;
 exports.editDockerfile = editDockerfile
 exports.removeDockerfile = removeDockerfile
 exports.getDockerfile = getDockerfile

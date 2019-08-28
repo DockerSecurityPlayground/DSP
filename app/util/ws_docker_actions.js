@@ -34,7 +34,19 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
 exports.build = function build(params, body, callback, notifyCallback) {
   async.waterfall([
     (cb) => Checker.checkParams(params, ['dockerfile'], cb),
-    (cb) => configData.getUserPath(cb),
+    (cb) => {
+      if (!params.repo) {
+        configData.getUserPath(cb);
+      } else {
+        configData.getMainDir((err, mainDir) => {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, path.join(mainDir, params.repo));
+          }
+        });
+      };
+    },
     (up, cb) => cb(null, path.join(up, '.dockerfiles', params.dockerfile)),
     (dockerfilePath, cb) => dockerManager.build(dockerfilePath, params.dockerfile, cb, notifyCallback)
   ], (err) => callback(err))

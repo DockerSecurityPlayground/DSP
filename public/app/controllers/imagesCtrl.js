@@ -4,6 +4,9 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
   $scope.imagePanel = "repo_images"
   $scope.dockerFilterName = "";
   $scope.dockerFiles = [];
+  // {
+  //   content: "Hello"
+  // }
   $scope.dockerFileToCreate = { name : "testdocker"};
   function init() {
     // All images if query string is allimages
@@ -13,6 +16,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
     dockerAPIService.getDockerImages()
       .then(function successCallback(response) {
         $scope.allImages = response.data.data
+        console.log("IMAGES");
         console.log($scope.allImages)
         $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
         /* DODCKER API INIT  : load docker images */
@@ -20,7 +24,6 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         dockerAPIService.getDSPImages(true)
           .then(function successCallback(response) {
             var images = response.data.data.images
-            console.log(images)
             $log.warn("TODO : CHECK SIZE DOCKER IMAGES == 0")
             Object.keys(images).forEach(function(e) {
               // Get the key and assign it to `connector`
@@ -28,6 +31,12 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
               let labImages = images[e].lab_images;
               _.each(labImages, function(li) {
                 li.images = colorImages(li.images, $scope.allImages)
+                // // Add build parameter
+                // _.each(li.images, function(i) {
+                //   var dockerImage = _.findWhere($scope.allImages, { name : i.name });
+                //   i.toBuild = dockerImage.toBuild;
+                // });
+
               })
               imageList.push(images[e]);
             });
@@ -67,13 +76,17 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
       }  else {
         image.textType = "text-warning"
       }
-
+    })
+    // Set log for download info
+    _.each($scope.imageList, function(i) {
+      _.each(i.lab_images, function(li) {
+        li.log = {content : ""};
+      })
     })
   }
   function disableAllImages(iName, status=true) {
     _.each($scope.allImages, function (ims) {
       if (ims.name === iName) {
-        console.log("CONTAINS")
         console.log(ims.name)
         ims.contains = status
       }
@@ -110,7 +123,8 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
       newI = {}
       newI.name = i.name
       newI.textType = i.contains ? "text-success" : "text-danger";
-      newI.contains = i.contains
+      newI.contains = i.contains;
+      newI.toBuild = i.toBuild;
       newI.progress = ""
       newI.disabled = false
       retImages.push(newI);
@@ -179,7 +193,50 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
     $scope.downloadImage(ni);
   }
 
-  $scope.downloadImage = function downloadImage(p) {
+  $scope.buildImage = function buildImage(p, repoName, log) {
+    if (p.disabled == true) {
+      console.log(p.name + " already in build")
+    } else {
+      p.isVisible = true;
+      p.isExtracting = false;
+      var ids = [];
+      var total = 0;
+      var imageSep = p.name.split(":")
+      var nameToBuild = imageSep[0]
+      disableAllImages(p.name, true)
+      SocketService.manage(JSON.stringify({
+        action : 'docker_build',
+        params : {
+          repo : repoName,
+          dockerfile : nameToBuild
+        }
+      }), function(event) {
+    var data = JSON.parse(event.data);
+    switch (data.status) {
+      case 'success':
+        console.log("Success");
+        p.progress = ""
+        p.isVisible = false;
+        log.content = "";
+        successAll(p.name, true);
+        p.textType = "text-success"
+        Notification({message: "Build done"}, 'success');
+      case 'error':
+        Notification({message: data.message}, 'error');
+        break;
+      default:
+        console.log("Update");
+        log.content += data.message;
+        // if (data.message.startsWith("Step "))
+        // Indeterminate bar
+        p.isExtracting=true;
+        break
+        }
+      });
+    }
+  }
+
+  $scope.downloadImage = function downloadImage(p, log) {
     if (p.disabled == true) {
       console.log(p.name + " already in downloading")
     } else {
@@ -202,10 +259,11 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         var data = JSON.parse(event.data);
         if(data.status === 'success')  {
           console.log("Success")
+          log.content = "";
           p.progress=""
           p.isVisible = false
           successAll(p.name, true)
-          // p.textType = "text-success"
+          p.textType = "text-success"
         }
         else if(data.status === 'error') {
           Notification('Some error in download image', 'error');
@@ -215,6 +273,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         // Notify
         else {
           console.log("IMAGES");
+          log.content += data.message;
           console.log(data.message);
           var message = JSON.parse(data.message);
           if(message.status == 'Pulling fs layer'){
@@ -250,13 +309,15 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
       })
     }
   }
-  $scope.downloadAll = function downloadAll(lab) {
+  $scope.downloadAll = function downloadAll(lab, repoName, log) {
     var images = lab.images
 
     _.each(images, (i) => {
-      console.log("IMAGE")
-      console.log(i)
-      $scope.downloadImage(i)
+      if (!i.toBuild) {
+        $scope.downloadImage(i, log)
+      } else {
+        $scope.buildImage =(i, repoName, log)
+      }
     })
   }
   /** Dockerfiles scope methods  */

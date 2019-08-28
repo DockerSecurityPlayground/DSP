@@ -2,6 +2,7 @@ const networkData = require('../data/network.js');
 const appRoot = require('app-root-path');
 const async = require('async');
 const dockerVolumes = require('../data/dockerVolumes.js');
+const dockerFiles = require('../data/dockerfiles.js');
 const configData = require('../data/config.js');
 const path = require('path');
 const httpHelper = require('help-nodejs').httpHelper;
@@ -135,13 +136,21 @@ function getUser(req, res) {
 
 
 function getListImages(req, res) {
+    let imagesToBuild;
     completeDescription = req.query.completeDescription
-    dockerImages.getListImages((err, data, completeDescription) => {
-        httpHelper.response(res, err, data);
-  });
+    async.waterfall([
+    (cb) => dockerFiles.getDockerfiles(cb),
+    (dockerfiles, cb) => {
+      imagesToBuild = dockerfiles.map((d) => d + ":latest");
+      dockerImages.getListImages(cb);
+    },
+    (images, cb) => {
+      images.forEach((i) => {
+        i.toBuild = _.contains(imagesToBuild, i.name);
+      })
+      cb(null, images);
+    }], (err, data) => httpHelper.response(res, err, data));
 }
-
-
 
 
 

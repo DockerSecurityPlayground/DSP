@@ -1,4 +1,5 @@
 const dockerImages = require('mydockerjs').imageMgr;
+const dockerFiles = require('../data/dockerfiles.js');
 const dot = require('dot-object');
 const _ = require('underscore');
 const path = require('path');
@@ -126,13 +127,14 @@ function buildImages(thepath, callback, notifyBuild) {
     }
   });
 }
-function getCurrentImages(labImages, images) {
+function getCurrentImages(labImages, images, imagesToBuild) {
   retImages =  []
   ims = images.map(i => i.name)
   _.each(labImages, function(i) {
       newI = {}
       newI.name = i
       newI.contains = _.contains(ims, i) ? true : false;
+      newI.toBuild = _.contains(imagesToBuild, i) ? true : false;
       retImages.push(newI);
 })
   return retImages
@@ -156,7 +158,7 @@ function getImagesLabNames(reponame, labname, callback) {
     })
 }
 
-function getImagesLab(reponame, labname, allImages, callback) {
+function getImagesLab(reponame, labname, allImages, imagesToBuild, callback) {
   let listIms = []
   let arrRet = []
   networkManager.get(reponame, labname, (err, data) => {
@@ -167,7 +169,7 @@ function getImagesLab(reponame, labname, allImages, callback) {
         _.each(data.clistToDraw, (ele) => {
           listIms.push(ele.selectedImage.name)
         })
-        arrRet = getCurrentImages(listIms, allImages)
+        arrRet = getCurrentImages(listIms, allImages, imagesToBuild)
         callback(null, arrRet)
       }
     })
@@ -185,10 +187,19 @@ function getImagesAllLabs(namerepo, callback) {
   let images = [];
   let lab_images = [];
   let allImages = [];
+  let imagesToBuild;
   log.info("[Docker Images] Get All Images");
   async.waterfall([
-    (cb) => getListImages(cb),
+    (cb) => dockerFiles.getImageNames(cb),
+    (imb, cb) => {
+      imagesToBuild = imb;
+      getListImages(cb);
+    },
     (ims, cb) => {
+      // Check to build
+      ims.forEach((i) => {
+        i.toBuild = _.contains(imagesToBuild, i.name);
+      })
       allImages = ims;
       configData.getConfig(cb)
     },
@@ -229,7 +240,7 @@ function getImagesAllLabs(namerepo, callback) {
       async.each(labsPath, (lb, c) => {
         log.info(`[Docker Images] Get Lab ${path.basename(lb)} Images`);
 
-        getImagesLab(namerepo, path.basename(lb), allImages, (err, data) => {
+        getImagesLab(namerepo, path.basename(lb), allImages, imagesToBuild, (err, data) => {
           if (err) {
             // Do not block other images
             log.error(`${path.basename(lb)} Lab has not network.json file!`);

@@ -106,7 +106,6 @@ function deleteLab(name, callback) {
     (up, cb) => {
       userPath = up;
       const toDelete = path.join(userPath, name);
-      console.log(toDelete);
       rimraf(toDelete, cb);
     },
     (cb) => {

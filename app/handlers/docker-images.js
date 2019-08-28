@@ -12,6 +12,7 @@ const Checker = require('../util/AppChecker');
 const networkData = require('../data/network.js');
 const c = require('../../config/local.config.json');
 const dockerImages = require('../data/docker-images.js');
+const dockerFiles = require('../data/dockerfiles.js');
 
 
 
@@ -40,19 +41,24 @@ function getImagesAllRepos(req, res) {
 }
 
 function areImagesInstalled(req, res) {
-
+  let imagesToBuild;
   async.waterfall([
   (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
   (cb) => Checker.checkString(req.params.reponame, cb),
   (cb) => Checker.checkString(req.params.labname, cb),
-  (cb) => dockerImages.getListImages(cb),
-  (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, cb),
+  (cb) => dockerFiles.getImageNames(cb),
+  (imb, cb) => {
+    imagesToBuild = imb;
+    dockerImages.getListImages(cb);
+  },
+  (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, imagesToBuild, cb),
   (labImages, cb) => dockerImages.areImagesInstalled(labImages, cb) ], (err, results) => {
      httpHelper.response(res, err, { areInstalled: results.areInstalled });
   })
 }
 
 function getImagesLab(req, res) {
+  let imagesToBuild;
   if (req.query.checkInstallation) {
     areImagesInstalled(req, res);
     } else {
@@ -60,8 +66,12 @@ function getImagesLab(req, res) {
       (cb) => Checker.checkParams(req.params, ['reponame', 'labname'], cb),
       (cb) => Checker.checkString(req.params.reponame, cb),
       (cb) => Checker.checkString(req.params.labname, cb),
-      (cb) => dockerImages.getListImages(cb),
-      (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, cb),
+      (cb) => dockerFiles.getImageNames(cb),
+      (imb, cb) => {
+        imagesToBuild = imb;
+        dockerImages.getListImages(cb);
+      },
+      (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, imagesToBuild, cb),
       (images, cb) => {
         cb(images);
       }], (results, err) => {

@@ -2,6 +2,8 @@
 .adjust-label {
   padding-top: 4px
 }
+.log-panel { height: 100px; }
+
 </style>
 <div id="page-wrapper">
   <h1 class="text-center"> Manage Images </h1>
@@ -18,7 +20,7 @@
 
     <div class="list-group">
       <div ng-repeat="i in imageList" class="panel panel-default">
-          <div class="panel-heading">{{ i.repoName }}</div>
+        <div class="panel-heading">{{ i.repoName }}</div>
           <div class="panel-body">
             <table class="table table-hover ">
                 <tbody>
@@ -28,7 +30,7 @@
                     <td class="text-center"> 
                       <a href="/lab/use/{{i.repoName}}/{{ li.nameLab }}" > {{ li.nameLab }} </a>
                     <p> 
-                    <button class="btn btn-default" ng-click="downloadAll(li)"> Download All </button>
+                    <button class="btn btn-default" ng-click="downloadAll(li, i.repoName, li.log)"> Download All </button>
                     </p>
                     
                     </td>
@@ -39,8 +41,11 @@
                                 <b class="{{ p.textType }} col-sm-6">
                                     {{ p.name }}
                                 </b>
-                                <div ng-if=!p.contains class="col-sm-3">
-                                  <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="downloadImage(p)" >Download   <span class="glyphicon glyphicon-download"></span></a>
+                                <div ng-if="!p.contains && p.toBuild"class="col-sm-3">
+                                  <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="buildImage(p, i.repoName, li.log)" >Build   <span class="glyphicon glyphicon-download"></span></a>
+                                </div>
+                                <div ng-if="!p.contains && !p.toBuild" class="col-sm-3">
+                                  <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="downloadImage(p, li.log)" >Download   <span class="glyphicon glyphicon-download"></span></a>
                                 </div>
                                 <div ng-if=p.contains class="col-sm-3">
                                     <a href="" id="delAction" ng-click="delImage(p)" >Delete   <span class="glyphicon glyphicon-remove"></span></a>
@@ -57,6 +62,13 @@
                             </div>
                             </li>
                         </ul> 
+                    <!-- <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{ -->
+                    <div  ng-show="li.log.content" class="log-panel" ui-ace="{
+                                  theme: 'terminal',
+                                  mode: 'yaml'
+                                  }"
+                        ng-model=li.log.content
+                  </div>
                     
                     </td>
                   </tr>
