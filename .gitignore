@@ -58,3 +58,6 @@ public/downloads/**
 
 # UltiSnip vim plugin
 UltiSnips
+
+# Vagrant dir
+.vagrant
