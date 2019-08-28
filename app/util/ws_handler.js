@@ -73,8 +73,6 @@ function manageInstallation(ws, jsonMessage) {
 // }
 
 function manageDockerBuild(ws, jsonMessage) {
-  console.log("MANAGE DOCKERBUILD");
-  console.log(jsonMessage);
   const body = jsonMessage.body;
   const params = jsonMessage.params;
   dockerActions.build(params, body, (err) => {

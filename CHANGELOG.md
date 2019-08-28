@@ -13,6 +13,9 @@ Versioning of Docker Security Playground
  New terminal on a new tab in visual editor
 
 
+## [3.1.0] - 2019 - 08 -29
+- Added .dockerfiles and Dockerfile build feature
+- Fixed test environment
 ## [3.0.0] - 2019 - 08 -03
 ### Added  
 New Graph editor created  
