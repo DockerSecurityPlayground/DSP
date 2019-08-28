@@ -253,8 +253,8 @@ $scope.saveDockerfile = function() {
 
   dockerAPIService.editDockerfile(toSend)
     .then(function successCallback(response) {
-      // Notification("Success");
       $scope.build();
+      Notification("Success");
     },function errorCallback(response) {
       Notification({message: response.data.message}, 'error');
     });
