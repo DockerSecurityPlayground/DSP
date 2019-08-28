@@ -14,10 +14,13 @@ function initUserRepo(homeDSP, config) {
   // Create .dsp inside user dir
   const dspID = path.join(homeDSP, config.name, '.dsp');
   const dataDIR = path.join(homeDSP, config.name, '.data');
+  const dockerfileDIR = path.join(homeDSP, config.name, '.dockerfiles');
   const labelsJSON = path.join(homeDSP, config.name, 'labels.json');
   if (!fs.existsSync(dspID)) fs.writeFileSync(dspID);
   // Create .data directory
   if (!fs.existsSync(dataDIR)) fs.mkdirSync(dataDIR);
+  // Create .dockerfiles directory
+  if (!fs.existsSync(dockerfileDIR)) fs.mkdirSync(dockerfileDIR);
   // Create labels.json file
   if (!fs.existsSync(labelsJSON)) {
     jsonfile.writeFileSync(labelsJSON,

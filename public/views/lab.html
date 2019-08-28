@@ -1,4 +1,7 @@
-﻿﻿<div id="page-wrapper" >
+﻿<style>
+.ace-run { height: 100px; }
+</style>
+<div id="page-wrapper" >
   <script src="assets/mxgraph/common.js"> </script>
   <script src="assets/mxgraph/use_utils.js"> </script>
   <script>
@@ -76,8 +79,13 @@
     </div>
     <div class="row">
       <div class="col-sm-12">  
-        <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify">
-        </div>
+          <div class="ace-run" ng-show="notify" ui-ace="{
+          theme: 'terminal',
+          mode: 'yaml'
+          }"
+                                                  ng-bind-html=notify
+                                                  >
+          </div>
       </div>
     </div>
     <div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
@@ -87,7 +95,8 @@
       </button> 
       </p>
     </div>
-    <uib-tabset active="active">
+    <div ng-show="!noImages">
+    <uib-tabset ng-show="noImages" active="active">
       <uib-tab index="0" heading="Graph">
         <br>
         <!-- GRAPH CANVAS -->
@@ -126,6 +135,7 @@
          ng-bind-html="ctrl.tinymceHtmlSolution"
 
          ></div>
+  </div>
   </div>
 </div>              
 </div>

@@ -221,6 +221,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         successAll(p.name, true);
         p.textType = "text-success"
         Notification({message: "Build done"}, 'success');
+        break;
       case 'error':
         Notification({message: data.message}, 'error');
         break;
