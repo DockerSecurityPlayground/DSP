@@ -13,7 +13,9 @@ Versioning of Docker Security Playground
  New terminal on a new tab in visual editor
 
 
-## [3.1.0] - 2019 - 08 -29
+## [3.1.1] - 2019 - 08 -29
+- Added git and copy support
+## [3.1.0] - 2019 - 08 -27
 - Added .dockerfiles and Dockerfile build feature
 - Fixed test environment
 ## [3.0.0] - 2019 - 08 -03
