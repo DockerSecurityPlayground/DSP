@@ -14,9 +14,10 @@ labs**. For more information look at the [Labs Managment]() page.
 
 ## DSP Features  
 -  Graphic Editor of docker-compose  
--  Docker Image Management  
+-  Docker Image and Dockerfile Management  
 -  GIT Integration  
 -  DSP Repository with a set of network sescurity scenarios  
+
 
 ## How can I **share my labs with the world** ?
    
