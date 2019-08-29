@@ -122,6 +122,38 @@
       <uib-tab index="2" heading="Hack Tools">
         <div ng-include="'views/services.html'"> </div>
       </uib-tab>
+      <uib-tab index="3" heading="Network Elements">
+        <h4 class="text-center">Containers</h4>
+	<hr>
+	<div class="list-group">
+          <div id="{{c.name}}" class="list-group-item"
+	ng-repeat="(key,c) in listContainers">
+          <div class="row">
+            <div class="col-sm-6">
+              {{c.name}}
+            </div>
+            <div class="col-sm-6">
+
+              <div class="row">
+                <div class="col-sm-1">
+                <button
+                  class="glyphicon glyphicon-share"
+                  ng-click="goToContainer(c.name)"
+                  >
+                </div>
+                <div class="col-sm-1 col-sm-offset-1">
+                <button
+                  class="glyphicon glyphicon-download"
+                  ng-click="copyFromContainer(c.name)"
+                  >
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+    </div>
+      </uib-tab>
     </uib-tabset>
 
 

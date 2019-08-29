@@ -50,6 +50,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
   vm.actionVisible = true,
     $scope.imageList = [];
   toEditName = ''	;
+  $scope.listContainers = {};
   $scope.init = function() {
     console.log("DSP_INIT");
 
@@ -195,6 +196,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                   $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
                   $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
                   console.log("ONLOAD");
+                  $scope.listContainers = data.clistToDraw;
                   onLoadCanvas(data)
                   var yamlcode = angular.element('#code_yaml')
 
