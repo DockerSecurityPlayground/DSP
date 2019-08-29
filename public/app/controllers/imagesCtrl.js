@@ -1,12 +1,16 @@
 var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, $anchorScroll, $timeout, AjaxService, dockerAPIService, FetchFileFactory) {
-  console.log("in manage images")
   var imageList = [];
   $scope.imagePanel = "repo_images"
   $scope.dockerFilterName = "";
   $scope.dockerFiles = [];
+  $scope.typeImports = ["None", "Dockerfile", "Git"];
+  $scope.selectedImport = "None";
   // {
   //   content: "Hello"
   // }
+  $scope.changeTypeImport = function(t) {
+    $scope.selectedImport = t;
+  };
   $scope.dockerFileToCreate = { name : "testdocker"};
   function init() {
     // All images if query string is allimages
@@ -323,8 +327,16 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
   }
   /** Dockerfiles scope methods  */
   $scope.createDockerFile = function() {
+    var options = {};
     // Function to create
-    dockerAPIService.createDockerFile($scope.dockerFileToCreate.name)
+    if ($scope.selectedImport == "Dockerfile") {
+      options.typeImport = "Dockerfile";
+      options.name = $scope.dockerFileToCreate.baseDockerfile;
+    } else if ($scope.selectedImport === "Git") {
+      options.typeImport = "Git";
+      options.gitUrl = $scope.dockerFileToCreate.github;
+    }
+    dockerAPIService.createDockerFile($scope.dockerFileToCreate.name, options)
     .then(function successCallback(response) {
       Notification("Success");
       $location.url('/dockerfile/' + $scope.dockerFileToCreate.name);

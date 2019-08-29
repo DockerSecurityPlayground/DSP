@@ -33,7 +33,7 @@ function createDockerFile(req, res) {
   log.info("[DOCKERFILES] In Create Dockerfile");
   async.waterfall([
     (cb) => Checker.checkParams(req.params, ['dockerfile'], cb),
-    (cb) => dockerFileData.createDockerfile(req.params.dockerfile, cb)
+    (cb) => dockerFileData.createDockerfile(req.params.dockerfile, req.body, cb)
     ], (err) => {
     httpHelper.response(res, err);
     });
@@ -50,7 +50,6 @@ function deleteDockerFile(req, res) {
 
 function editDockerFile(req, res) {
   log.info("[DOCKERFILES] In Edit Dockerfile");
-  // console.log(req.body);
   async.waterfall([
     (cb) => Checker.checkParams(req.params, ['dockerfile'], cb),
     (cb) => Checker.checkParams(req.body, ['name', 'content'], cb),

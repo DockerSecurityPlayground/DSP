@@ -62,8 +62,13 @@ app.use(function(req, res, next) {
   next();
 });
 // Parse application/x-www-form-urlencoded & JSON
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+
+// Extend the dimension of body
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use('/webshell', express.static(path.join(__dirname, 'public','webshell')));
 // app.use((err, req, res) => {
@@ -194,7 +199,6 @@ app.get('/api/resource', treeRoutes.resourceSearch);
 app.post('/api/tree/repo', treeRoutes.uploadFile);
 app.delete('/api/tree/repo/', treeRoutes.deleteFile);
 //
-
 app.use('/', (req, res) => {
   res.sendFile(`${__dirname}/public/index.html`);
 });

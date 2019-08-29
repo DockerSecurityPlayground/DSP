@@ -251,8 +251,8 @@ var api = '/dsp_v1/docker_network/' ;
       return $http.delete(dsp_dockerfile_service + imageName)
     },
     // Dockerfile functions
-    createDockerFile : function createDockerFile(imageName) {
-      return $http.post(dsp_dockerfile_service + imageName)
+    createDockerFile : function createDockerFile(imageName, type) {
+      return $http.post(dsp_dockerfile_service + imageName, type);
     },
 
     getDockerfile : function getDockerfile(name) {

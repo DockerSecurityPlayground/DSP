@@ -7,6 +7,7 @@
   overflow:hidden;
   cursor:default;
 }
+.ace-run { height: 500px; }
 
 .wrapper {
   display: flex;
@@ -89,6 +90,8 @@ $( document ).ready(function() {
         <div class="row lateral_options">
           <div class="col-sm-3" > <a ng-click="goBack()" class="btn btn-primary">   <span class="glyphicon glyphicon-arrow-left"></span> Back</a> </div>
           <div class="col-sm-3" > <a onclick="MX__Save()" class="btn btn-default">   <span class="glyphicon glyphicon-floppy-save"></span> Save</a> </div>
+          <div class="col-sm-3" ng-show="!isRunning"> <a ng-click="run()" class="btn btn-default">   <span class="glyphicon glyphicon-play"></span> Run</a> </div>
+          <div class="col-sm-3" ng-show="isRunning" > <a ng-click="stop()" class="btn btn-default">   <span class="glyphicon glyphicon-stop"></span> Stop</a> </div>
         </div>
       </div>
     </div>
@@ -105,6 +108,13 @@ $( document ).ready(function() {
     <!-- Creates a container for the toolboox -->
     <!-- style="position:relative;overflow:hidden;top:96px;left:0px;bottom:36px;width:30%;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');" -->
 
+      <div ng-show="log" class="ace-run" ui-ace="{
+      theme: 'terminal',
+      mode: 'yaml'
+      }"
+      ng-model=log
+      >
+      </div>
     <div class="wrapper">
       <section 
          class="side-container"
@@ -174,7 +184,9 @@ $( document ).ready(function() {
           </div>
         </uib-tab>
       </uib-tabset>
+
       <!-- End compose file -->
+
       <!-- /. PAGE WRAPPER  -->
     </div>	
   </div>

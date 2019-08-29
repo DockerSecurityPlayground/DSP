@@ -16,6 +16,7 @@ const repoData = require('../data/repos.js');
 const log = appUtils.getLogger();
 
 const _ = require('underscore');
+let initialized = false;
 
 function _checkRepos(cb) {
     // Official repositories
@@ -143,43 +144,45 @@ function initConditions() {
   const GetLabsErr = new Errors.find('GetLabsErr');
   const NoValidPath = new Errors.find('NoValidPath');
   const NoURL = new Errors.find('NoURL');
-
-  Checker.load('labname', (fn) => {
-    const re = /[^. a-zA-Z0-9_-]/;
-    return typeof fn === 'string' && fn.length > 0 && !(fn.match(re)) &&
-    !(fn.trim().length === 0);
-  },
-  new NoValidFilenameErr());
-
-
-  Checker.load('filetype', (fn) => {
-    const re = /[^.a-zA-Z0-9_-]/;
-    return typeof fn === 'string' && fn.length > 0 && !(fn.match(re)) &&
-    !(fn.trim().length === 0);
-  },
-  new NoValidFilenameErr());
-
-  Checker.load('valid_path', (thePath) => isValidPath(thePath),
-  new NoValidPath());
+  if (!initialized) {
+      Checker.load('labname', (fn) => {
+        const re = /[^. a-zA-Z0-9_-]/;
+        return typeof fn === 'string' && fn.length > 0 && !(fn.match(re)) &&
+        !(fn.trim().length === 0);
+      },
+      new NoValidFilenameErr());
 
 
-  JoiChecker.load('url', Joi.string().uri(
-    {
-      scheme: [
-        'git',
-        'https',
-        'http',
-        /git\+https?/,
-      ],
-    }), new NoURL());
+      Checker.load('filetype', (fn) => {
+        const re = /[^.a-zA-Z0-9_-]/;
+        return typeof fn === 'string' && fn.length > 0 && !(fn.match(re)) &&
+        !(fn.trim().length === 0);
+      },
+      new NoValidFilenameErr());
 
-  Checker.load('getLabsCheck', (req) => {
-    if (req.params && req.params.repo) { return true; }
-    else {
-      return false;
+      Checker.load('valid_path', (thePath) => isValidPath(thePath),
+      new NoValidPath());
+
+
+      JoiChecker.load('url', Joi.string().uri(
+        {
+          scheme: [
+            'git',
+            'https',
+            'http',
+            /git\+https?/,
+          ],
+        }), new NoURL());
+
+      Checker.load('getLabsCheck', (req) => {
+        if (req.params && req.params.repo) { return true; }
+        else {
+          return false;
+        }
+      },
+    new GetLabsErr());
+      initialized = true;
     }
-  },
-new GetLabsErr());
 }
 
 

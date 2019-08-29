@@ -61,7 +61,7 @@
         <!-- IMAGE -->
         <div class="form-group"> 
           <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
-          <div class="col-sm-5"> 
+          <div class="col-sm-4"> 
             <select 
                ng-model="currentContainer.selectedImage" 
                ng-change="changedImage(currentContainer.selectedImage)" 
@@ -73,9 +73,12 @@
             <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
             </input>
           </div>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <button class="btn btn-default" ng-click="updateImages()"> 
               <i class="glyphicon glyphicon-refresh" > </i>
+            </button>
+            <button ng-show="currentContainer.selectedImage.toBuild" class="btn btn-default" ng-click="editDockerfile(currentContainer.selectedImage.name)"> 
+              <i class="glyphicon glyphicon-pencil" >Dockerfile </i>
             </button>
           </div>
         </div>

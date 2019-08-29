@@ -51,6 +51,9 @@ const complexObj = { name: 'existent',
 describe('Dockerfile test', () => {
   before((done) => {
     chai.use(require('chai-fs'));
+    appChecker.initErrors();
+    appChecker.initConditions();
+
     done();
   });
   beforeEach((done) => {
@@ -62,13 +65,59 @@ describe('Dockerfile test', () => {
     const testName = "dockertest";
     const testPath = path.join(dockerfilesDir, 'dockertest');
     const testDockerfileTemplate = "FROM alpine:latest";
-    testModule.createDockerfile("dockertest", (err, res) => {
+    testModule.createDockerfile("dockertest", undefined, (err, res) => {
       expect(err).to.be.null;
       expect(testPath).to.be.a.directory().with.files(['Dockerfile'])
       expect(path.join(testPath, 'Dockerfile')).to.be.a.file().with.content(testDockerfileTemplate);
       done();
     });
   });
+  it('Should create dockerfile from an existent', (done) => {
+    const testName = "dockertest";
+    const options = {
+      typeImport : "Dockerfile",
+      name: "existent"
+    }
+    const testPath = path.join(dockerfilesDir, 'dockertest');
+    const testDockerileExistent = "FROM existent\n";
+    testModule.createDockerfile("dockertest", options, (err, res) => {
+      expect(err).to.be.null;
+      expect(testPath).to.be.a.directory().with.files(['Dockerfile'])
+      expect(path.join(testPath, 'Dockerfile')).to.be.a.file().with.content(testDockerileExistent);
+      done();
+    });
+  });
+  it('Should create dockerfile from an existent git dockerfile', (done) => {
+    const testName = "dockertest";
+    const options = {
+      typeImport : "Git",
+      gitUrl: "https://github.com/giper45/dsp_dockerfile_test.git"
+    }
+    const testPath = path.join(dockerfilesDir, 'dockertest');
+    const testDockerfile = "FROM git\n";
+    testModule.createDockerfile("dockertest", options, (err, res) => {
+      expect(err).to.be.null;
+      expect(testPath).to.be.a.directory().with.files(['Dockerfile'])
+      expect(path.join(testPath, 'Dockerfile')).to.be.a.file().with.content(testDockerfile);
+      // Should delete .git dir
+      expect(path.join(testPath, '.git')).not.to.be.a.path()
+      done();
+    });
+  }).timeout(5000);
+  it('Should give error if git repository does not contain a dockerfile ', (done) => {
+    const testName = "dockertest";
+    const options = {
+      typeImport : "Git",
+      gitUrl: "https://github.com/giper45/DSP_Repo.git"
+    }
+    const testPath = path.join(dockerfilesDir, 'dockertest');
+    const testDockerfile = "FROM git\n";
+    testModule.createDockerfile("dockertest", options, (err, res) => {
+      expect(err).not.to.be.null;
+      expect(testPath).not.to.be.path()
+      done();
+    });
+  }).timeout(5000);
 
   it('Should update dockerfile content', (done) => {
     done();
@@ -80,7 +129,7 @@ describe('Dockerfile test', () => {
     it('Should give error if name is not right', (done) => {
       const testPath = path.join(dockerfilesDir, 'dockertest');
       const testDockerfileTemplate = "FROM alpine:latest";
-      testModule.createDockerfile(w, (err, res) => {
+      testModule.createDockerfile(w, undefined, (err, res) => {
         expect(err).not.to.be.null;
         done();
       });
@@ -90,7 +139,7 @@ describe('Dockerfile test', () => {
     it('Should give error if already exists', (done) => {
       const testPath = path.join(dockerfilesDir, 'dockertest');
       const testDockerfileTemplate = "FROM alpine:latest";
-      testModule.createDockerfile("existent", (err, res) => {
+      testModule.createDockerfile("existent", undefined, (err, res) => {
         expect(err).not.to.be.null;
         done();
       });

@@ -4,8 +4,10 @@ const pathConverter = require('../util/pathConverter.js');
 const configData = require('./config.js');
 const async = require('async');
 const fs = require('fs');
+const simpleGit = require('simple-git');
 const fsExtra= require('fs-extra');
 const checker = require('../util/AppChecker.js');
+const JoiConditions = checker.JoiAppConditions
 const rimraf = require('rimraf');
 const recursive  = require('recursive-readdir');
 
@@ -24,21 +26,58 @@ function createFiles(dfPath, content, cb) {
     }, (err) => cb(err));
 }
 
-function getDockerfileBasePath(cb) {
+function getDockerfileBasePath(callback) {
   async.waterfall([
     (cb) => configData.getUserPath(cb),
     (up, cb) => cb(null, path.join(up, '.dockerfiles'))
-  ], (err, dockerPath) => cb(null, dockerPath));
+  ], (err, dockerPath) => callback(null, dockerPath));
 }
 
 function isDockerfileDir(f, cb) {
   cb(null, true);
 }
 
-function createDockerfile (name, callback) {
-  let dataPath = "";
+function _createFromDockerfile(name, options, callback) {
   async.waterfall([
-    (cb) => checker.checkAlphabetic(name, cb),
+    (cb) => checker.checkAlphabetic(options.name, cb),
+    (cb) => getDockerfileBasePath(cb),
+    // Create file
+    (dp, cb) =>  {
+      dataPath = dp;
+      appUtil.copy(path.join(dataPath, options.name), path.join(dataPath, name), cb);
+    }], (err, results) => callback(err, results));
+}
+
+function _createFromGit(name, options, callback) {
+  let errGit = null;
+  async.waterfall([
+    (cb) => checker.checkAlphabetic(options.name, cb),
+    (cb) => JoiConditions.check(options.gitUrl, 'url', cb),
+    (resp, cb) => getDockerfileBasePath(cb),
+    // Create file
+    (dp, cb) =>  {
+      dataPath = dp;
+      simpleGit(dataPath).silent(false).clone(options.gitUrl, name, ['-q'], cb);
+    },
+    (d, cb) => fs.exists(path.join(dataPath, name, 'Dockerfile'), (exists, err) => {
+      if (err) {
+        cb(err);
+      } else if (exists) {
+          cb(null);
+          // Should clean from the repository
+        } else {
+          errGit = new Error("Git repository does not contain Dockerfile");
+          rimraf(path.join(dataPath, name), cb);
+      }
+    }),
+    (cb) => {
+      cb(errGit)
+    }, (cb) => rimraf(path.join(dataPath, name, ".git"), cb)
+  ], (err, results) => callback(err, results));
+}
+
+function _createNew(name, callback) {
+  async.waterfall([
     (cb) => getDockerfileBasePath(cb),
     // Create file
     (dp, cb) =>  {
@@ -46,6 +85,22 @@ function createDockerfile (name, callback) {
       fs.mkdir(path.join(dataPath, name), cb);
     },
     (cb) => fs.writeFile(path.join(dataPath, name, 'Dockerfile'), dockerfileBaseContent, cb)
+  ], (err, results) => callback(err, results));
+}
+
+function createDockerfile (name, options, callback) {
+  let dataPath = "";
+  async.waterfall([
+    (cb) => checker.checkAlphabetic(name, cb),
+    (cb) => {
+      if (options && options.typeImport && options.typeImport === "Dockerfile" && options.name) {
+        _createFromDockerfile(name, options, cb)
+      } else if (options && options.typeImport && options.typeImport === "Git" && options.gitUrl) {
+        _createFromGit(name, options, cb);
+      } else {
+        _createNew(name, cb)
+      }
+    }
   ], (err, results) => callback(err, results));
 }
 

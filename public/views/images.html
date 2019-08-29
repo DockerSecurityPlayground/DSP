@@ -115,6 +115,40 @@
         <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.name" placeholder="Image name" id="" >
         <button type="button" class="btn btn-success" ng-click="createDockerFile()" >Create</button>
       </form>
+        <br />
+            <div>
+              <div>
+                <div class="form-check" ng-repeat="t in typeImports">
+                  <input ng-click="changeTypeImport(t)" name="type_import" type="radio" id="{{t}}" >
+                  <label for="{{t}}">{{t}}</label>
+                </div>
+              </div>
+            <div ng-show="selectedImport==='Git'" class="row">
+                <div class="col-sm-2">
+                  <label for="toCreate"> From github: </label>
+                </div>
+                  <div class="col-sm-3">
+        <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.github" placeholder="Repo Dockerfile" id="" >
+                </div>
+              </div>
+              <br />
+            <div ng-show="selectedImport==='Dockerfile'" class="row">
+                <div class="col-sm-2">
+                  <label for="toCreate"> From dockerfile: </label>
+                </div>
+                <div class="col-sm-3">
+                  <select 
+                     ng-model="dockerFileToCreate.baseDockerfile" 
+                     ng-required=true
+                     class="form-control" 
+                    >
+                    <option ng-repeat="d in dockerFiles" value="{{d}}">{{d}}</option>
+                  </select>
+                </div>
+                
+              </div>
+              
+            </div>
       <br />
              <form role="form">
                <div class="form-group input-group">

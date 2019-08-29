@@ -1,4 +1,4 @@
-DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, AjaxService, $uibModal, RegexService, $log, $http, $location, $window, NetworkManagerService,  portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
+DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routeParams, AjaxService, $uibModal, RegexService, $log, $http, $location, $window, NetworkManagerService,  SocketService, portService, dockerAPIService, containerManager, infoService, safeApplyService, Notification, dependsFilter) {
   console.log("=== INIT GRAPH EDITOR ===");
 
   $scope.labName= '';
@@ -6,6 +6,8 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.showEditNetwork   = false;
   $scope.yamlfile='';
   $scope.showYamlFile = false;
+  $scope.isRunning = false;
+  $scope.log = ""
   $scope.environment = {name: "Name",
     value: "Value"
   };
@@ -1129,6 +1131,10 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
   $scope.goToImageRepository = function() {
     window.open('/images', '_blank');
   }
+  $scope.editDockerfile = function(iName) {
+    var dockerName = iName.replace(":latest", "");
+    window.open('/dockerfile/' + dockerName, '_blank');
+  }
   $scope.updateImages = function() {
     dockerAPIService.getDockerImages()
       .then(function successCallback(response) {
@@ -1202,5 +1208,62 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
     });
   }
 
+  // Docker actions
+  $scope.run = function() {
+            // namerepo : $scope.nameRepo,
+            // namelab : $scope.labName,
 
+    console.log("namerepo");
+    $scope.isRunning = true;
+      //Send
+      SocketService.manage(JSON.stringify({
+        action : 'docker_up',
+        params : {
+          namerepo : $scope.repoName,
+          namelab : $scope.labName
+        }
+      }), function(event) {
+        var data = JSON.parse(event.data);
+        switch (data.status) {
+          case 'success':
+            Notification("Run finished!", 'success');
+            $scope.isRunning = true;
+            break;
+          case 'error':
+            Notification({message: data.message}, 'error');
+            $scope.isRunning = false;
+            break;
+          default:
+            $scope.log += data.message;
+            break
+          };
+      });
+    }
+
+  $scope.stop = function() {
+    SocketService.manage(JSON.stringify({
+      action : 'docker_down',
+      params : {
+        namerepo : $scope.repoName,
+        namelab : $scope.labName
+      }
+    }),
+      function(event) {
+        var data = JSON.parse(event.data);
+        switch (data.status) {
+          case 'success':
+            Notification("Stoppe!", 'success');
+            $scope.isRunning = false;
+            $scope.log = "";
+            break;
+          case 'error':
+            Notification({message: data.message}, 'error');
+            $scope.isRunning = true;
+            break;
+          default:
+            $scope.log += data.message;
+            break
+          };
+      });
+  }
 }
