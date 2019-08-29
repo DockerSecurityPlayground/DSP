@@ -70,7 +70,17 @@ npm start
 To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
 
 
-Go to you favourite browser and digit localhost:8080. You'll be redirected on installation page, set parameters and click install.   
+With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.   
+### Vagrant Environment   
+In the project, there is also a vagrant environment with an Ubuntu box with DSP installed:  
+```
+cd vagrant
+vagrant up
+vagrant ssh 
+-> cd /home/vagrant/DockerSecurityPlayground
+-> npm start  
+```   
+Now you can use DSP ( http://localhost:8080 ).
 
 
 ## Documentation   
