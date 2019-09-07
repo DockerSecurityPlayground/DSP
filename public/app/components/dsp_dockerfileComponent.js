@@ -91,6 +91,7 @@ var dsp_dockerfileComponent  =
         });
       }
       function _editElement(treeModel, id, content, isExecutable) {
+        console.log("EDIT");
         treeModel.forEach(function (m) {
           if (m.id === id) {
             m.content = content;
@@ -111,7 +112,7 @@ var dsp_dockerfileComponent  =
           "content": content,
           "type": type
         };
-        if (type == 'textfile'){ 
+        if (type == 'textfile'){
           toAppend.icon = 'jstree-file';
           toAppend.isExecutable = false;
         }
@@ -273,7 +274,9 @@ $scope.saveDockerfile = function() {
 
 $scope.saveExecutable = function() {
   if ($scope.selectedElement.type !== "dir") {
+  safeApplyService.exec($scope, function() {
     _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content, $scope.selectedElement.isExecutable)
+  });
   }
   console.log($scope.treeModel);
 }

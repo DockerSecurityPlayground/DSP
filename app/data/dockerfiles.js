@@ -4,6 +4,7 @@ const pathConverter = require('../util/pathConverter.js');
 const configData = require('./config.js');
 const async = require('async');
 const fs = require('fs');
+const executable = require('executable');
 const simpleGit = require('simple-git');
 const fsExtra= require('fs-extra');
 const checker = require('../util/AppChecker.js');
@@ -15,15 +16,43 @@ const recursive  = require('recursive-readdir');
 
 const dockerfileBaseContent = "FROM alpine:latest";
 
-function createFiles(dfPath, content, cb) {
-    async.eachSeries(content, (f, c) => {
-      filePath = path.join(path.join(dfPath, f.id));
-      if(f.type == 'dir') {
-        c(null);
-      } else {
-        fsExtra.outputFile(filePath, f.content, c);
+function _readFile(f, arrayRet, callback) {
+  async.waterfall([
+    (cb) => fs.readFile(f, cb),
+    (data, cb) => {
+      // Append to ret structure
+      executable(f)
+      .then(exec => {
+        arrayRet.push({file: f, content: data.toString(), isExecutable: exec});
+        cb(null);
+      })
+    }], (err) => callback(err));
+}
+
+function setPermissions(dfPath, content, cb) {
+  async.eachSeries(content, (f,c) => {
+    filePath = path.join(path.join(dfPath, f.id));
+      if(f.isExecutable == true)
+      {
+        fs.chmod(filePath, 0o755, (err) => {
+          c(err);
+        })
       }
-    }, (err) => cb(err));
+      else{
+        c(null);
+      }
+      //fsExtra.outputFile(filePath, f.content, c);
+  }, (err) => cb(err));
+}
+function createFiles(dfPath, content, cb) {
+  async.eachSeries(content, (f, c) => {
+    filePath = path.join(path.join(dfPath, f.id));
+    if(f.type == 'dir') {
+      c(null);
+    } else {
+      fsExtra.outputFile(filePath, f.content, c);
+    }
+  }, (err) => cb(err));
 }
 
 function getDockerfileBasePath(callback) {
@@ -63,11 +92,11 @@ function _createFromGit(name, options, callback) {
       if (err) {
         cb(err);
       } else if (exists) {
-          cb(null);
-          // Should clean from the repository
-        } else {
-          errGit = new Error("Git repository does not contain Dockerfile");
-          rimraf(path.join(dataPath, name), cb);
+        cb(null);
+        // Should clean from the repository
+      } else {
+        errGit = new Error("Git repository does not contain Dockerfile");
+        rimraf(path.join(dataPath, name), cb);
       }
     }),
     (cb) => {
@@ -119,14 +148,14 @@ function getDockerfiles (callback) {
           if (err) {
             c(err);
           } else {
-              if (exists) {
+            if (exists) {
               res.push(f);
             }
             c(null);
           }
         })}, (err2) => cb(err2, res))
-      }
-    ], (err, results) => callback(err, results));
+    }
+  ], (err, results) => callback(err, results));
 }
 
 function editDockerfile(name, content, callback) {
@@ -147,18 +176,20 @@ function editDockerfile(name, content, callback) {
     // Create empty dir
     (cb) => fs.mkdir(dfPath, cb),
     (cb) => createFiles(dfPath, content, cb),
+    //set execute permissions
+    (cb) => setPermissions(dfPath, content, cb),
     // Delete temp path
     (cb) => rimraf(tempPath, cb)
-      // const mm = jsonConverter(
-    ], (err) => {
-      if (err) {
-        appUtil.renameDir(tempPath, dfPath, (e) => {
-          callback(err);
-        });
-      } else {
-        callback(null);
-      }
-    })
+    // const mm = jsonConverter(
+  ], (err) => {
+    if (err) {
+      appUtil.renameDir(tempPath, dfPath, (e) => {
+        callback(err);
+      });
+    } else {
+      callback(null);
+    }
+  })
 }
 
 function removeDockerfile(name, callback) {
@@ -180,26 +211,17 @@ function getDockerfile(name, callback) {
     (up, cb) => {
       dockerfilesPath = path.join(up, '.dockerfiles', name);
       recursive(dockerfilesPath, cb)
-  },
-  (allFiles, cb) => {
-    let arrayRet = [];
-    // Read files and generate structure
-    async.eachSeries(allFiles, (f, c) => {
-      fs.readFile(f, (err, data) => {
-        if (err) {
-          c(err);
-        } else {
-          // Append to ret structure
-          arrayRet.push({file: f, content: data.toString()});
-          c(null);
-        }
-      })
-    }, (err) => cb(err, arrayRet))
-  },
-  (structure, cb) => {
-    const treeModel = pathConverter.getTree(structure, dockerfilesPath);
-    cb(null, treeModel);
-  }], (err, data) => callback(err, data))
+    },
+    (allFiles, cb) => {
+      let arrayRet = [];
+      // Read files and generate structure
+      async.eachSeries(allFiles, (f, c) => _readFile(f, arrayRet, c)
+        , (err) => cb(err, arrayRet))
+    },
+    (structure, cb) => {
+      const treeModel = pathConverter.getTree(structure, dockerfilesPath);
+      cb(null, treeModel);
+    }], (err, data) => callback(err, data))
 }
 
 function getImageNames(callback) {

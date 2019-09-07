@@ -55,7 +55,7 @@ function makeTreeDir(dir) {
 }
 
 // TBD: detect file type
-function makeTreeFile(f, content) {
+function makeTreeFile(f, content, isExecutable = false) {
   f = fix2Slash(f);
   return {
     id: f,
@@ -63,7 +63,8 @@ function makeTreeFile(f, content) {
     content: content,
     text: path.basename(f),
     type: "textfile",
-    icon: 'jstree-file'
+    icon: 'jstree-file',
+    isExecutable: isExecutable
   }
 }
 
@@ -77,7 +78,7 @@ function getTree(data, rootPath) {
     // For each dirname generate a tree dir structur and push in aray ret
     dirNames.forEach((dir) => ret.push(makeTreeDir(dir)));
     // Finally push tree file structure for the current file
-    ret.push(makeTreeFile(relPath, d.content))
+    ret.push(makeTreeFile(relPath, d.content, d.isExecutable))
   })
   return _.uniq(ret, (r) => {
     return r.id

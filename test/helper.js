@@ -166,6 +166,8 @@ module.exports = {
     const projectTestOrig = path.join(appRoot.toString(), 'test', 'testDSPDir_orig');
     const projectTestDir = path.join(appRoot.toString(), 'test', 'testDSPDir');
     copyDir(projectTestOrig, projectTestDir)
+    const execFile = path.join(projectTestDir, "test", ".dockerfiles", "complex", "files", "emptydir", "internaldir", "my.cnf");
+    fs.chmodSync(execFile,'755');
     // const testConfigPath = path.join(appRoot.path, 'config', 'test_user.json');
     // jsonfile.writeFileSync(testConfigPath, testConfig);
     // simpleGit(testConfig.mainDir).silent(false).clone(testConfig.githubURL, testConfig.name, ['-q'], cb);
