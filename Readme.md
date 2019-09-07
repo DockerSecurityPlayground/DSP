@@ -16,8 +16,10 @@ labs**. For more information look at the [Labs Managment]() page.
 -  Graphic Editor of docker-compose  
 -  Docker Image and Dockerfile Management  
 -  GIT Integration  
--  DSP Repository with a set of network sescurity scenarios  
+-  DSP Repository with a set of network security scenarios  
 
+## Official Repository  
+[DSP_Projects](https://github.com/giper45/DSP_Projects.git) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
 
 ## How can I **share my labs with the world** ?
    
