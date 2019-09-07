@@ -37,7 +37,9 @@
           <button type="button" ng-click="removeElement()" class="btn btn-default">
             <span class="glyphicon glyphicon-remove-circle"></span>  Delete
           </button>
-
+          <label> Executable:
+            <input type="checkbox" ng-model="selectedElement.isExecutable" ng-click=saveExecutable()>
+          </label><br/>
 
 
       </div>

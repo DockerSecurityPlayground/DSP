@@ -18,6 +18,7 @@ const complexObj = { name: 'existent',
          text: 'Dockerfile',
          type: 'textfile',
          content: testDockerfileTemplate,
+         isExecutable : false,
          icon: 'jstree-file' },
         { id: './files',
         parent: '.',
@@ -40,11 +41,13 @@ const complexObj = { name: 'existent',
         { id: './files/emptydir/internaldir/my.cnf',
          parent: './files/emptydir/internaldir',
          content: f1,
+         isExecutable : true,
          type: 'textfile'
         },
         { id: './files/emptydir/internaldir/my.cnf3',
          parent: './files/emptydir/internaldir',
          content: f2,
+         isExecutable : false,
          type: 'textfile'
         }
       ]};
@@ -242,6 +245,7 @@ describe('Dockerfile test', () => {
         expect(path.join(testPath, 'files/emptydir/internaldir')).to.be.a.path().with.files(['my.cnf', 'my.cnf3']);
         expect(path.join(testPath, 'files/emptydir/internaldir/my.cnf')).to.be.a.file().with.content(f1.toString());
         expect(path.join(testPath, 'files/emptydir/internaldir/my.cnf3')).to.be.a.file().with.content(f2.toString());
+        expect(fs.accessSync(path.join(testPath, 'files/emptydir/internaldir/my.cnf3'),fs.constants.X_OK)).to.be.undefined;
         done();
     });
       // testModule.editDockerfiles((
