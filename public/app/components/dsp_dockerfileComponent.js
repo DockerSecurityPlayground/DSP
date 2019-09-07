@@ -81,16 +81,21 @@ var dsp_dockerfileComponent  =
           }
           if (t.id === "./Dockerfile") {
             t.state = { selected : true }
+            t.isExecutable = false;
             $scope.selectedElement= {content: t.content, selected: "Dockerfile",
               type: "textfile",
-              id: "./Dockerfile"};
+              id: "./Dockerfile",
+              isExecutable : false
+            };
           }
         });
       }
-      function _editElement(treeModel, id, content) {
+      function _editElement(treeModel, id, content, isExecutable) {
+        console.log("EDIT");
         treeModel.forEach(function (m) {
           if (m.id === id) {
             m.content = content;
+            m.isExecutable = isExecutable;
           }
         });
         return treeModel;
@@ -107,12 +112,16 @@ var dsp_dockerfileComponent  =
           "content": content,
           "type": type
         };
-        if (type == 'textfile') toAppend.icon = 'jstree-file';
+        if (type == 'textfile'){
+          toAppend.icon = 'jstree-file';
+          toAppend.isExecutable = false;
+        }
         else toAppend.state= {
           'opened' : true,
           'selected' : false
         };
         treeModel.push(toAppend);
+        $scope.selectedElement.isExecutable = toAppend.isExecutable;
         return treeModel;
         // safeApplyService.exec($scope, function() {
         //   console.log(toAppend);
@@ -229,10 +238,13 @@ $scope.nodeSelected = function(e, data) {
   var _l = data.node.li_attr;
   var content = data.node.original.content
   var type = data.node.original.type
+  var isExecutable = data.node.original.isExecutable
+  console.log(data);
   safeApplyService.exec($scope, function() {
-    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content)
+    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content, $scope.selectedElement.isExecutable)
     $scope.selectedElement.content = content;
     $scope.selectedElement.type = type;
+    $scope.selectedElement.isExecutable = isExecutable;
     $scope.selectedElement.selected = data.node.original.text;
     $scope.selectedElement.id = data.node.original.id;
   })
@@ -243,7 +255,7 @@ $scope.goToImages = function() {
 }
 $scope.saveDockerfile = function() {
   if ($scope.selectedElement.type !== "dir") {
-    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content)
+    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content, $scope.selectedElement.isExecutable)
   }
   var toSend = {
     name: $ctrl.dockerfile.name,
@@ -260,6 +272,14 @@ $scope.saveDockerfile = function() {
     });
 };
 
+$scope.saveExecutable = function() {
+  if ($scope.selectedElement.type !== "dir") {
+  safeApplyService.exec($scope, function() {
+    _editElement($scope.treeModel, $scope.selectedElement.id, $scope.selectedElement.content, $scope.selectedElement.isExecutable)
+  });
+  }
+  console.log($scope.treeModel);
+}
 $scope.clearBuild = function() {
   $scope.notify = "";
 }

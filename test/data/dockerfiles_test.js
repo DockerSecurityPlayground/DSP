@@ -1,6 +1,7 @@
 const expect = require('chai').expect;
 const chai = require('chai')
 const helper = require('../helper');
+const executable = require('executable');
 const testModule = require('../../app/data/dockerfiles.js');
 const appRoot = require('app-root-path');
 const path = require('path')
@@ -18,6 +19,7 @@ const complexObj = { name: 'existent',
          text: 'Dockerfile',
          type: 'textfile',
          content: testDockerfileTemplate,
+         isExecutable : false,
          icon: 'jstree-file' },
         { id: './files',
         parent: '.',
@@ -40,11 +42,13 @@ const complexObj = { name: 'existent',
         { id: './files/emptydir/internaldir/my.cnf',
          parent: './files/emptydir/internaldir',
          content: f1,
+         isExecutable : true,
          type: 'textfile'
         },
         { id: './files/emptydir/internaldir/my.cnf3',
          parent: './files/emptydir/internaldir',
          content: f2,
+         isExecutable : false,
          type: 'textfile'
         }
       ]};
@@ -178,7 +182,9 @@ describe('Dockerfile test', () => {
         text: 'Dockerfile',
         type: 'textfile',
         content: "isDockerfile" + "\n",
-        icon: 'jstree-file' },
+        icon: 'jstree-file' ,
+        isExecutable : false
+      },
       { id: './files',
         parent: '.',
         text: 'files',
@@ -213,14 +219,16 @@ describe('Dockerfile test', () => {
         content: "isMyCnf" + "\n",
         type: 'textfile',
         text: "my.cnf",
-        icon: "jstree-file"
+        icon: "jstree-file",
+        isExecutable: true
       },
       { id: './files/emptydir/internaldir/my.cnf3',
         parent: './files/emptydir/internaldir',
         content: "isMyCnf3" + "\n",
         type: 'textfile',
         text: "my.cnf3",
-        icon: "jstree-file"
+        icon: "jstree-file",
+        isExecutable: false
       }
     ];
       testModule.getDockerfile('complex', (err, res) => {
@@ -230,7 +238,7 @@ describe('Dockerfile test', () => {
       });
     });
 
-    it('Should save all the content structure', (done) => {
+    it.only('Should save all the content structure', (done) => {
       const testPath = path.join(dockerfilesDir, 'existent');
       const tempdir = path.join(dockerfilesDir, '.tmpdir');
 
@@ -242,6 +250,7 @@ describe('Dockerfile test', () => {
         expect(path.join(testPath, 'files/emptydir/internaldir')).to.be.a.path().with.files(['my.cnf', 'my.cnf3']);
         expect(path.join(testPath, 'files/emptydir/internaldir/my.cnf')).to.be.a.file().with.content(f1.toString());
         expect(path.join(testPath, 'files/emptydir/internaldir/my.cnf3')).to.be.a.file().with.content(f2.toString());
+        expect(executable.sync(path.join(testPath, 'files/emptydir/internaldir/my.cnf'))).to.be.ok;
         done();
     });
       // testModule.editDockerfiles((
