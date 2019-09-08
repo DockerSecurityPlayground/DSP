@@ -15,6 +15,7 @@ Versioning of Docker Security Playground
 
 ## [3.1.1] - 2019 - 08 -29
 - Added git and copy support
+- Fixed executable file
 ## [3.1.0] - 2019 - 08 -27
 - Added .dockerfiles and Dockerfile build feature
 - Fixed test environment

@@ -51,7 +51,17 @@
            tree-model="treeModel"
            tree-events="select_node:nodeSelected"
            ></js-tree>
+          <br />
+      <div class="row">
+			  <div class="col-sm-9">
+          <input type="text" class="form-control" ng-model="newFile" placeholder="new file" id="namefile"/> 
+			  </div>
+			  <div class="col-sm-3">
+          <button ng-disabled="!newFile" ng-click="addNewFile()" class="btn btn-success btn-small" > Add </button>
+        </div>
       </div>
+      </div>
+      
       <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{
       theme: 'terminal',
       mode: 'yaml'

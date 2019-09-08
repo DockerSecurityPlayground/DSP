@@ -1,5 +1,5 @@
+const dockerImages = require('./docker-images.js');
 const _ = require('underscore');
-const dockerImages = require('./docker-images');
 const appUtils = require('../util/AppUtils');
 const log = appUtils.getLogger();
 
@@ -110,7 +110,26 @@ exports.getComposeOptions = function getComposeOptions(clistToDraw) {
   return options;
 };
 
-exports.getCommand = function getCommand(a) {
+function _getCTFCommand(a) {
+  const ctf = a.args["ctf"].val;
+  const thePath = (a.args["username"].val == "root") ? "/root/proof.txt" : "/home/"+ a.args["username"].val + "/proof.txt";
+  const command = `echo "${ctf}" > ${thePath}`;
+  return `/bin/sh -c "${command} "`;
+}
+
+function _getExecCommand(a) {
+  const command = a.args["command"].val;
+  return `/bin/sh -c "${command} "`;
+}
+
+// function _getUsernameCommand(a) {
+//   const name = a.args["name"].val;
+//   const password = a.args["password"].val;
+//   const command = `mkdir /home/${name}; adduser  ${name} ; echo ${name}:${password} | chpasswd`;
+//   return `/bin/sh -c "${command} "`;
+
+// }
+function _getLabelCommand(a) {
   const args = a.args;
   let strArgs = '';
   // Concatenate arguments
@@ -120,8 +139,23 @@ exports.getCommand = function getCommand(a) {
     // strArgs += `${flag}${key} '${arg.val}' `;
     strArgs += getArg(key, arg);
   });
-
   const command = `${a.command} ${strArgs}`;
   // Default Interpreter
   return `/bin/sh -c "${command} "`;
+}
+
+exports.getCommand = function getCommand(a) {
+  let commandRet;
+  switch (a.name) {
+    case "ctf":
+      commandRet = _getCTFCommand(a);
+      break;
+    case "exec":
+      commandRet = _getExecCommand(a);
+      break;
+    default:
+      commandRet = _getLabelCommand(a);
+      break;
+  }
+  return commandRet;
 };
