@@ -64,3 +64,5 @@ UltiSnips
 
 # Vagrant dir
 .vagrant
+vagrant/dsp/**
+!vagrant/dsp/.keep

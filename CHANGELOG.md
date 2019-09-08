@@ -13,6 +13,9 @@ Versioning of Docker Security Playground
  New terminal on a new tab in visual editor
 
 
+## [3.2.0] - 2019 - 09 - 08
+- Added ctf and exec default actions for images  
+- Vagrant with vbguest
 ## [3.1.1] - 2019 - 08 -29
 - Added git and copy support
 - Fixed executable file

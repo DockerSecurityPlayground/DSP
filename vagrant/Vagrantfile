@@ -30,6 +30,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision :docker_compose
   config.vm.provision "shell", inline: "apt-get update && apt-get install -y python-minimal"
   config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.synced_folder "dsp", "/home/vagrant/dsp"
+
 
   config.vm.provision "shell", path: "init.sh", privileged: false
 
