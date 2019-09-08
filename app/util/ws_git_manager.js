@@ -96,12 +96,11 @@ const api = {
       rootDir = config.mainDir;
       repos = localConfig.config.repos;
       cb(null);
-    }, (cb) => LabStates.checkAll(repo.name, 'STOPPED', (err, areStopped, labsRunnings) => {
+    }, (cb) => LabStates.checkAll(repo.name, 'STOPPED', (err, areStopped, labsRunning) => {
       if (err) {
         cb(err);
       } else if (areStopped) cb(null);
       else {
-        log.warn(`${r.name} is not stopped!`);
         cb(Checker.errorLabNoStopped(labsRunning));
       }
     }),
