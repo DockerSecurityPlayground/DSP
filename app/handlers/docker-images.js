@@ -53,7 +53,11 @@ function areImagesInstalled(req, res) {
   },
   (allImages, cb) => dockerImages.getImagesLab(req.params.reponame, req.params.labname, allImages, imagesToBuild, cb),
   (labImages, cb) => dockerImages.areImagesInstalled(labImages, cb) ], (err, results) => {
+    if (err) {
+     httpHelper.response(res, err);
+    } else {
      httpHelper.response(res, err, { areInstalled: results.areInstalled });
+    }
   })
 }
 
