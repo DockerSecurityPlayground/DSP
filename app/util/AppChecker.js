@@ -213,6 +213,10 @@ module.exports = {
                 else {
                   const userPath = path.join(appUtils.getHome(), config.mainDir, config.name);
                   if (!fs.existsSync(userPath)) { cb(new Error(`${userPath} dir not found! Pls delete config_user.json and reinstall `)); }
+                  if (!fs.existsSync(path.join(userPath, ".dockerfiles"))) {
+                    log.warn('.dockerfiles directory does not exists, create it');
+                    fs.mkdirSync(path.join(userPath, ".dockerfiles"));
+                  }
                   // Update repogitData
                   cb(null);
                 }
