@@ -1,8 +1,10 @@
 {
   "images":[
     { 
+      "label": "nmap",
       "name": "uzyexe/nmap:latest",
-      "description": "nmap container image"
+      "description": "nmap container image",
+      "default_command": "-sT localhost"
     }
   ]
 }
