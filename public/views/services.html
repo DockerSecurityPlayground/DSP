@@ -7,7 +7,7 @@
 
 </script>
 <style>
-.ace-run { height: 400px; }
+.ace-run { height: 100px; }
 </style>
 
 <!-- <div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl"> -->
@@ -140,7 +140,7 @@
         <label class="control-label col-sm-2" for="container_name">Networks: </label>
         <input class="form-check-input" type="checkbox" ng-model=n.isNetworkOnelineAttached > <label class="form-check-label"> {{n.name}} </label>
       </div>
-      <label class="control-label col-sm-2" for="container_name">Command One Line: </label>
+      <label class="control-label col-sm-2" for="container_name">{{hackLabel}} </label>
                   <div class="col-sm-9" >
                     <input type="text" class="form-control"  
                                        name="container_command" 
@@ -152,7 +152,7 @@
                     <br />
                     <br />
         <div class="text-center">
-      <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command</button>
+          <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command </button>
         </div>
         <br /><br />
                 <div class="ace-run" ui-ace="{

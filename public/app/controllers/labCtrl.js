@@ -152,7 +152,9 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
                     dockerAPIService.getListHackTools()
                       .then(function successCallback(response){
+                        console.log("LIST TOOLS");
                              $scope.listTools = response.data.data.images;
+                        console.log($scope.listTools);
                       });
                     }
                   }, function error(err) {

@@ -8,6 +8,7 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerA
     $scope.hackToolMode = {
       val : "interactive"
     }
+    $scope.hackLabel = "Command:"
     $scope.optPort = { container: 0, host: 0};
     $scope.optionalPorts = [];
     $scope.currentEnvironment = {name: '', value: ''};
@@ -85,6 +86,8 @@ $scope.addEnvironment = function addEnvironment() {
   }
   // $scope.currentEnvironment = {name: '', value: '' };
 }
+
+
 $scope.deleteEnvironment = function deleteEnvironment(nameEnv) {
       // var nn = _.without(c.networks, _.findWhere(c.networks, {
   $scope.currentContainer.environments = _.without($scope.currentContainer.environments, _.findWhere($scope.currentContainer.environments,
@@ -283,6 +286,13 @@ $scope.addOptionalPort = function addOptionalPort() {
   catch (e) {
       console.log(e);
       Notification({message:"Pls insert correct values"}, 'error');
+  }
+}
+
+$scope.changedImage = function changedImage(selectedImage) {
+  if ($scope.hackToolMode.val == "oneline") {
+    $scope.currentContainer.command = selectedImage.default_command;
+    $scope.hackLabel = selectedImage.label;
   }
 }
 
