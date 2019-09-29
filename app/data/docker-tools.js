@@ -217,8 +217,6 @@ function getNetworksLab(nameLab, callback) {
     (obj, cb) => {
       networksLab = __getLabNetwork(nameLab, obj);
       async.eachSeries(networksLab, (n, c) => {
-        console.log("NETWORKS");
-        console.log(networksLab);
         dockerJS.getNetwork(n.name, (err, theNetwork) => {
           if (err) {
             log.err(err);
