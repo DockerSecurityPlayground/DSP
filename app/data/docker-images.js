@@ -13,6 +13,7 @@ const jsonFile = 'images_to_build.json';
 const networkManager = require('./network.js')
 const AppUtils = require('../util/AppUtils');
 const log = AppUtils.getLogger();
+const appRoot = require('app-root-path');
 
 function setDefaultActions(ele) {
   ele.actions['exec'] = {
@@ -423,6 +424,17 @@ function getListImages(callback) {
   });
 }
 
+
+function getListHackTools(callback) {
+   const path_tools = path.join(appRoot.path, 'config', 'hack_tools.json');
+   jsonfile.readFile(path_tools,(err,data)=> {
+       if(err) callback(err);
+       else{
+           callback(err,data);
+       }
+   });
+}
+
 exports.buildImages = buildImages;
 exports.getRepoImages = getRepoImages;
 exports.getImagesLab = getImagesLab;
@@ -431,3 +443,4 @@ exports.getImagesAllLabs = getImagesAllLabs;
 exports.getImagesAllRepos = getImagesAllRepos;
 exports.areImagesInstalled = areImagesInstalled;
 exports.getListImages = getListImages;
+exports.getListHackTools = getListHackTools;

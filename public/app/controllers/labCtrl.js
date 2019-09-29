@@ -48,7 +48,9 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
   vm.isGoalPreviewOpen= false;
   vm.noImages = false;
   vm.actionVisible = true,
-    $scope.imageList = [];
+  $scope.imageList = [];
+  $scope.interactiveImageList = [];
+  $scope.listTools = [];
   toEditName = ''	;
   $scope.listContainers = {};
   $scope.init = function() {
@@ -145,6 +147,12 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                     } else {
                       dockerImagesService.get(function(images) {
                         $scope.imageList = images
+                        $scope.interactiveImageList = images;
+                      });
+
+                    dockerAPIService.getListHackTools()
+                      .then(function successCallback(response){
+                             $scope.listTools = response.data.data.images;
                       });
                     }
                   }, function error(err) {
@@ -261,6 +269,15 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
           })
 
+    }
+  }
+
+  // Called when the image change
+  $scope.switchImages = function switchImages(hackToolMode) {
+    if (hackToolMode == "interactive") {
+      $scope.imageList = $scope.interactiveImageList;
+    } else {
+      $scope.imageList = $scope.listTools;
     }
   }
   $scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
@@ -516,6 +533,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
     dockerAPIService.getNetworkList(vm.repoName, vm.lab.name)
       .then(function successCallback(response) {
         $scope.networkList = response.data.data;
+        console.log($scope.networkList);
       }, function errorCallback(error) {
         Notification({message:"Server error: "+error}, 'error');
       });

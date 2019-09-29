@@ -1,14 +1,18 @@
-var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService, dockerImagesService) {
+var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerAPIService, dockerImagesService) {
   $scope.init = function init() {
     console.log("=== INIT DOCKER TOOLS CONTROLLER ===");
     $scope.listServices = [];
     $scope.showPorts = false;
     $scope.showEnv = false;
     $scope.showTools = false;
+    $scope.hackToolMode = {
+      val : "interactive"
+    }
     $scope.optPort = { container: 0, host: 0};
     $scope.optionalPorts = [];
     $scope.currentEnvironment = {name: '', value: ''};
     $scope.currentContainer = {};
+    $scope.hackToolNotify = "";
     // dockerImagesService.get(function(images) {
     //   $scope.imageList = images
     // });
@@ -34,15 +38,26 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, dockerAPIService, dock
       }
     });
   }
+// $scope.setOneLineNetwork = function setOneLineNetwork(networkName){
+//  $scope.currentContainer.OneLineNetwork = networkName;
+// }
+
+  $scope.setNetwork = function() {
+  }
+
   $scope.updateImages = function() {
     dockerImagesService.get(function(images) {
       $scope.imageList = images;
     }, true);
   }
 
+  $scope.changeMode = function() {
+  }
+
   function initCurrentContainer() {
     $scope.currentContainer.name = "newService"
     $scope.currentContainer.isInteractive = true;
+    $scope.currentContainer.isOneLine = false;
     $scope.currentContainer.isDaemonized = true;
     $scope.currentContainer.command = "/bin/bash"
     $scope.currentContainer.environments = [];
@@ -144,6 +159,50 @@ $scope.detachNetwork = function detachNetwork(c, n) {
       Notification(error.data.message, 'error');
     })
   }
+ $scope.runServiceOneLine = function runServiceOneLine() {
+   $scope.hackToolNotify = "";
+   console.log($scope.currentContainer.selectedImage);
+   // $scope.showTerminal = true;
+   console.log("RUN SERVICE ONE LINE");
+   console.log($scope.currentContainer);
+   // Set selected networks
+  $scope.currentContainer.OneLineNetworks = []
+   _.each($scope.networkList, function(n) {
+     if (n.isNetworkOnelineAttached) {
+       $scope.currentContainer.OneLineNetworks.push(n.name);
+     }
+   })
+   SocketService.manage(JSON.stringify({
+       action : 'docker_run',
+       params : {
+         currentContainer: $scope.currentContainer
+       }
+   }), function(event) {
+    var data = JSON.parse(event.data)
+    if(data.status === 'success')  {
+      console.log('success');
+    }
+    else if(data.status === 'error') {
+            Notification('Some error in docker-compose up command', 'error');
+            console.log(data)
+            // $scope.responseError = $scope.responseErrorHeader + data.message;
+            // $scope.labState = playProto
+            // $scope.action = $scope.startLab
+      }
+    // Notification
+    else {
+        $scope.hackToolNotify += data.message;
+        $scope.hackToolNotify += "<br>"
+        // $scope.$broadcast('terminal-output', {
+        //        output: true,
+        //        text: [data.message],
+        //        breakLine: true
+        //    });
+        //    $scope.$apply();
+       }
+     });
+   }
+
   $scope.stopService = function stopService(containerName) {
      console.log("STOP SERVICE");
     dockerAPIService.stopService(containerName)

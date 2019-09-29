@@ -51,6 +51,37 @@ exports.build = function build(params, body, callback, notifyCallback) {
     (dockerfilePath, cb) => dockerManager.build(dockerfilePath, params.dockerfile, cb, notifyCallback)
   ], (err) => callback(err))
 }
+
+exports.dockerRun = function dockerRun(params, callback, notifyCallback){
+  log.info('[DOCKER ACTIONS - RUN SERVICE ONE LINE]');
+  async.waterfall([
+    // (cb) => Checker.checkParams(params.currentContainer, ['name', 'isOneLine', 'OneLineNetwork', 'command'], cb),
+    (cb) => Checker.checkParams(params.currentContainer, ['name', 'command'], cb),
+    (cb) => {
+      let image = params.currentContainer.selectedImage.name;
+      const options = {
+       rm : true,
+       cmd: params.currentContainer.command,
+       net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : []
+      }
+      // let flags = '--rm';
+      // flags += ` --network=${params.currentContainer.OneLineNetwork}`;
+      dockerManager.run(image, callback, options, notifyCallback);
+      // let cmd = params.currentContainer.command;
+      // const toExec = `docker run ${flags} ${image} ${cmd}`;
+      // dockerJS.docker_stdout(utils.get(toExec,cb),notifyCallback);
+    }
+  ],
+    (err) => {
+      if (err) {
+        log.error(err.message);
+      }
+      callback(err)
+    })
+}
+
+
+
 // Start compose up and execute commands in body there are cListToDraw containers
 exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let networkInfo;
@@ -105,12 +136,12 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
           cb(null);
         } else cb(err);
       },
-    notifyCallback, dockerComposeOptions);
+        notifyCallback, dockerComposeOptions);
     },
     // Copy before actions
     (cb) => {
       dockerFilesToCopy.copyBeforeActions(mainDir, params.namerepo,
-          thePath, networkInfo.clistToDraw, cb);
+        thePath, networkInfo.clistToDraw, cb);
     },
 
     // Actions
@@ -127,15 +158,15 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
           async.eachSeries(actions, (a, innerCallback) => {
             log.info('Calling action:');
             const command = dockerAction.getCommand(a);
-             log.info(`${a.cname} ${command}`);
+            log.info(`${a.cname} ${command}`);
             if (a.backgroundMode) {
               log.info(`${command} in backgroundMode`);
             }
-          const params = { detached: a.backgroundMode };
-          // call docker-compose exec service (cname) command (a.command)
-          // TO SEE THE PROBLEM OF DETACHED COMMAND SHOULD CALL DOCKER-COMPOSE exec -d
-          // ref: https://github.com/docker/compose/issues/4690
-          // Default value : labname_containername_1
+            const params = { detached: a.backgroundMode };
+            // call docker-compose exec service (cname) command (a.command)
+            // TO SEE THE PROBLEM OF DETACHED COMMAND SHOULD CALL DOCKER-COMPOSE exec -d
+            // ref: https://github.com/docker/compose/issues/4690
+            // Default value : labname_containername_1
             dockerComposer.exec(thePath, a.cname, command, (err, data) => {
               if (err) {
                 innerCallback(err);
@@ -144,7 +175,7 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
                 log.info(data);
                 innerCallback(null);
               }
-            // In background mode (set false for debugging)
+              // In background mode (set false for debugging)
             }, params);
             // End loop , final function
           }, (err) => {
@@ -154,15 +185,15 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
       });
     },
 
-        // files to copy
-        // Those copy files are done after the actions
+    // files to copy
+    // Those copy files are done after the actions
     (cb) => {
       // Mangage actions
       // in clistToDraw
       // After actions
       log.info('COPY AFTER');
       dockerFilesToCopy.copyAfterActions(mainDir, params.namerepo,
-            thePath, networkInfo.clistToDraw, cb);
+        thePath, networkInfo.clistToDraw, cb);
     }, // End manage files to copy
 
     // After all correct operations set state to running
@@ -234,13 +265,13 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
       LabStates.setStopState(params.namerepo, params.namelab, cb);
     }
   ],
-  // End function , return correct or error
-  (err) => {
-    if (err) {
-      log.error(err.message);
-    }
-    callback(err);
-  });
+    // End function , return correct or error
+    (err) => {
+      if (err) {
+        log.error(err.message);
+      }
+      callback(err);
+    });
 };
 exports.downloadImages = function downloadImages(params, body, callback, notifyCallback) {
   log.info('[DOCKER ACTIONS - DOWNLOAD IMAGE]')
@@ -248,12 +279,12 @@ exports.downloadImages = function downloadImages(params, body, callback, notifyC
     (cb) => Checker.checkParams(params, ['name', 'tag'], cb),
     (cb) => imageMgr.pullImage(params.name, params.tag, callback, notifyCallback)
   ],
-  (err) => {
-    if (err) {
-      log.error(err.message);
-    }
-    callback(err)
-  })
+    (err) => {
+      if (err) {
+        log.error(err.message);
+      }
+      callback(err)
+    })
 };
 
 exports.removeImage = function removeImage(params, body, callback) {
@@ -262,10 +293,10 @@ exports.removeImage = function removeImage(params, body, callback) {
     (cb) => Checker.checkParams(params, ['name', 'tag'], cb),
     (cb) => imageMgr.removeImage(params.name, params.tag, callback)
   ],
-  (err) => {
-    if (err) {
-      log.error(err.message);
-    }
-    callback(err)
-  })
+    (err) => {
+      if (err) {
+        log.error(err.message);
+      }
+      callback(err)
+    })
 }

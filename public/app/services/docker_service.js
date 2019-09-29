@@ -5,6 +5,7 @@ var api = '/dsp_v1/docker_network/' ;
 	var dsp_images_docker = '/dsp_v1/dsp_images/' ;
 	var dsp_running_services = '/dsp_v1/services/' ;
 	var dsp_dockerfile_service = '/dsp_v1/dockerfiles/' ;
+  var dsp_hack_tools = '/dsp_v1/hack_tools';
 	var dsp_service_network = '/dsp_v1/networkservices' ;
   var url = 'http://' + location.host + '/';
 
@@ -147,6 +148,9 @@ var api = '/dsp_v1/docker_network/' ;
     },
     getDSPImages : function getDSPImages() {
             return $http.get(dsp_images_docker)
+    },
+    getListHackTools : function getListHackTools(){
+          return $http.get(dsp_hack_tools);
     },
     formatPullLog: function formatPullLog(json) {
    //  ss = JSON.parse(json);
