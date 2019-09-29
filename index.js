@@ -116,6 +116,9 @@ app.put('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.editDockerFile);
 app.get('/dsp_v1/dockerfiles', dockerfilesHandler.getDockerFiles);
 app.get('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.getDockerFile);
 app.delete('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.deleteDockerFile);
+
+//Api Hack Tools
+app.get('/dsp_v1/hack_tools/', serviceHandler.getListHackTools);
 // Api labels
 app.get('/dsp_v1/labels/:repo', labels.allLabels);
 app.get('/dsp_v1/labels/:repo/:nameLab', labels.labelsOfLab);

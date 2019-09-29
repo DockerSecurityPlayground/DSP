@@ -322,6 +322,14 @@ function setAsDefault(req, res) {
 
 }
 
+function getListHackTools(req,res){
+   dockerImages.getListHackTools((err,data) => {
+       httpHelper.response(res,err,data);
+   });
+}
+
+
+
 
 // exports.save = save;
 exports.getServices = getServices;
@@ -333,6 +341,8 @@ exports.getNetworkList = getNetworkList;
 exports.attachNetwork = attachNetwork;
 exports.detachNetwork = detachNetwork;
 exports.setAsDefault = setAsDefault;
+exports.getListHackTools = getListHackTools;
+
 // exports.getListImages = getListImages;
 // exports.dirExists = dirExists;
 // exports.dockershell = dockershell;
