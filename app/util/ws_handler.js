@@ -83,8 +83,6 @@ function manageDockerBuild(ws, jsonMessage) {
 }
 function manageDockerRun(ws,jsonMessage) {
      const params = jsonMessage.params;
-     console.log('in manage docker run');
-     console.log(jsonMessage);
      dockerActions.dockerRun(params, err => {
          sendResponse(ws,err);
      }, (dataline) => {

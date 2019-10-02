@@ -1,13 +1,18 @@
 <script> 
-  $( document ).ready(function() {
-    console.log("INIT SERVICE");
-    var appScope = angular.element(document.getElementById("serviceComponent")).scope()
-    appScope.init();
-  });
+$( document ).ready(function() {
+  console.log("INIT SERVICE");
+  var appScope = angular.element(document.getElementById("serviceComponent")).scope()
+  appScope.init();
+});
 
 </script>
 <style>
-.ace-run { height: 100px; }
+.terminal {
+  background-color: black;
+  border: 1px solid #000;
+  color: white;
+  padding: 8px;
+}
 </style>
 
 <!-- <div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl"> -->
@@ -101,7 +106,7 @@
     <div> <!-- Start add container -->
       <h3 class="text-center">{{currentAction}} </h3>
       <hr ng-show=showTools>
-<div class="row">
+      <div class="row">
         <div class="col-sm-offset-4">
           <div class="btn-group" >
             <label class="btn btn-primary" ng-model="hackToolMode.val" uib-btn-radio="'interactive'" ng-change="switchImages(hackToolMode.val)" >Interactive</label>
@@ -110,59 +115,79 @@
         </div>
       </div>
       <div ng-show="hackToolMode.val == 'oneline'">
-              <h3 class="text-center"> One Line Hack Tool </h3>
+        <h3 class="text-center"> One Line Hack Tool </h3>
         <h5 class="text-center"> Send your attacks by using predefined hack tools </h5>
         <br /><br />
+<textarea ng-show="hackToolNotify" class="terminal form-control rounded-0" id="hack-tool-notify" rows="20">
+            {{hackToolNotify}} 
+          </textarea>
+                <table class="table table-reduced-width " >
+                    <thead>
+                      <tr>
+                        <th class="text-center">Running Hack Tool</th>
+                        <th class="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="c in runningHackTools"> 
+                        <td> {{c}}</td>
+                        <td> <button type="button" class="btn btn-sm btn-danger" ng-click="stopHackTool(c)">  Stop </button> </td></td>
+                      </tr>
+                    </tbody>
+                </table>
 
-      <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
-      <div class="col-sm-4"> 
-        <select 
-           ng-model="currentContainer.selectedImage" 
-           ng-change="changedImage(currentContainer.selectedImage)" 
-           ng-required=true
-           ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
-        </select>
-      </div>
-      <div class="col-sm-4"> 
-        <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
-        </input>
-      </div>
-
-      <div class="col-sm-2">
-        <button class="btn btn-default" ng-click="updateImages()"> 
-          <i class="glyphicon glyphicon-refresh" > </i>
-        </button>
-      </div>
-      <br />
-      <br />
-      <br />
-      <div  ng-repeat="n in networkList">
-        <label class="control-label col-sm-2" for="container_name">Networks: </label>
-        <input class="form-check-input" type="checkbox" ng-model=n.isNetworkOnelineAttached > <label class="form-check-label"> {{n.name}} </label>
-      </div>
-      <label class="control-label col-sm-2" for="container_name">{{hackLabel}} </label>
-                  <div class="col-sm-9" >
-                    <input type="text" class="form-control"  
-                                       name="container_command" 
-                                       id="container_command" 
-                                       placeholder="Name"
-                                       ng-model="currentContainer.command" 
-                                       >	
-      </div>
-                    <br />
-                    <br />
-        <div class="text-center">
-          <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command </button>
+        <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
+        <div class="col-sm-4"> 
+          <select 
+             ng-model="currentContainer.selectedImage" 
+             ng-change="changedImage(currentContainer.selectedImage)" 
+             ng-required=true
+             ng-options="il.name for il in imageList | filter :{name:filterImage}" class="form-control select_style" id="selector_imagelist"> 
+          </select>
         </div>
-        <br /><br />
-                <div class="ace-run" ui-ace="{
-                theme: 'terminal',
-                mode: 'yaml'
-                }"
-                ng-bind-html=hackToolNotify
-              > </div>
+        <div class="col-sm-4"> 
+          <input type="text" class="form-control" name="filterImage" placeholder="Image Filter" ng-model="filterImage"  >
+          </input>
+        </div>
 
-    </div>
+        <div class="col-sm-2">
+          <button class="btn btn-default" ng-click="updateImages()"> 
+            <i class="glyphicon glyphicon-refresh" > </i>
+          </button>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div  ng-repeat="n in networkList">
+          <label class="control-label col-sm-2" for="container_name">Networks: </label>
+          <input class="form-check-input" type="checkbox" ng-model=n.isNetworkOnelineAttached > <label class="form-check-label"> {{n.name}} </label>
+        </div>
+        <label class="control-label col-sm-2" for="container_name">{{hackLabel}} </label>
+        <div class="col-sm-9" >
+          <input type="text" class="form-control"  
+                             name="container_command" 
+                             id="container_command" 
+                             placeholder="Name"
+                             ng-model="currentContainer.command" 
+                             >	
+        </div>
+          <br />
+          <br />
+          
+          <div class="text-center">
+            <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command </button>
+          </div>
+          <br /><br />
+
+
+          <!-- <div class="ace-run" ui-ace="{ -->
+          <!-- theme: 'terminal', -->
+          <!-- mode: 'yaml' -->
+          <!-- }" -->
+          <!-- ng-bind-html=hackToolNotify -->
+          <!-- > </div> -->
+
+      </div>
       <md-content class="md-padding" ng-show="hackToolMode.val == 'interactive'">
         <md-nav-bar md-selected-nav-item="selectedItem" nav-bar-aria-label="navigation links">
           <md-nav-item md-nav-sref="cname" name="cname" ng-click="changeTab(0,'cname')">Main</md-nav-item>
@@ -237,7 +262,7 @@
             <br />
 
 
-                        </div> <!-- End main -->
+            </div> <!-- End main -->
 
             <!-- </div> -->
             <div class="row form-group" ng-show=checked[1]>
@@ -485,7 +510,7 @@
                   <hr>
                   <p class="text-center">
                   <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runService()" ng-show="hackToolMode.val == 'interactive'">Run</button>
-                  
+
 
                   </p>    
             </div> <!-- END DIV CONTAINER ADD -->
