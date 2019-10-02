@@ -2,9 +2,17 @@
   "images":[
     { 
       "label": "nmap",
-      "name": "uzyexe/nmap:latest",
+      "name": "uzyexe/nmap",
+      "tag": "latest",
       "description": "nmap container image",
       "default_command": "-sT localhost"
+    },
+    { 
+      "label": "dirbuster",
+      "name": "hypnza/dirbuster",
+      "tag": "latest",
+      "description": "Dirbuster container",
+      "default_command": "-u localhost"
     }
   ]
 }

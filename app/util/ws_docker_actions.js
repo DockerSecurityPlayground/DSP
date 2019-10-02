@@ -12,6 +12,7 @@ const LabStates = require('./LabStates');
 const appUtils = require('../util/AppUtils');
 const fs = require('fs');
 const rimraf = require('rimraf');
+const service_prefix="dsp_hacktool"
 
 
 const dockerAction = require(`${appRoot}/app/data/docker_actions`);
@@ -57,12 +58,16 @@ exports.build = function build(params, body, callback, notifyCallback) {
 
 exports.dockerRun = function dockerRun(params, callback, notifyCallback){
   log.info('[DOCKER ACTIONS - RUN SERVICE ONE LINE]');
+  console.log(params.currentContainer);
   async.waterfall([
     // (cb) => Checker.checkParams(params.currentContainer, ['name', 'isOneLine', 'OneLineNetwork', 'command'], cb),
-    (cb) => Checker.checkParams(params.currentContainer, ['name', 'command'], cb),
+    (cb) => Checker.checkParams(params.currentContainer, ['command'], cb),
+    (cb) => Checker.checkParams(params.currentContainer.selectedImage, ['label', 'name', 'tag'], cb),
+    (cb) => imageMgr.pullImage(params.currentContainer.selectedImage.name, params.currentContainer.selectedImage.tag, cb, notifyCallback),
     (cb) => {
-      let image = params.currentContainer.selectedImage.name;
+      let image = params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag;
       const options = {
+       name: service_prefix + "_" + params.currentContainer.selectedImage.label,
        rm : true,
        cmd: params.currentContainer.command,
        net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : []

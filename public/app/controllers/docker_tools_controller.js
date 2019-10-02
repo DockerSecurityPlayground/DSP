@@ -11,6 +11,7 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerA
     $scope.hackLabel = "Command:"
     $scope.optPort = { container: 0, host: 0};
     $scope.optionalPorts = [];
+    $scope.runningHackTools = [];
     $scope.currentEnvironment = {name: '', value: ''};
     $scope.currentContainer = {};
     $scope.hackToolNotify = "";
@@ -168,6 +169,7 @@ $scope.detachNetwork = function detachNetwork(c, n) {
    // $scope.showTerminal = true;
    console.log("RUN SERVICE ONE LINE");
    console.log($scope.currentContainer);
+   $scope.runningHackTools.push($scope.currentContainer.selectedImage.label);
    // Set selected networks
   $scope.currentContainer.OneLineNetworks = []
    _.each($scope.networkList, function(n) {
@@ -184,10 +186,13 @@ $scope.detachNetwork = function detachNetwork(c, n) {
     var data = JSON.parse(event.data)
     if(data.status === 'success')  {
       console.log('success');
+      Notification('Done', 'success');
+      console.log(data);
+      $scope.runningHackTools = _.without($scope.runningHackTools, $scope.currentContainer.selectedImage.tag);
     }
     else if(data.status === 'error') {
-            Notification('Some error in docker-compose up command', 'error');
-            console.log(data)
+            Notification('Error', 'error');
+          $scope.hackToolNotify += data.message;
             // $scope.responseError = $scope.responseErrorHeader + data.message;
             // $scope.labState = playProto
             // $scope.action = $scope.startLab
@@ -195,7 +200,7 @@ $scope.detachNetwork = function detachNetwork(c, n) {
     // Notification
     else {
         $scope.hackToolNotify += data.message;
-        $scope.hackToolNotify += "<br>"
+        // $scope.hackToolNotify += "<br>"
         // $scope.$broadcast('terminal-output', {
         //        output: true,
         //        text: [data.message],
@@ -292,8 +297,21 @@ $scope.addOptionalPort = function addOptionalPort() {
 $scope.changedImage = function changedImage(selectedImage) {
   if ($scope.hackToolMode.val == "oneline") {
     $scope.currentContainer.command = selectedImage.default_command;
+    $scope.currentContainer.tag = selectedImage.tag;
     $scope.hackLabel = selectedImage.label;
   }
+}
+
+$scope.stopHackTool = function stopHackTool(name) {
+  console.log("name");
+  console.log(name);
+  dockerAPIService.stopService(name)
+  .then(function successCallback(response) {
+      Notification("Service Stopped!");
+      $scope.runningHackTools = _.without($scope.runningHackTools, name);
+  }, function errorCallback(error) {
+      Notification(error.data.message, "error");
+  });
 }
 
 $scope.removeOptionalPort = function removeOptionalPort($index) {
