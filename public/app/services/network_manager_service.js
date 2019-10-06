@@ -70,6 +70,14 @@ function dsp_networkManagerService() {
         return network.listIP[0]
 
     },
+    genList(subnet) {
+      var s =  subnet.substring(0,subnet.length-2)
+      var i = 1
+      var listIP = []
+      for( i = 2; i <= 255; i++)
+        listIP[i-2]=s+"."+i
+      return listIP;
+    },
     //n : {name , subnet, color }
     newNetwork(n) {
       var obj = 	_.create(networkPrototype, n)

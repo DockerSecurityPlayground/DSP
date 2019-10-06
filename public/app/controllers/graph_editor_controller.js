@@ -205,6 +205,9 @@ window.location.href = urlToGo;
     var networkToEdit = NetworkManagerService.getNetwork(networkInEditing.name);
     networkToEdit.name = $scope.n.name;
     networkToEdit.subnet = s;
+    networkToEdit.listIP = NetworkManagerService.genList(networkToEdit.subnet)
+    console.log("network to edit");
+    console.log(networkToEdit);
 
     // Callback to graphedit
     $scope.graphEditTerminatedCallback(networkInEditing.name, $scope.n.name);
