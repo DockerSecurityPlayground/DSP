@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
- if !Vagrant.has_plugin?("vagrant-docker-compose")
-   puts "Pls install vagrant-docker-compose (vagrant plugin install vagrant-docker-compose), then try 'vagrant up' again"
-   # system("vagrant plugin install vagrant-docker-compose")
-   exit
- end 
+ # if !Vagrant.has_plugin?("vagrant-docker-compose")
+ #   puts "Pls install vagrant-docker-compose (vagrant plugin install vagrant-docker-compose), then try 'vagrant up' again"
+ #   # system("vagrant plugin install vagrant-docker-compose")
+ #   exit
+ # end 
 
 if !Vagrant.has_plugin?("vagrant-disksize")
    puts "Pls install vagrant-disksize (vagrant plugin install vagrant-disksize), then try 'vagrant up' again"
@@ -26,14 +26,14 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/bionic64"
   config.disksize.size = "40GB"
-  config.vm.provision :docker
-  config.vm.provision :docker_compose
+  # config.vm.provision :docker
+  # config.vm.provision :docker_compose
   config.vm.provision "shell", inline: "apt-get update && apt-get install -y python-minimal"
   config.vm.network "forwarded_port", guest: 8080, host: 8080
   config.vm.synced_folder "dsp", "/home/vagrant/dsp"
 
 
-  config.vm.provision "shell", path: "init.sh", privileged: false
+  # config.vm.provision "shell", path: "init.sh", privileged: false
 
 
 
