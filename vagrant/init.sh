@@ -10,5 +10,10 @@ fi
 cd $DSP_PATH
 git pull
 npm install
+sudo npm install pm2@latest -g
+pm2 start index.js
+pm2 startup
+pm2 save
+echo "DSP is running! Go to http://localhost:8080 and enjoy!"
 # forever list
 # sudo npm install -g forever
