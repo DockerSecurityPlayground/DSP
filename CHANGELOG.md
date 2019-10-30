@@ -3,19 +3,27 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
-Versioning of Docker Security Playground 
-
-
  Fix of Angular WebSocket Code during installation long running
  Fix the filterImage bug in edit container page OK
  Fix the .data bug (delete when .data is empty)
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+### Unreleased hacktools
+- Host network support
+- Default oneline
+- Single page hacktools
+- Redirect stderr to stdout when run oneline (see dirhunt)
+Versioning of Docker Security Playground 
+
+
+
 ## [3.2.4] - 2019 - 11 - 23  
 - Added dockersecplayground username in tag of docker build
 ## [3.2.3] - 2019 - 09 - 08
 - Fixed pty exception crashes when col or row is null
+
+
 
 ## [3.2.0] - 2019 - 09 - 08
 - Added ctf and exec default actions for images  

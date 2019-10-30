@@ -57,6 +57,7 @@ mxBasePath = 'assets/mxgraph/';
     <script src="app/services/docker_service.js"> </script>
     <script src="app/services/regex_service.js"> </script>
     <script src="app/services/walker_service.js"> </script>
+    <script src="app/services/increment_number_service.js"> </script>
     <script src="app/services/current_lab.js"> </script>
     <script src="app/services/images_service.js"> </script>
     <script src="app/services/socket_service.js"> </script>
@@ -180,6 +181,7 @@ return _factory;
   .service('dockerAPIService', DockerAPIService) 
   .service('dockerImagesService', dsp_imagesService) 
   .service('containerManager',dsp_ContainerManagerService) 
+  .service('incrementNumber',IncrementNumber) 
   .service('safeApplyService', SafeApply) 
   .controller("MainCtrl", dsp_MainCtrl)
   .controller("labelsCtrl", dsp_LabelsCtrl) 

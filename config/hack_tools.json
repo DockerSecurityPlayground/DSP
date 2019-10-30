@@ -13,6 +13,13 @@
       "tag": "latest",
       "description": "Dirbuster container",
       "default_command": "-u localhost"
+    },
+    { 
+      "label": "dirhunt",
+      "name": "trevorbryant/dirhunt",
+      "tag": "latest",
+      "description": "Dihunt container",
+      "default_command": "-t http://localhost:8081/bodgeit/"
     }
   ]
 }

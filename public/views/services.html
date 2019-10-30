@@ -109,8 +109,8 @@ $( document ).ready(function() {
       <div class="row">
         <div class="col-sm-offset-4">
           <div class="btn-group" >
-            <label class="btn btn-primary" ng-model="hackToolMode.val" uib-btn-radio="'interactive'" ng-change="switchImages(hackToolMode.val)" >Interactive</label>
             <label class="btn btn-primary" ng-model="hackToolMode.val" ng-change="switchImages(hackToolMode.val)" uib-btn-radio="'oneline'" >One Line</label>
+            <label class="btn btn-primary" ng-model="hackToolMode.val" uib-btn-radio="'interactive'" ng-change="switchImages(hackToolMode.val)" >Interactive</label>
           </div>
         </div>
       </div>
@@ -118,23 +118,21 @@ $( document ).ready(function() {
         <h3 class="text-center"> One Line Hack Tool </h3>
         <h5 class="text-center"> Send your attacks by using predefined hack tools </h5>
         <br /><br />
-<textarea ng-show="hackToolNotify" class="terminal form-control rounded-0" id="hack-tool-notify" rows="20">
-            {{hackToolNotify}} 
-          </textarea>
-                <table class="table table-reduced-width " >
-                    <thead>
-                      <tr>
-                        <th class="text-center">Running Hack Tool</th>
-                        <th class="text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="c in runningHackTools"> 
-                        <td> {{c}}</td>
-                        <td> <button type="button" class="btn btn-sm btn-danger" ng-click="stopHackTool(c)">  Stop </button> </td></td>
-                      </tr>
-                    </tbody>
-                </table>
+
+                <!-- <table class="table table-reduced-width " > -->
+                <!--     <thead> -->
+                <!--       <tr> -->
+                <!--         <th class="text-center">Running Hack Tool</th> -->
+                <!--         <th class="text-center">Action</th> -->
+                <!--       </tr> -->
+                <!--     </thead> -->
+                <!--     <tbody> -->
+                <!--       <tr ng-repeat="c in runningHackTools"> --> 
+                <!--         <td> {{c}}</td> -->
+                <!--         <td> <button type="button" class="btn btn-sm btn-danger" ng-click="stopHackTool(c)">  Stop </button> </td></td> -->
+                <!--       </tr> -->
+                <!--     </tbody> -->
+                <!-- </table> -->
 
         <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
         <div class="col-sm-4"> 
@@ -177,6 +175,17 @@ $( document ).ready(function() {
           <div class="text-center">
             <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command </button>
           </div>
+
+    <uib-tabset  active="active">
+    <uib-tab ng-repeat="(k, v) in terminals" index="v.name" heading="v.name">
+    <uib-tab-heading>
+      <button class="btn btn-deafult glyphicon glyphicon-remove-circle" ng-click=closeHackTool(v.name)></button> {{v.name}} 
+      </uib-tab-heading>
+          <textarea class="terminal form-control rounded-0" rows="20">
+            {{v.message}} 
+          </textarea>
+     </uib-tab>
+   </uib-tabset>
           <br /><br />
 
 
