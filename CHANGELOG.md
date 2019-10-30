@@ -12,6 +12,13 @@ Versioning of Docker Security Playground
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+### Unreleased hacktools
+- Host network support
+- Default oneline
+- Single page hacktools
+- Redirect stderr to stdout when run oneline (see dirhunt)
+
+
 
 ## [3.2.0] - 2019 - 09 - 08
 - Added ctf and exec default actions for images  

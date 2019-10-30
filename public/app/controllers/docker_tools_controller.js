@@ -1,4 +1,4 @@
-var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerAPIService, dockerImagesService) {
+var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketService, incrementNumber, dockerAPIService, dockerImagesService) {
   $scope.init = function init() {
     console.log("=== INIT DOCKER TOOLS CONTROLLER ===");
     $scope.listServices = [];
@@ -12,6 +12,7 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerA
     $scope.optPort = { container: 0, host: 0};
     $scope.optionalPorts = [];
     $scope.runningHackTools = [];
+    $scope.terminals = [];
     $scope.currentEnvironment = {name: '', value: ''};
     $scope.currentContainer = {};
     $scope.hackToolNotify = "";
@@ -40,6 +41,9 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SocketService, dockerA
       }
     });
   }
+
+
+
 // $scope.setOneLineNetwork = function setOneLineNetwork(networkName){
 //  $scope.currentContainer.OneLineNetwork = networkName;
 // }
@@ -165,11 +169,15 @@ $scope.detachNetwork = function detachNetwork(c, n) {
   }
  $scope.runServiceOneLine = function runServiceOneLine() {
    $scope.hackToolNotify = "";
-   console.log($scope.currentContainer.selectedImage);
    // $scope.showTerminal = true;
-   console.log("RUN SERVICE ONE LINE");
-   console.log($scope.currentContainer);
-   $scope.runningHackTools.push($scope.currentContainer.selectedImage.label);
+   incrementNumber.newObj($scope.currentContainer.selectedImage.label)
+   var nameRunning = incrementNumber.newName($scope.currentContainer.selectedImage.label)
+   if (_.contains($scope.runningHackTools, nameRunning)) {
+     Notification(nameRunning + " is already in execution, pls wait", 'error');
+   } else {
+   $scope.currentContainer.name = nameRunning;
+   $scope.runningHackTools.push(nameRunning);
+   $scope.terminals.push({name: nameRunning, message: ''})
    // Set selected networks
   $scope.currentContainer.OneLineNetworks = []
    _.each($scope.networkList, function(n) {
@@ -187,29 +195,31 @@ $scope.detachNetwork = function detachNetwork(c, n) {
     if(data.status === 'success')  {
       console.log('success');
       Notification('Done', 'success');
-      console.log(data);
-      $scope.runningHackTools = _.without($scope.runningHackTools, $scope.currentContainer.selectedImage.tag);
+      SafeApply.exec($scope, function() {
+        $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
+      })
     }
     else if(data.status === 'error') {
             Notification('Error', 'error');
           $scope.hackToolNotify += data.message;
+        if (_.contains($scope.runningHackTools, nameRunning)) {
+          $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
+        }
             // $scope.responseError = $scope.responseErrorHeader + data.message;
             // $scope.labState = playProto
             // $scope.action = $scope.startLab
       }
     // Notification
     else {
-        $scope.hackToolNotify += data.message;
-        // $scope.hackToolNotify += "<br>"
-        // $scope.$broadcast('terminal-output', {
-        //        output: true,
-        //        text: [data.message],
-        //        breakLine: true
-        //    });
-        //    $scope.$apply();
+        // $scope.hackToolNotify += data.message;
+        _.findWhere($scope.terminals, {name: nameRunning}).message += data.message;
        }
      });
    }
+ }
+  $scope.closeHackTool = function(nameHacktool) {
+    console.log(nameHacktool);
+  }
 
   $scope.stopService = function stopService(containerName) {
      console.log("STOP SERVICE");
