@@ -48,7 +48,12 @@ exports.init = function init(httpserv) {
 socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`)
         });
         socket.on('resize', function(data) {
-            term.resize(data.col, data.row);
+          try {
+            if (data.col && data.row)
+              term.resize(data.col, data.row);
+          } catch(e) {
+            log.warn(`log exception: ${1}`, e.message)
+          }
         });
         socket.on('input', (data) => {
             term.write(data);

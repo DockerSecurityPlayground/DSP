@@ -12,6 +12,8 @@ Versioning of Docker Security Playground
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.2.3] - 2019 - 09 - 08
+- Fixed pty exception crashes when col or row is null
 
 ## [3.2.0] - 2019 - 09 - 08
 - Added ctf and exec default actions for images  
