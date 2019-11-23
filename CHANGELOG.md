@@ -12,6 +12,8 @@ Versioning of Docker Security Playground
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.2.4] - 2019 - 11 - 23  
+- Added dockersecplayground username in tag of docker build
 ## [3.2.3] - 2019 - 09 - 08
 - Fixed pty exception crashes when col or row is null
 

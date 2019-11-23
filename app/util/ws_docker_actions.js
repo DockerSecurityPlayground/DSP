@@ -32,6 +32,7 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
 }
 
 exports.build = function build(params, body, callback, notifyCallback) {
+  const DOCKER_USERNAME = "dockersecplayground/"
   async.waterfall([
     (cb) => Checker.checkParams(params, ['dockerfile'], cb),
     (cb) => {
@@ -48,7 +49,9 @@ exports.build = function build(params, body, callback, notifyCallback) {
       };
     },
     (up, cb) => cb(null, path.join(up, '.dockerfiles', params.dockerfile)),
-    (dockerfilePath, cb) => dockerManager.build(dockerfilePath, params.dockerfile, cb, notifyCallback)
+    (dockerfilePath, cb) => {
+      dockerManager.build(dockerfilePath, DOCKER_USERNAME + params.dockerfile, cb, notifyCallback)
+    }
   ], (err) => callback(err))
 }
 // Start compose up and execute commands in body there are cListToDraw containers
