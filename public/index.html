@@ -140,6 +140,21 @@ modelSetter(scope, element[0].files[0]);
 }
 };
 }])
+.directive('onFinishRender',['$timeout', '$parse', function ($timeout, $parse) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            if (scope.$last === true) {
+                $timeout(function () {
+                    scope.$emit('ngRepeatFinished');
+                    if(!!attr.onFinishRender){
+                      $parse(attr.onFinishRender)(scope);
+                    }
+                });
+            }
+        }
+    }
+}])
   .filter('depends', function() {
 return function(input, currentContainerName) {
 console.log("IN FILTER");

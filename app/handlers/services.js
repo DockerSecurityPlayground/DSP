@@ -328,6 +328,16 @@ function getListHackTools(req,res){
    });
 }
 
+function deleteHackTool(req, res) {
+  log.info("[DOCKER TOOLS] Remove Hacking Tool");
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ["name"], cb),
+    (cb) => dockerServices.deleteHackTool(req.params.name, cb)
+    ],
+    (err) => {
+      AppUtils.response('SET DEFAULT NETWORK', res, err);
+    });
+}
 
 
 
@@ -342,6 +352,7 @@ exports.attachNetwork = attachNetwork;
 exports.detachNetwork = detachNetwork;
 exports.setAsDefault = setAsDefault;
 exports.getListHackTools = getListHackTools;
+exports.deleteHackTool = deleteHackTool;
 
 // exports.getListImages = getListImages;
 // exports.dirExists = dirExists;

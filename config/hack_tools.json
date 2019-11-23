@@ -12,14 +12,25 @@
       "name": "hypnza/dirbuster",
       "tag": "latest",
       "description": "Dirbuster container",
-      "default_command": "-u localhost"
+      "default_command": "-u http://localhost:18080"
     },
     { 
       "label": "dirhunt",
       "name": "trevorbryant/dirhunt",
       "tag": "latest",
       "description": "Dihunt container",
-      "default_command": "-t http://localhost:8081/bodgeit/"
+      "default_command": "http://localhost:18080/bodgeit/"
+    },
+    {
+      "label": "tcpdump",
+      "name": "itsthenetwork/alpine-tcpdump",
+      "tag": "latest",
+      "description": "Tcpdump container",
+      "default_command": "-i any",
+      "default_options":  {
+        "privileged": true
+      }
+
     }
   ]
 }

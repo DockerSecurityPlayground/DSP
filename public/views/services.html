@@ -176,10 +176,11 @@ $( document ).ready(function() {
             <button ng-disabled="!currentContainer.selectedImage" type="submit" class="btn btn-success" ng-click="runServiceOneLine()" ng-show="hackToolMode.val == 'oneline'">Run Command </button>
           </div>
 
-    <uib-tabset  active="active">
-    <uib-tab ng-repeat="(k, v) in terminals" index="v.name" heading="v.name">
+    <uib-tabset  active="activeTab">
+    <!-- <uib-tab ng-repeat="(k, v) in terminals" index="v.name" heading="v.name"> -->
+    <uib-tab ng-repeat="v in terminals" index="v.name" on-finish-render="onFinishRender()" heading="v.name">
     <uib-tab-heading>
-      <button class="btn btn-deafult glyphicon glyphicon-remove-circle" ng-click=closeHackTool(v.name)></button> {{v.name}} 
+      <button class="btn btn-deafult glyphicon glyphicon-remove-circle" ng-click=deleteHackTool(v.name)></button> {{v.name}} 
       </uib-tab-heading>
           <textarea class="terminal form-control rounded-0" rows="20">
             {{v.message}} 

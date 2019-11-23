@@ -146,15 +146,14 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                       $scope.noImages = true;
                     } else {
                       dockerImagesService.get(function(images) {
-                        $scope.imageList = images
                         $scope.interactiveImageList = images;
                       });
 
                     dockerAPIService.getListHackTools()
                       .then(function successCallback(response){
                         console.log("LIST TOOLS");
-                             $scope.listTools = response.data.data.images;
-                        console.log($scope.listTools);
+                          $scope.imageList = response.data.data.images;
+                          $scope.listTools = response.data.data.images;
                       });
                     }
                   }, function error(err) {
@@ -276,6 +275,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
   // Called when the image change
   $scope.switchImages = function switchImages(hackToolMode) {
+    console.log("Switch images");
     if (hackToolMode == "interactive") {
       $scope.imageList = $scope.interactiveImageList;
     } else {

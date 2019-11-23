@@ -5,8 +5,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.showEditContainer = false;
   $scope.showEditNetwork   = false;
   $scope.yamlfile='';
+  $scope.active = 0
   $scope.showYamlFile = false;
   $scope.isRunning = false;
+  $scope.isCreated = false;
   $scope.log = ""
   $scope.environment = {name: "Name",
     value: "Value"
@@ -1037,6 +1039,7 @@ window.location.href = urlToGo;
       .then(function successCallback(response) {
 
         Notification({message:"Save success!"}, 'success');
+        $scope.isCreated = true;
         $scope.yamlfile = response.data.data
         //Update yamlfile in interface
         var yamlcode = angular.element('#code_yaml')
@@ -1050,7 +1053,6 @@ window.location.href = urlToGo;
   }
 
   $scope.exitLab = function exitLab() {
-    console.log("EXIT");
     var urlExit = "/lab/use/"+$scope.repoName+"/"+$scope.labName;
     // console.log(urlExit);
     $window.location.href="/lab/use/"+$scope.repoName+"/"+$scope.labName;
@@ -1216,13 +1218,14 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
             // namerepo : $scope.nameRepo,
             // namelab : $scope.labName,
 
-    console.log("namerepo");
     $scope.isRunning = true;
+    // Set Log
+    $scope.active = 2;
       //Send
       SocketService.manage(JSON.stringify({
         action : 'docker_up',
         params : {
-          namerepo : $scope.repoName,
+          // namerepo : $scope.repoName,
           namelab : $scope.labName
         }
       }), function(event) {
@@ -1244,6 +1247,8 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
     }
 
   $scope.stop = function() {
+    // Set active tab on log
+    $scope.active = 2;
     SocketService.manage(JSON.stringify({
       action : 'docker_down',
       params : {

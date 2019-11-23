@@ -45,7 +45,7 @@
     "help-nodejs": "^0.6.0",
     "homedir": "^0.6.0",
     "is-valid-path": "^0.1.1",
-    "joi": "^13.7.0",
+    "joi": "^14.3.1",
     "js-yaml": "^3.12.1",
     "json-fs-converter": "^1.4.0",
     "jsonfile": "^4.0.0",

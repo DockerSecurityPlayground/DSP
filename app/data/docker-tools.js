@@ -3,9 +3,13 @@ const _ = require('underscore');
 const appUtils = require('../util/AppUtils.js');
 const log = appUtils.getLogger();
 const service_prefix="dsp_hacktool"
+const oneline_prefix="dsp_oneline"
 const allowedNetworks = ['external', 'public', 'default'];
 const routerIDs = ['router', 'firewall'];
 const async = require('async');
+
+const HACK_TOOLS_CONFIG_FILE = require('../../config/hack_tools.json');
+const hackTools = HACK_TOOLS_CONFIG_FILE.images;
 
 function parsePorts(ports) {
   const retPorts = []
@@ -78,6 +82,22 @@ function removeService(nameService, callback) {
     nameService = `${service_prefix}_${nameService}`;
   }
   dockerJS.rm(nameService, callback);
+}
+
+function deleteHackTool(name, callback) {
+  const hackToolName = `${oneline_prefix}_${name}`;
+  console.log(hackToolName);
+  async.waterfall([
+    (cb) => dockerJS.isRunning(hackToolName, cb),
+    (isRunning, cb) => {
+      if (isRunning) {
+      log.info("Remove hack tool")
+      dockerJS.rm(hackToolName, cb, true);
+    } else {
+      log.info("Hack tool already finished!")
+      cb(null)
+    }
+  }], callback(null))
 }
 
 function isDefaultNetwork(networkName) {
@@ -295,6 +315,19 @@ function setDefaultGW(nameService, ipRouter, callback) {
     dockerJS.exec(nameService, `ip route replace default via ${ipRouter}`, cb)
     }],(err) => callback(err));
 }
+
+function getImage(name) {
+}
+function get(name) {
+  const ret = _.findWhere(hackTools, {label: name});
+  if (!ret)
+    throw new Error("Not existent hack tool")
+  if (!ret.default_options)
+    ret.default_options = {}
+  return ret;
+}
+
+
     // if (err) {
     //   callback(err);
     // } else {
@@ -310,11 +343,14 @@ module.exports = {
   startService,
   stopService,
   removeService,
+  get,
+  // getDefaultOptions,
   detachServiceToNetwork,
   attachServiceToNetwork,
   getFreeAddress,
   getNetworksLab,
   findRouterIp,
   runService,
-  setDefaultGW
+  setDefaultGW,
+  deleteHackTool
 }

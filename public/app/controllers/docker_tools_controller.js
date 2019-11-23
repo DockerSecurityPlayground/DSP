@@ -1,12 +1,16 @@
 var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketService, incrementNumber, dockerAPIService, dockerImagesService) {
+  function sleep (time) {
+      return new Promise((resolve) => setTimeout(resolve, time));
+  }
   $scope.init = function init() {
     console.log("=== INIT DOCKER TOOLS CONTROLLER ===");
     $scope.listServices = [];
+    $scope.activeTab = "";
     $scope.showPorts = false;
     $scope.showEnv = false;
     $scope.showTools = false;
     $scope.hackToolMode = {
-      val : "interactive"
+      val : "oneline"
     }
     $scope.hackLabel = "Command:"
     $scope.optPort = { container: 0, host: 0};
@@ -177,6 +181,7 @@ $scope.detachNetwork = function detachNetwork(c, n) {
    } else {
    $scope.currentContainer.name = nameRunning;
    $scope.runningHackTools.push(nameRunning);
+   // var newIndex = $scope.terminals.length + 1;
    $scope.terminals.push({name: nameRunning, message: ''})
    // Set selected networks
   $scope.currentContainer.OneLineNetworks = []
@@ -196,15 +201,16 @@ $scope.detachNetwork = function detachNetwork(c, n) {
       console.log('success');
       Notification('Done', 'success');
       SafeApply.exec($scope, function() {
-        $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
+        // $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
       })
     }
     else if(data.status === 'error') {
-            Notification('Error', 'error');
+          console.log(data);
+            // Notification(data, 'error');
           $scope.hackToolNotify += data.message;
-        if (_.contains($scope.runningHackTools, nameRunning)) {
-          $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
-        }
+        // if (_.contains($scope.runningHackTools, nameRunning)) {
+          // $scope.runningHackTools = _.without($scope.runningHackTools, nameRunning);
+        // }
             // $scope.responseError = $scope.responseErrorHeader + data.message;
             // $scope.labState = playProto
             // $scope.action = $scope.startLab
@@ -217,8 +223,17 @@ $scope.detachNetwork = function detachNetwork(c, n) {
      });
    }
  }
-  $scope.closeHackTool = function(nameHacktool) {
+  $scope.deleteHackTool = function(nameHacktool) {
+    console.log("Remove hack tooL");
     console.log(nameHacktool);
+    dockerAPIService.deleteHackTool(nameHacktool)
+    .then(function successCallback(response) {
+      console.log('Service Deleted');
+      $scope.terminals = _.filter($scope.terminals, function(o) { return o.name !== nameHacktool; });
+      $scope.runningHackTools = _.without($scope.runningHackTools, nameHacktool)
+    }, function errorCallback(error) {
+      Notification({message: error.message}, 'error');
+    })
   }
 
   $scope.stopService = function stopService(containerName) {
@@ -331,5 +346,13 @@ $scope.removeOptionalPort = function removeOptionalPort($index) {
   $scope.optionalPorts.splice($index, 1);
   if($scope.optionalPorts.length === 0)
     $scope.showPorts = false;
+}
+$scope.onFinishRender = function onFinishRender() {
+  const currentTerminal = $scope.terminals[$scope.terminals.length -1];
+  console.log(currentTerminal);
+  $scope.activeTab = currentTerminal.name;
+  console.log("COPEAT");
+  console.log($scope.activeTab);
+
 }
 }

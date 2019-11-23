@@ -2,23 +2,31 @@ const networkData = require('../data/network.js');
 const appRoot = require('app-root-path');
 const configData = require('../data/config.js');
 const dockerImages = require('../data/docker-images.js');
+const dockerAction = require(`${appRoot}/app/data/docker_actions`);
+const dockerFilesToCopy = require(`${appRoot}/app/data/docker_filesToCopy`);
+const dockerTools = require('../data/docker-tools.js');
 const dockerComposer = require('mydockerjs').dockerComposer;
 const dockerManager = require('mydockerjs').docker;
+const _ = require('underscore');
 const imageMgr = require('mydockerjs').imageMgr;
 const path = require('path');
 const async = require('async');
 const Checker = require('./AppChecker');
 const LabStates = require('./LabStates');
 const appUtils = require('../util/AppUtils');
+const di = require('mydockerjs').imageMgr;
 const fs = require('fs');
 const rimraf = require('rimraf');
-const service_prefix="dsp_hacktool"
-const oneline_prefix="dsp_oneline"
 
 
-const dockerAction = require(`${appRoot}/app/data/docker_actions`);
-const dockerFilesToCopy = require(`${appRoot}/app/data/docker_filesToCopy`);
-const dockerTools = require('../data/docker-tools.js');
+// CONSTANTS
+const SERVICE_PREFIX="dsp_hacktool"
+const ONELINE_PREFIX="dsp_oneline"
+
+const HACK_TOOL_PATH = path.join(appRoot.toString(), "hacktool_volume");
+const HACK_TOOL_CONTAINER_PATH = "/shared";
+
+
 const log = appUtils.getLogger();
 const downloadPath = 'public/downloads';
 
@@ -59,22 +67,48 @@ exports.build = function build(params, body, callback, notifyCallback) {
 
 exports.dockerRun = function dockerRun(params, callback, notifyCallback){
   log.info('[DOCKER ACTIONS - RUN SERVICE ONE LINE]');
-  console.log(params.currentContainer);
+  let chosenHackTool = {};
   async.waterfall([
     // (cb) => Checker.checkParams(params.currentContainer, ['name', 'isOneLine', 'OneLineNetwork', 'command'], cb),
     (cb) => Checker.checkParams(params.currentContainer, ['name', 'command'], cb),
     (cb) => Checker.checkParams(params.currentContainer.selectedImage, ['label', 'name', 'tag'], cb),
-    (cb) => imageMgr.pullImage(params.currentContainer.selectedImage.name, params.currentContainer.selectedImage.tag, cb, notifyCallback),
+    // Get hack tool
+    (cb) => {
+      try {
+        chosenHackTool = dockerTools.get(params.currentContainer.selectedImage.label);
+        console.log(chosenHackTool);
+        cb(null);
+      } catch (err) {
+        cb(err);
+      }
+    },
+    (cb) => di.isImageInstalled(params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag, cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) {
+        log.info('Image already installed');
+        cb(null);
+      } else {
+        log.info("Image not installed, pull image");
+        imageMgr.pullImage(params.currentContainer.selectedImage.name, params.currentContainer.selectedImage.tag, cb, notifyCallback);
+    };
+  },
     (cb) => {
       let image = params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag;
+      console.log(params.currentContainer);
       const options = {
-       // name: service_prefix + "_" + params.currentContainer.selectedImage.label,
-       name: oneline_prefix + "_" + params.currentContainer.name,
+       // name: SERVICE_PREFIX + "_" + params.currentContainer.selectedImage.label,
+       name: ONELINE_PREFIX + "_" + params.currentContainer.name,
        rm : true,
        cmd: params.currentContainer.command,
-       net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : []
+       net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : [],
+       volumes: [{
+          hostPath: HACK_TOOL_PATH,
+          containerPath: HACK_TOOL_CONTAINER_PATH}
+       ]
       }
-      dockerManager.run(image, callback, options, notifyCallback);
+      const dockerOptions = _.defaults(chosenHackTool.default_options, options)
+      console.log(dockerOptions);
+      dockerManager.run(image, callback, dockerOptions, notifyCallback, notifyCallback);
     }
   ],
     (err) => {
@@ -97,7 +131,17 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
   let dockerComposeOptions = "";
 
   async.waterfall([
-    (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    // (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    (cb) => Checker.checkParams(params, ['namelab'], cb),
+    (cb) => configData.getConfig(cb),
+    (theConfig, cb) => {
+      config = theConfig;
+      if (!params.namerepo) {
+        log.info('namerepo not defined, set default to user name');
+        params.namerepo = config.name;
+      }
+      cb(null)
+    },
     // Check if all images exists
     (cb) => dockerImages.getImagesLabNames(params.namerepo, params.namelab, cb),
     (imagesLab, cb) => imageMgr.areImagesInstalled(imagesLab, cb),
@@ -108,11 +152,9 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
         cb(new Error(`The following images are not installed: ${installedResult.notInstalled}`));
       }
     },
-    (cb) => configData.getConfig(cb),
     // Create download directory
-    (theConfig, cb) => {
+    (cb) => {
       pathCopyDirectory = path.join(downloadPath, `${params.namerepo}_${params.namelab}`);
-      config = theConfig;
       if(!fs.existsSync(pathCopyDirectory)) {
         fs.mkdir(pathCopyDirectory, cb);
       }
@@ -232,8 +274,19 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
 
 exports.composeDown = function composeDown(params, body, callback, notifyCallback) {
   log.info('[COMPOSE DOWN]');
+  let config;
+
   async.waterfall([
-    (cb) => Checker.checkParams(params, ['namelab', 'namerepo'], cb),
+    (cb) => Checker.checkParams(params, ['namelab'], cb),
+    (cb) => configData.getConfig(cb),
+    (theConfig, cb) => {
+      config = theConfig;
+      if (!params.namerepo) {
+        log.info('namerepo not defined, set default to user name');
+        params.namerepo = config.name;
+      }
+      cb(null)
+    },
     (cb) => {
       log.info("Remove containers from the network");
       log.info("Get lab networks");
@@ -252,9 +305,8 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
         }, (err) => c(err));
       }, (err) => cb(err));
     },
-    (cb) => configData.getConfig(cb),
     // build path
-    (config, cb) => {
+    (cb) => {
       const mainDir = config.mainDir;
       const thePath = path.join(appUtils.getHome(), mainDir, params.namerepo, params.namelab);
       // Remove download repository

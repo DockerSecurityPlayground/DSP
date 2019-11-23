@@ -200,6 +200,9 @@ var api = '/dsp_v1/docker_network/' ;
     stopService: function stopService(containerName) {
       return $http.put(dsp_running_services+"stop/"+containerName);
     },
+    deleteHackTool: function(containerName) {
+      return $http.delete(dsp_hack_tools + "/" + containerName);
+    },
     deleteService: function deleteService(containerName) {
       return $http.delete(dsp_running_services+containerName);
     },
