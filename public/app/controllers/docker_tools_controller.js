@@ -39,7 +39,7 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketServi
     }
     dockerAPIService.setServices($scope.listServices);
     initCurrentContainer();
-      dockerAPIService.initServices(function(services) {
+    dockerAPIService.initServices(function(services) {
       if(services.length > 0) {
         $scope.showTools = true;
       }
@@ -172,6 +172,8 @@ $scope.detachNetwork = function detachNetwork(c, n) {
     })
   }
  $scope.runServiceOneLine = function runServiceOneLine() {
+
+  console.log("Seected comamnd: "+ $scope.currentContainer.command)
    $scope.hackToolNotify = "";
    // $scope.showTerminal = true;
    incrementNumber.newObj($scope.currentContainer.selectedImage.label)

@@ -16,6 +16,7 @@
 		font-size: 16px;" > 
 		<ul class="nav nav-tabs nav-tabs-blue ">
 		      <li ng-class="getClass('/lab/new/')"><a href="/lab/new"> New Lab</a></li>
+		      <li ng-click="updateBreadCrumbs('/hacktools')" ng-class="getClass('/hacktools')"><a href="/hacktools">Hack Tools</a></li>
 		      <li ng-click="updateBreadCrumbs('/labs')" ng-class="getClass('/labs')" ><a href="/labs">Labs</a></li>
 		      <li ng-click="updateBreadCrumbs('/labels')" ng-class="getClass('/labels')"><a href="/labels">Labels</a></li>
 		      <li ng-click="updateBreadCrumbs('/images')" ng-class="getClass('/images')"><a href="/images"> Images </a></li>

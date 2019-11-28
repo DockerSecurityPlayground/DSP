@@ -76,7 +76,6 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
     (cb) => {
       try {
         chosenHackTool = dockerTools.get(params.currentContainer.selectedImage.label);
-        console.log(chosenHackTool);
         cb(null);
       } catch (err) {
         cb(err);
@@ -94,7 +93,8 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
   },
     (cb) => {
       let image = params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag;
-      console.log(params.currentContainer);
+      console.log("COMMAND");
+      console.log(params.currentContainer.command);
       const options = {
        // name: SERVICE_PREFIX + "_" + params.currentContainer.selectedImage.label,
        name: ONELINE_PREFIX + "_" + params.currentContainer.name,
@@ -106,7 +106,7 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
           containerPath: HACK_TOOL_CONTAINER_PATH}
        ]
       }
-      const dockerOptions = _.defaults(chosenHackTool.default_options, options)
+      const dockerOptions = _.extend(chosenHackTool.default_options, options)
       console.log(dockerOptions);
       dockerManager.run(image, callback, dockerOptions, notifyCallback, notifyCallback);
     }

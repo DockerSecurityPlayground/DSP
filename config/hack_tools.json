@@ -1,13 +1,6 @@
 {
   "images":[
     { 
-      "label": "nmap",
-      "name": "uzyexe/nmap",
-      "tag": "latest",
-      "description": "nmap container image",
-      "default_command": "-sT localhost"
-    },
-    { 
       "label": "dirbuster",
       "name": "hypnza/dirbuster",
       "tag": "latest",
@@ -20,6 +13,20 @@
       "tag": "latest",
       "description": "Dihunt container",
       "default_command": "http://localhost:18080/bodgeit/"
+    },
+    { 
+      "label": "network_tools",
+      "name": "praqma/network-multitool",
+      "tag": "latest",
+      "description": "Network multi tools (https://hub.docker.com/r/praqma/network-multitool/)",
+      "default_command": "ifconfig"
+    },
+    { 
+      "label": "nmap",
+      "name": "uzyexe/nmap",
+      "tag": "latest",
+      "description": "nmap container image",
+      "default_command": "-sT localhost"
     },
     {
       "label": "tcpdump",

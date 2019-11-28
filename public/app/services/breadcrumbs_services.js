@@ -14,6 +14,9 @@ function dsp_BreadCrumbs() {
     default:
             this.breads.array.push({ name : "labs", link:"/labs"})
     break
+    case '/hacktools' :
+            this.breads.array.push({ name : "hacktools", link:"/hacktools"})
+    break
     case '/configuration' :
             this.breads.array.push({ name : "configuration", link:"/configuration"})
     break
