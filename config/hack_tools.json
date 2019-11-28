@@ -5,7 +5,7 @@
       "name": "hypnza/dirbuster",
       "tag": "latest",
       "description": "Dirbuster container",
-      "default_command": "-u http://localhost:18080"
+      "default_command": "-u localhost"
     },
     { 
       "label": "dirhunt",

@@ -275,7 +275,6 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
   // Called when the image change
   $scope.switchImages = function switchImages(hackToolMode) {
-    console.log("Switch images");
     if (hackToolMode == "interactive") {
       $scope.imageList = $scope.interactiveImageList;
     } else {

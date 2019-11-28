@@ -181,7 +181,7 @@ $( document ).ready(function() {
     <uib-tab ng-repeat="v in terminals" index="v.name" on-finish-render="onFinishRender()" heading="v.name">
     <uib-tab-heading>
       <button class="btn btn-deafult glyphicon glyphicon-remove-circle" ng-click=deleteHackTool(v.name)></button> {{v.name}} 
-      </uib-tab-heading>
+    </uib-tab-heading>
           <textarea class="terminal form-control rounded-0" rows="20">
             {{v.message}} 
           </textarea>

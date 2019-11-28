@@ -172,8 +172,6 @@ $scope.detachNetwork = function detachNetwork(c, n) {
     })
   }
  $scope.runServiceOneLine = function runServiceOneLine() {
-
-  console.log("Seected comamnd: "+ $scope.currentContainer.command)
    $scope.hackToolNotify = "";
    // $scope.showTerminal = true;
    incrementNumber.newObj($scope.currentContainer.selectedImage.label)
@@ -183,7 +181,6 @@ $scope.detachNetwork = function detachNetwork(c, n) {
    } else {
    $scope.currentContainer.name = nameRunning;
    $scope.runningHackTools.push(nameRunning);
-   // var newIndex = $scope.terminals.length + 1;
    $scope.terminals.push({name: nameRunning, message: ''})
    // Set selected networks
   $scope.currentContainer.OneLineNetworks = []

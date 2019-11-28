@@ -17,6 +17,8 @@ const appUtils = require('../util/AppUtils');
 const di = require('mydockerjs').imageMgr;
 const fs = require('fs');
 const rimraf = require('rimraf');
+const service_prefix="dsp_hacktool"
+const oneline_prefix="dsp_oneline"
 
 
 // CONSTANTS
