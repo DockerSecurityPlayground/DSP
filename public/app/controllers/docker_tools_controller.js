@@ -29,10 +29,10 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketServi
 
     var initTab = "cname";
     $scope.selectedItem = initTab;
-    $scope.checked = ['true','','','',''];
+    $scope.checked = ['true','','',''];
     $scope.changeTab = function(tab,selected){
         console.log($scope.currentContainer.selectedImage)
-      for(i = 0;i<$scope.checked.length;i++)
+      for(i = 0; i<$scope.checked.length; i++)
         $scope.checked[i] = 0;
       $scope.checked[tab] = 'true';
       $scope.selectedItem = selected;

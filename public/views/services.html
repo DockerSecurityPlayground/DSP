@@ -202,10 +202,10 @@ $( document ).ready(function() {
         <md-nav-bar md-selected-nav-item="selectedItem" nav-bar-aria-label="navigation links">
           <md-nav-item md-nav-sref="cname" name="cname" ng-click="changeTab(0,'cname')">Main</md-nav-item>
           <!-- <md-nav-item md-nav-sref="image" name="image" ng-click="changeTab(1,'image')">Image</md-nav-item> -->
-          <md-nav-item md-nav-sref="options" name="options" ng-click="changeTab(1,'options')">Options</md-nav-item>
-          <md-nav-item md-nav-sref="command" name="command" ng-click="changeTab(2,'command')">Command</md-nav-item>
-          <md-nav-item md-nav-sref="ports" name="ports" ng-click="changeTab(3,'ports')">Ports</md-nav-item>
-          <md-nav-item md-nav-sref="environments" name="environments" ng-click="changeTab(4,'environments')">Environment Variables</md-nav-item>
+          <!-- <md-nav-item md-nav-sref="options" name="options" ng-click="changeTab(1,'options')">Options</md-nav-item> -->
+          <md-nav-item md-nav-sref="command" name="command" ng-click="changeTab(1,'command')">Command</md-nav-item>
+          <md-nav-item md-nav-sref="ports" name="ports" ng-click="changeTab(2,'ports')">Ports</md-nav-item>
+          <md-nav-item md-nav-sref="environments" name="environments" ng-click="changeTab(3,'environments')">Environment Variables</md-nav-item>
         </md-nav-bar>
 
         <ui-view></ui-view>
@@ -244,12 +244,8 @@ $( document ).ready(function() {
           </div>
             <br>
             <br>
-            <div class="form-check col-sm-1" ng-show=checked[1]>
-              <input class="form-check-input" type="checkbox" id="oneline" ng-model="currentContainer.isOneLine" ng-disabled="currentContainer.isInteractive">
-              <label class="form-check-label" for="inlineCheckbox2">One Line</label>
-            </div>
+            
 
-            <!-- <div class="form-group" ng-show=checked[1]> --> 
             <label class="control-label col-sm-2 label_style text-left"  uib-popover="  {{currentContainer.selectedImage.description}} " popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Image: </label>
             <div class="col-sm-4"> 
               <select 
@@ -275,35 +271,8 @@ $( document ).ready(function() {
             </div> <!-- End main -->
 
             <!-- </div> -->
-            <div class="row form-group" ng-show=checked[1]>
-              <label class="control-label col-sm-2" for="container_flags">Mode: </label>
-              <div class="form-check col-sm-1">
-                <input class="form-check-input" type="checkbox" id="interactive" ng-model="currentContainer.isInteractive">
-                <label class="form-check-label" for="inlineCheckbox1">Interactive</label>
-              </div>
-              <!-- <div class="form-check col-sm-1"ng-show=checked[1]> -->
-              <!--   <input class="form-check-input" type="checkbox" id="daemonize" ng-model="currentContainer.isDaemonized"> -->
-              <!--   <label class="form-check-label" for="inlineCheckbox2">Daemonize</label> -->
-              <!-- </div> -->
-              <label>
-                <input type="radio" ng-model="hackToolMode" value="interactive">
-                Interactive
-              </label><br/>
-              <label>
-                <input type="radio" ng-model="hackToolMode" ng-value="oneline">
-                One Line
-              </label><br/>
-              <div class="form-check col-sm-1" ng-show=checked[1]>
-                <input class="form-check-input" type="checkbox" id="oneline" ng-model="currentContainer.isOneLine" ng-disabled="currentContainer.isInteractive">
-                <label class="form-check-label" for="inlineCheckbox2">One Line</label>
-              </div>
-              <div ng-show="currentContainer.isOneLine" ng-repeat="n in networkList">
-                <label class="radio-inline">
-                  <input type="radio"  ng-click="setOneLineNetwork(n.name)" id="{{n.name}}"> <i>{{n.name}}</i>
-                </label>
-              </div>
-            </div>
-            <div class="row" ng-show=checked[2]>
+            
+            <div class="row" ng-show=checked[1]>
               <label class="control-label col-sm-2" for="container_command">Command: </label>
               <div class="col-sm-9" >
                 <input type="text" class="form-control"  
@@ -321,7 +290,7 @@ $( document ).ready(function() {
 
 
                 <!--- PORT INPUT SELECT -->
-                <div class="text-center" style="margin-right:40px" ng-show=checked[4]> 
+                <div class="text-center" style="margin-right:40px" ng-show=checked[3]> 
                   <table class="table table-reduced-width col-sm-offset-1" ng-show=showPorts>
                     <thead>
                       <tr>
@@ -339,7 +308,7 @@ $( document ).ready(function() {
                   </table>
                 </div>
 
-                <div class="optionalPorts form-group" ng-show=checked[3]> 
+                <div class="optionalPorts form-group" ng-show=checked[2]> 
                   <label class="control-label col-sm-2" style="margin-top:5px; font-style:italic;" for="optional_ports"> Ports</label>
                   <form name="optionalPortForm">
                     <div class="col-sm-2">
@@ -381,13 +350,13 @@ $( document ).ready(function() {
                 </div>
                 <!-- ENVIRONMENTS -->
 
-                <!-- <div class="row" ng-show=checked[5]>
+                <!-- <div class="row" ng-show=checked[4]>
                   <label class="control-label col-sm-2" >Environments: </label>
                   </div>
                   <br/> -->
 
                   <!-- Start Env -->
-                  <div class="row" ng-show=checked[4]>
+                  <div class="row" ng-show=checked[3]>
                     <table class="table table-reduced-width col-sm-offset-1" ng-show=showEnv>
                       <thead>
                         <tr>
@@ -410,7 +379,7 @@ $( document ).ready(function() {
                       <button type="button" class="btn btn-sm btn-danger" ng-click="deleteEnvironment(env.name)">   Del </button> -->
                   </div>
 
-                  <div class="row" ng-show=checked[4]>
+                  <div class="row" ng-show=checked[3]>
                     <label class="control-label col-sm-2" >Environments: </label>
                     <div class="col-sm-2">
                       <input class="form-control" type="text" ng-model="currentEnvironment.name"> </input>
@@ -476,31 +445,26 @@ $( document ).ready(function() {
                   -->
 
 
+                  
+
                   <div class="form-group" ng-show=checked[0]> 
                     <div class="text-center">
                       <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
-                      <button type="submit" class="btn btn-info" ng-click="changeTab(1,'options')">Set Options</button>
+                      <button type="submit" class="btn btn-info" ng-click="changeTab(1,'command')">Specify Command</button>
                     </div>
                   </div>
 
                   <div class="form-group" ng-show=checked[1]> 
                     <div class="text-center">
                       <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
-                      <button type="submit" class="btn btn-info" ng-click="changeTab(2,'command')">Specify Command</button>
+                      <button type="submit" class="btn btn-info" ng-click="changeTab(2,'ports')">Forward Ports</button>
                     </div>
                   </div>
 
                   <div class="form-group" ng-show=checked[2]> 
                     <div class="text-center">
                       <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
-                      <button type="submit" class="btn btn-info" ng-click="changeTab(3,'ports')">Forward Ports</button>
-                    </div>
-                  </div>
-
-                  <div class="form-group" ng-show=checked[3]> 
-                    <div class="text-center">
-                      <!-- <button type="submit" class="btn btn-success" ng-disabled="form_add_container.$invalid" ng-click="runService()">Run</button> -->
-                      <button type="submit" class="btn btn-info" ng-click="changeTab(4,'environments')">Set Env Vars</button>
+                      <button type="submit" class="btn btn-info" ng-click="changeTab(3,'environments')">Set Env Vars</button>
                     </div>
                   </div>
 
