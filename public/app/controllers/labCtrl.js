@@ -373,7 +373,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
     {
       AjaxService.newLab(l, vm.labels)
         .then(function successCallback(response) {
-          window.location.href='/labs';
+          window.location.href='/network/' + l.name+ '?create=1';
           //    SafeApply.exec($scope, function() {
           //      WalkerService.repoNewLab({
           //        name:l.name,
