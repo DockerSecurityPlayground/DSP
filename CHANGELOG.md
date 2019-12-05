@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
-### Unreleased hacktools
+## [3.3.0] - 2019 - 12 - 05
 - Host network support
 - Default oneline
 - Single page hacktools

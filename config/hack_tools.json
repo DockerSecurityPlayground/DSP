@@ -1,6 +1,13 @@
 {
   "images":[
     { 
+      "label": "dirb",
+      "name": "hypnza/dirb",
+      "tag": "latest",
+      "description": "Dirb container",
+      "default_command": "-u localhost"
+    },
+    { 
       "label": "dirbuster",
       "name": "hypnza/dirbuster",
       "tag": "latest",
@@ -37,7 +44,26 @@
       "default_options":  {
         "privileged": true
       }
-
+    },
+    {
+      "label": "wpscan",
+      "name": "wpscanteam/wpscan",
+      "tag": "latest",
+      "description": "Wpscan container",
+      "default_command": "--url https://target.tld/ ",
+      "default_options":  {
+        "privileged": true
+      }
+    },
+    {
+      "label": "pentest-tools",
+      "name": "szalek/pentest-tools",
+      "tag": "latest",
+      "description": "This containers has:\n- https://hub.docker.com/r/szalek/pentest-tools/",
+      "default_command": "--url https://target.tld/ ",
+      "default_options":  {
+        "privileged": true
+      }
     }
   ]
 }
