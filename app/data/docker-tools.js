@@ -86,7 +86,6 @@ function removeService(nameService, callback) {
 
 function deleteHackTool(name, callback) {
   const hackToolName = `${oneline_prefix}_${name}`;
-  console.log(hackToolName);
   async.waterfall([
     (cb) => dockerJS.isRunning(hackToolName, cb),
     (isRunning, cb) => {

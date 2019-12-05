@@ -95,8 +95,6 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
   },
     (cb) => {
       let image = params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag;
-      console.log("COMMAND");
-      console.log(params.currentContainer.command);
       const options = {
        // name: SERVICE_PREFIX + "_" + params.currentContainer.selectedImage.label,
        name: ONELINE_PREFIX + "_" + params.currentContainer.name,
@@ -109,7 +107,6 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
        ]
       }
       const dockerOptions = _.extend(chosenHackTool.default_options, options)
-      console.log(dockerOptions);
       dockerManager.run(image, callback, dockerOptions, notifyCallback, notifyCallback);
     }
   ],
