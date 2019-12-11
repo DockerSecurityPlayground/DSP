@@ -18,6 +18,43 @@ labs**. For more information look at the [Labs Managment]() page.
 -  GIT Integration  
 -  DSP Repository with a set of network security scenarios  
 
+## Guide
+Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A?view_as=subscriber) to learn how to use DSP.
+
+
+## Prerequisites
+* Nodejs (v 7 or later)
+* git
+* docker
+* docker-compose
+* compiler tools (g++, c, c++)
+
+## Installation
+Install prerequisites and run: 
+
+```
+npm install
+```      
+
+## Start  
+Run 
+
+```
+npm start  
+```
+To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
+
+
+With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.   
+
+## Update the application: 
+When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
+```
+npm run update
+```  
+
+
+
 ## Official Repository  
 [DSP_Projects](https://github.com/giper45/DSP_Projects.git) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
 
@@ -38,19 +75,7 @@ It is important that all images that you use should be available to other users,
 If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
 
 In DSP you can manage multiple user repositories (Repositories tab) 
-## Prerequisites
-* Nodejs (v 7 or later)
-* git
-* docker
-* docker-compose
-* compiler tools (g++, c, c++)
 
-## Installation
-Install prerequisites and run: 
-
-```
-npm install
-```   
 ### Troubleshooting during installation   
 If you have error regarding **node-pty** module, try to:   
 - Install build-essentials : (In Ubuntu: apt install -y build-essentials)  
@@ -61,22 +86,7 @@ If you have a problem you can use Issue section.
 You can also write you problem to the Google Group:   
 https://groups.google.com/forum/#!forum/dockersecurityplayground
 
-## Update the application: 
-When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
-```
-npm run update
-```  
 
-## Start  
-Run 
-
-```
-npm start  
-```
-To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
-
-
-With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.   
 ### Vagrant Environment   
 In the project, there is also a vagrant environment with an Ubuntu box with DSP installed:  
 ```
