@@ -99,18 +99,11 @@ vagrant ssh
 Now you can use DSP ( http://localhost:8080 ).
 
 
-## Documentation   
-For documentation about DSP usage go to Wiki page:   
-* Main Page: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/home)    
-* User Guide[http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/user_guide)  
-* Docker Wrapper Image: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)  
-An example of Docker Wrapper Image is at the following link:   
-https://github.com/giper45/DSP_Projects/blob/master/.dockerfiles/dockersecplayground_kali/Dockerfile
+## WIKI Documentation 
+For documentation about DSP usage go to Wiki page:
+https://github.com/giper45/DockerSecurityPlayground/wiki  
 
 
-
-It is a little outdated, I will update it as possible !  
-   
    
 ## Docker Wrapper Image  
 DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
