@@ -219,6 +219,10 @@ window.location.href = urlToGo;
     $scope.showEditNetwork = false;
   }
 
+  $scope.cancelNetworkElement = function() {
+    $scope.showEditNetwork = false;
+  }
+
   //PORTS
   portService.init()
   $scope.hostPorts =  portService
@@ -392,15 +396,18 @@ window.location.href = urlToGo;
       Notification({message: containerToEdit.name+ " modified!"}, 'success');
     }
 
+
+  }
+
     $scope.cancelEditContainer = function cancelEditContainer() {
       //Add
+      console.log("Cancel Edit Container");
       $scope.optPort = { container: '', host: ''};
       $scope.optionalPorts = [];
       containerManager.resetCurrent($scope.imageList, $scope.networkList)
       $scope.isAddContainer = true
+      $scope.showEditContainer = false;
     }
-
-  }
   $scope.containerExists = function elementExists(nameContainer) {
     if(_.findWhere($scope.containerListToDraw, {name: nameContainer})) {
       return  true;

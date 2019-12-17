@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.3.2] - 2019 - 12 - 17  
+- Added back button to edit network or element  
 ## [3.3.0] - 2019 - 12 - 05
 - Host network support
 - Default oneline
