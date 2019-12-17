@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.3.2] - 2019 - 12 - 17  
 - Added back button to edit network or element  
+- Save compose upon editing of nodes / networks
 ## [3.3.0] - 2019 - 12 - 05
 - Host network support
 - Default oneline

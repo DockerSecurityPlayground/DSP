@@ -217,6 +217,7 @@ window.location.href = urlToGo;
 
     // Don't show the network panel
     $scope.showEditNetwork = false;
+    MX__Save();
   }
 
   $scope.cancelNetworkElement = function() {
@@ -394,6 +395,7 @@ window.location.href = urlToGo;
       // Don't show the container panel
       $scope.showEditContainer = false;
       Notification({message: containerToEdit.name+ " modified!"}, 'success');
+      MX__Save();
     }
 
 
