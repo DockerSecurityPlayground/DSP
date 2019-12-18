@@ -1,333 +1,352 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
-    <title>Docker Security Playground </title>
-    <!-- <script type="text/javascript"> -->
-<!-- mxBasePath = 'assets/mxgraph/'; -->
-<!-- </script> -->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Security Playground </title>
+  <!-- <script> -->
+  <!-- mxBasePath = 'assets/mxgraph/'; -->
+  <!-- </script> -->
+
+  <base href="/">
+  <script async>
+    mxBasePath = 'assets/mxgraph/';
+  </script>
+  <script src="assets/js/mxClient.js"></script>
+  <script src="assets/js/js-yaml.js"></script>
+  <script src="assets/js/approve.min.js"></script>
+  <!-- JS Libraries -->
+  <script src="assets/js/underscore-min.js"> </script>
+  <script src="assets/ace/ace.js"> </script>
+  <!-- -->
+  <!-- ANGULAR DEPENDENCIES -->
+  <script src="assets/tinymce/tinymce.min.js"> </script>
+  <script src="assets/js/jquery-min.js"> </script>
+  <script src="assets/js/angular.min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script> -->
+
+  <script src="assets/ace/ui-ace.js"> </script>
+  <script src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
+  <script src="assets/js/prism.js"></script>
 
 
+  <script src="assets/js/angular-animate.min.js"></script>
+  <script src="assets/js/angular-sanitize.min.js"></script>
+  <script src="assets/js/angular-ui-notification.min.js"></script>
+  <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+  <script src="assets/js/angular-route-min.js"></script>
+  <script src="assets/js/angular-ui-notification.min.js"></script>
+  <script src="assets/js/bootstrap-colorpicker-module.min.js"> </script>
+  <script src="assets/js/angular-websocket.min.js"></script>
+  <script src="assets/js/svg-assets-cache.js"></script>
+  <script src="assets/js/angular-messages.min.js"></script>
+  <script src="assets/js/angular-material.min.js"></script>
+  <script src="assets/js/angular-aria.min.js"></script>
+  <script src="assets/js/loading-bar.js"></script>
+  <script src="assets/js/ng-file-upload-shim.js"></script>
+  <script src="assets/js/ng-file-upload.js"></script>
+
+  <link rel='stylesheet' type='text/css' href='assets/css/loading-bar.css' />
+  <link rel="stylesheet" type='text/css' href="assets/css/select.css" />
+
+  <script src="app/services/breadcrumbs_services.js"> </script>
+  <script src="app/services/ajax_service.js"> </script>
+  <script src="app/services/docker_service.js"> </script>
+  <script src="app/services/regex_service.js"> </script>
+  <script src="app/services/walker_service.js"> </script>
+  <script src="app/services/increment_number_service.js"> </script>
+  <script src="app/services/current_lab.js"> </script>
+  <script src="app/services/images_service.js"> </script>
+  <script src="app/services/socket_service.js"> </script>
+  <script src="app/services/safe_apply_service.js"> </script>
+  <script src="app/services/statemanager.js"> </script>
+  <script src="app/services/network_manager_service.js"> </script>
+  <script src="app/services/port_service.js"> </script>
+  <script src="app/services/info_service.js"></script>
+  <script src="app/services/constants_service.js"> </script>
+  <script src="app/services/response_server_service.js"> </script>
+  <script src="app/services/container_manager_service.js"> </script>
+  <script src="app/services/cleaner_service.js"> </script>
+  <script src="app/components/dsp_deleteConfirm.js"> </script>
+  <script src="app/components/dsp_changeGithub.js"> </script>
+  <script src="app/components/dsp_copyFromContainer.js"> </script>
+  <script src="app/components/dsp_dockerfileComponent.js"> </script>
+  <script src="app/components/dsp_copyInContainer.js"> </script>
+  <script src="app/components/dsp_dockerfileComponent.js"> </script>
 
 
-    <base href="/">
-    <script async type="text/javascript">
-mxBasePath = 'assets/mxgraph/';
-    </script>
-    <script type="text/javascript" src="assets/js/mxClient.js"></script>
-    <script type="text/javascript" src="assets/js/js-yaml.js"></script>
-    <script src="assets/js/approve.min.js"></script>
-    <!-- JS Libraries --> 
-    <script src="assets/js/underscore-min.js"> </script>
-    <script src="assets/ace/ace.js"> </script>
-    <!-- -->
-    <!-- ANGULAR DEPENDENCIES --> 
-    <script type="text/javascript" src="assets/tinymce/tinymce.min.js"> </script>
-    <script src="assets/js/jquery-min.js"> </script>
-    <!-- <script src="assets/js/angular.min.js"></script> -->
-     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <!--CUSTOMS ANGULAR COMPONENTS -->
+  <script src="app/controllers/mainCtrl.js"> </script>
+  <script src="app/controllers/labsCtrl.js"> </script>
+  <script src="app/controllers/labCtrl.js"> </script>
+  <script src="app/controllers/hacktoolsCtrl.js"> </script>
+  <script src="app/controllers/labelsCtrl.js"> </script>
+  <script src="app/controllers/imagesCtrl.js"> </script>
+  <script src="app/controllers/dockerfileCtrl.js"> </script>
+  <script src="app/controllers/repoCtrl.js"> </script>
+  <script src="app/controllers/docker_tools_controller.js"></script>
+  <script src="app/controllers/configCtrl.js"> </script>
+  <script src="app/controllers/graph_editor_controller.js"></script>
 
-    <script src="assets/ace/ui-ace.js"> </script>
-    <script type="text/javascript" src="assets/angular-ui-tinymce/src/tinymce.js"> </script>
-    <script src="assets/js/prism.js"></script>
+  <!-- BOOTSTRAP STYLES-->
+  <link href="assets/css/bootswatch-paper-bootstrap.css" type="text/css" rel="stylesheet">
+  <link href="assets/css/bootstrap4-utils.css" type="text/css" rel="stylesheet">
+  <link href="assets/css/callouts.css" type="text/css" rel="stylesheet">
+  <script src="assets/js/bootstrap.js"></script>
 
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">    -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css"> -->
 
-    <script src="assets/js/angular-animate.min.js"></script>
-    <script src="assets/js/angular-sanitize.min.js"></script>
-    <script src="assets/js/angular-ui-notification.min.js"></script>
-    <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
-    <script src="assets/js/angular-route-min.js"></script>
-    <script src="assets/js/angular-ui-notification.min.js"></script>
-    <script src="assets/js/bootstrap-colorpicker-module.min.js"> </script>
-    <script src="assets/js/angular-websocket.min.js"></script>
-    <script src="assets/js/svg-assets-cache.js"></script>
-    <script src="assets/js/angular-messages.min.js"></script>
-    <script src="assets/js/angular-material.min.js"></script>
-    <script src="assets/js/angular-aria.min.js"></script>
-    <script src="assets/js/loading-bar.js"></script>
-    <script type="text/javascript" src="assets/js/ng-file-upload-shim.js"></script>
-    <script type="text/javascript" src="assets/js/ng-file-upload.js"></script>
+  <!-- FONTAWESOME STYLES-->
+  <link href="assets/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet">
 
-    <link href='assets/css/loading-bar.css' rel='stylesheet' />
+  <!-- CUSTOM STYLES-->
+  <link href="assets/css/custom.css" type="text/css" rel="stylesheet">
+  <link href="assets/css/progress.css" rel="stylesheet">
 
-    <link href="assets/css/select.css" rel="stylesheet" type='text/css' >
-    <script src="app/services/breadcrumbs_services.js"> </script>
-    <script src="app/services/ajax_service.js"> </script>
-    <script src="app/services/docker_service.js"> </script>
-    <script src="app/services/regex_service.js"> </script>
-    <script src="app/services/walker_service.js"> </script>
-    <script src="app/services/increment_number_service.js"> </script>
-    <script src="app/services/current_lab.js"> </script>
-    <script src="app/services/images_service.js"> </script>
-    <script src="app/services/socket_service.js"> </script>
-    <script src="app/services/safe_apply_service.js"> </script>
-    <script src="app/services/statemanager.js"> </script>
-    <script src="app/services/network_manager_service.js"> </script>
-    <script src="app/services/port_service.js"> </script>
-    <script src="app/services/info_service.js"></script>
-    <script src="app/services/constants_service.js"> </script>
-    <script src="app/services/response_server_service.js"> </script>
-    <script src="app/services/container_manager_service.js"> </script>
-    <script src="app/services/cleaner_service.js"> </script>
-    <script src="app/components/dsp_deleteConfirm.js"> </script>
-    <script src="app/components/dsp_changeGithub.js"> </script>
-    <script src="app/components/dsp_copyFromContainer.js"> </script>
-    <script src="app/components/dsp_dockerfileComponent.js"> </script>
-    <script src="app/components/dsp_copyInContainer.js"> </script>
-    <script src="app/components/dsp_dockerfileComponent.js"> </script>
+  <!-- PRISM CSS -->
+  <link rel='stylesheet' href='assets/css/prism.css'>
+
+  <!-- GOOGLE FONTS-->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' > -->
+  <link href="assets/css/colorpicker.css" rel="stylesheet prefetch" type='text/css' />
+  <link href="assets/css/build.css" rel="stylesheet" type='text/css' />
+  <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css" />
+  <script src="assets/js/select.js"> </script>
+
+  <!-- MATERIAL FONT -->
+  <link href="/assets/css/angular-material.min.css" rel="stylesheet" />
+
+  <!-- JSTree Imports -->
+  <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
+
+  <script src="assets/jstree/jstree.js"></script>
+  <script src="app/components/jsTree.directive.js"></script>
 
 
-    <!--CUSTOMS ANGULAR COMPONENTS --> 
-    <script src="app/controllers/mainCtrl.js"> </script>
-    <script src="app/controllers/labsCtrl.js"> </script>
-    <script src="app/controllers/labCtrl.js"> </script>
-    <script src="app/controllers/hacktoolsCtrl.js"> </script>
-    <script src="app/controllers/labelsCtrl.js"> </script>
-    <script src="app/controllers/imagesCtrl.js"> </script>
-    <script src="app/controllers/dockerfileCtrl.js"> </script>
-    <script src="app/controllers/repoCtrl.js"> </script>
-    <script src="app/controllers/docker_tools_controller.js"></script>
-    <script src="app/controllers/configCtrl.js"> </script>
-    <script src="app/controllers/graph_editor_controller.js"></script>
-    <!-- COLORPICKER STYLES --> 
-    <!-- BOOTSTRAP STYLES-->
-    <link href="assets/css/bootstrap.css" type="text/css" rel="stylesheet" >
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">    -->
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css"> -->
+  <script>
+    var underscore = angular.module('underscore', []);
+    underscore.factory('_', function () {
+      return window._; //Underscore must already be loaded on the page
+    });
+    //ANGULAR COMPONENT REGISTRATION 
+    angular.module("myApp", ['ui.tinymce', 'jsTree.directive', 'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ui.ace', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages', 'material.svgAssetsCache', 'ngFileUpload'])
+      .directive('fileModel', ['$parse', function ($parse) {
+        return {
+          restrict: 'A',
+          link: function (scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
 
-    <!-- FONTAWESOME STYLES-->
-    <link href="assets/css/font-awesome.css" type="text/css" rel="stylesheet" >
-    <!-- CUSTOM STYLES-->
-    <link href="assets/css/custom.css" type="text/css" rel="stylesheet" >
-    <link href="assets/css/progress.css" rel ="stylesheet">
-    <!-- PRISM CSS -->
-    <link rel='stylesheet' href='assets/css/prism.css'>
-    <!-- GOOGLE FONTS-->
-    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' type="text/css" rel='stylesheet' > -->
-    <link href="assets/css/colorpicker.css" rel="stylesheet prefetch" type='text/css' />
-    <link href="assets/css/build.css" rel="stylesheet" type='text/css' />
-    <link rel="stylesheet" href="assets/css/angular-ui-notification.min.css"/>
-    <script src="assets/js/select.js"> </script>
-    <!-- MATERIAL FONT -->
-    <link href="/assets/css/angular-material.min.css" rel="stylesheet"/>
-    <!-- JSTree Imports -->
-    <link rel="stylesheet" type="text/css" href="assets/jstree/themes/default/style.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/tree_dir.css">
-
-    <script src="assets/jstree/jstree.js"></script>
-    <script src="app/components/jsTree.directive.js"></script>
-
-
-    <script>
-var underscore = angular.module('underscore', []);
-underscore.factory('_', function() {
-return window._; //Underscore must already be loaded on the page
-});
-//ANGULAR COMPONENT REGISTRATION 
-angular.module("myApp", ['ui.tinymce', 'jsTree.directive',  'chieffancypants.loadingBar', 'ngAnimate', 'ngWebSocket', 'underscore', 'ngSanitize', 'ui.bootstrap', 'ui.select', 'ui-notification', 'ui.ace', 'ngRoute', 'colorpicker.module', 'ngMaterial', 'ngMessages','material.svgAssetsCache', 'ngFileUpload'] )
-  .directive('fileModel', ['$parse', function ($parse) {
-return {
-restrict: 'A',
-  link: function(scope, element, attrs) {
-var model = $parse(attrs.fileModel);
-var modelSetter = model.assign;
-
-element.bind('change', function() {
-scope.$apply(function() {
-modelSetter(scope, element[0].files[0]);
-});
-});
-}
-};
-}])
-.directive('onFinishRender',['$timeout', '$parse', function ($timeout, $parse) {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attr) {
+            element.bind('change', function () {
+              scope.$apply(function () {
+                modelSetter(scope, element[0].files[0]);
+              });
+            });
+          }
+        };
+      }])
+      .directive('onFinishRender', ['$timeout', '$parse', function ($timeout, $parse) {
+        return {
+          restrict: 'A',
+          link: function (scope, element, attr) {
             if (scope.$last === true) {
-                $timeout(function () {
-                    scope.$emit('ngRepeatFinished');
-                    if(!!attr.onFinishRender){
-                      $parse(attr.onFinishRender)(scope);
-                    }
-                });
+              $timeout(function () {
+                scope.$emit('ngRepeatFinished');
+                if (!!attr.onFinishRender) {
+                  $parse(attr.onFinishRender)(scope);
+                }
+              });
             }
+          }
         }
+      }])
+      .filter('depends', function () {
+        return function (input, currentContainerName) {
+          console.log("IN FILTER");
+          console.log(input);
+          console.log(currentContainerName);
+          var out = [];
+          for (var i = 0; i < input.length; i++) {
+            if (input[i].name != currentContainerName) {
+              out.push(input[i]);
+            }
+          }
+          return out;
+        }
+      })
+      .factory('FetchFileFactory', ['$http',
+        function ($http) {
+          var _factory = {};
+
+          _factory.fetchFile = function (file) {
+            return $http.get('/api/resource?resource=' + encodeURIComponent(file));
+          };
+
+          return _factory;
+        }
+      ])
+      .service("BreadCrumbs", dsp_BreadCrumbs)
+      .service("AjaxService", dsp_AjaxService)
+      .service("ServerResponse", dsp_server_response)
+      .service("WalkerService", dsp_WalkerService)
+      .service("CurrentLabService", dsp_currentLab)
+      .service("RegexService", dsp_regex_service)
+      .service("NetworkManagerService", dsp_networkManagerService)
+      .service('portService', dsp_portService)
+      .service('infoService', DSP_infoService)
+      .service("Constants", dsp_Constants)
+      .service("SocketService", SocketService)
+      .service("SafeApply", SafeApply)
+      .service("CleanerService", dsp_cleanerService)
+      .service('dockerAPIService', DockerAPIService)
+      .service('dockerImagesService', dsp_imagesService)
+      .service('containerManager', dsp_ContainerManagerService)
+      .service('incrementNumber', IncrementNumber)
+      .service('safeApplyService', SafeApply)
+      .controller("MainCtrl", dsp_MainCtrl)
+      .controller("labelsCtrl", dsp_LabelsCtrl)
+      .controller("labsCtrl", dsp_LabsCtrl)
+      .controller("hacktoolsCtrl", dsp_HackToolsCtrl)
+      .controller("labCtrl", dsp_LabCtrl)
+      .controller("configCtrl", dsp_ConfigCtrl)
+      .controller("imagesCtrl", dsp_ImagesCtrl)
+      .controller("dockerfileCtrl", dsp_dockerfileCtrl)
+      .controller('actionController', DSP_GraphEditorController)
+      .controller('DockerToolsCtrl', DSP_DockerToolsCtrl)
+      .controller("repoCtrl", dsp_RepoCtrl)
+      .run(['$anchorScroll', function ($anchorScroll) {
+        $anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
+      }])
+
+      //Delete confirm component 
+      .component('modalComponent', dsp_deleteConfirmComponent)
+      .component('changeGithubComponent', dsp_changeGithub)
+      .component('copyFromContainerComponent', dsp_copyFromContainer)
+      .component('copyInContainerComponent', dsp_copyInContainer)
+      .component('dockerfileComponent', dsp_dockerfileComponent)
+      .config(function (NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) {
+        NotificationProvider.setOptions({
+          delay: 3500,
+          startTop: 20,
+          startRight: 10,
+          verticalSpacing: 20,
+          horizontalSpacing: 20,
+          positionX: 'center',
+          positionY: 'bottom'
+        })
+        cfpLoadingBarProvider.includeSpinner = true;
+        cfpLoadingBarProvider.includeBar = false;
+        cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
+
+        $routeProvider
+          .when('/', {
+            templateUrl: "views/labs.html",
+            controller: "labsCtrl as ctrl"
+          })
+          .when("/hacktools", {
+            templateUrl: "views/hacktools.html",
+            controller: "hacktoolsCtrl as ctrl"
+          })
+          .when("/labs", {
+            templateUrl: "views/labs.html",
+            controller: "labsCtrl as ctrl"
+          })
+          .when("/lab/:action/:repo/:namelab", {
+            templateUrl: "views/lab.html",
+            controller: "labCtrl as ctrl"
+          })
+          .when("/lab/:action/", {
+            templateUrl: "views/edit_lab.html",
+            controller: "labCtrl as ctrl"
+          })
+          .when("/lab/:action/:namelab", {
+            templateUrl: "views/edit_lab.html",
+            controller: "labCtrl as ctrl"
+          })
+          .when("/network/:namelab", {
+            templateUrl: "views/edit_network.html",
+            controller: "actionController"
+          })
+          .when("/labels", {
+            templateUrl: "views/labels.html",
+            controller: "labelsCtrl",
+            //Don't reload ctrl when anchor scrolling
+            reloadOnSearch: false
+          })
+          .when("/configuration", {
+            templateUrl: "views/configuration.html",
+            controller: "configCtrl"
+          })
+          .when("/images", {
+            templateUrl: "views/images.html",
+            controller: "imagesCtrl"
+          })
+          .when("/dockerfile/:dockerfile", {
+            templateUrl: "views/dockerfile.html",
+            controller: "dockerfileCtrl"
+          })
+          .when("/repositories", {
+            templateUrl: "views/repositories.html",
+            controller: "repoCtrl"
+          })
+          .otherwise(
+            { redirectTo: "/labs" }
+          );
+
+        $locationProvider.html5Mode(true)
+        //Add x http methods to fully support methods
+        $httpProvider.defaults.headers.put = { 'X-HTTP-Method-Override': 'PUT' };
+        $httpProvider.defaults.headers.delete = { 'X-HTTP-Method-Override': 'DELETE' };
+      })
+
+    var setOptions = function (acee, session, opts) {
+
+      // sets the ace worker path, if running from concatenated
+      // or minified source
+      if (angular.isDefined(opts.workerPath)) {
+        var config = window.ace.require('ace/config');
+        config.set('workerPath', opts.workerPath);
+      }
+      if (angular.isDefined(opts.modePath)) {
+        var config = window.ace.require('ace/config');
+        config.set('modePath', opts.modePath);
+      }
+      if (angular.isDefined(opts.themePath)) {
+        var config = window.ace.require('ace/config');
+        config.set('themePath', opts.themePath);
+      }
+      if (angular.isDefined(opts.basePath)) {
+        var config = window.ace.require('ace/config');
+        config.set('basePath', opts.basePath);
+      }
     }
-}])
-  .filter('depends', function() {
-return function(input, currentContainerName) {
-console.log("IN FILTER");
-console.log(input);
-console.log(currentContainerName);
-var out = [];
-for (var i = 0; i < input.length; i++) {
-if(input[i].name != currentContainerName){
-out.push(input[i]);
-}
-}
-return out;
-}
-})
-  .factory('FetchFileFactory', ['$http',
-  function($http) {
-var _factory = {};
-
-_factory.fetchFile = function(file) {
-return $http.get('/api/resource?resource=' + encodeURIComponent(file));
-};
-
-return _factory;
-}
-])
-  .service("BreadCrumbs", dsp_BreadCrumbs) 
-  .service("AjaxService", dsp_AjaxService) 
-  .service("ServerResponse", dsp_server_response)
-  .service("WalkerService", dsp_WalkerService) 
-  .service("CurrentLabService", dsp_currentLab) 
-  .service("RegexService", dsp_regex_service) 
-  .service("NetworkManagerService", dsp_networkManagerService) 
-  .service('portService', dsp_portService) 
-  .service('infoService', DSP_infoService) 
-  .service("Constants", dsp_Constants) 
-  .service("SocketService", SocketService) 
-  .service("SafeApply", SafeApply)
-  .service("CleanerService", dsp_cleanerService)
-  .service('dockerAPIService', DockerAPIService) 
-  .service('dockerImagesService', dsp_imagesService) 
-  .service('containerManager',dsp_ContainerManagerService) 
-  .service('incrementNumber',IncrementNumber) 
-  .service('safeApplyService', SafeApply) 
-  .controller("MainCtrl", dsp_MainCtrl)
-  .controller("labelsCtrl", dsp_LabelsCtrl) 
-  .controller("labsCtrl",  dsp_LabsCtrl) 
-  .controller("hacktoolsCtrl",  dsp_HackToolsCtrl) 
-  .controller("labCtrl",  dsp_LabCtrl) 
-  .controller("configCtrl", dsp_ConfigCtrl)
-  .controller("imagesCtrl", dsp_ImagesCtrl)
-  .controller("dockerfileCtrl", dsp_dockerfileCtrl)
-  .controller('actionController', DSP_GraphEditorController)
-  .controller('DockerToolsCtrl', DSP_DockerToolsCtrl)
-  .controller("repoCtrl", dsp_RepoCtrl)
-  .run(['$anchorScroll', function($anchorScroll) {
-$anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
-}])
-
-//Delete confirm component 
-  .component('modalComponent', dsp_deleteConfirmComponent)  
-  .component('changeGithubComponent', dsp_changeGithub)  
-  .component('copyFromContainerComponent', dsp_copyFromContainer)  
-  .component('copyInContainerComponent', dsp_copyInContainer)  
-  .component('dockerfileComponent', dsp_dockerfileComponent)  
-  .config(function(NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) { 
-NotificationProvider.setOptions({
-delay: 3500,
-  startTop: 20,
-  startRight: 10,
-  verticalSpacing: 20,
-  horizontalSpacing: 20,
-  positionX: 'center',
-  positionY: 'bottom'
-})
-cfpLoadingBarProvider.includeSpinner = true;
-cfpLoadingBarProvider.includeBar = false;
-cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
-
-$routeProvider 
-  .when('/', { 
-templateUrl: "views/labs.html" ,
-  controller: "labsCtrl as ctrl"
-}) 
-  .when("/hacktools", {
-templateUrl: "views/hacktools.html" ,
-controller: "hacktoolsCtrl as ctrl"
-}) 
-  .when("/labs", {
-templateUrl: "views/labs.html" ,
-  controller: "labsCtrl as ctrl"
-}) 
-  .when("/lab/:action/:repo/:namelab", {
-templateUrl: "views/lab.html" ,
-  controller: "labCtrl as ctrl"
-}) 
-  .when("/lab/:action/", {
-templateUrl: "views/edit_lab.html" ,
-  controller: "labCtrl as ctrl"
-}) 
-  .when("/lab/:action/:namelab", {
-templateUrl: "views/edit_lab.html" ,
-  controller: "labCtrl as ctrl"
-}) 
-  .when("/network/:namelab", {
-templateUrl: "views/edit_network.html" ,
-  controller: "actionController"
-}) 
-  .when("/labels", {
-templateUrl: "views/labels.html" ,
-  controller: "labelsCtrl",
-  //Don't reload ctrl when anchor scrolling
-  reloadOnSearch: false
-}) 
-  .when("/configuration", {
-templateUrl: "views/configuration.html" ,
-  controller: "configCtrl"
-})
-  .when("/images", {
-templateUrl: "views/images.html" ,
-  controller: "imagesCtrl"
-})
-  .when("/dockerfile/:dockerfile", {
-templateUrl: "views/dockerfile.html" ,
-  controller: "dockerfileCtrl"
-})
-  .when("/repositories", {
-templateUrl: "views/repositories.html" ,
-  controller: "repoCtrl"
-})
-  .otherwise(
-{redirectTo: "/labs"} 
-);
-
-$locationProvider.html5Mode(true)
-//Add x http methods to fully support methods
-$httpProvider.defaults.headers.put = { 'X-HTTP-Method-Override': 'PUT'};
-$httpProvider.defaults.headers.delete = { 'X-HTTP-Method-Override': 'DELETE'};
-})
-
-var setOptions = function(acee, session, opts) {
-
-// sets the ace worker path, if running from concatenated
-// or minified source
-if (angular.isDefined(opts.workerPath)) {
-var config = window.ace.require('ace/config');
-config.set('workerPath', opts.workerPath);
-}
-if (angular.isDefined(opts.modePath)) {
-var config = window.ace.require('ace/config');
-config.set('modePath', opts.modePath);
-}
-if (angular.isDefined(opts.themePath)) {
-var config = window.ace.require('ace/config');
-config.set('themePath', opts.themePath);
-}
-if (angular.isDefined(opts.basePath)) {
-var config = window.ace.require('ace/config');
-config.set('basePath', opts.basePath);
-}
-}
 
 
 
-    </script>
-  </head>
-  <body ng-app="myApp">
-    <div id="wrapper" ng-controller="MainCtrl">
-      <div ng-include="'views/header.html'"> </div>
-      <div ng-include="'views/sidebar.html'"> </div>
-      <div class="ng-view"> </div> 
+  </script>
+
+</head>
+
+<body ng-app="myApp" class="paper-theme">
+  <div id="wrapper" class="container-fluid" ng-controller="MainCtrl">
+
+    <div ng-include="'views/header.html'"> </div>
+
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+          <div ng-include="'views/sidebar.html'"></div>
+      </div>
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main p-5">
+        <div ng-include="'views/breadcrumbs.html'"></div>
+        <div class="ng-view"></div>
+      </div>
     </div>
-    <!-- /. WRAPPER  -->
-    <div ng-include="'views/footer.html'"> </div> 
-  </body>
+  </div>
+  <!-- /. WRAPPER  -->
+  <div ng-include="'views/footer.html'"> </div>
+</body>
+
 </html>

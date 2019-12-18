@@ -64,7 +64,12 @@
       <h2 class="text-center" > Goal </h2>
       <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
     </div>
-      <div ng-show="noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div>
+
+    <div ng-show="noImages === true" class="bs-callout bs-callout-warning">
+      <h4><i class="fa fa-warning text-warning"></i> Some images are not installed</h4>
+      <i class="fa fa-angle-right"></i> Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a>
+    </div>
+
     <div ng-show="!ctrl.exists" class="row">
       <p class="text-center"><button class={{ctrl.buttonAction.class}} id="labState" href="" ng-click="ctrl.buttonAction.action()">
         <span class="{{ctrl.labState.actionClass}}"></span> {{ctrl.buttonAction.label}}
