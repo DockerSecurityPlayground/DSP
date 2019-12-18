@@ -7,16 +7,16 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Repository</th>
-          <th>Actions</th>
+          <th>Repository URL</th>
+          <th>&nbsp;</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="r in repos">
           <td>{{r.name}}</td>
           <td><a href="{{r.url}}" target="_blank">{{r.url}}</a></td>
-          <td>
-            <div class="btn-group">
+          <td class="text-right">
+            <div class="btn-group btn-group-xs">
               <a class="editing-components btn btn-default">
                 <span uib-popover="Update" popover-trigger="'mouseenter'" ng-click="updateRepository(r)" class="fa fa-fw fa-download"> </span>
               </a>
@@ -30,8 +30,8 @@
       <tfoot>
         <tr>
           <td colspan="2">&nbsp;</td>
-          <td>
-            <button ng-disabled="areReposUploading" class="btn btn-primary" ng-click="updateAll()"> Update All</button>
+          <td class="text-right">
+            <button ng-disabled="areReposUploading" class="btn btn-default" ng-click="updateAll()"><i class="fa fa-fw fa-refresh"></i> Update All</button>
           </td>
         </tr>
       </tfoot>
@@ -41,15 +41,15 @@
 
     <div ng-show="areReposUploading" class="alert alert-info"> Uploading Repositories, pls wait... </div>
 
-    <form name="githubForm">
+    <form name="githubForm" class="form-horizontal">
       <h3>Add GitHub Repository</h3>
       <div class="row">
         <div class="col-sm-3">
-          <label for="name"> Name: </label>
+          <label for="name"> Name </label>
           <input type="text" placeholder="Repository name" class="form-control" name="name" id="githubName" ng-model=repo.name>
         </div>
         <div class="col-sm-9">
-          <label for="url"> URL: </label>
+          <label for="url"> URL </label>
           <input type="text" placeholder="Repository URL" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
             id="githubURL" ng-model=repo.url>
         </div>
