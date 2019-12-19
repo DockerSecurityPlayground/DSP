@@ -1,42 +1,46 @@
-var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
+var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
   console.log("=== INIT LAB CONTROLLER ===");
   var userDir;
   var vm = this;
-  var buttonDeleteProto = { action:openConfirmDelete, label:"Delete Lab" , class: "btn btn-danger"}
-  var buttonImportProto = { action:importLab, label:"Import lab in your repo" , class: "btn btn-success"}
-  var buttonGoProto = { action:goToUseNetwork, label : "Go", class: "btn btn-lg btn-blue"}
-  var buttonGoDisabledProto = {action:goToUseNetwork, label: "Go", class: "btn btn-lg btn-blue disabled"}
-  var buttonGoImage = { action:goToImages, label : "Images", class: "btn btn-lg btn-blue"}
-  var buttonCreateProto = { action:goToCreateNetwork, label:"Create Docker Network" , class: "btn  btn-lg btn-success"}
+  var buttonDeleteProto = { action: openConfirmDelete, label: "Delete Lab", class: "btn btn-danger", icon: 'fa fa-fw fa-remove' }
+  var buttonImportProto = { action: importLab, label: "Import lab in your repo", class: "btn btn-primry", icon: "fa fa-fw fa-upload" }
+  var buttonGoProto = { action: goToUseNetwork, label: "Go", class: "btn btn-lg btn-primary", icon: '' }
+  var buttonGoDisabledProto = { action: goToUseNetwork, label: "Go", class: "btn btn-lg btn-blue disabled", icon: '' }
+  var buttonGoImage = { action: goToImages, label: "Images", class: "btn btn-lg btn-primary", icon: '' }
+  var buttonCreateProto = { action: goToCreateNetwork, label: "Create Docker Network", class: "btn  btn-lg btn-success", icon: '' }
   var onLoadCanvas;
   const warningMessageHeader = 'WARNING: ';
-  const networkEmptyMessage =  'Network is empty! Have you drawn the containers?';
+  const networkEmptyMessage = 'Network is empty! Have you drawn the containers?';
 
   $scope.registerCallback = function (cb) {
     onLoadCanvas = cb;
   }
 
+  $scope.trustedHtml = function (plainText) {
+    return $sce.trustAsHtml(plainText);
+}
+
 
   $scope.tinymceOptions = {
-    onChange: function(e) {
+    onChange: function (e) {
       // put logic here for keypress and cut/paste changes
     },
     inline: false,
-    plugins : 'advlist autolink link image lists charmap print preview',
+    plugins: 'advlist autolink link image lists charmap print preview',
     skin: 'lightgray',
-    theme : 'modern'
+    theme: 'modern'
   };
 
-  vm.tinymceHtmlGoal=''
-  vm.tinymceHtmlSolution=''
+  vm.tinymceHtmlGoal = ''
+  vm.tinymceHtmlSolution = ''
   //Button action create or go
   vm.buttonAction = buttonCreateProto
   //Button action import or delete
   vm.deleteImportButton = buttonDeleteProto
   vm.editVisible = false
   vm.repos,
-    vm.lab = {} ,
-    vm.labels=[],
+    vm.lab = {},
+    vm.labels = [],
     // Preview on the labs
     vm.previewSolution = '';
   vm.previewGoal = '';
@@ -45,30 +49,30 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
   vm.isGoalEditShowed = true;
   vm.isSolutionEditShowed = true;
   vm.isSolutionPreviewOpen = false;
-  vm.isGoalPreviewOpen= false;
+  vm.isGoalPreviewOpen = false;
   vm.noImages = false;
   vm.actionVisible = true,
-  $scope.imageList = [];
+    $scope.imageList = [];
   $scope.interactiveImageList = [];
   $scope.listTools = [];
-  toEditName = ''	;
+  toEditName = '';
   $scope.listContainers = {};
-  $scope.init = function() {
+  $scope.init = function () {
     console.log("DSP_INIT");
 
     AjaxService.init()
       .dLabel
-      .then(function(res) {
+      .then(function (res) {
         vm.labelProjects = AjaxService.projectLabels.labels
       },
-        function(err) {
+        function (err) {
 
         })
 
-    var action = $routeParams.action ;
-    if(action === 'new') {
+    var action = $routeParams.action;
+    if (action === 'new') {
       //		console.log("action new")
-      $scope.lab_action_btn = { text : "Create", class:"btn btn-success" }
+      $scope.lab_action_btn = { text: "Create", class: "btn btn-success" }
       $scope.lab_action = 'New lab '
       BreadCrumbs.breadCrumbs('/lab/new')
       $scope.lab_action_form = 'newlab'
@@ -76,30 +80,30 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
     else if (action === 'edit') {
 
       //BreadCrumbs.breadCrumbs('/lab/edit/$routeParams.namelab')
-      $scope.lab_action_btn = { text : "Edit", class:"btn btn-warning" }
-      $scope.lab_action = 'Edit '+ $routeParams.namelab;
+      $scope.lab_action_btn = { text: "Edit", class: "btn btn-warning" }
+      $scope.lab_action = 'Edit ' + $routeParams.namelab;
       $scope.lab_action_form = 'editlab'
       //Update in edit breadcrumbs
       BreadCrumbs.breadCrumbs('/lab/edit', $routeParams.namelab);
       AjaxService.init()
         .dAll
-        .then(function(res) {
+        .then(function (res) {
           //User can only edit his labs (repo= username)
           vm.repos = WalkerService.repos
           userDir = AjaxService.config.name;
           var labname = $routeParams.namelab;
-          var repo=  WalkerService.getUserRepo();
+          var repo = WalkerService.getUserRepo();
 
-          if(repo) {
-            var lab =  WalkerService.findLab(repo.name, $routeParams.nameLab);
+          if (repo) {
+            var lab = WalkerService.findLab(repo.name, $routeParams.nameLab);
             CurrentLabService.updateLab(lab);
             //User labs repos
             var labs = repo.labs
-            if(labs) {
-              var labToUse = _.findWhere(labs, {name:labname})
-              if(labToUse) {
+            if (labs) {
+              var labToUse = _.findWhere(labs, { name: labname })
+              if (labToUse) {
                 toEditName = labToUse.name
-                vm.lab.name= labToUse.name;
+                vm.lab.name = labToUse.name;
                 vm.lab.description = labToUse.informations.description;
                 //vm.lab.goal = CleanerService.parse(labToUse.informations.goal);
                 vm.lab.goal = labToUse.informations.goal;
@@ -113,17 +117,17 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
             }
           }
         },
-          function(err) {
+          function (err) {
 
           })
     }
     //Use
-    else if (action ==='use') {
+    else if (action === 'use') {
       vm.buttonAction = '';
       BreadCrumbs.breadCrumbs('/lab/use', $routeParams.namelab);
       AjaxService.init()
         .dAll
-        .then(function(res) {
+        .then(function (res) {
           vm.repos = WalkerService.repos
           var labname = $routeParams.namelab
           var rname = $routeParams.repo;
@@ -133,7 +137,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
             .then(function successCallback(response) {
               var exists = response.data.data
               //If doesn't exists create new network button
-              if(!exists)  {
+              if (!exists) {
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
                 vm.exists = false;
@@ -145,16 +149,16 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                       console.log("NOT INSTALLED");
                       $scope.noImages = true;
                     } else {
-                      dockerImagesService.get(function(images) {
+                      dockerImagesService.get(function (images) {
                         $scope.interactiveImageList = images;
                       });
 
-                    dockerAPIService.getListHackTools()
-                      .then(function successCallback(response){
-                        console.log("LIST TOOLS");
+                      dockerAPIService.getListHackTools()
+                        .then(function successCallback(response) {
+                          console.log("LIST TOOLS");
                           $scope.imageList = response.data.data.images;
                           $scope.listTools = response.data.data.images;
-                      });
+                        });
                     }
                   }, function error(err) {
                     console.log(err);
@@ -170,38 +174,35 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
               })
           //If username = repo name it's the user repo and it' possible to edit
-          if(username === rname)
-          {
-            vm.actionVisible= true;
+          if (username === rname) {
+            vm.actionVisible = true;
             vm.deleteImportButton = buttonDeleteProto;
           }
           //Don't edit if it's not a user repo
-          else
-          {
+          else {
             vm.actionVisible = false;
             vm.deleteImportButton = buttonImportProto;
           }
-          var repo = _.findWhere(vm.repos, {name:rname})
+          var repo = _.findWhere(vm.repos, { name: rname })
           var labs = repo.labs
-          if(labs)
-          {
-            var labToUse = _.findWhere(labs, {name:labname})
-            if(labToUse) {
+          if (labs) {
+            var labToUse = _.findWhere(labs, { name: labname })
+            if (labToUse) {
               vm.isRunning = labToUse.state === 'RUNNING' ? true : false;
               // Repo name
               vm.repoName = rname
-              vm.lab.name= labToUse.name;
+              vm.lab.name = labToUse.name;
               if (vm.isRunning) {
                 _initNetworkList();
               }
               // Check the state
-              if(labToUse.state === 'NO_NETWORK') {
+              if (labToUse.state === 'NO_NETWORK') {
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
               }
               // Else go button or images
               else {
-                dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function(data) {
+                dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function (data) {
                   $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
                   $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
                   console.log("ONLOAD");
@@ -218,20 +219,19 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
                 vm.editVisible = true
               }
 
-              if(labToUse.informations) {
+              if (labToUse.informations) {
                 vm.lab.description = labToUse.informations.description;
                 //vm.lab.goal = labToUse.informations.goal;
                 vm.lab.goal = CleanerService.parse(labToUse.informations.goal);
                 vm.lab.solution = CleanerService.parse(labToUse.informations.solution);
-                vm.tinymceHtmlGoal= $sce.trustAsHtml(vm.lab.goal);
+                vm.tinymceHtmlGoal = $sce.trustAsHtml(vm.lab.goal);
                 vm.tinymceHtmlSolution = $sce.trustAsHtml(vm.lab.solution);
-
               }
               else {
                 vm.lab.description = '';
                 vm.lab.goal = '';
                 vm.lab.solution = '';
-                vm.tinymceHtmlGoal= '';
+                vm.tinymceHtmlGoal = '';
                 vm.tinymceHtmlSolution = '';
               }
             }
@@ -266,7 +266,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
             //});
           }
         },
-          function(err) {
+          function (err) {
 
           })
 
@@ -281,14 +281,14 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
       $scope.imageList = $scope.listTools;
     }
   }
-  $scope.goToContainer = function goToContainer(nameContainer, dc="true")  {
+  $scope.goToContainer = function goToContainer(nameContainer, dc = "true") {
     console.log(nameContainer)
     console.log(dc)
     $http.post('/dsp_v1/dockershell', {
-      namerepo : vm.repoName,
-      namelab : vm.lab.name,
+      namerepo: vm.repoName,
+      namelab: vm.lab.name,
       dockername: nameContainer,
-      dockercompose : dc
+      dockercompose: dc
     })
       .then(
         function success(response) {
@@ -299,21 +299,21 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
         },
         function error(err) {
           // Lab running error
-          Notification({message:"Server error: "+err.data.message}, 'error');
+          Notification({ message: "Server error: " + err.data.message }, 'error');
         });
   }
 
-  $scope.copyFromContainer = function (nameContainer, dc="true") {
+  $scope.copyFromContainer = function (nameContainer, dc = "true") {
     var modalInstance = $uibModal.open({
       animation: true,
       component: 'copyFromContainerComponent',
       resolve: {
         lab: function () {
-          return  {
-            namerepo : vm.repoName,
-            namelab : vm.lab.name,
+          return {
+            namerepo: vm.repoName,
+            namelab: vm.lab.name,
             namecontainer: nameContainer,
-            dockercompose : dc
+            dockercompose: dc
           };
         }
       }
@@ -324,17 +324,17 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
       $log.info('modal-component dismissed at: ' + new Date());
     });
   }
-  $scope.copyInContainer = function (nameContainer, dc="true") {
+  $scope.copyInContainer = function (nameContainer, dc = "true") {
     var modalInstance = $uibModal.open({
       animation: true,
       component: 'copyInContainerComponent',
       resolve: {
         lab: function () {
-          return  {
-            namerepo : vm.repoName,
-            namelab : vm.lab.name,
+          return {
+            namerepo: vm.repoName,
+            namelab: vm.lab.name,
             namecontainer: nameContainer,
-            dockercompose : dc
+            dockercompose: dc
           };
         }
       }
@@ -351,29 +351,28 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
       .then(function successCallback(response) {
         Notification('Lab copied!', 'success');
         var newLabName = response.data.data;
-        var urlToGo = '/lab/use/'+ vm.repoName+'/'+ newLabName;
-        window.location.href= urlToGo;
+        var urlToGo = '/lab/use/' + vm.repoName + '/' + newLabName;
+        window.location.href = urlToGo;
 
       },
         function errorCallback(resp) {
-          Notification('Server error:'+ resp.data.message, 'error');
+          Notification('Server error:' + resp.data.message, 'error');
         });
 
   }
 
-  vm.goBack = function() {
-    var urlToGo = '/lab/use/'+ AjaxService.config.name +'/'+ vm.lab.name;
+  vm.goBack = function () {
+    var urlToGo = '/lab/use/' + AjaxService.config.name + '/' + vm.lab.name;
     $location.url(urlToGo);
   }
 
   vm.labAction = function labAction() {
-    var l = vm.lab ;
+    var l = vm.lab;
     //New lab
-    if($scope.lab_action_form === 'newlab')
-    {
+    if ($scope.lab_action_form === 'newlab') {
       AjaxService.newLab(l, vm.labels)
         .then(function successCallback(response) {
-          window.location.href='/network/' + l.name+ '?create=1';
+          window.location.href = '/network/' + l.name + '?create=1';
           //    SafeApply.exec($scope, function() {
           //      WalkerService.repoNewLab({
           //        name:l.name,
@@ -392,13 +391,13 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
         },
 
           function errorCallback(response) {
-            Notification('Server error:'+ response.data.message, 'error');
+            Notification('Server error:' + response.data.message, 'error');
 
           });
 
     }
     //Edit lab
-    else if($scope.lab_action_form === 'editlab') {
+    else if ($scope.lab_action_form === 'editlab') {
       AjaxService.editLab(vm.lab, toEditName, vm.labels)
         .then(function successCallback(response) {
 
@@ -406,20 +405,20 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
           WalkerService.repoChangeLab(toEditName, {
             //Lab object
             name: vm.lab.name,
-            informations : {
-              description : vm.lab.description || '',
-              goal : vm.lab.goal || '',
-              solution : vm.lab.solution || ''
+            informations: {
+              description: vm.lab.description || '',
+              goal: vm.lab.goal || '',
+              solution: vm.lab.solution || ''
             },
-            labels:vm.labels
+            labels: vm.labels
           })
 
           //Redirect to usage
-          var urlRet = '/lab/use/'+AjaxService.config.name+"/"+vm.lab.name;
+          var urlRet = '/lab/use/' + AjaxService.config.name + "/" + vm.lab.name;
           $location.url(urlRet)
         },
           function errorCallback(response) {
-            Notification('Server error:'+ response.data.message, 'error');
+            Notification('Server error:' + response.data.message, 'error');
           })
     }
   }
@@ -427,21 +426,21 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
 
   function goToCreateNetwork() {
-    window.location.href = '/network/'+vm.lab.name+ "?create=1";
+    window.location.href = '/network/' + vm.lab.name + "?create=1";
     // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName +'&namelab='+vm.lab.name+'&action=new'
   }
 
   function goToImages() {
-    $location.url("/images#"+vm.lab.name);
+    $location.url("/images#" + vm.lab.name);
   }
 
   function goToUseNetwork() {
 
-    window.location.href='/lab/use/'+vm.lab.name;
+    window.location.href = '/lab/use/' + vm.lab.name;
 
   }
   vm.goToEditNetwork = function goToEditNetwork() {
-    $location.url('/lab/edit/'+vm.lab.name);
+    $location.url('/lab/edit/' + vm.lab.name);
     // window.open('/lab/edit/'+vm.lab.name, '_blank');
   }
   vm.goToNetwork = function goToNetwork() {
@@ -450,7 +449,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
       Notification('Cannot edit a running lab! Pls stop first', 'warning');
     else {
       // $location.url('/network/'+vm.lab.name);
-      window.location.href = '/network/'+vm.lab.name;
+      window.location.href = '/network/' + vm.lab.name;
       // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
       // window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
     }
@@ -475,14 +474,14 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
         AjaxService.deleteLab(nameToDelete)
           .then(function successCallback(response) {
             //Remove from ajaxRepos
-            SafeApply.exec($scope, function() {
+            SafeApply.exec($scope, function () {
               WalkerService.repoRemoveLab(nameToDelete)
               vm.repos = WalkerService.repos;
             });
             //Return to labs
             $location.url('/labs')
-          },function errorCallback(response) {});
-      }, function() {});
+          }, function errorCallback(response) { });
+      }, function () { });
     }
   }
 
@@ -491,42 +490,49 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
       .then(
         function successCallback(response) {
           Notification('Lab imported!', 'success');
-          SafeApply.exec($scope, function() { WalkerService.repoNewLab(vm.lab); });
+          SafeApply.exec($scope, function () { WalkerService.repoNewLab(vm.lab); });
         },
         function errorCallback(resp) {
-          Notification('Server error:'+ resp.data.message, 'error');
+          Notification('Server error:' + resp.data.message, 'error');
         }
       );
 
 
   }
   //Managment of tinyMCE area
-  vm.updatePreviewSolution = function() {
+  vm.updatePreviewSolution = function () {
     vm.previewSolution = $sce.trustAsHtml(vm.lab.solution);
   }
-  vm.updatePreviewGoal = function() {
+  vm.updatePreviewGoal = function () {
     vm.previewGoal = $sce.trustAsHtml(vm.lab.goal);
   }
-  vm.updateHtml = function() {
+  vm.updateHtml = function () {
     vm.tinymceHtml = $sce.trustAsHtml(vm.lab.solution);
   };
 
-  $scope.notify=''
-  $scope.yamlfile='';
+  $scope.notify = ''
+  $scope.yamlfile = '';
 
   // ACTION FUNCTIONS
   //Proto actions
-  const playProto = {  actionLabel:"Start lab",  actionClass:"glyphicon glyphicon-play", statusLabel: "Lab is inactive" , actionButton:"btn btn-success", state:'inactive' , statusClass:"alert alert-danger text-center"}
-  const loadingProto = {  actionLabel:"Loading",  actionClass:"glyphicon glyphicon-refresh", statusLabel: "Loading..." , actionButton:"btn btn-warning", state:'loading' , statusClass:"alert alert-warning text-center"}
-  const stopProto = { actionLabel:"Stop lab",  actionButton:"btn btn-danger", actionClass:"glyphicon glyphicon-stop", statusLabel: "Lab is active", state:'active', statusClass:"alert alert-success text-center"}
+  const playProto = { actionLabel: "Start lab", actionClass: "fa fa-fw fa-play", statusLabel: "Lab is inactive", actionButton: "btn btn-success", state: 'inactive', statusClass: "bs-callout bs-callout-danger ", statusIcon: 'fa fa-fw fa-stop' }
+  const loadingProto = { actionLabel: "Loading", actionClass: "fa fa-fw fa-spinner fa-pulse", statusLabel: "Loading...", actionButton: "btn btn-warning", state: 'loading', statusClass: "bs-callout bs-callout-warning", statusIcon: 'fa fa-fw fa-spinner fa-pulse' }
+  const stopProto = { actionLabel: "Stop lab", actionButton: "btn btn-danger", actionClass: "fa fa-fw fa-stop", statusLabel: "Lab is active", state: 'active', statusClass: "bs-callout bs-callout-success", statusIcon: 'fa fa-fw fa-check' }
+
+  var ansi_up = new AnsiUp;
+
   function updateNotify(data) {
-    if(!$scope.$$phase) {
-      $scope.$apply(function() {
-        $scope.notify+= data.message+"<br>";
+
+    var message = data.message;
+    //console.log(message);
+
+    if (!$scope.$$phase) {
+      $scope.$apply(function () {
+        $scope.notify += ansi_up.ansi_to_html(message).replace(/(\r\n|\n)/g, '<br>');
       });
       //$digest or $apply
     }
-    else $scope.notify += data.message;
+    else $scope.notify += ansi_up.ansi_to_html(message).replace(/(\r\n|\n)/g, '<br>');
   }
 
   function _initNetworkList() {
@@ -536,12 +542,11 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
         $scope.networkList = response.data.data;
         console.log($scope.networkList);
       }, function errorCallback(error) {
-        Notification({message:"Server error: "+error}, 'error');
+        Notification({ message: "Server error: " + error }, 'error');
       });
   }
   //Start the lab
-  $scope.startLab = function startLab()
-  {
+  $scope.startLab = function startLab() {
     //On start loading
     $scope.labState = loadingProto
     startLoad()
@@ -549,14 +554,14 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
 
     //Send
     SocketService.manage(JSON.stringify({
-      action : 'docker_up',
-      params : {
-        namerepo : vm.repoName,
-        namelab : vm.lab.name
+      action: 'docker_up',
+      params: {
+        namerepo: vm.repoName,
+        namelab: vm.lab.name
       }
-    }), function(event) {
+    }), function (event) {
       var data = JSON.parse(event.data);
-      if(data.status === 'success')  {
+      if (data.status === 'success') {
         //Set state on stop
         $scope.labState = stopProto
         $scope.action = $scope.stopLab
@@ -564,18 +569,20 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
         //End load action
         completeLoad()
       }
-      else if(data.status === 'error') {
+      else if (data.status === 'error') {
         Notification('Some error in docker-compose up command', 'error');
         $scope.responseError = $scope.responseErrorHeader + data.message;
+        $scope.labError = true;
         $scope.labState = playProto
         $scope.action = $scope.startLab
       }
       else updateNotify(data);
     });
   } //End startlab
-  $scope.clearLogs = function() {
+  $scope.clearLogs = function () {
     $scope.notify = "";
     $scope.responseError = "";
+    $scope.labError = false;
   }
   //Stop the lab
   $scope.stopLab = function stopLab() {
@@ -587,15 +594,15 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
     //	var url = '/dsp_v1/docker_compose/'+$scope.nameRepo+"/"+$scope.labName
     //Send compose up
     SocketService.manage(JSON.stringify({
-      action : 'docker_down',
-      params : {
-        namerepo : vm.repoName,
-        namelab : vm.lab.name
+      action: 'docker_down',
+      params: {
+        namerepo: vm.repoName,
+        namelab: vm.lab.name
       }
     }),
-      function(event) {
+      function (event) {
         var data = JSON.parse(event.data);
-        if(data.status === 'success')  {
+        if (data.status === 'success') {
           dockerAPIService.detachAllServices();
           //Complete spinner
           completeLoad()
@@ -604,7 +611,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
           $scope.action = $scope.startLab
           _initNetworkList()
         }
-        else if(data.status === 'error') {
+        else if (data.status === 'error') {
           Notification('Some error in docker-compose down command', 'error');
           //	$scope.labState = playProto
           //	$scope.action = $scope.startLab
@@ -614,7 +621,7 @@ var dsp_LabCtrl = function($scope, ServerResponse, $log, SocketService, dockerIm
   }
 
   //Nothing to do
-  $scope.loading = function loading() {}
+  $scope.loading = function loading() { }
 
 
   function startLoad() {

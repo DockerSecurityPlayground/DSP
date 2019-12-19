@@ -1,14 +1,23 @@
 ﻿<style>
-.ace-run { height: 100px; }
+  .ace-run {
+    height: 100px;
+  }
+  .terminal {
+    background: #111;
+    color: #EEE;
+    max-height: 250px;
+    overflow-y: scroll;
+    font-size: 0.9em;
+  }
 </style>
-<div id="page-wrapper" >
+<div id="page-wrapper">
   <script src="assets/mxgraph/common.js"> </script>
   <script src="assets/mxgraph/use_utils.js"> </script>
   <script>
-    $( document ).ready(function() {
+    $(document).ready(function () {
       main(document.getElementById("graphContainer"));
       var appScope = angular.element(document.getElementById("page-wrapper")).scope()
-      appScope.registerCallback(function(data) {
+      appScope.registerCallback(function (data) {
         var canvasXML = data.canvasJSON;
         if (Graph__isValidXML(canvasXML)) {
           var doc = mxUtils.parseXml(canvasXML);
@@ -22,47 +31,51 @@
     });
   </script>
   <div id="page-inner">
-    <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->
-    <!-- <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div> -->
-    <div class="row">
-      <div class="col-sm-4"> 
-        <button ng-show="ctrl.actionVisible" 
-                class="btn btn-primary"
-                ng-click="ctrl.copyLab()"
-                > 
-                Copy 
-        </button>
-          <button 
-                class="{{ctrl.deleteImportButton.class}}"
-                ng-click="ctrl.deleteImportButton.action()"
-                >
-                {{ctrl.deleteImportButton.label}}
-          </button> 
 
-      </div>	
-      <div style="margin-top:20px" class="col-sm-4">
-        <h1 class="text-lg" id="name_lab">{{ctrl.lab.name}}</h1>   
-        <div class="row">
-          <div class="{{labState.statusClass}}" > <h5>{{labState.statusLabel}}</h5> </div>
-        </div>
-        <h4 id="description_lab">{{ctrl.lab.description}}</h4>
+    <div class="media my-5">
+      <div class="media-left">
+        <i class="fa fa-fw fa-cube fa-4x media-object"></i> 
       </div>
-
-      <div ng-show="ctrl.actionVisible" class="col-sm-4" > 
-        <!-- Panel edit options -->
-        <div class="row lateral_options">
-          <div class="col-sm-6" > <a ng-click="ctrl.goToEditNetwork()" class="fa fa-pencil-square btn btn-warning"> Edit info </a> </div>
-          <div class="col-sm-6" ng-show="ctrl.editVisible"> <a href="#" ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)"  class="fa fa-cloud btn btn-warning"> Edit Network  </a> </div>
-        </div>
+      <div class="media-body">
+        <h3 class="media-heading">{{ctrl.lab.name}}</h3>
+        <p>{{ctrl.lab.description}}</p>
+        <ul class="list-inline">
+          <li ng-repeat="label in ctrl.lab.labels">
+            <span class="label label-primary" style="background-color:{{label.color}}"><i class="fa fa-fw fa-tag"></i> {{label.name}}</span>
+          </li>
+        </ul>
       </div>
-
-      <!-- Endo panel edit options -->
-
     </div>
-    <hr>
-    <div> 
-      <h2 class="text-center" > Goal </h2>
-      <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
+
+
+    <div class="text-right">
+      <button ng-show="ctrl.actionVisible" class="btn btn-primary" ng-click="ctrl.copyLab()">
+        <i class="fa fa-fw fa-copy"></i> Copy
+      </button>
+      <button class="{{ctrl.deleteImportButton.class}}" ng-click="ctrl.deleteImportButton.action()">
+        <i class="{{ctrl.deleteImportButton.icon}}"></i> {{ctrl.deleteImportButton.label}}
+      </button>
+    </div>
+
+
+    <div class="{{labState.statusClass}}">
+      <div class="row">
+        <div class="col-md-10">
+          <h4><i class="{{labState.statusIcon}}"></i> {{labState.statusLabel}}</h4>
+        </div>
+        <div class="col-md-2 text-right">
+          <div ng-show="!ctrl.exists">
+            <button class={{ctrl.buttonAction.class}} id="labState" href="#" ng-click="ctrl.buttonAction.action()">
+              <span class="{{ctrl.labState.actionClass}}"></span> {{ctrl.buttonAction.label}}
+            </button>
+          </div>
+          <div ng-show="ctrl.exists && !noImages">
+            <button ng-disabled="labState.actionLabel === 'Loading'" class="{{labState.actionButton}}" id="labState" href="#" ng-click="action()">
+              <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div ng-show="noImages === true" class="bs-callout bs-callout-warning">
@@ -70,109 +83,133 @@
       <i class="fa fa-angle-right"></i> Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a>
     </div>
 
-    <div ng-show="!ctrl.exists" class="row">
-      <p class="text-center"><button class={{ctrl.buttonAction.class}} id="labState" href="" ng-click="ctrl.buttonAction.action()">
-        <span class="{{ctrl.labState.actionClass}}"></span> {{ctrl.buttonAction.label}}
-      </button> 
-      </p>
+    <div ng-show="labError === true" class="bs-callout bs-callout-danger">
+      <h4><i class="fa fa-fw fa-warning"></i> Error</h4>
+      <code class="pt-2">{{responseError}}</code>
     </div>
-    <div ng-show="ctrl.exists && !noImages" class="row">
-      <p class="text-center"><button ng-disabled="labState.actionLabel === 'Loading'" class={{labState.actionButton}} id="labState" href="" ng-click="action()">
-        <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
-      </button> 
-      </p>
-    </div>
+
+    <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->
+    <!-- <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div> -->
+
     <div class="row">
-      <div class="col-sm-12">  
-          <div class="ace-run" ng-show="notify" ui-ace="{
-          theme: 'terminal',
-          mode: 'yaml'
-          }"
-                                                  ng-bind-html=notify
-                                                  >
+
+      <div ng-show="ctrl.actionVisible" class="col-sm-4">
+        <!-- Panel edit options -->
+        <div class="row lateral_options">
+          <div class="col-sm-6">
+            <a ng-click="ctrl.goToEditNetwork()" class="fa fa-pencil-square btn btn-warning">
+              Edit info
+            </a>
           </div>
+          <div class="col-sm-6" ng-show="ctrl.editVisible">
+            <a href="#" ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)" class="fa fa-cloud btn btn-warning">
+              Edit Network
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endo panel edit options -->
+
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading"><i class="fa fa-fw fa-info"></i> Goal</div>
+      <div class="panel-body">
+        <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
       </div>
     </div>
-    <div ng-show="responseError !== ''" class="text text-center text-danger"> <b> {{responseError}} </b></div>
-    <div class="row">
-      <p class="col-sm-1 col-sm-offset-9"><button class="btn btn-default" ng-click="clearLogs()">
-        Clear Logs
-      </button> 
-      </p>
-    </div>
-    <div ng-show="!noImages">
-    <uib-tabset active="active">
-      <uib-tab index="0" heading="Graph">
-        <br>
-        <!-- GRAPH CANVAS -->
-        <div id="graphContainer"
-             style="position:relative;overflow:hidden;width:95%;height:500px;cursor:default; border-width:1px;border-style:solid;border-color:black;">
-        </div>
-        <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
-        <br>
-        <br>
-        <br>
-        <!-- END GRAPH CANVAS -->
-      </uib-tab>
-      <uib-tab index="1" heading="Docker-Compose"> 
-        <br>
-        <h4 class="text-center"> Docker Compose </h4>
-        <div ng-show="yamlfile !== ''" class="row">
-          <div class="col-sm-offset-1 col-sm-10" > 
-            <!-- <h4 class="text-center"> JSON Docker Compose </h4> -->
-            <pre> <code id="code_yaml" class="language-yaml"></code></pre>
-          </div>
-        </div>
-      </uib-tab>
-      <uib-tab index="2" heading="Hack Tools">
-        <div ng-include="'views/services.html'"> </div>
-      </uib-tab>
-      <uib-tab index="3" heading="Network Elements">
-        <h4 class="text-center">Containers</h4>
-	<hr>
-	<div class="list-group">
-          <div id="{{c.name}}" class="list-group-item"
-	ng-repeat="(key,c) in listContainers">
-          <div class="row">
-            <div class="col-sm-6">
-              {{c.name}}
-            </div>
-            <div class="col-sm-6">
 
-              <div class="row">
-                <div class="col-sm-1">
-                <button
-                  class="glyphicon glyphicon-share"
-                  ng-click="goToContainer(c.name)"
-                  >
-                </div>
-                <div class="col-sm-1 col-sm-offset-1">
-                <button
-                  class="glyphicon glyphicon-download"
-                  ng-click="copyFromContainer(c.name)"
-                  >
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <i class="fa fa-fw fa-terminal"></i> Logs
+      </div>
+      <div class="panel-body terminal text-monospace" ng-show="notify">
+        <div ng-bind-html="trustedHtml(notify)"></div>
+      </div>
+      <div class="panel-footer text-right">
+        <button class="btn btn-default" ng-click="clearLogs()">
+          <i class="fa fa-fw fa-eraser"></i> Clear Logs
+        </button>
+      </div>
+    </div>
+
+    <div ng-show="!noImages">
+
+      <div class="panel panel-default">
+        <div class="panel-heading"><i class="fa fa-fw fa-cube"></i> Container</div>
+        <div class="panel-body">
+
+          <uib-tabset active="active">
+            <uib-tab index="0" heading="Graph">
+              <br>
+              <!-- GRAPH CANVAS -->
+              <div id="graphContainer"></div>
+              <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
+              <br>
+              <br>
+              <br>
+              <!-- END GRAPH CANVAS -->
+            </uib-tab>
+            <uib-tab index="1" heading="Docker-Compose">
+              <br>
+              <h4 class="text-center"> Docker Compose </h4>
+              <div ng-show="yamlfile !== ''" class="row">
+                <div class="col-sm-offset-1 col-sm-10">
+                  <!-- <h4 class="text-center"> JSON Docker Compose </h4> -->
+                  <pre> <code id="code_yaml" class="language-yaml"></code></pre>
                 </div>
               </div>
+            </uib-tab>
+            <uib-tab index="2" heading="Hack Tools">
+              <div ng-include="'views/services.html'"> </div>
+            </uib-tab>
+            <uib-tab index="3" heading="Network Elements">
+              <h4 class="text-center">Containers</h4>
+              <hr>
+              <div class="list-group">
+                <div id="{{c.name}}" class="list-group-item" ng-repeat="(key,c) in listContainers">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      {{c.name}}
+                    </div>
+                    <div class="col-sm-6">
+    
+                      <div class="row">
+                        <div class="col-sm-1">
+                          <button class="glyphicon glyphicon-share" ng-click="goToContainer(c.name)">
+                        </div>
+                        <div class="col-sm-1 col-sm-offset-1">
+                          <button class="glyphicon glyphicon-download" ng-click="copyFromContainer(c.name)">
+                        </div>
+                      </div>
+    
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </uib-tab>
+          </uib-tabset>
 
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-11">
+              <i class="fa fa-fw fa-map"></i> Solution
+            </div>
+            <div class="col-md-1 text-right">
+              <a ng-click="isSolutionShowed = !isSolutionShowed" href="#" title="Show/Hide the solution" class="btn btn-default btn-xs"><i ng-class="isSolutionShowed ? 'fa fa-fw fa-eye-slash' : 'fa fa-fw fa-eye' "></i></a>
             </div>
           </div>
         </div>
+        <div class="panel-body" ng-show="isSolutionShowed" >
+          <div class="large_div" ng-bind-html="ctrl.tinymceHtmlSolution"></div>
+        </div>
+      </div>
+
     </div>
-      </uib-tab>
-    </uib-tabset>
-
-
-
-    <!-- /. PAGE INNER  -->
-
-    <h2 class="text-center" ><a  ng-click="isSolutionShowed = !isSolutionShowed" href="#"> Solution</a> </h2>
-
-    <div ng-show="isSolutionShowed" 
-         class="large_div"
-         ng-bind-html="ctrl.tinymceHtmlSolution"
-
-         ></div>
   </div>
-  </div>
-</div>              
 </div>
