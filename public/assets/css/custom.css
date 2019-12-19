@@ -4,6 +4,31 @@ body {
   height: auto !important; /** Solve incompatibility with AngularMaterial style */
   background: #fff;
 }
+
+
+.paper-theme h1 {
+  font-size: 40px;
+}
+
+.paper-theme h2 {
+  font-size: 35px;
+}
+
+.paper-theme h3 {
+  font-size: 30px;
+}
+
+.paper-theme h4 {
+  font-size: 25px;
+}
+
+.paper-theme h5 {
+  font-size: 20px;
+}
+
+.paper-theme h6 {
+  font-size: 15px;
+}
   
 footer {
   margin: 50px;
@@ -11,6 +36,16 @@ footer {
 
 #dsp_logo {
     margin: 20px 0 40px 0;
+}
+
+#graphContainer {
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-height: 500px;
+  cursor: default;
+  border: 0 solid transparent;
 }
 
 #wrapper {
@@ -54,6 +89,15 @@ footer {
     overflow-y: auto;
     overflow-x: hidden;
     background-color: transparent;
+    scrollbar-width: thin;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #ddd;
 }
 
 .sidebar .nav {
