@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.4.0] - 2019 - 12 - 21
+- New theme by diterlizzi
 ## [3.3.2] - 2019 - 12 - 17  
 - Added back button to edit network or element  
 - Save compose upon editing of nodes / networks
