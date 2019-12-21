@@ -1,63 +1,73 @@
-﻿<div id="page-wrapper" >
-<h1 class="text-center"> Labels </h1>
-<hr>	
-<div id="page-inner">
-<table class="table table-bordered table-hover ">
-    <thead>
-      <tr>
-	<th>Name</th>
-	<th>Description</th>
-	<th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="l in loadedLabels">
-	<td><div class="label label-primary" style="background-color:{{l.color}}">{{l.name}}</div></td>
-	<td>{{l.description}}</td>
-	<td>
-	<div class="row">
-		<div class="col-sm-6 text-center" ><a class="editing-components" >  <span uib-popover="Edit" popover-trigger="'mouseenter'"  ng-click="initEdit(l)" class="fa fa-pencil"> </span> </a> </div>
-		<div class="col-sm-6 text-center"><a class="editing-components" ><span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-remove" ng-click="removeLabel(l.name)"> </span> </a> </div>
-	</div>
-	</td>
-      </tr>
-      
-	
+﻿<div id="page-wrapper">
 
-    </tbody>
-  </table>
-<hr>
-		<form id="form-label-id" ng-submit="addLabel(labelForm)" name="formLabelName" class="form-horizontal" >
-		  <div class="form-group">
-		    <label class="control-label col-sm-2" for="nameLabel">Name</label>
-		    <div class="col-sm-10">
-		      <input type="text" class="form-control" ng-model="labelForm.name" id="nameLabel" >
-		    </div>
-		  </div>
-		<div class="form-group">
-		    <label class="control-label col-sm-2" for="descrLabel">Description</label>
-		    <div class="col-sm-10">
-		      <input type="text" class="form-control" ng-model="labelForm.description" id="descrLabel" >
-		    </div>
-		  </div>
-		<div class="form-group">
-		    <label class="control-label col-sm-2" for="colorLabel">Background color</label>
-		    <div class="col-sm-10">
-			 <input colorpicker colorpicker-with-input="false" id="colorLabel"  class="form-color" ng-model="labelForm.color" style="background-color:{{labelForm.color}}" type="text" />
-		    </div>
-		  </div>
-		  
-		  
-		  
-			<hr>
-			<button type="submit" class={{labelForm.action.css}} >{{labelForm.action.name}}</button>
-			<div ng-click="cancelEdit()" class="btn btn-danger" style="visibility:{{labelForm.visibilityCancelEdit}}">Cancel</div>
+  <h1><i class="fa fa-fw fa-tags"></i> Labels </h1>
+  <p>&nbsp;</p>
 
-		</form>
-</div>              
-     <!-- /. PAGE INNER  -->
+  <div id="page-inner">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th class="w-25">Name</th>
+          <th class="w-50">Description</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="l in loadedLabels">
+          <td>
+              <div class="label label-primary" style="background-color:{{l.color}}">&nbsp;</div>
+          </td>
+          <td>
+            {{l.name}}
+          </td>
+          <td>
+            {{l.description}}
+          </td>
+          <td class="text-right">
+            <div class="btn-group btn-group-xs">
+              <a class="btn btn-default editing-components" uib-popover="Edit" popover-trigger="'mouseenter'" ng-click="initEdit(l)">
+                <i class="fa fa-fw fa-pencil"></i>
+              </a>
+              <a class="btn btn-danger editing-components" uib-popover="Remove" popover-trigger="'mouseenter'" ng-click="removeLabel(l.name)">
+                <i class="fa fa-fw fa-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <form id="form-label-id" ng-submit="addLabel(labelForm)" name="formLabelName" class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="nameLabel">Name</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="labelForm.name" id="nameLabel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="descrLabel">Description</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="labelForm.description" id="descrLabel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="colorLabel">Background color</label>
+        <div class="col-sm-10">
+          <input colorpicker colorpicker-with-input="false" id="colorLabel" class="form-color" ng-model="labelForm.color" style="background-color:{{labelForm.color}}" type="text" />
+        </div>
+      </div>
+
+      <hr>
+      <button type="submit" class={{labelForm.action.css}}>{{labelForm.action.name}}</button>
+      <div ng-click="cancelEdit()" class="btn btn-default" style="visibility:{{labelForm.visibilityCancelEdit}}">
+        <i class="fa fa-fw fa-angle-left"></i> Cancel
+      </div>
+
+    </form>
+  </div>
+  <!-- /. PAGE INNER  -->
 </div>
-	 <!--/. PAGE WRAPPER  -->
-    </div>
-</div>
-</div>
+<!--/. PAGE WRAPPER  -->

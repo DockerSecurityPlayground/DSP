@@ -1,36 +1,33 @@
 <!-- /. NAV TOP  -->
-<nav class="navbar-default navbar-side" role="navigation">
-  <div class="sidebar-collapse">
-    <ul class="nav" id="main-menu">
-      <li class="text-center">
-        <img src="assets/img/dsp_logo.png" class="user-image img-responsive"/>
-      </li>
-      <!-- end search form -->
-      <li ng-repeat="r in repos"> 
-        <a href="#"  name="{{r.name}}" ng-click="r.isCollapsed= !r.isCollapsed" ><i class="fa fa-sitemap fa-3x"></i> {{r.name}}_{{r.version }}<span class="fa arrow"></span></a>
-          <div uib-collapse="r.isCollapsed"> 
-            <ul class="nav nav-second-level">
-              <li ng-repeat="lab in r.labs">
-                <a href="/lab/use/{{r.name}}/{{lab.name}}" >
-                {{lab.name}}
-                <i ng-class="r.name === currentLab.repoName && lab.name === currentLab.name ? 
-                    'fa fa-angle-left' :'' " aria-hidden="true" style="color:white;margin-left:10px"> </i>
-                <!-- <i class="fa fa-pencil-square-o" aria-hidden="true"></i> -->
 
-                <i ng-show="lab.state === 'RUNNING'" class="fa fa-caret-square-o-right" aria-hidden="true"></i>
-                <i ng-show="lab.state === 'NO_NETWORK'" class="fa fa-pencil" aria-hidden="true"></i>
+<div id="dsp_logo" class="text-center">
+  <a href="/"><img src="assets/img/dsp_logo.png" class="user-image img-responsive" /></a>
+</div>
 
-                <span ng-repeat="label in lab.labels">
-                <br><span style="margin-left:20px; background-color:{{label.color}}" class="label label-primary">{{label.name}}</span>
-                </span>
-                </a>
-              </li>
-            </ul>
+<div ng-repeat="r in repos" class="lab pb-2">
+  <div class="panel panel-default">
+    <div class="panel-heading" ng-click="r.isCollapsed= !r.isCollapsed" >
+      <i class="fa fa-fw fa-cubes"></i> {{r.name}} {{r.version }} labs
+    </div>
+    <div class="list-group" uib-collapse="r.isCollapsed">
+      <a ng-repeat="lab in r.labs" href="/lab/use/{{r.name}}/{{lab.name}}" class="list-group-item">
+        <div class="text-ellipsis" title="{{lab.name}}">
+            <i class="fa fa-fw fa-cube"></i>
+            <i ng-class="r.name === currentLab.repoName && lab.name === currentLab.name ?  'fa fa-fw fa-angle-right' : '' " aria-hidden="true"></i>
+            {{lab.name}}
         </div>
-      </li>
-  </ul>
-</div>
-</div>
-</nav>  
-<!-- /. NAV SIDE  -->
 
+        <i ng-show="lab.state === 'RUNNING'" class="fa fa-fw fa-caret-square-o-right" aria-hidden="true"></i>
+        <i ng-show="lab.state === 'NO_NETWORK'" class="fa fa-fw fa-pencil" aria-hidden="true"></i>
+
+        <ul class="list-inline">
+          <li ng-repeat="label in lab.labels">
+            <span style="background-color:{{label.color}}" class="label label-primary"><i class="fa fa-fw fa-tag"></i> {{label.name}}</span>
+          </li>
+        </ul>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- /. NAV SIDE  -->

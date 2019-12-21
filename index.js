@@ -54,9 +54,9 @@ Checker.isInstalled((isInstalled) => {
 });
 
 app.use(multipart({
-	uploadDir: localConfig.tmpDir
+  uploadDir: localConfig.tmpDir
 }));
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -66,11 +66,11 @@ app.use(function(req, res, next) {
 // app.use(bodyParser.json());
 
 // Extend the dimension of body
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(methodOverride('X-HTTP-Method-Override'));
-app.use('/webshell', express.static(path.join(__dirname, 'public','webshell')));
+app.use('/webshell', express.static(path.join(__dirname, 'public', 'webshell')));
 // app.use((err, req, res) => {
 //  res.status(500);
 //  res.end(`${err}\n`);
@@ -105,6 +105,7 @@ app.use((req, res, next) => {
     }
   });
 });
+
 // Api images
 app.get('/dsp_v1/docker_images/', networkHandler.getListImages);
 app.get('/dsp_v1/dsp_images', dockerImages.getImagesAllRepos);
@@ -249,6 +250,6 @@ process.env.COMPOSE_INTERACTIVE_NO_CLI = 1
 
 server.listen(port, () => {
   if (localConfig.config.test) { log.warn('Testing mode enabled'); }
-  log.info(`Server listening on port${port}`);
+  log.info(`Server listening on port ${port}`);
 });
 

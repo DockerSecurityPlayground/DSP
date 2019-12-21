@@ -1,190 +1,211 @@
 ﻿<style>
-.adjust-label {
-  padding-top: 4px
-}
-.log-panel { height: 100px; }
+  .adjust-label {
+    padding-top: 4px
+  }
 
+  .log-panel {
+    height: 100px;
+  }
 </style>
+
 <div id="page-wrapper">
-  <h1 class="text-center"> Manage Images </h1>
-  <hr>	
+  <h1>
+    <i class="fa fa-fw fa-clone"></i> Manage Images
+  </h1>
+  <p>&nbsp;</p>
+
   <div id="page-inner">
-     <div class="btn-group">
-        <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'repo_images'">Repo Images</label>
-        <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'all_images'">All Images</label>
-        <label class="btn btn-primary" ng-model="imagePanel" uib-btn-radio="'dockerfiles'">Dockerfiles</label>
+    <div class="btn-group">
+      <label class="btn btn-default" ng-model="imagePanel" uib-btn-radio="'repo_images'">Repo Images</label>
+      <label class="btn btn-default" ng-model="imagePanel" uib-btn-radio="'all_images'">All Images</label>
+      <label class="btn btn-default" ng-model="imagePanel" uib-btn-radio="'dockerfiles'">Dockerfiles</label>
     </div>
+    <p>&nbsp;</p>
+
     <div ng-if="imagePanel === 'repo_images'">
-          <h2 class="text-center"> Repo Images </h2>
-    <hr>
 
-    <div class="list-group">
-      <div ng-repeat="i in imageList" class="panel panel-default">
-        <div class="panel-heading">{{ i.repoName }}</div>
-          <div class="panel-body">
-            <table class="table table-hover ">
-                <tbody>
-                
-                    <tr id="{{li.nameLab}}" ng-repeat="li in i.lab_images">
-                        
-                    <td class="text-center"> 
-                      <a href="/lab/use/{{i.repoName}}/{{ li.nameLab }}" > {{ li.nameLab }} </a>
-                    <p> 
-                    <button class="btn btn-default" ng-click="downloadAll(li, i.repoName, li.log)"> Download All </button>
-                    </p>
-                    
-                    </td>
-                    <td class="text-center"> 
-                        <ul class="list-group">
-                            <li class="list-group-item borderless" ng-repeat="p in li.images">
-                            <div class="row">
-                                <b class="{{ p.textType }} col-sm-6">
-                                    {{ p.name }}
-                                </b>
-                                <div ng-if="!p.contains && p.toBuild"class="col-sm-3">
-                                  <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="buildImage(p, i.repoName, li.log)" >Build   <span class="glyphicon glyphicon-download"></span></a>
-                                </div>
-                                <div ng-if="!p.contains && !p.toBuild" class="col-sm-3">
-                                  <a href="" id="downloadImage" ng-class="{disabled : p.disabled}" ng-click="downloadImage(p, li.log)" >Download   <span class="glyphicon glyphicon-download"></span></a>
-                                </div>
-                                <div ng-if=p.contains class="col-sm-3">
-                                    <a href="" id="delAction" ng-click="delImage(p)" >Delete   <span class="glyphicon glyphicon-remove"></span></a>
-                                </div>
+      <h2> Repo Images </h2>
+      <p>&nbsp;</p>
 
-                            </div>
-                            <div ng-switch="p.isExtracting" ng-show="p.isVisible" class="row">
-                                <br>
-                                <md-progress-linear md-mode="determinate" value="{{p.progress}}" ng-switch-default></md-progress-linear>
-                                <md-progress-linear md-mode="indeterminate" ng-switch-when="true"></md-progress-linear>
-                             <!-- <textarea ng-if=p.progress class="form-control" rows="5" id="comment">
+      <div class="list-group">
+        <div ng-repeat="i in imageList" class="panel panel-default">
+          <div class="panel-heading"><i class="fa fa-fw fa-server"></i> {{ i.repoName }} labs</div>
+
+          <table class="table table-sm">
+            <tbody>
+
+              <tr id="{{li.nameLab}}" ng-repeat="li in i.lab_images">
+
+                <td>
+                  <h5>
+                    <i class="fa fa-fw fa-cube"></i> <a href="/lab/use/{{i.repoName}}/{{ li.nameLab }}">{{ li.nameLab }} </a>
+                  </h5>
+                </td>
+                <td>
+                  <button class="btn btn-success" ng-click="downloadAll(li, i.repoName, li.log)">
+                    <i class="fa fa-download"></i> Download All Images
+                  </button>
+                </td>
+                <td>
+                  <ul class="list-group">
+                    <li class="list-group-item borderless" ng-repeat="p in li.images">
+                      <div class="row">
+                        <div class="{{ p.textType }} col-sm-9" style="font-family: monospace">{{ p.name }}</div>
+                        <div ng-if="!p.contains && p.toBuild" class="col-sm-3">
+                          <a title="Build image" href="#" id="downloadImage" class="btn btn-xs btn-primary" ng-class="{disabled : p.disabled}" ng-click="buildImage(p, i.repoName, li.log)">
+                            <i class="fa fa-fw fa-download"></i> Build image
+                          </a>
+                        </div>
+                        <div ng-if="!p.contains && !p.toBuild" class="col-sm-3">
+                          <a title="Download image" href="#" id="downloadImage" class="btn btn-default btn-xs" ng-class="{disabled : p.disabled}"  ng-click="downloadImage(p, li.log)">
+                              <i class="fa fa-fw fa-download"></i> Download image
+                          </a>
+                        </div>
+                        <div ng-if=p.contains class="col-sm-3">
+                          <a title="Delete image" href="#" id="delAction" class="btn btn-xs btn-danger" ng-click="delImage(p)">
+                              <i class="fa fa-fw fa-times"></i> Delete image
+                          </a>
+                        </div>
+
+                      </div>
+                      <div ng-switch="p.isExtracting" ng-show="p.isVisible" class="row">
+                        <br>
+                        <md-progress-linear md-mode="determinate" value="{{p.progress}}" ng-switch-default>
+                        </md-progress-linear>
+                        <md-progress-linear md-mode="indeterminate" ng-switch-when="true"></md-progress-linear>
+                        <!-- <textarea ng-if=p.progress class="form-control" rows="5" id="comment">
                                     {{ p.progress }} 
-                                </textarea> --> 
-                            </div>
-                            </li>
-                        </ul> 
-                    <!-- <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{ -->
-                    <div  ng-show="li.log.content" class="log-panel" ui-ace="{
-                                  theme: 'terminal',
-                                  mode: 'yaml'
-                                  }"
-                        ng-model=li.log.content
-                  </div>
-                    
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                                </textarea> -->
+                      </div>
+                    </li>
+                  </ul>
+                  <!-- <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{ -->
+                  <div ng-show="li.log.content" class="log-panel" ui-ace="{ theme: 'terminal', mode: 'yaml' }" ng-model=li.log.content></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Images -->
+    <div ng-if="imagePanel === 'all_images'">
+
+      <h2> Installed Docker Images </h2>
+      <p>&nbsp;</p>
+
+      <form class="pb-5">
+        <div class="row form-group">
+          <div class="col-sm-2">
+            <label class="adjust-label control-label" for="download">Name Image:</label>
+          </div>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="download" ng-model="imageToDownload">
+          </div>
+          <div class="col-sm-3">
+            <button class="btn btn-default" ng-click="downloadNewImage(imageToDownload)"> <span class="fa fa-fw fa-download"></span> Download</button>
           </div>
         </div>
-      </div>
-    </div>
-                <!-- All Images --> 
-     <div ng-if="imagePanel === 'all_images'">
-          <h2 class="text-center"> Installed Docker Images </h2>
-    <hr>
-    <form>
-      <div class="row form-group">
-        <div class="col-sm-2"> <label class="adjust-label control-label" for="download">Name Image:</label> </div>
-       <div class="col-sm-6">
-         <input type="text" class="form-control" id="download" ng-model="imageToDownload" >
-       </div>
-         <div class="col-sm-3">
-           <button class="btn btn-default" ng-click="downloadNewImage(imageToDownload)"> <span class="glyphicon glyphicon-download" ></span>  Download</button>
-         </div>
-      </div>  
-    </form>
-    <ul class="list-group">
-      <li class="list-group-item borderless" ng-repeat="ele in allImages"> 
-        <div ng-if=ele.contains class="row"> 
-          <div class="col-sm-6" ng-class="ele.textType"> <b>{{ ele.name }} </b></div>
-          <div  class="col-sm-6">
-            <a href="" id="delAction" ng-click="delImage(ele)" >Delete   <span class="glyphicon glyphicon-remove"></span></a>
-        </div>
-        </div>
-      
-      
-      </li>
-    </ul>
-
-
-    </div>   
-     <div ng-if="imagePanel === 'dockerfiles'">
-      <h2 class="text-center">Dockerfiles</h2>
-      <hr>
-      <form class="form-inline">
-        <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.name" placeholder="Image name" id="" >
-        <button type="button" class="btn btn-success" ng-click="createDockerFile()" >Create</button>
       </form>
-        <br />
-            <div>
-              <div>
-                <div class="form-check" ng-repeat="t in typeImports">
-                  <input ng-click="changeTypeImport(t)" name="type_import" type="radio" id="{{t}}" >
-                  <label for="{{t}}">{{t}}</label>
-                </div>
-              </div>
-            <div ng-show="selectedImport==='Git'" class="row">
-                <div class="col-sm-2">
-                  <label for="toCreate"> From github: </label>
-                </div>
-                  <div class="col-sm-3">
-        <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.github" placeholder="Repo Dockerfile" id="" >
-                </div>
-              </div>
-              <br />
-            <div ng-show="selectedImport==='Dockerfile'" class="row">
-                <div class="col-sm-2">
-                  <label for="toCreate"> From dockerfile: </label>
-                </div>
-                <div class="col-sm-3">
-                  <select 
-                     ng-model="dockerFileToCreate.baseDockerfile" 
-                     ng-required=true
-                     class="form-control" 
-                    >
-                    <option ng-repeat="d in dockerFiles" value="{{d}}">{{d}}</option>
-                  </select>
-                </div>
-                
-              </div>
-              
+
+      <ul class="list-group">
+        <li class="list-group-item borderless" ng-repeat="ele in allImages">
+          <div ng-if=ele.contains class="row">
+            <div class="col-sm-11">
+                <i class="fa fa-fw fa-clone"></i> <span ng-class="ele.textType" class="text-monospace">{{ ele.name }}</span>
             </div>
+            <div class="col-sm-1">
+              <a href="#" id="delAction" ng-click="delImage(ele)" class="btn btn-danger"><i class="fa fa-fw fa-times"></i> Delete</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+
+    </div>
+
+    <div ng-if="imagePanel === 'dockerfiles'">
+
+      <h2>Dockerfiles</h2>
+      <p>&nbsp;</p>
+
+      <form class="form-inline">
+        <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.name" placeholder="Image name"
+          id="">
+        <button type="button" class="btn btn-success" ng-click="createDockerFile()">Create</button>
+      </form>
       <br />
-             <form role="form">
-               <div class="form-group input-group">
-                 <input type="text" class="form-control" ng-model="dockerFilterName" placeholder="Name filter">
-                   <span class="input-group-btn">
-                     <div class="btn btn-default"><i class="fa fa-search"></i>
-                     </div>
-                   </span>
-                 </div>
-               </form>
-         <hr />
-         <table class="table table-hover ">
-           <tbody>
-             <tr ng-repeat="d in dockerFiles | filter :dockerFilterName">
-               <td class="text-center">{{d}}</td>
-              <td class="text-center">  
-                  <div class="row">
-                    <div class="col-sm-6 text-center" ><a class="editing-components" >  <span uib-popover="Edit" popover-trigger="'mouseenter'"  ng-click="editDockerFile(d)" class="fa fa-pencil"> </span> </a> </div>
-                    <div class="col-sm-6 text-center"><a class="editing-components" ><span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-remove" ng-click="deleteDockerFile(d)"> </span> </a> </div>
-                  </div>
-              </td> 
-             </tr>
-           </tbody>
-         </table>
+      <div>
+        <div>
+          <div class="form-check" ng-repeat="t in typeImports">
+            <input ng-click="changeTypeImport(t)" name="type_import" type="radio" id="{{t}}">
+            <label for="{{t}}">{{t}}</label>
+          </div>
+        </div>
+        <div ng-show="selectedImport==='Git'" class="row">
+          <div class="col-sm-2">
+            <label for="toCreate"> From GitHub: </label>
+          </div>
+          <div class="col-sm-3">
+            <input type="text" size=35 class="form-control" ng-model="dockerFileToCreate.github"
+              placeholder="Repo Dockerfile" id="">
+          </div>
+        </div>
+        <br />
+        <div ng-show="selectedImport==='Dockerfile'" class="row">
+          <div class="col-sm-2">
+            <label for="toCreate"> From <code>.dockerfile</code>: </label>
+          </div>
+          <div class="col-sm-3">
+            <select ng-model="dockerFileToCreate.baseDockerfile" ng-required=true class="form-control">
+              <option ng-repeat="d in dockerFiles" value="{{d}}">{{d}}</option>
+            </select>
+          </div>
+
+        </div>
 
       </div>
-    
-    
-          <!-- <a  id="addAction" href="" ng-click="graphAction($event)" > <div class="glyphicon glyphicon-plus"></div></a></span> -->
+      <br />
+      <form role="form">
+        <div class="form-group input-group">
+          <input type="text" class="form-control" ng-model="dockerFilterName" placeholder="Name filter">
+          <span class="input-group-btn">
+            <div class="btn btn-default"><i class="fa fa-search"></i>
+            </div>
+          </span>
+        </div>
+      </form>
+      <hr />
+      <table class="table table-hover ">
+        <tbody>
+          <tr ng-repeat="d in dockerFiles | filter :dockerFilterName">
+            <td class="text-center">{{d}}</td>
+            <td class="text-center">
+              <div class="row">
+                <div class="col-sm-6 text-center"><a class="editing-components"> <span uib-popover="Edit"
+                      popover-trigger="'mouseenter'" ng-click="editDockerFile(d)" class="fa fa-pencil"> </span> </a>
+                </div>
+                <div class="col-sm-6 text-center"><a class="editing-components"><span uib-popover="Remove"
+                      popover-trigger="'mouseenter'" class="fa fa-remove" ng-click="deleteDockerFile(d)"> </span> </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <!-- <div class="row"> -->
-        <!--     <div class="col-sm-4"> -->
-        <!--         <i style="margin-left:10px">{{ i.name }} </i> -->
-        <!--     </div> -->
-        <!--     <div class="col-sm-4"> -->
-        <!--         <i style="margin-left:10px">{{ i.name }} </i> -->
-        <!--     </div> -->
+    </div>
+
+
+    <!-- <a  id="addAction" href="" ng-click="graphAction($event)" > <div class="glyphicon glyphicon-plus"></div></a></span> -->
+
+    <!-- <div class="row"> -->
+    <!--     <div class="col-sm-4"> -->
+    <!--         <i style="margin-left:10px">{{ i.name }} </i> -->
+    <!--     </div> -->
+    <!--     <div class="col-sm-4"> -->
+    <!--         <i style="margin-left:10px">{{ i.name }} </i> -->
+    <!--     </div> -->
   </div>
 </div>
