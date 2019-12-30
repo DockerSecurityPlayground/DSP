@@ -11,16 +11,6 @@
   "commitConvention": "none",
   "contributors": [
     {
-      "login": "giterlizzi",
-      "name": "Giuseppe Di Terlizzi",
-      "avatar_url": "https://avatars0.githubusercontent.com/u/1824717?v=4",
-      "profile": "https://lotar.altervista.org",
-      "contributions": [
-        "code",
-        "content"
-      ]
-    },
-    {
       "login": "giper45",
       "name": "gx1",
       "avatar_url": "https://avatars2.githubusercontent.com/u/18548727?v=4",
@@ -31,6 +21,16 @@
         "design",
         "doc",
         "maintenance"
+      ]
+    },
+    {
+      "login": "giterlizzi",
+      "name": "Giuseppe Di Terlizzi",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1824717?v=4",
+      "profile": "https://lotar.altervista.org",
+      "contributions": [
+        "code",
+        "content"
       ]
     }
   ],

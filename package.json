@@ -70,6 +70,7 @@
     "zip-dir": "^1.0.2"
   },
   "devDependencies": {
+    "all-contributors-cli": "^6.11.2",
     "chai": "^4.2.0",
     "chai-fs": "^1.0.0",
     "chai-http": "^4.2.0",
