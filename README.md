@@ -178,12 +178,6 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-* **Technical support**: Gaetano Perrone, Francesco Caturano 
-* **Documentation support** Gaetano Perrone, Alessandro Placido Luise, Francesco Caturano
-* **Application design: Gaetano Perrone, Simon Pietro Romano**
-* **Application development: Gaetano Perrone, Francesco Caturano, Giuseppe Di Terlizzi**
-* **Docker wrapper image development: Gaetano Perrone, Francesco Caturano**
-
 
 Thanks to **Giuseppe Criscuolo** and **Alessandro Placido Luise** for the logo design
 ## Changelog   
