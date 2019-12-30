@@ -24,6 +24,17 @@
         "maintenance",
         "projectManagement"
       ]
+    },
+    {
+      "login": "spromano",
+      "name": "Simon Pietro Romano",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4959718?v=4",
+      "profile": "https://github.com/spromano",
+      "contributions": [
+        "design",
+        "doc",
+        "projectManagement"
+      ]
     }
   ],
   "contributorsPerLine": 7

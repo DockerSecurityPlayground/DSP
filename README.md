@@ -1,6 +1,6 @@
 # DockerSecurityPlayground
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/DSP_Example.png)
 
@@ -168,6 +168,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 <table>
   <tr>
     <td align="center"><a href="https://github.com/giper45"><img src="https://avatars2.githubusercontent.com/u/18548727?v=4" width="100px;" alt=""/><br /><sub><b>gx1</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/issues?q=author%3Agiper45" title="Bug reports">🐛</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=giper45" title="Code">💻</a> <a href="#content-giper45" title="Content">🖋</a> <a href="#design-giper45" title="Design">🎨</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=giper45" title="Documentation">📖</a> <a href="#maintenance-giper45" title="Maintenance">🚧</a> <a href="#projectManagement-giper45" title="Project Management">📆</a></td>
+    <td align="center"><a href="https://github.com/spromano"><img src="https://avatars1.githubusercontent.com/u/4959718?v=4" width="100px;" alt=""/><br /><sub><b>Simon Pietro Romano</b></sub></a><br /><a href="#design-spromano" title="Design">🎨</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=spromano" title="Documentation">📖</a> <a href="#projectManagement-spromano" title="Project Management">📆</a></td>
   </tr>
 </table>
 
