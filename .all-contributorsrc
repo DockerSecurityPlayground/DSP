@@ -1,0 +1,74 @@
+{
+  "projectName": "DockerSecurityPlayground",
+  "projectOwner": "giper45",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "giper45",
+      "name": "gx1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/18548727?v=4",
+      "profile": "https://github.com/giper45",
+      "contributions": [
+        "bug",
+        "code",
+        "content",
+        "design",
+        "doc",
+        "maintenance",
+        "projectManagement"
+      ]
+    },
+    {
+      "login": "spromano",
+      "name": "Simon Pietro Romano",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4959718?v=4",
+      "profile": "https://github.com/spromano",
+      "contributions": [
+        "design",
+        "doc",
+        "projectManagement"
+      ]
+    },
+    {
+      "login": "catuhub",
+      "name": "catuhub",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/27270820?v=4",
+      "profile": "https://github.com/catuhub",
+      "contributions": [
+        "bug",
+        "code",
+        "design",
+        "doc"
+        "maintenance"
+      ]
+    },
+    {
+      "login": "giterlizzi",
+      "name": "Giuseppe Di Terlizzi",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1824717?v=4",
+      "profile": "https://lotar.altervista.org",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ale753",
+      "name": "Alessandro",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/33957205?v=4",
+      "profile": "https://github.com/ale753",
+      "contributions": [
+        "doc",
+        "video"
+        "content"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
