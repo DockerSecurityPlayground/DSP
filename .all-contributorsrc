@@ -1,0 +1,25 @@
+{
+  "projectName": "DockerSecurityPlayground",
+  "projectOwner": "gx1",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "giterlizzi",
+      "name": "Giuseppe Di Terlizzi",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1824717?v=4",
+      "profile": "https://lotar.altervista.org",
+      "contributions": [
+        "code",
+        "content"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
