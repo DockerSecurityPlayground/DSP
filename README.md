@@ -1,6 +1,6 @@
 # DockerSecurityPlayground
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/DSP_Example.png)
 
@@ -171,6 +171,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
     <td align="center"><a href="https://github.com/spromano"><img src="https://avatars1.githubusercontent.com/u/4959718?v=4" width="100px;" alt=""/><br /><sub><b>Simon Pietro Romano</b></sub></a><br /><a href="#design-spromano" title="Design">🎨</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=spromano" title="Documentation">📖</a> <a href="#projectManagement-spromano" title="Project Management">📆</a></td>
     <td align="center"><a href="https://github.com/catuhub"><img src="https://avatars0.githubusercontent.com/u/27270820?v=4" width="100px;" alt=""/><br /><sub><b>catuhub</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/issues?q=author%3Acatuhub" title="Bug reports">🐛</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=catuhub" title="Code">💻</a> <a href="#design-catuhub" title="Design">🎨</a> <a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=catuhub" title="Documentation">📖</a></td>
     <td align="center"><a href="https://lotar.altervista.org"><img src="https://avatars0.githubusercontent.com/u/1824717?v=4" width="100px;" alt=""/><br /><sub><b>Giuseppe Di Terlizzi</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=giterlizzi" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ale753"><img src="https://avatars0.githubusercontent.com/u/33957205?v=4" width="100px;" alt=""/><br /><sub><b>Alessandro</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=ale753" title="Documentation">📖</a> <a href="#video-ale753" title="Videos">📹</a></td>
   </tr>
 </table>
 
