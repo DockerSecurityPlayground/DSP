@@ -46,6 +46,7 @@
         "code",
         "design",
         "doc"
+        "maintenance"
       ]
     },
     {
@@ -65,6 +66,7 @@
       "contributions": [
         "doc",
         "video"
+        "content"
       ]
     }
   ],
