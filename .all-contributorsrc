@@ -19,6 +19,19 @@
         "code",
         "content"
       ]
+    },
+    {
+      "login": "giper45",
+      "name": "gx1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/18548727?v=4",
+      "profile": "https://github.com/giper45",
+      "contributions": [
+        "code",
+        "content",
+        "design",
+        "doc",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7
