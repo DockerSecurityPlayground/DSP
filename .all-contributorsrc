@@ -1,0 +1,30 @@
+{
+  "projectName": "DockerSecurityPlayground",
+  "projectOwner": "giper45",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "giper45",
+      "name": "gx1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/18548727?v=4",
+      "profile": "https://github.com/giper45",
+      "contributions": [
+        "bug",
+        "code",
+        "content",
+        "design",
+        "doc",
+        "maintenance",
+        "projectManagement"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
