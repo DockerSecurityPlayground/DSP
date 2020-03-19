@@ -186,7 +186,10 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
           }, function error(response) {
             Notification({message: response.data.message}, 'error');
           });
-
+        dockerAPIService.getSnippets('efrcatu')
+          .then(function successCallback(response){
+            console.log("IN GETSNIPPETS", response.data.data);
+          });
       };
 
       // console.log(dockerfile);

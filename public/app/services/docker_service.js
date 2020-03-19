@@ -6,7 +6,8 @@ var api = '/dsp_v1/docker_network/' ;
 	var dsp_running_services = '/dsp_v1/services/' ;
 	var dsp_dockerfile_service = '/dsp_v1/dockerfiles/' ;
   var dsp_hack_tools = '/dsp_v1/hack_tools';
-	var dsp_service_network = '/dsp_v1/networkservices' ;
+  var dsp_service_network = '/dsp_v1/networkservices' ;
+  var dsp_snippets_service = '/dsp_v1/snippets/';
   var url = 'http://' + location.host + '/';
 
   var i=0;
@@ -277,6 +278,10 @@ var api = '/dsp_v1/docker_network/' ;
     },
     getDockerFiles : function getDockerImages() {
       return $http.get(dsp_dockerfile_service);
+    },
+
+    getSnippets : function getSnippets(namerepo) {
+      return $http.get(dsp_snippets_service + namerepo);
     }
 	}
 }
