@@ -188,7 +188,8 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
           });
         dockerAPIService.getSnippets('efrcatu')
           .then(function successCallback(response){
-            console.log("IN GETSNIPPETS", response.data.data);
+            $scope.snippetList = response.data.data.snippets;
+            console.log("scope snippets", $scope.snippetList);
           });
       };
 
@@ -197,6 +198,7 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
       $scope.newFile = "";
       $scope.log = '';
       $scope.treeModel = [];
+      $scope.snippets = {};
 
       var rootElement = _getRoot($scope.treeModel);
       $scope.$watch('files', function () {
