@@ -50,6 +50,7 @@
     "json-fs-converter": "^1.4.0",
     "jsonfile": "^4.0.0",
     "method-override": "^2.3.8",
+    "mocha": "^7.1.0",
     "multer": "^1.4.1",
     "mydockerjs": "^2.10.0",
     "ncp": "^2.0.0",
