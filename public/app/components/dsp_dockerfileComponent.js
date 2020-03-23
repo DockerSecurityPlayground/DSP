@@ -173,6 +173,8 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
     $scope.selectedElement.content = contentDockerfile;
   }
 }
+
+
       var $ctrl = this;
       $scope.notify = "";
       this.$onInit = function() {
@@ -252,6 +254,14 @@ $scope.removeElement = function() {
     // angular.copy(newTreeModel, $scope.treeModel);
     // });
   }
+}
+
+$scope.changedSnippet = function(selectedSnippet){
+  $scope.treeModel.forEach(function (t) {
+    if (t.id === "./Dockerfile") {
+      $scope.selectedElement.content = t.content + "\n\n" + selectedSnippet.code
+    }
+  });
 }
 
 $scope.nodeSelected = function(e, data) {
