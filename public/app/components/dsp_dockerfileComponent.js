@@ -260,6 +260,10 @@ $scope.changedSnippet = function(selectedSnippet){
   $scope.treeModel.forEach(function (t) {
     if (t.id === "./Dockerfile") {
       $scope.selectedElement.content = t.content + "\n\n" + selectedSnippet.code
+      const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
+      const newImage = selectedSnippet.image
+      const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
+      $scope.selectedElement.content = newContent
     }
   });
 }
