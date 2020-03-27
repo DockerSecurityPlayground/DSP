@@ -16,6 +16,7 @@ function initUserRepo(homeDSP, config) {
   const dataDIR = path.join(homeDSP, config.name, '.data');
   const dockerfileDIR = path.join(homeDSP, config.name, '.dockerfiles');
   const labelsJSON = path.join(homeDSP, config.name, 'labels.json');
+  const snippetsJSON = path.join(homeDSP, config.name, 'snippets.json')
   if (!fs.existsSync(dspID)) fs.writeFileSync(dspID);
   // Create .data directory
   if (!fs.existsSync(dataDIR)) fs.mkdirSync(dataDIR);
@@ -25,6 +26,10 @@ function initUserRepo(homeDSP, config) {
   if (!fs.existsSync(labelsJSON)) {
     jsonfile.writeFileSync(labelsJSON,
   { labels: [] });
+  }
+  if (!fs.existsSync(snippetsJSON)) {
+    jsonfile.writeFileSync(snippetsJSON,
+  { snippets: [] });
   }
 }
 // Create configuration file throws an error if already exists
