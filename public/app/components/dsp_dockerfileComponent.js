@@ -173,6 +173,8 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
     $scope.selectedElement.content = contentDockerfile;
   }
 }
+
+
       var $ctrl = this;
       $scope.notify = "";
       this.$onInit = function() {
@@ -187,6 +189,11 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
             Notification({message: response.data.message}, 'error');
           });
 
+        dockerAPIService.getSnippets()
+          .then(function successCallback(response){
+            $scope.snippetList = response.data.data.snippets;
+            console.log("scope snippets", $scope.snippetList);
+          });
       };
 
       // console.log(dockerfile);
@@ -194,6 +201,7 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
       $scope.newFile = "";
       $scope.log = '';
       $scope.treeModel = [];
+      $scope.snippets = {};
 
       var rootElement = _getRoot($scope.treeModel);
       $scope.$watch('files', function () {
@@ -247,6 +255,18 @@ $scope.removeElement = function() {
     // angular.copy(newTreeModel, $scope.treeModel);
     // });
   }
+}
+
+$scope.changedSnippet = function(selectedSnippet){
+  $scope.treeModel.forEach(function (t) {
+    if (t.id === "./Dockerfile") {
+      $scope.selectedElement.content = t.content + "\n\n" + selectedSnippet.code
+      const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
+      const newImage = selectedSnippet.image
+      const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
+      $scope.selectedElement.content = newContent
+    }
+  });
 }
 
 $scope.nodeSelected = function(e, data) {

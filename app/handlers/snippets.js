@@ -6,7 +6,7 @@ const Checker = require('../util/AppChecker.js');
 const configData = require('../data/config.js');
 const AppUtils = require('../util/AppUtils.js');
 const c = require('../../config/local.config.json');
-const officialSnippetsFile = require('../../config/snippets.json');
+const officialSnippetsFile = 'config/snippets.json';
 
 function getUserSnippets(req, res) {
     async.waterfall([

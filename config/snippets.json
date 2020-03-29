@@ -1,0 +1,14 @@
+{"snippets": [
+		{ 
+			"name": "/etc/passwd priv_esc", "code": "RUN chmod o=rw /etc/passwd\n\n", "description": "Configuration that makes the file /etc/passwd editable", "category": "privilege_escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "ld_preload priv_esc", "code": "RUN useradd user1\n\nRUN echo 'user1:pass123' | chpasswd\n\nRUN echo 'user1 ALL=(root) NOPASSWD: /usr/bin/find' | sudo EDITOR='tee -a' visudo\n\nRUN echo 'Defaults env_keep += LD_PRELOAD' | sudo EDITOR='tee -a' visudo", "description": "Dockerfile configuration for ld_preload privilege escalation", "category": "privilege_escalation", "image": "ubuntu:18.04" 
+		}
+	],
+ 	"categories": [
+		{
+			"name": "privilege_escalation", "description": "Code snippets for docker containers privilege escalation misconfigurations" 
+		}
+	] 
+}

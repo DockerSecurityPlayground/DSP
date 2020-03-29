@@ -120,7 +120,7 @@ app.get('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.getDockerFile);
 app.delete('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.deleteDockerFile);
 
 //Api snippets
-app.get('dsp_v1/snippets/:repo', snippets.allSnippets);
+app.get('/dsp_v1/snippets/', snippets.allSnippets);
 
 //Api Hack Tools
 app.get('/dsp_v1/hack_tools/', serviceHandler.getListHackTools);

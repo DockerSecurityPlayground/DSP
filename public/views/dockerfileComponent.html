@@ -112,3 +112,24 @@
                                                   >
           </div>
         </div>
+    <div>
+      <div class="panel panel-default">
+        <div class="panel-heading"><i class="fa fa-fw fa-cube"></i> Code Snippets</div>
+        <div class="panel-body"> 
+          <label class="control-label col-sm-2 label_style text-left"  uib-popover="{{snippets.selectedSnippet.description}}" popover-trigger="'mouseenter'" popover-placement="right" for="container_image"> <span class="glyphicon glyphicon-search" ></span> Snippet: </label>
+          <div class="col-sm-4">
+            <select 
+            ng-model="snippets.selectedSnippet" 
+            ng-change="changedSnippet(snippets.selectedSnippet)" 
+            ng-required=true
+            ng-options="il.name for il in snippetList.snippets | filter :{category:SnippetFilter}" class="form-control select_style" id="selector_snippetlist"> 
+         </select>          
+          </div>
+          <div class="col-sm-4"> 
+            <input type="text" class="form-control" name="SnippetFilter" placeholder="Snippet Filter" ng-model="SnippetFilter">
+            </input>
+          </div>
+        </div>
+        </div>
+      </div>     
+    </div>
