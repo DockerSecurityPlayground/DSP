@@ -6,8 +6,9 @@ const Checker = require('../util/AppChecker.js');
 const configData = require('../data/config.js');
 const AppUtils = require('../util/AppUtils.js');
 const c = require('../../config/local.config.json');
+const officialSnippetsFile = require('../../config/snippets.json');
 
-function allSnippets(req, res){
+function getUserSnippets(req, res) {
     async.waterfall([
         (cb) => Checker.checkParams(req.params, ['repo'], cb),
         (cb) => {configData.getConfig(cb);},
@@ -22,6 +23,17 @@ function allSnippets(req, res){
     (err, results) => {
         httpHelper.response(res, err, {snippets: results});
     });
+}
+
+function getOfficialSnippets(cb) {
+  snippetsData.getSnippets(officialSnippetsFile,(cb));
+}
+
+function allSnippets(req, res) {
+  // TODO WITH waterfall
+  getOfficialSnippets((err, results) => {
+    httpHelper.response(res, err, {snippets: results});
+  })
 }
 
 exports.allSnippets = allSnippets;
