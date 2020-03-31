@@ -120,7 +120,6 @@
           <div class="col-sm-4">
             <select 
             ng-model="snippets.selectedSnippet" 
-            ng-change="changedSnippet(snippets.selectedSnippet)" 
             ng-required=true
             ng-options="il.name for il in snippetList.snippets | filter :{category:SnippetFilter}" class="form-control select_style" id="selector_snippetlist"> 
          </select>          
@@ -128,6 +127,9 @@
           <div class="col-sm-4"> 
             <input type="text" class="form-control" name="SnippetFilter" placeholder="Snippet Filter" ng-model="SnippetFilter">
             </input>
+          </div>
+          <div class="col-sm-2">
+            <button ng-disabled="!snippets.selectedSnippet" ng-click="changedSnippet(snippets.selectedSnippet)" class="btn btn-success btn-small" > Add </button>
           </div>
         </div>
         </div>
