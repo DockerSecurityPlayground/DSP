@@ -1,0 +1,60 @@
+language: node_js
+
+os:
+- linux
+- osx
+- windows
+
+dist:
+- bionic # Ubuntu 18.04 LTS Bionic Beaver
+#- xenial # Ubuntu 16.04 LTS Xenial Xerus
+# (not avarable) Ubuntu 20.04 LTS Focal Fossa
+#- Precise # Ubuntu 12.04 LTS Precise Pangolin
+#- Trusty # Ubuntu 14.04 LTS Trusty Tahr
+# multi dist version: https://github.com/travis-ci/travis-rubies/blob/build/.travis.yml
+
+osx_image:
+- xcode11.3 # macOS 10.14 Mojave
+
+
+jobs:
+  allow_failures:
+    - node_js: 12
+    - node_js: 13
+
+node_js:
+- 8
+- 10
+- 12
+- 13
+
+cache:
+  directories:
+  - node_modules
+
+#before_install:
+#- npm install
+
+#before_script:
+#- greenkeeper-lockfile-update
+
+script: # TODO: muovere in jobs
+- if $UPDATE_NPM_DEPS ; then npm update; else npm install; fi
+
+#after_script:
+#- greenkeeper-lockfile-upload
+
+#after_success:
+#- npm run-script coveralls
+
+env:
+  global:
+    - YARN_GPG=no # fix windows
+  jobs:
+    - UPDATE_DSP_NPM_DEPS=false
+    - UPDATE_DSP_NPM_DEPS=true
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
