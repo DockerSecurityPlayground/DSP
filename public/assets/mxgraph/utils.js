@@ -5,7 +5,7 @@ var Popup = function Popup(cell, Model__AppScope) {
   function show() {
     if (cell.type == NETWORK_TYPE) {
       var content = document.createElement('div');
-      var networkName = cell.id;
+      var networkName = cell.name;
       if(cell.edges && cell.edges.length != 0) {
         alert("Cannot change a network with attached elements");
       } else {
@@ -88,10 +88,10 @@ function Graph__setRemoveHandler(canRemove) {
 }
 
 
-function graphEditCallback(oldName, newName) {
-  var theCell = theGraph.getModel().getCell(oldName);
+function graphEditCallback(obj, newObj) {
+  var theCell = theGraph.getModel().getCell(obj.name);
   // Update the cell name
-  Graph__update(theCell, newName, oldName);
+  Graph__update(theCell, newObj.name, obj.name);
 }
 
 function _incrementID(id, names, stringBase) {
@@ -118,16 +118,16 @@ function Model__ElementCreate(nameContainer) {
     Model__currentElementID++;
     nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
   }
-  Model__AppScope.newContainer(nameContainer);
+  const theContainer = Model__AppScope.newContainer(nameContainer);
   Model__currentElementID++;
-  return nameContainer;
+  return theContainer;
 }
 function Model__NetworkCreate() {
   var nameNetwork = Model__NETWORK_BASENAME + Model__networkID;
   // Model__AppScope.newContainer(nameContainer);
   Model__networkID++;
-  Model__AppScope.addNetworkElement(nameNetwork);
-  return nameNetwork;
+  const theNetwork = Model__AppScope.addNetworkElement(nameNetwork);
+  return theNetwork;
 }
 
 
@@ -148,8 +148,8 @@ function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCre
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
   var funct = function(graph, evt, cell, x, y) {
-    var nameContainer = fnCreateModel();
-    fnCreateGraph(graph, nameContainer, x, y);
+    var obj = fnCreateModel();
+    fnCreateGraph(graph, obj, x, y);
   }
 
   const Graph__NetworkElementImage = icon;
@@ -243,8 +243,8 @@ function addSidebarNetworkIcon(graph, sidebar) {
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
   var funct = function(graph, evt, cell, x, y) {
-    var nameNetwork = Model__NetworkCreate();
-    Graph__NetworkCreate(graph, nameNetwork, x, y);
+    var network = Model__NetworkCreate();
+    Graph__NetworkCreate(graph, network.name, x, y);
   }
 
   const Graph__NetworkImage =  'assets/docker_image_icons/network_icon.png';

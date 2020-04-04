@@ -6,6 +6,8 @@ var Model__NETWORK_BASENAME = "network_";
 var Model__AppScope = null;
 var NETWORK_ELEMENT_TYPE = "NetworkElement";
 var NETWORK_TYPE = 'Network';
+const NETWORK_WIDTH = 140;
+const NETWORK_HEIGHT = 140;
 var theParent = null;
 var Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
@@ -45,6 +47,16 @@ function Graph__update(cell, newName, oldName) {
   $html.find('h5').html(newName);
   var newValue = $html.html();
   theGraph.model.setValue(cell, newValue)
+  console.log(cell)
+   if (cell.type === "Network") {
+     console.log("NETWORK TYPE")
+   var network = Model__AppScope.getNetwork(newName);
+     console.log(network.subnet);
+   console.log(network);
+   $html.find('h6').html(network.subnet);
+   newValue = $html.html();
+   theGraph.model.setValue(cell, newValue)
+ }
 
   // Update the cell id
   cell.setId(newName);
@@ -125,54 +137,33 @@ function getCellsByName(name) {
 function Graph__getElement(e) {
   return theGraph.model.cells[e];
 }
-// Update the name of the cell
-function Graph__update(cell, newName, oldName) {
-  var label = cell.value;
-  var $html = $('<div />',{html:label});
-  // replace "Headline" with "whatever" => Doesn't work
-  $html.find('h5').html(newName);
-  var newValue = $html.html();
-  theGraph.model.setValue(cell, newValue)
-
-  // Update the cell id
-  cell.setId(newName);
-  var cells = theGraph.model.cells
-  // Rename cell in id
-  graphRenameProperty(cells, oldName, newName);
-  var cellWithOldName = getCellsByName(oldName);
-  _.each(cellWithOldName, function(e) {
-    e.name= newName;
-  });
-  // cells.remove(oldName);
-  // cells.put(newName, cell);
-}
-function Graph__ElementCreate(graph, nameContainer, x, y) {
+function Graph__ElementCreate(graph, obj, x, y) {
   var parent = graph.getDefaultParent();
   var model = graph.getModel();
   var v1 = null;
   var label = Graph__NetworkElementLabel;
 
-  label.name = nameContainer;
+  label.name = obj.name;
   model.beginUpdate();
   try {
     // NOTE: For non-HTML labels the image must be displayed via the style
     // rather than the label markup, so use 'image=' + image for the style.
     // as follows: v1 = graph.insertVertex(parent, null, label,
     // pt.x, pt.y, 120, 120, 'image=' + image);
-    v1 = graph.insertVertex(parent, nameContainer, label, x, y, 120, 120);
+    v1 = graph.insertVertex(parent, obj.name, label, x, y, NETWORK_WIDTH, NETWORK_HEIGHT);
     v1.setConnectable(false);
 
     // Presets the collapsed size
     v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
-    Graph__addFirstPort(graph, v1, nameContainer);
-    Graph__addSecondPort(graph, v1, nameContainer);
-    Graph__addThirdPort(graph, v1, nameContainer);
-    Graph__addFourthPort(graph, v1, nameContainer);
+    Graph__addFirstPort(graph, v1, obj.name);
+    Graph__addSecondPort(graph, v1, obj.name);
+    Graph__addThirdPort(graph, v1, obj.name);
+    Graph__addFourthPort(graph, v1, obj.name);
   }
   finally {
     graph.setSelectionCell(v1);
     model.endUpdate();
-    Graph__update(v1, nameContainer, NETWORK_ELEMENT_TYPE);
+    Graph__update(v1, obj.name, NETWORK_ELEMENT_TYPE);
   }
 }
 // If error create html tag
@@ -189,7 +180,7 @@ function Graph__isValidXML(canvasXML) {
   }
 }
 
-function Graph__NetworkCreate(graph, nameNetwork, x, y) {
+function Graph__NetworkCreate(graph, obj, x, y) {
   var parent = graph.getDefaultParent();
   console.log(parent);
   var model = graph.getModel();
@@ -203,10 +194,10 @@ function Graph__NetworkCreate(graph, nameNetwork, x, y) {
     //
 var ne = {
       type: NETWORK_TYPE,
-      contentHTML : '<h5 class="no-selection">'+nameNetwork+'</h5>',
-      name: nameNetwork
+      contentHTML : '<h5 class="no-selection">'+obj.name+'</h5><h6>'+ obj.subnet + '</h6>',
+      name: obj.name
     }
-    v1 = graph.insertVertex(parent, nameNetwork, ne, x, y, 120, 120, 'shape=cloud');
+    v1 = graph.insertVertex(parent, obj.name, ne, x, y, 120, 120, 'shape=cloud');
 
 
     v1.setConnectable(true);
@@ -237,13 +228,12 @@ function Graph__CreateGraphFromStructure(data) {
   console.log("FROM STRUCTURE")
   var networkList = data.networkList;
   var containerListToDraw = data.clistToDraw
-  var networkNames = networkList.map(a => a.name)
   var containerNames = containerListToDraw.map( c => c.name);
   console.log(containerNames);
   console.log(networkNames);
   // Create networks
-  for (var i = 0; i < networkNames.length; i++) {
-    Graph__NetworkCreate(theGraph, networkNames[i], 200, i*100);
+  for (var i = 0; i < networkList.length; i++) {
+    Graph__NetworkCreate(theGraph, networkList[i], 200, i*100);
   }
   // Create elements
   for (var i = 0; i < containerNames.length; i++) {
