@@ -1,6 +1,6 @@
 # DockerSecurityPlayground
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![alt text](https://raw.githubusercontent.com/giper45/DockerSecurityPlayground/master/public/assets/img/DSP_Example.png)
 
@@ -173,6 +173,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
     <td align="center"><a href="https://lotar.altervista.org"><img src="https://avatars0.githubusercontent.com/u/1824717?v=4" width="100px;" alt=""/><br /><sub><b>Giuseppe Di Terlizzi</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=giterlizzi" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/ale753"><img src="https://avatars0.githubusercontent.com/u/33957205?v=4" width="100px;" alt=""/><br /><sub><b>Alessandro</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=ale753" title="Documentation">📖</a> <a href="#video-ale753" title="Videos">📹</a> <a href="#content-ale753" title="Content">🖋</a></td>
     <td align="center"><a href="https://github.com/RobertoD91"><img src="https://avatars2.githubusercontent.com/u/298514?v=4" width="100px;" alt=""/><br /><sub><b>Roberto</b></sub></a><br /><a href="https://github.com/giper45/DockerSecurityPlayground/commits?author=RobertoD91" title="Code">💻</a> <a href="#content-RobertoD91" title="Content">🖋</a> <a href="#infra-RobertoD91" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/the-licato"><img src="https://avatars2.githubusercontent.com/u/20096272?v=4" width="100px;" alt=""/><br /><sub><b>the-licato</b></sub></a><br /><a href="#a11y-the-licato" title="Accessibility">️️️️♿️</a> <a href="#infra-the-licato" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 
