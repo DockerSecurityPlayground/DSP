@@ -45,7 +45,7 @@
         "bug",
         "code",
         "design",
-        "doc"
+        "doc",
         "maintenance"
       ]
     },
@@ -65,8 +65,19 @@
       "profile": "https://github.com/ale753",
       "contributions": [
         "doc",
-        "video"
+        "video",
         "content"
+      ]
+    },
+    {
+      "login": "RobertoD91",
+      "name": "Roberto",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/298514?v=4",
+      "profile": "https://github.com/RobertoD91",
+      "contributions": [
+        "code",
+        "content",
+        "infra"
       ]
     }
   ],
