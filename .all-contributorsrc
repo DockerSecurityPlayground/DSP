@@ -46,7 +46,8 @@
         "code",
         "design",
         "doc",
-        "maintenance"
+        "maintenance",
+        "projectManagement"
       ]
     },
     {
