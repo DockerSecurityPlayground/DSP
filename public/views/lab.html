@@ -23,6 +23,7 @@
           var doc = mxUtils.parseXml(canvasXML);
           var codec = new mxCodec(doc);
           codec.decode(doc.documentElement, theGraph.getModel());
+          // Graph__updateLabels(appScope);
         } else {
           Graph__CreateGraphFromStructure(data);
         }

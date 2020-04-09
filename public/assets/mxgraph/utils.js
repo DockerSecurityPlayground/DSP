@@ -1,5 +1,6 @@
 // var theGraph;
 
+
 var Popup = function Popup(cell, Model__AppScope) {
   var popupContainer ;
   function show() {
@@ -460,6 +461,7 @@ function mxInitGraph(graph, appScope) {
     Model__AppScope.attachNetwork(target.name, source.name);
     return mxCreateEdge.apply(this, arguments);
   }
+
   // Override remove edge
   mxRemoveEdge = mxCell.prototype.removeEdge
   mxCell.prototype.removeEdge = function(edge, isOutgoing) {
@@ -471,6 +473,39 @@ function mxInitGraph(graph, appScope) {
       Model__AppScope.detachNetwork(edge.target.name, edge.source.name);
     }
     return mxRemoveEdge.apply(this, arguments);
+  }
+
+  mxInsertEdge = mxCell.prototype.insertEdge
+  mxCell.prototype.insertEdge = function(parent, id, value, source, target, style) {
+    const edge = arguments[0]
+    
+      
+      // console.log("networkName")
+      // console.log(edge);
+    // const networkName = edge.target.id
+    if (edge.source && edge.source.parent ) {
+      containerName = edge.source.parent.id;
+      const container = Model__AppScope.getContainer(containerName);
+      const network = _.findWhere(edge.parent.children, {type: "Network"})
+      const containerNetwork = container.networks[network.name];
+      // Get container element
+      console.log("CONTAINER");
+      edge.value = (containerNetwork.isDynamic) ? "DHCP" : containerNetwork.ip;
+      // const networkName = edge.target.id; 
+      // const ip = container.networks[networkName];
+      // console.log(ip);
+      
+      
+
+    }
+    // const containerElement = edge.source.parent;
+    // console.log(containerElement)
+      // var nameElement =  source.id
+      // const container = Model__AppScope.getContainer(nameElement);
+      // console.log(container)
+    
+    
+    return mxInsertEdge.apply(this, arguments);
   }
 
 

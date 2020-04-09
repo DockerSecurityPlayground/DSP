@@ -56,6 +56,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       if(!createNew) {
         ////When imageList it's loded load lab
         dockerAPIService.loadLab($scope.labName, true, function(data) {
+          
           $scope.canvas = data.canvasJSON;
 
           $scope.repoName = data.repoName;
@@ -372,6 +373,9 @@ window.location.href = urlToGo;
       $scope.containerErrors.more_validation="###"
 
     }
+  }
+  $scope.getContainer = function getContainer(name) {
+     return  _.findWhere($scope.containerListToDraw, {name: name});
   }
 
   /* Called when the container is edit

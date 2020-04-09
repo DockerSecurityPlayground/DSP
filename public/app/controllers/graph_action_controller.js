@@ -257,7 +257,7 @@ $http.get("/dsp_v1/labs/"+$scope.nameRepo+"/"+$scope.labName)
 
 
 
-/** GRAPH INFOS **/
+/** GRAPH INFORMATION **/
 var gh = GraphHandler()
 //Called when an element is called
 var graphOkCallback = function graphErrorCallback(currentToDraw) {

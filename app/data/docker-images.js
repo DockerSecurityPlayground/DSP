@@ -305,7 +305,11 @@ function areImagesInstalled(labImages, callback) {
   _.each(labImages, (li) => {
     images.push(li.name);
   });
+  try {
   di.areImagesInstalled(images, callback);
+  } catch (e) {
+    callback(new Error("Some error in docker client"));
+  }
 }
 function getImagesAllRepos(callback) {
   let repoImages = {};

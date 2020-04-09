@@ -206,7 +206,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
                 dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function (data) {
                   $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
                   $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
-                  console.log("ONLOAD");
+                  console.log("ONLOAD CANVAS");
                   $scope.listContainers = data.clistToDraw;
                   onLoadCanvas(data)
                   var yamlcode = angular.element('#code_yaml')
