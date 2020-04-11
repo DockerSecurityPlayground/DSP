@@ -56,6 +56,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       if(!createNew) {
         ////When imageList it's loded load lab
         dockerAPIService.loadLab($scope.labName, true, function(data) {
+          
           $scope.canvas = data.canvasJSON;
 
           $scope.repoName = data.repoName;
@@ -189,12 +190,16 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     $scope.n.name = networkName
     //Update informations network of containers
     containerManager.newNetworkOccurred(network)
+    return {name:networkName, subnet:$scope.n.subnet};
   };
 
   $scope.goBack = function() {
     var urlToGo = '/lab/use/'+ AjaxService.config.name +'/'+ $scope.labName;
 window.location.href = urlToGo;
     // $location.url(urlToGo);
+  }
+  $scope.getNetwork = function(networkName) {
+       return NetworkManagerService.getNetwork(networkName);
   }
 
   // Variable that contains old name of network is sent to networkElementCallback when the editNetwork is done
@@ -212,7 +217,7 @@ window.location.href = urlToGo;
     console.log(networkToEdit);
 
     // Callback to graphedit
-    $scope.graphEditTerminatedCallback(networkInEditing.name, $scope.n.name);
+    $scope.graphEditTerminatedCallback(networkInEditing, $scope.n);
     // Reset current container
 
     // Don't show the network panel
@@ -369,6 +374,9 @@ window.location.href = urlToGo;
 
     }
   }
+  $scope.getContainer = function getContainer(name) {
+     return  _.findWhere($scope.containerListToDraw, {name: name});
+  }
 
   /* Called when the container is edit
    *
@@ -387,7 +395,7 @@ window.location.href = urlToGo;
     } else {
       containerManager.setContainer($scope.currentContainer, containerToEdit);
       // Callback to graphedit
-      $scope.graphEditTerminatedCallback(oldName, $scope.currentContainer.name);
+      $scope.graphEditTerminatedCallback(containerToEdit, $scope.currentContainer);
       // Reset current container
       containerManager.resetCurrent($scope.imageList, $scope.networkList);
       $scope.isAddContainer = true;
@@ -440,6 +448,7 @@ window.location.href = urlToGo;
       ////Add to not drawed new container
       containerManager.addToDraw(c)
       Notification({message: c.name+ " created!"}, 'success');
+      return c;
     }
   }
 

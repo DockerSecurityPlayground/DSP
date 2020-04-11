@@ -1,11 +1,12 @@
 // var theGraph;
 
+
 var Popup = function Popup(cell, Model__AppScope) {
   var popupContainer ;
   function show() {
     if (cell.type == NETWORK_TYPE) {
       var content = document.createElement('div');
-      var networkName = cell.id;
+      var networkName = cell.name;
       if(cell.edges && cell.edges.length != 0) {
         alert("Cannot change a network with attached elements");
       } else {
@@ -88,10 +89,10 @@ function Graph__setRemoveHandler(canRemove) {
 }
 
 
-function graphEditCallback(oldName, newName) {
-  var theCell = theGraph.getModel().getCell(oldName);
+function graphEditCallback(obj, newObj) {
+  var theCell = theGraph.getModel().getCell(obj.name);
   // Update the cell name
-  Graph__update(theCell, newName, oldName);
+  Graph__update(theCell, newObj.name, obj.name);
 }
 
 function _incrementID(id, names, stringBase) {
@@ -118,16 +119,16 @@ function Model__ElementCreate(nameContainer) {
     Model__currentElementID++;
     nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
   }
-  Model__AppScope.newContainer(nameContainer);
+  const theContainer = Model__AppScope.newContainer(nameContainer);
   Model__currentElementID++;
-  return nameContainer;
+  return theContainer;
 }
 function Model__NetworkCreate() {
   var nameNetwork = Model__NETWORK_BASENAME + Model__networkID;
   // Model__AppScope.newContainer(nameContainer);
   Model__networkID++;
-  Model__AppScope.addNetworkElement(nameNetwork);
-  return nameNetwork;
+  const theNetwork = Model__AppScope.addNetworkElement(nameNetwork);
+  return theNetwork;
 }
 
 
@@ -148,8 +149,8 @@ function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCre
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
   var funct = function(graph, evt, cell, x, y) {
-    var nameContainer = fnCreateModel();
-    fnCreateGraph(graph, nameContainer, x, y);
+    var obj = fnCreateModel();
+    fnCreateGraph(graph, obj, x, y);
   }
 
   const Graph__NetworkElementImage = icon;
@@ -243,8 +244,8 @@ function addSidebarNetworkIcon(graph, sidebar) {
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
   var funct = function(graph, evt, cell, x, y) {
-    var nameNetwork = Model__NetworkCreate();
-    Graph__NetworkCreate(graph, nameNetwork, x, y);
+    var network = Model__NetworkCreate();
+    Graph__NetworkCreate(graph, network.name, x, y);
   }
 
   const Graph__NetworkImage =  'assets/docker_image_icons/network_icon.png';
@@ -460,6 +461,7 @@ function mxInitGraph(graph, appScope) {
     Model__AppScope.attachNetwork(target.name, source.name);
     return mxCreateEdge.apply(this, arguments);
   }
+
   // Override remove edge
   mxRemoveEdge = mxCell.prototype.removeEdge
   mxCell.prototype.removeEdge = function(edge, isOutgoing) {
@@ -471,6 +473,39 @@ function mxInitGraph(graph, appScope) {
       Model__AppScope.detachNetwork(edge.target.name, edge.source.name);
     }
     return mxRemoveEdge.apply(this, arguments);
+  }
+
+  mxInsertEdge = mxCell.prototype.insertEdge
+  mxCell.prototype.insertEdge = function(parent, id, value, source, target, style) {
+    const edge = arguments[0]
+    
+      
+      // console.log("networkName")
+      // console.log(edge);
+    // const networkName = edge.target.id
+    if (edge.source && edge.source.parent ) {
+      containerName = edge.source.parent.id;
+      const container = Model__AppScope.getContainer(containerName);
+      const network = _.findWhere(edge.parent.children, {type: "Network"})
+      const containerNetwork = container.networks[network.name];
+      // Get container element
+      console.log("CONTAINER");
+      edge.value = (containerNetwork.isDynamic) ? "DHCP" : containerNetwork.ip;
+      // const networkName = edge.target.id; 
+      // const ip = container.networks[networkName];
+      // console.log(ip);
+      
+      
+
+    }
+    // const containerElement = edge.source.parent;
+    // console.log(containerElement)
+      // var nameElement =  source.id
+      // const container = Model__AppScope.getContainer(nameElement);
+      // console.log(container)
+    
+    
+    return mxInsertEdge.apply(this, arguments);
   }
 
 
