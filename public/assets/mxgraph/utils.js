@@ -112,8 +112,8 @@ function _incrementID(id, names, stringBase) {
 
 // Create a new element and update angular model
 function Model__ElementCreate(nameContainer) {
+  Graph__log("Model__ElementCreate")
   var nameContainer = Model__CONTAINER_BASENAME + Model__currentElementID;
-  console.log("add new element");
   // Update elementID
   while (Model__AppScope.containerExists(nameContainer)) {
     Model__currentElementID++;
@@ -145,6 +145,7 @@ function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
 
 
 function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCreateGraph) {
+  Graph__log("_addSidebarElement()")
   // Function that is executed when the image is dropped on
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
@@ -198,6 +199,7 @@ function addSidebarElementIcon(graph, sidebar) {
   // Function that is executed when the image is dropped on
   // the graph. The cell argument points to the cell under
   // the mousepointer if there is one.
+  Graph__log("addSidebarElementIcon")
   var funct = function(graph, evt, cell, x, y) {
     var nameContainer = Model__ElementCreate();
     Graph__ElementCreate(graph, nameContainer, x, y);
@@ -381,6 +383,7 @@ function mxWorkaroundIE() {
 
 
 function mxInitGraph(graph, appScope) {
+  Graph__log("mxInitGraph()")
   Model__AppScope = appScope;
   // Disable highlight of cells when dragging from toolbar
   theGraph = graph;
@@ -477,6 +480,7 @@ function mxInitGraph(graph, appScope) {
 
   mxInsertEdge = mxCell.prototype.insertEdge
   mxCell.prototype.insertEdge = function(parent, id, value, source, target, style) {
+    Graph__log("insertEdge()");
     const edge = arguments[0]
     
       
@@ -487,10 +491,12 @@ function mxInitGraph(graph, appScope) {
       containerName = edge.source.parent.id;
       const container = Model__AppScope.getContainer(containerName);
       const network = _.findWhere(edge.parent.children, {type: "Network"})
-      const containerNetwork = container.networks[network.name];
       // Get container element
-      console.log("CONTAINER");
-      edge.value = (containerNetwork.isDynamic) ? "DHCP" : containerNetwork.ip;
+      
+      
+      const containerNetwork = container.networks[network.name];
+      // Only if isDynamic is defined
+      Graph__setEdgeLabel(theGraph, edge, containerNetwork);
       // const networkName = edge.target.id; 
       // const ip = container.networks[networkName];
       // console.log(ip);

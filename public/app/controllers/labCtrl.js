@@ -1,4 +1,4 @@
-var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, WalkerService, Notification) {
+var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, containerManager, WalkerService, Notification) {
   console.log("=== INIT LAB CONTROLLER ===");
   var userDir;
   var vm = this;
@@ -302,6 +302,10 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
           // Lab running error
           Notification({ message: "Server error: " + err.data.message }, 'error');
         });
+  }
+
+  $scope.getContainer = function getContainer(name) {
+     return  containerManager.getContainer(name)
   }
 
   $scope.copyFromContainer = function (nameContainer, dc = "true") {

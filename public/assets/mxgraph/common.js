@@ -12,11 +12,25 @@ var theParent = null;
 var Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
   contentHTML : '<h5 id="toptitle" class="no-selection" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
-  '<img src="assets/docker_image_icons/host.png" width="48" height="48">'
+  '<img src="assets/docker_image_icons/host.png" width="48" height="48"><br><h7 id=element_info></h7>'
 };
 var elementToEdit = '';
 var theGraph;
 
+function Graph__log(msg) {
+  console.log("[mxgraph]" + msg)
+
+}
+
+function Graph__setEdgeLabel(graph, edge, containerNetwork) {
+  Graph__log("Graph__setEdgeLabel()")
+  console.log(containerNetwork);
+  
+  
+  if (containerNetwork) {
+    graph.model.setValue(edge, containerNetwork.isDynamic ? "DHCP" : containerNetwork.ip);
+  }
+}
 function Graph__getElement(e) {
   return theGraph.model.cells[e];
 }
@@ -41,22 +55,48 @@ function graphRenameProperty(cells, oldName, newName) {
 
 // Update the name of the cell
 function Graph__update(cell, newName, oldName) {
+  Graph__log("Graph__update()")
   var label = cell.value;
   var $html = $('<div />',{html:label});
+  if(Model__AppScope)
+    var container = Model__AppScope.getContainer(newName);
+  
+  
   cell.children.forEach(function (interface) {
     if (interface.edges) {
       edge = interface.edges[0];
-      const container = Model__AppScope.getContainer(newName);
       const network = _.findWhere(edge.parent.children, {type: "Network"})
+      if (container && container.networks) {
       const containerNetwork = container.networks[network.name];
-      theGraph.model.setValue(edge, containerNetwork.isDynamic ? "DHCP" : containerNetwork.ip);
+      Graph__setEdgeLabel(theGraph, edge, containerNetwork)
+      }
     }
   })
-  console.log("CELL");
-  
-  console.log(cell)
   // replace "Headline" with "whatever" => Doesn't work
   $html.find('h5').html(newName);
+  // Info setting
+  if (container) {
+    const elementInfo = $html.find("#element_info")
+    var elementVal = "<i><br>"
+    // Port info
+    _.forEach(_.keys(container.ports), function(pk) {
+      pValue = container.ports[pk];
+      elementVal += pk + "=>" + pValue + "<br>"
+    })
+    // Volume info
+    _.forEach(container.volumes, function(v) {
+      elementVal += v.host + "=>" + v.container + "<br>"
+    })
+    
+    // Action info
+    for (var i = 0; i < container.actions.length; i++) {
+      elementVal += "Action (" + i + "): " + container.actions[i].name + "<br>"
+    };
+
+    elementVal += "</i>"
+    elementInfo.html(elementVal)  
+}
+  
   var newValue = $html.html();
   theGraph.model.setValue(cell, newValue)
    if (cell.type === "Network") {
@@ -149,6 +189,7 @@ function Graph__getElement(e) {
   return theGraph.model.cells[e];
 }
 function Graph__ElementCreate(graph, obj, x, y) {
+  Graph__log("Graph__ElementCreate")
   var parent = graph.getDefaultParent();
   var model = graph.getModel();
   var v1 = null;
@@ -179,6 +220,7 @@ function Graph__ElementCreate(graph, obj, x, y) {
 }
 // Update all labels
 function Graph__updateLabels(appScope) {
+  Graph__log("Graph__updateLabels()")
   var model = theGraph.getModel()
   var elements = _.where(model.cells, {type : NETWORK_ELEMENT_TYPE });
   _.each(elements, function (e) {
@@ -186,16 +228,12 @@ function Graph__updateLabels(appScope) {
       var edge = interface.edges[0];
       const containerName = e.name;
       const container = appScope.getContainer(containerName);
-      console.log("EDGE");
-      
-      console.log(edge)
       const network = _.findWhere(edge.parent.children, {type: "Network"})
       const containerNetwork = container.networks[network.name];
-      edge.value = (containerNetwork.isDynamic) ? "DHCP" : containerNetwork.ip;
-    })
-  })
-  
-
+      
+      Graph__setEdgeLabel(theGraph, edge, containerNetwork)
+    });
+  });
 }
 // If error create html tag
 function Graph__isValidXML(canvasXML) {
@@ -212,6 +250,7 @@ function Graph__isValidXML(canvasXML) {
 }
 
 function Graph__NetworkCreate(graph, obj, x, y) {
+  Graph__log("Graph__NetworkCreate")
   var parent = graph.getDefaultParent();
   console.log(parent);
   var model = graph.getModel();
@@ -223,6 +262,7 @@ function Graph__NetworkCreate(graph, obj, x, y) {
     // as follows: v1 = graph.insertVertex(parent, null, label,
     // pt.x, pt.y, 120, 120, 'image=' + image);
     //
+  
 var ne = {
       type: NETWORK_TYPE,
       contentHTML : '<h5 class="no-selection">'+obj.name+'</h5><h6>'+ obj.subnet + '</h6>',
@@ -258,7 +298,7 @@ function Graph__AddConnection(name1, name2, index) {
   }
 }
 function Graph__CreateGraphFromStructure(data) {
-  console.log("FROM STRUCTURE")
+  Graph__log("Graph__CreateGraphFromStructure()")
   var networkList = data.networkList;
   var containerListToDraw = data.clistToDraw
   // var containerNames = containerListToDraw.map( c => c.name);
