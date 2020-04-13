@@ -54,6 +54,29 @@
             id="githubURL" ng-model=repo.url>
         </div>
       </div>
+      <div class="row">
+        <br>
+        <div class="col-sm-3">
+          <span>Is private?</span>
+          <label class="switch">
+            <input type="checkbox" ng-click="checkRepoPrivate()" ng-model=repo.isprivate>
+          </label>
+        </div>
+      </div>
+      <div class="row" id="gitauthrow" ng-show="isPrivate">
+        <div class="col-sm-3">
+          <label for="username"> Username </label>
+          <input type="text" placeholder="Username" class="form-control" name="username" id="username" ng-model=repo.username>
+        </div>
+        <div class="col-sm-3">
+          <label for="token"> Token </label>
+          <input type="text" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token>
+        </div>
+        <div class="col-sm-6">
+          <label for="sshkeypath"> SSH key path </label>
+          <input type="text" placeholder="SSH key path" class="form-control" name="sshkeypath" id="sshkeypath" ng-model=repo.sshkeypath>
+        </div>
+      </div>
 
       <div class="py-4">
         <div ng-show="isRepoUploading" class="alert alert-info"> Uploading Repo, pls wait... </div>

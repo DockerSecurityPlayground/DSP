@@ -61,6 +61,16 @@ function create(repos, cb) {
 function post(repo, cb) {
   log.info("[repositories ] post repos]");
   let repoFile;
+  var newRepo = {
+    "name": repo.name,
+    "url": repo.url
+  };
+  if (repo.hasOwnProperty("isprivate")) {
+    newRepo.isprivate = repo.isprivate;
+    if (repo.hasOwnProperty("sshkeypath") && repo.sshkeypath){
+      newRepo.sshkeypath = repo.sshkeypath;
+    }
+  }
   async.waterfall([
     // Update repos.json file
     (cb) => configData.getConfig(cb),
@@ -70,10 +80,7 @@ function post(repo, cb) {
     },
     (cb) => get(cb),
     (repos, cb) => {
-      repos.push({
-      "name": repo.name,
-      "url": repo.url
-      });
+      repos.push(newRepo);
       jsonfile.writeFile(repoFile, repos, cb);
     }], (err) => {
       cb(err);

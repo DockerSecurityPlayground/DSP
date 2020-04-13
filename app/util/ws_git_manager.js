@@ -78,8 +78,10 @@ const api = {
     log.info('[WS_GIT_MANAGER] Add repo');
     async.waterfall([
     (cb) => Checker.checkParams(repo, ['name', 'url'], cb),
+    //Check if repo is private and auth method is valid
+    (cb) => Checker.checkIfRepoIsPrivateAndValid(repo, cb),
     // Initialize repository
-    (cb) => GitUtils.initRepository(repo.name, repo.url, cb, (data) => {
+    (cb) => GitUtils.initRepository(repo, cb, (data) => {
         log.info(data);
       }),
     // Add to list of repos

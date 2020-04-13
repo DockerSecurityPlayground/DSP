@@ -84,7 +84,6 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
       Notification('Server error:'+ response.data.message, 'error');
     });
 
-
   $scope.updateAll= function() {
     $scope.isReposUploading = true;
 
@@ -124,7 +123,11 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
     );
   }
 
+  $scope.isPrivate = false;
 
+  $scope.checkRepoPrivate = function () {
+    $scope.isPrivate = !$scope.isPrivate;
+  }
 
 
 

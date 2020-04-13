@@ -7,6 +7,25 @@ const strings = require('help-nodejs').strings;
 const AppUtils = require('./AppUtils.js');
 const _ = require('underscore');
 const appRoot = require('app-root-path');
+const Errors = require('errors');
+
+/*TODO 
+function initErrors() {
+  const userErrors = [
+    {
+      name: 'repoIsPrivate',
+      defaultMessage: 'Repo is Private',
+      code: 2000,
+    },
+    {
+      name: 'missingAuth',
+      defaultMessage: 'If the repository is private Auth is required',
+      code: 2001,
+    },
+  ];
+  userErrors.forEach((err) => Errors.create(err));
+}
+*/
 
 function haveToFilter(baseDir, dir) {
   const re = new RegExp(`${baseDir}/?([^/]+/?){0,1}$`);
@@ -21,14 +40,37 @@ failAuthError.code = -2;
 module.exports = {
   clone(giturl, params, callback) {
     // const url = this.getGitUrl(giturl, params);
-    const url = giturl;
+    var url = giturl;
+    var GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
     configData.getConfig((err, c) => {
       if (err) {
         callback(err);
       }
       else {
         const thePath = path.join(AppUtils.getHome(), c.mainDir);
-        simpleGit(thePath).silent(false).clone(url, params.reponame, ['-q'], callback);
+        var gitClient = simpleGit(thePath).silent(true);
+        gitClient = gitClient.env('GIT_TERMINAL_PROMPT', 0);
+        if (params.isprivate) {
+          if (params.sshkeypath) {
+            //TODO control if path is valid
+            GIT_SSH_COMMAND += params.sshkeypath;
+            gitClient = gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
+          } else if (params.username && params.token) {
+            url = strings.add(url, `${params.username}:${params.token}@`, '//'); // It doesn't contain a username
+          } else {
+            callback(new Error('If repository is private auth is required'));
+          }
+        }
+        gitClient.clone(url, params.reponame, ['-q'], (err) => {
+          if (err) {
+            if (err.includes("not read Username") || err.includes("Permission denied")) {
+              callback(new Error('Repo is Private'));
+            } else {
+              callback(err);
+            }
+          }
+          callback(null);
+        });
       }
     });
   },

@@ -132,7 +132,22 @@ function initErrors() {
       name: 'alphabetic',
       defaultMessage: 'Only alphabetic name allowed',
       code: 1008,
-    }
+    },
+    {
+      name: 'invalidHttpAuth',
+      defaultMessage: 'Expected Username and Token',
+      code: 1009,
+    },
+    {
+      name: 'invalidSshAuth',
+      defaultMessage: 'Expected SSH key path',
+      code: 1010,
+    },
+    {
+      name: 'invalidGitUrl',
+      defaultMessage: 'Invalid Git Url',
+      code: 1010,
+    },
   ];
 
 
@@ -294,5 +309,22 @@ module.exports = {
     });
   },
 
+  checkIfRepoIsPrivateAndValid(repo, callback) {
+    const url = repo.url;
+    if (repo.hasOwnProperty('isprivate') && repo.isprivate) {
+      if (url.includes('http://') || url.includes('https://')) {
+        if (!(repo.hasOwnProperty('username') && repo.hasOwnProperty('token') && repo.username && repo.token)) {
+          callback(new Errors.invalidHttpAuth());
+        }
+      } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:([\\w]+)\\/([\\w_\\-]+).git)')) {
+        if (!(repo.hasOwnProperty('sshkeypath') && repo.sshkeypath)) {
+          callback(new Errors.invalidSshAuth());
+        }
+      } else {
+        callback(new Errors.invalidGitUrl());
+      }
+    }
+    callback(null);
+  },
 };
 
