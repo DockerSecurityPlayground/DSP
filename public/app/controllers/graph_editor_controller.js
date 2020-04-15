@@ -375,7 +375,6 @@ window.location.href = urlToGo;
    */
   $scope.editContainer = function editContainer() {
     //Add to current container infos about container list not drawed selected
-    console.log("EDITCONTAINER")
     $scope.optionalPorts = [];
     $scope.optPort = { container: '', host: ''};
 

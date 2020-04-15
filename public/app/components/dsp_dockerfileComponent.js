@@ -258,15 +258,12 @@ $scope.removeElement = function() {
 }
 
 $scope.changedSnippet = function(selectedSnippet){
-  $scope.treeModel.forEach(function (t) {
-    if (t.id === "./Dockerfile") {
-      $scope.selectedElement.content = t.content + "\n\n" + selectedSnippet.code
-      const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
-      const newImage = selectedSnippet.image
-      const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
-      $scope.selectedElement.content = newContent
-    }
-  });
+  $scope.selectedElement.content = $scope.selectedElement.content + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
+  // TODO CHECK IF FIRST LINE starts with FROM refactor with regex
+  const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
+  const newImage = selectedSnippet.image
+  const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
+  $scope.selectedElement.content = newContent
 }
 
 $scope.nodeSelected = function(e, data) {
