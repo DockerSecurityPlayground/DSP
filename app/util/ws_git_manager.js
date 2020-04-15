@@ -79,7 +79,7 @@ const api = {
     async.waterfall([
     (cb) => Checker.checkParams(repo, ['name', 'url'], cb),
     //Check if repo is private and auth method is valid
-    (cb) => Checker.checkIfRepoIsPrivateAndValid(repo, cb),
+    (cb) => Checker.checkIfRepoIsPrivateAndValid(repo, false, cb),
     // Initialize repository
     (cb) => GitUtils.initRepository(repo, cb, (data) => {
         log.info(data);
@@ -108,12 +108,12 @@ const api = {
     }),
     (cb) => {
       log.info(' All stopped, pulling repo ');
-      repogitData.pullRepo(path.join(AppUtils.getHome(), rootDir, repo.name), cb);
+      repogitData.pullRepo({'rootDir':rootDir, 'repo':repo}, cb);
     },
     (summary, cb) => {
       log.info("Update state table");
       LabStates.initStates(repo.name, cb);
-    }], (err) => callback(err))
+    }], (err) => callback(err));
   },
 
   // Update all projects
@@ -162,7 +162,7 @@ const api = {
           async.eachSeries(repos, (item, c) => {
             log.info(`PULLING ${item}...`);
             // Pull repo and update the table state
-            repogitData.pullRepo(path.join(AppUtils.getHome(), rootDir, item.name), (err) => {
+            repogitData.pullRepo({'rootDir': rootDir, 'repo':item}, (err) => {
               if (err) c(err);
               // If no error  it's been pulled, update the state file
               else {
@@ -181,6 +181,18 @@ const api = {
         }],
       (err) => callback(err)
     );
+  },
+  editRepository(repo, callback) {
+    log.info('[WS_GIT_MANAGER] Update Repo');
+    async.waterfall([
+      (cb) => Checker.checkParams(repo, ['name', 'url'], cb),
+      //Check if repo is private and auth method is valid
+      (cb) => Checker.checkIfRepoIsPrivateAndValid(repo, true, cb),
+      (cb) => GitUtils.updateRepoUrl(repo, cb),
+      // Pull repository
+      // Update repo
+      (cb) => repoData.update(repo, cb)
+    ], (err) => callback(err));
   }
 };
 

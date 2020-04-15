@@ -309,17 +309,22 @@ module.exports = {
     });
   },
 
-  checkIfRepoIsPrivateAndValid(repo, callback) {
+  checkIfRepoIsPrivateAndValid(repo, isUpdate, callback) {
     const url = repo.url;
-    if (repo.hasOwnProperty('isprivate') && repo.isprivate) {
+    if (repo.hasOwnProperty('isPrivate') && repo.isPrivate) {
       if (url.includes('http://') || url.includes('https://')) {
-        if (!(repo.hasOwnProperty('username') && repo.hasOwnProperty('token') && repo.username && repo.token)) {
-          callback(new Errors.invalidHttpAuth());
+        if (!isUpdate) {
+          if (!(repo.hasOwnProperty('username') && repo.hasOwnProperty('token') && repo.username && repo.token)) {
+            callback(new Errors.invalidHttpAuth());
+          }
         }
-      } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:([\\w]+)\\/([\\w_\\-]+).git)')) {
-        if (!(repo.hasOwnProperty('sshkeypath') && repo.sshkeypath)) {
+        repo.sshKeyPath = null;
+      } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:(([\\w]+)\\/([\\w_\\-]+))+.git)')) {
+        if (!(repo.hasOwnProperty('sshKeyPath') && repo.sshKeyPath)) {
           callback(new Errors.invalidSshAuth());
         }
+        repo.username = null;
+        repo.token = null;
       } else {
         callback(new Errors.invalidGitUrl());
       }

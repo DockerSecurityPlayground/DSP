@@ -12,21 +12,22 @@ const LabStates = require('./LabStates.js');
 const dockerManager = require('../data/docker-images.js');
 const imageMgr = require('mydockerjs').imageMgr;
 
+
 // Clone a project in the main directory
 function cloneProject(repo, callback) {
   const log = appUtils.getLogger();
   const githubUrl = repo.url;
-  var params = { reponame: repo.name };
+  let params = { reponame: repo.name };
   log.info('Cloning...');
   log.info(repo.name);
   log.info(githubUrl);
 
   //Make params for git clone private repo
-  if (repo.hasOwnProperty("isprivate") && repo.isprivate){
+  if (repo.hasOwnProperty("isPrivate") && repo.isPrivate){
     log.info('Repo is private');
-    params.isprivate = repo.isprivate;
-    if (repo.hasOwnProperty("sshkeypath") && repo.sshkeypath) {
-      params.sshkeypath = repo.sshkeypath;
+    params.isPrivate = repo.isPrivate;
+    if (repo.hasOwnProperty("sshKeyPath") && repo.sshKeyPath) {
+      params.sshKeyPath = repo.sshKeyPath;
     } else if (repo.hasOwnProperty("username") && repo.hasOwnProperty("token") && repo.username && repo.token) {
       params.username = repo.username;
       params.token = repo.token;
@@ -120,9 +121,22 @@ function initRepository(repo, callback, notifyCallback) {
     // (cb) => buildImages(nameProject, cb, notifyCallback),
   ], (err) => callback(err));
 }
+
+function updateRepoUrl(repo, callback){
+  const log = appUtils.getLogger();
+  const nameProject = repo.name;
+  if(repo.username && repo.token && repo.username !== '' && repo.token !== ''){
+    repogitData.updateRepoUrl(repo.name, repo.username, repo.token, repo.url, (error) =>{
+      if (error) callback(error);
+      else callback(null);
+    });
+  }else
+    callback(null);
+}
 // exports.getLocalConfigSync = getLocalConfigSync;
 
 module.exports = {
   initRepository,
-  buildImages
+  buildImages,
+  updateRepoUrl
 };

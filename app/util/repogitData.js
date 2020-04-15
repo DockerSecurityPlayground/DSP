@@ -8,8 +8,10 @@ const AppUtils = require('./AppUtils.js');
 const _ = require('underscore');
 const appRoot = require('app-root-path');
 const Errors = require('errors');
+const async = require('async');
 
-/*TODO 
+
+/*TODO
 function initErrors() {
   const userErrors = [
     {
@@ -40,20 +42,20 @@ failAuthError.code = -2;
 module.exports = {
   clone(giturl, params, callback) {
     // const url = this.getGitUrl(giturl, params);
-    var url = giturl;
-    var GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
+    let url = giturl;
+    let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
     configData.getConfig((err, c) => {
       if (err) {
         callback(err);
       }
       else {
         const thePath = path.join(AppUtils.getHome(), c.mainDir);
-        var gitClient = simpleGit(thePath).silent(true);
+        let gitClient = simpleGit(thePath).silent(true);
         gitClient = gitClient.env('GIT_TERMINAL_PROMPT', 0);
-        if (params.isprivate) {
-          if (params.sshkeypath) {
+        if (params.isPrivate) {
+          if (params.sshKeyPath) {
             //TODO control if path is valid
-            GIT_SSH_COMMAND += params.sshkeypath;
+            GIT_SSH_COMMAND += params.sshKeyPath;
             gitClient = gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
           } else if (params.username && params.token) {
             url = strings.add(url, `${params.username}:${params.token}@`, '//'); // It doesn't contain a username
@@ -117,10 +119,19 @@ module.exports = {
   pullApplication(callback) {
     simpleGit(appRoot.toString()).pull(callback);
   },
-  pullRepo(reponame, callback) {
-    pathExists(reponame).then((ex) => {
+  pullRepo(params, callback) {
+    const repoPath = path.join(AppUtils.getHome(), params.rootDir, params.repo.name);
+    let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
+
+    pathExists(repoPath).then((ex) => {
       if (ex) {
-        simpleGit(reponame).pull(callback);
+        let gitClient = simpleGit(repoPath).silent(true);
+        if (params.repo.isPrivate && params.repo.sshKeyPath) {
+          //TODO control if path is valid
+          GIT_SSH_COMMAND += params.repo.sshKeyPath;
+          gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
+        }
+        gitClient.pull(callback);
       } else {
         callback(new Error('No repo dir'));
       }
@@ -140,6 +151,43 @@ module.exports = {
         callback(new Error('Doesn\t exists'));
       }
     }); // End pathExists
-  }
+  },
+
+  updateRepoUrl(reponame, username, token, url, callback) {
+    let remoteUrl = '';
+
+    configData.getConfig((err, c) => {
+      if (err) {
+        callback(err);
+      }
+      else {
+        const thePath = path.join(AppUtils.getHome(), c.mainDir, reponame);
+        let gitClient = simpleGit(thePath).silent(true);
+        if (username && token ) {
+          gitClient.listRemote(['--get-url'], (err, data) => {
+            if(!err)
+              remoteUrl = data;
+          });
+          url = strings.add(url, `${username}:${token}@`, '//');
+          if( url !== remoteUrl ){
+            gitClient.removeRemote("origin")
+              .addRemote("origin", url)
+              .fetch('origin', 'master',(err) => {
+                if(!err) {
+                  gitClient.branch(['-u', 'origin/master']);
+                  callback(null, "Update");
+                }else {
+                  gitClient.removeRemote("origin")
+                    .addRemote("origin", remoteUrl.replace('\n',''))
+                    .fetch('origin', 'master')
+                    .branch(['-u', 'origin/master']);
+                  callback(err);
+                }
+              });
+          }
+        }
+      }
+    });
+  },
 };
 

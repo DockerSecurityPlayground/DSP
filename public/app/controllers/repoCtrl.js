@@ -80,6 +80,7 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
   AjaxService.getProjects()
     .then(function successCallback(response) {
       $scope.repos = response.data.data;
+      console.log(response.data.data);
     }, function errorCallback(err) {
       Notification('Server error:'+ response.data.message, 'error');
     });
@@ -123,14 +124,84 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
     );
   }
 
-  $scope.isPrivate = false;
+  $scope.isPrivateCheckbox = false;
+  $scope.readOnlyUsername = false;
+  $scope.readOnlyToken = false;
+  $scope.readOnlyFields = false;
+  $scope.isEditing = false;
+  $scope.updateAddButton = {
+    text: "Add repo",
+  };
+  $scope.githubFormHeader = "Add Git Repository";
+  $scope.usernamePlaceholder = "Username";
+  $scope.tokenPlaceholder = "Token";
+
 
   $scope.checkRepoPrivate = function () {
-    $scope.isPrivate = !$scope.isPrivate;
+    $scope.isPrivateCheckbox = !$scope.isPrivateCheckbox;
   }
 
+  $scope.editRepositoryClick = function (repo) {
+    $scope.clearGithubForm();
+    $scope.repo.name = repo.name;
+    $scope.repo.url = repo.url;
+    $scope.repo.isPrivate = repo.isPrivate;
+    if(repo.isPrivate) {
+      $scope.isPrivateCheckbox = true;
+      $scope.usernamePlaceholder = 'New Username';
+      $scope.tokenPlaceholder = 'New Token';
+      $scope.repo.sshKeyPath = repo.sshKeyPath;
+      //$scope.readOnlyUsername = true;
+      //$scope.readOnlyToken = true;
+    }else
+      $scope.isPrivateCheckbox = false;
+    $scope.readOnlyFields = true;
+    $scope.githubForm.$dirty = true;
+    $scope.updateAddButton.text="Update repo";
+    $scope.githubFormHeader = "Edit Git Repository";
+  }
 
+  $scope.clearGithubForm = function () {
+    $scope.repo.name = '';
+    $scope.repo.url = '';
+    $scope.repo.isPrivate = false;
+    $scope.repo.username = null;
+    $scope.repo.token = null;
+    $scope.repo.sshKeyPath = null;
+    $scope.githubForm.$dirty = false;
+    $scope.isPrivateCheckbox = false;
+    $scope.readOnlyUsername = false;
+    $scope.readOnlyToken = false;
+    $scope.readOnlyFields = false;
+    $scope.usernamePlaceholder = 'Username';
+    $scope.tokenPlaceholder = 'Token';
+    $scope.updateAddButton.text="Add repo";
+    $scope.githubFormHeader = "Add Git Repository";
+  }
 
+  $scope.editRepository = function() {
+    console.log("Update");
+    $scope.isEditing = true;
+    if ($scope.repo.name  == '') {
+      $theUrl = $scope.repo.url;
+      $scope.repo.name = $theUrl.substring($theUrl.lastIndexOf('/') + 1, $theUrl.length - 4);
+    }
+
+    SocketService.manage(
+      JSON.stringify({
+        action: 'edit_repository',
+        body: $scope.repo
+      }), function (event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          Notification(data.message, 'success');
+          window.location.href = '/repositories';
+        } else if (data.status === 'error') {
+          Notification(data.message, 'error');
+          $scope.isEditing = false;
+        };
+      });
+  }
 //  dockerAPIService.getDockerImages()
 //    .then(function successCallback(response) {
 //          $scope.allImages = response.data.data

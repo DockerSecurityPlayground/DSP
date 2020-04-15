@@ -182,6 +182,18 @@ function manageUpdateApplication(ws) {
   });
 }
 
+function manageEditRepository(ws, jsonMessage) {
+  wsGitHandler.editRepository(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
 exports.init = function init(server) {
   const wss = new WebSocket.Server({
     server,
@@ -229,6 +241,9 @@ exports.init = function init(server) {
           break;
         case 'add_project':
           manageAddProject(ws, jsonMessage);
+          break;
+        case 'edit_repository':
+          manageEditRepository(ws,jsonMessage);
           break;
         case 'update_application':
           manageUpdateApplication(ws, jsonMessage);
