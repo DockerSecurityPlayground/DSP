@@ -194,6 +194,32 @@ function manageEditRepository(ws, jsonMessage) {
   });
 }
 
+function managePullPersonalRepo(ws, jsonMessage){
+  log.info('[WS_HANDLER] Pulling Personal Repo');
+  wsGitHandler.pullPersonalRepo((err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
+function managePushPersonalRepo(ws, jsonMessage){
+  log.info('[WS_HANDLER] Pushing Personal Repo');
+  wsGitHandler.pushPersonalRepo(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
 exports.init = function init(server) {
   const wss = new WebSocket.Server({
     server,
@@ -247,6 +273,12 @@ exports.init = function init(server) {
           break;
         case 'update_application':
           manageUpdateApplication(ws, jsonMessage);
+          break;
+        case 'pull_personal_repo':
+          managePullPersonalRepo(ws, jsonMessage);
+          break;
+        case 'push_personal_repo':
+          managePushPersonalRepo(ws, jsonMessage);
           break;
         default:
           log.error(`in web socket message: ${jsonMessage.action} is no registered`);

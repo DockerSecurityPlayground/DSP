@@ -202,6 +202,15 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
         };
       });
   }
+
+  $scope.pushRepository = function(repo){
+    if(!repo.isPrivate){
+      Notification('Make repo private and add credentials', 'error' );
+      $scope.editRepositoryClick(repo);
+
+    }
+
+  }
 //  dockerAPIService.getDockerImages()
 //    .then(function successCallback(response) {
 //          $scope.allImages = response.data.data

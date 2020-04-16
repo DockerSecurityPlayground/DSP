@@ -122,7 +122,6 @@ module.exports = {
   pullRepo(params, callback) {
     const repoPath = path.join(AppUtils.getHome(), params.rootDir, params.repo.name);
     let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
-
     pathExists(repoPath).then((ex) => {
       if (ex) {
         let gitClient = simpleGit(repoPath).silent(true);
@@ -137,12 +136,19 @@ module.exports = {
       }
     });
   },
-  pushRepo(reponame, params, callback) {
-    pathExists(reponame).then(ex => {
+  pushRepo(params, callback) {
+    const repoPath = path.join(AppUtils.getHome(), params.rootDir, params.repo.name);
+    let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
+    pathExists(repoPath).then(ex => {
       if (ex) {
-        const theRepo = simpleGit(reponame);
-        theRepo
-          .add(path.join(reponame, '*'))
+        let gitClient = simpleGit(repoPath).silent(true);
+        if (params.repo.sshKeyPath) {
+          //TODO control if path is valid
+          GIT_SSH_COMMAND += params.repo.sshKeyPath;
+          gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
+        }
+        gitClient
+          .add( '*')
           .addConfig('user.name', params.username)
           .addConfig('user.email', params.email)
           .commit(params.commit)

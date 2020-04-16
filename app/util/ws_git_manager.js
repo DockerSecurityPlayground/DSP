@@ -22,19 +22,33 @@ const api = {
     // Temporary directory
     let tmpUserDir;
     let userPath;
-    let username;
+    let repo = {
+      name: '',
+      url: params.repo.gitUrlToEdit,
+      username: params.repo.username,
+      token: params.repo.token,
+      sshKeyPath: params.repo.sshKeyPath,
+    };
     let oldConfig;
+    console.log(params.repo);
     async.waterfall([
-      (cb) => Checker.checkParams(params, ['githubURL'], cb),
+      (cb) => Checker.checkParams(params.repo, ['gitUrlToEdit'], (cb)),
       // Check if is an url
-      (cb) => JoiConditions.check(params.githubURL, 'url', cb),
-      (resp, cb) => configData.getConfig(cb),
+      //(cb) => JoiConditions.check(params.repo.gitUrlToEdit, 'url', cb),
+      (cb) => {
+        if((repo.username && repo.token) || (repo.sshKeyPath)){
+          repo.isPrivate = true;
+        }
+        cb(null);
+      },
+      (cb) => Checker.checkIfRepoIsPrivateAndValid(repo, false, cb),
+      (cb) => configData.getConfig(cb),
       // Get repoconf.json
       // Move directory temporanealy
       (config, cb) => {
         oldConfig = config;
         userPath = path.join(AppUtils.getHome(), config.mainDir, config.name);
-        username = config.name;
+        repo.name = config.name;
         const random = randomstring.generate({
           length: 5,
           charset: 'alphabetic'
@@ -42,26 +56,32 @@ const api = {
         const tmpRandom = `.tempUserDir${random}`;
         tmpUserDir = path.join(AppUtils.getHome(), config.mainDir, tmpRandom);
         log.info(' delete local username dir');
+        console.log(userPath);
         fs.rename(userPath, tmpUserDir, cb);
       },
       (cb) => fs.mkdir(userPath, cb),
       // Clone repository
-      (cb) => GitUtils.initRepository(
-        username, params.githubURL, cb,
+      (cb) => GitUtils.initRepository(repo, cb,
         (dataline) => log.debug(dataline)
       ),
       // No error in init repository, add github url to configuratoin file
       (cb) => {
         const newConfig = oldConfig;
-        newConfig.githubURL = params.githubURL;
+        newConfig.githubURL = params.repo.gitUrlToEdit;
+        if( repo.sshKeyPath )
+          newConfig.sshKeyPath = repo.sshKeyPath;
+        else
+          newConfig.username = repo.username;
         configData.updateConfig(newConfig, cb);
       }
     ], (err) => {
       // If some error delete actual userPath and recover tmpUserDir
       if (err) {
         log.error('ERROR, RECOVER OLD PATH');
-        rimraf.sync(userPath);
-        fs.renameSync(tmpUserDir, userPath);
+        if(!(err.name === 'invalidSshAuth' || err.name === 'invalidHttpAuth' || err.name === 'invalidGitUrl')) {
+          rimraf.sync(userPath);
+          fs.renameSync(tmpUserDir, userPath);
+        }
         callback(err);
       }
       else {
@@ -192,6 +212,65 @@ const api = {
       // Pull repository
       // Update repo
       (cb) => repoData.update(repo, cb)
+    ], (err) => callback(err));
+  },
+
+  pullPersonalRepo(callback){
+    log.info('[WS_GIT_MANAGER] Update Personal Repo');
+    let repo = {
+      url : '',
+      sshKeyPath : '',
+      isPrivate : true,
+    };
+    async.waterfall([
+      (cb) => configData.getConfig(cb),
+      (config, cb) => {
+        rootDir = config.mainDir;
+        repo.name = config.name;
+        repo.sshKeyPath = config.sshKeyPath;
+        console.log(repo);
+        cb(null);
+      },
+      (cb) => {
+        log.info('Pulling Personal repo ');
+        repogitData.pullRepo({'rootDir':rootDir, 'repo':repo}, cb);
+      },
+    ], (err) => callback(err));
+  },
+
+  pushPersonalRepo(commitMessage, callback){
+    log.info('[WS_GIT_MANAGER] Update Personal Repo');
+    let params = {
+      username : '',
+      commit : '',
+      email : '',
+      repo : {
+        url : '',
+        sshKeyPath : '',
+      },
+    };
+    async.waterfall([
+      (cb) => {
+        if(commitMessage && commitMessage.isEmpty){
+          cb(new Error('Commit Message is required'));
+        }else {
+          params.commit = commitMessage;
+          cb(null);
+        }
+      },
+      (cb) => configData.getConfig(cb),
+      (config, cb) => {
+        params.rootDir = config.mainDir;
+        params.repo.name = config.name;
+        params.repo.sshKeyPath = config.sshKeyPath;
+        params.username = config.name;
+        params.email = config.email;
+        cb(null);
+      },
+      (cb) => {
+        log.info('Push Personal repo ');
+        repogitData.pushRepo(params, cb);
+      },
     ], (err) => callback(err));
   }
 };

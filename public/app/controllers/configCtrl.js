@@ -71,7 +71,8 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
   }
   // EDIT USER GITHUB //
   $scope.openEditGithub = function() {
-    if($scope.gitUrlToEdit !== $scope.config.githubURL) {
+    console.log($scope.config.githubURL);
+    if($scope.repo.gitUrlToEdit !== $scope.config.githubURL) {
       var modalInstance = $uibModal.open({
         component: 'changeGithubComponent',
       });
@@ -83,7 +84,7 @@ var dsp_ConfigCtrl = function($scope, SafeApply, RegexService, BreadCrumbs, Sock
         JSON.stringify({
           action : 'synchronize_github',
           body: {
-            githubURL: $scope.gitUrlToEdit
+            repo: $scope.repo
           }
         }),
         function(event) {
@@ -359,7 +360,43 @@ else {
   $scope.$apply(function() {
   });
 }
-
-
 };
+
+  $scope.pullPersonalRepo = function() {
+    $scope.isRepoUploading = true;
+
+    SocketService.manage(
+      JSON.stringify({
+        action: 'pull_personal_repo',
+      }), function (event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          Notification("Repository updated", 'success');
+          $scope.isRepoUploading = false;
+        } else if (data.status === 'error') {
+          Notification(data.message, 'error');
+          $scope.isRepoUploading = false;
+        };
+      });
+  };
+
+  $scope.pushPersonalRepo = function() {
+    $scope.isUserRepoUpdating = true;
+
+    SocketService.manage(
+      JSON.stringify({
+        action: 'push_personal_repo',
+        body: $scope.commitMessage
+      }), function (event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          Notification("Remote repository updated", 'success');
+          $scope.isUserRepoUpdating = false;
+        } else if (data.status === 'error') {
+          Notification(data.message, 'error');
+          $scope.isUserRepoUpdating = false;
+        };
+      });
+  };
+
 }

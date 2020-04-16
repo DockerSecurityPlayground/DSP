@@ -25,6 +25,9 @@
               <a class="editing-components btn btn-default">
                 <span uib-popover="Update" popover-trigger="'mouseenter'" ng-click="updateRepository(r)" class="fa fa-fw fa-download"> </span>
               </a>
+              <a class="editing-components btn btn-default">
+                <span uib-popover="Push to remote" popover-trigger="'mouseenter'" ng-click="pushRepository(r)" class="fa fa-fw fa-upload"> </span>
+              </a>
               <a class="editing-components btn btn-danger">
                 <span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-fw fa-remove" ng-click="removeRepository(r)"> </span>
               </a>
@@ -41,7 +44,6 @@
         </tr>
       </tfoot>
     </table>
-
     <p>&nbsp;</p>
 
     <div ng-show="areReposUploading" class="alert alert-info"> Uploading Repositories, pls wait... </div>
@@ -71,7 +73,7 @@
       <div class="row" id="gitauthrow" ng-show="isPrivateCheckbox">
         <div class="col-sm-3">
           <label for="username"> Username </label>
-          <input type="text" placeholder="{{usernamePlaceholder}}" class="form-control" name="username" id="username" ng-model=repo.username ng-readonly=readOnlyUsername>
+          <input type="text" placeholder="{{usernamePlaceholder}}" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/" ng-readonly=readOnlyUsername>
         </div>
         <div class="col-sm-3">
           <label for="token"> Token </label>

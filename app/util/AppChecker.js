@@ -309,27 +309,37 @@ module.exports = {
     });
   },
 
+  checkGitUrl(data, callback){
+    const myRegEx  = /((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/i;
+    let isValid = myRegEx.test(data);
+    if(isValid) {
+      callback(null);
+    } else {
+      callback(new Errors.invalidGitUrl());
+    }
+  },
+
   checkIfRepoIsPrivateAndValid(repo, isUpdate, callback) {
     const url = repo.url;
     if (repo.hasOwnProperty('isPrivate') && repo.isPrivate) {
       if (url.includes('http://') || url.includes('https://')) {
         if (!isUpdate) {
           if (!(repo.hasOwnProperty('username') && repo.hasOwnProperty('token') && repo.username && repo.token)) {
-            callback(new Errors.invalidHttpAuth());
+            return callback(new Errors.invalidHttpAuth());
           }
         }
         repo.sshKeyPath = null;
       } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:(([\\w]+)\\/([\\w_\\-]+))+.git)')) {
         if (!(repo.hasOwnProperty('sshKeyPath') && repo.sshKeyPath)) {
-          callback(new Errors.invalidSshAuth());
+          return callback(new Errors.invalidSshAuth());
         }
         repo.username = null;
         repo.token = null;
       } else {
-        callback(new Errors.invalidGitUrl());
+        return callback(new Errors.invalidGitUrl());
       }
     }
-    callback(null);
+   return  callback(null);
   },
 };
 

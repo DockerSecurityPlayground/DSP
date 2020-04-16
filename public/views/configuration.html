@@ -30,47 +30,89 @@
         Invalid main dir: no space, no empty, only alphanumeric characters
       </div>
 
+      <div class="form-group">
+        <label for="gitEmail">Git Email</label>
+        <input type="text" class="form-control" id="gitEmail" name="gitEmail" ng-model=config.email
+               ng-required="true" ng-readonly="false" ng-pattern="email">
+        <div class="text-muted small">Email for git</div>
+      </div>
+
+      <div class="form-group">
+        <label for="gitUrl">Git URL:</label>
+        <input type="text" class="form-control" id="gitUrl" name="gitUrl" ng-model=config.githubURL
+             ng-required="false" ng-readonly="true">
+        <div class="text-muted small">Current Git Repo URL</div>
+      </div>
+
+      <div class="form-group">
+        <label for="sshKeyPath">{{config.githubURL.includes('@') ? 'SSH Key Path:' : 'Username'}}</label>
+        <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
+               ng-model="config.githubURL.includes('@') ? config.sshKeyPath : config.username"
+               ng-required="false" ng-readonly="true">
+        <div class="text-muted small">Current Git Auth Data</div>
+      </div>
+
       <button type="submit" ng-disabled="formConfig.$invalid" ng-click="updateConfig()" class="btn btn-primary">
         <i class="fa fa-fw fa-refresh"></i> Update
       </button>
+      <button type="submit" ng-disabled="formConfig.$invalid" ng-click="pullPersonalRepo()" class="btn btn-primary">
+        <i class="fa fa-fw fa-download"></i> Pull Personal Repo
+      </button>
     </form>
 
+    <div class="py-4">
+      <div ng-show="isRepoUploading" class="alert alert-info"> Uploading Repo, pls wait... </div>
+    </div>
     <hr class="py-5" />
+    <form name="formPush">
+      <h3>Push Personal Repo</h3>
+      <div class="form-group">
+        <label for="gitUrl">Commit Message</label>
+        <input type="text" class="form-control" id="commitMessage" name="commitMessage" ng-model="commitMessage"
+               ng-required="true" ng-readonly="false">
+        <div class="text-muted small">Commit message for push</div>
+      </div>
+      <button type="submit" ng-disabled="formPush.$invalid" ng-click="pushPersonalRepo()" class="btn btn-primary">
+        <i class="fa fa-fw fa-upload"></i> Push Personal Repo
+      </button>
+    </form>
+    <hr class="py-5">
 
     <!--
   <div class="row">
-    <div class="col-sm-4"> 
+    <div class="col-sm-4">
     <h3> Application Managment</h3>
     </div>
-    <div class="col-sm-8"> 
+    <div class="col-sm-8">
     <div class="row">
       <div class="col-sm-12"><p>
-          <button type="submit" 
-              ng-click="updateApplication()" 
+          <button type="submit"
+              ng-click="updateApplication()"
               ng-disabled="isAppUpdating || isAppRestarting"
               class="btn btn-primary">Update Docker Security Playground</button>  </p></div>
     </div>
     <div class="row">
       <div class="col-sm-12"><p>
-        <button 
-           type="submit" 
-           ng-click="restartApplication()" 
+        <button
+           type="submit"
+           ng-click="restartApplication()"
            ng-disabled="isAppUpdating || isAppRestarting"
            class="btn btn-danger">
             Reinstall Docker Security Playground
         </button></p> </div>
     </div>
-    <div ng-show="isAppUpdating" class="alert alert-success col-sm-5"> Update, pls wait...</div> 
+    <div ng-show="isAppUpdating" class="alert alert-success col-sm-5"> Update, pls wait...</div>
     </div>
   </div>
     -->
 
     <div ng-show="isReposUploading" class="alert alert-info"> Projects in upload, pls wait... </div>
     <div ng-show="isUserRepoUpdating" class="alert alert-info">Send local changes in remote repo, pls wait... </div>
+
     <div ng-show="githubError.show" class="row">
       <div class="alert alert-danger text-center" ng-bind-html="githubError.message"></div>
     </div>
-  
+
 
       <h3>Labs Managment</h3>
 
@@ -83,12 +125,29 @@
       <div class="form-group">
         <form name="githubForm">
           <label for="github_project">Change your github remote project</label>
-          <input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
-            id="githubURL" ng-model=gitUrlToEdit>
+          <!--<input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
+            id="githubURL" ng-model=repo.gitUrlToEdit>-->
+          <input type="text" class="form-control" name="githubURL" ng-required="true" id="githubURL"
+                 ng-pattern = "/((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/"
+                 ng-model=repo.gitUrlToEdit>
           <div class="text-muted small">Change repository</div>
+          <div class="row" id="gitauthrow" >
+            <div class="col-sm-3">
+              <label for="username"> Username </label>
+              <input type="text" placeholder="Username" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/" ng-readonly=readOnlyUsername>
+            </div>
+            <div class="col-sm-3">
+              <label for="token"> Token </label>
+              <input type="text" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
+            </div>
+            <div class="col-sm-6">
+              <label for="sshKeyPath"> SSH key path </label>
+              <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=repo.sshKeyPath>
+            </div>
+          </div>
 
           <div ng-show='isLoadingGit' class="alert alert-info"> Loading new github</div>
-
+          <br>
           <button class="btn btn-warning" ng-click="openEditGithub()" ng-disabled="githubForm.$invalid"> Change repo
           </button>
         </form>
