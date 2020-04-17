@@ -11,6 +11,13 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   var onLoadCanvas;
   const warningMessageHeader = 'WARNING: ';
   const networkEmptyMessage = 'Network is empty! Have you drawn the containers?';
+  $scope.tags = [{
+      name: "{{hostname}}",
+      description: "it is converted to hostname (i.e. localhost) "
+    }, {
+      name: "{{url}}",
+      description: "it is converted to DSP url (i.e. http://localhost )"
+  }]
 
   $scope.registerCallback = function (cb) {
     onLoadCanvas = cb;
