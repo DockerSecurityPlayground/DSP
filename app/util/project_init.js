@@ -64,7 +64,7 @@ exports.createDSP = (nameConfig, callback, notifyCallback) => {
     // Synchronization with github
     else {
       log.info('Synchronization with GITHUB, clone user repository');
-      gitUtils.initRepository(config.name, config.githubURL, (err) => {
+      gitUtils.initRepository({name: config.name, url: config.githubURL}, (err) => {
         if (err) callback(err);
         else {
           log.info('Success in sync');
