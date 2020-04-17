@@ -39,7 +39,7 @@ function exists(cb) {
         const exists = pathExists.sync(repoFile);
         cb(null, exists);
       }
-    })
+    });
   }
 
 function create(repos, cb) {

@@ -148,6 +148,11 @@ function initErrors() {
       defaultMessage: 'Invalid Git Url',
       code: 1010,
     },
+    {
+      name: 'invalidEmail',
+      defaultMessage: 'Invalid Email Address',
+      code: 1011,
+    },
   ];
 
 
@@ -318,6 +323,18 @@ module.exports = {
       callback(new Errors.invalidGitUrl());
     }
   },
+
+  checkEmail(data, callback){
+    const myRegEx  = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
+    let isValid = myRegEx.test(data);
+    if(isValid) {
+      callback(null);
+    } else {
+      callback(new Errors.invalidEmail());
+    }
+  },
+
+
 
   checkIfRepoIsPrivateAndValid(repo, isUpdate, callback) {
     const url = repo.url;

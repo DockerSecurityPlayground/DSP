@@ -45,6 +45,7 @@ function sendProgressMessage(ws, message) {
 function manageInstallation(ws, jsonMessage) {
   installationHandler.installation(
     jsonMessage.config,
+    jsonMessage.repo,
     // End callback
     (err) => {
       sendResponse(ws, err);
