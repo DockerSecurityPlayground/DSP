@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.5.1] - 2020 - 04 - 17
+- Added network graph enchancements
+- Added tags guide in description
+
 ## [3.4.0] - 2019 - 12 - 21
 - New theme by diterlizzi
 ## [3.3.2] - 2019 - 12 - 17  
