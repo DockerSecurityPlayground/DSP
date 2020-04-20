@@ -64,7 +64,6 @@ exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
     // Synchronization with github
     else {
       log.info('Synchronization with GITHUB, clone user repository');
-      console.log(repo);
 
       let dspRepo = {
         name: config.name,
