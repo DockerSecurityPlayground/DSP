@@ -202,6 +202,7 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
       $scope.log = '';
       $scope.treeModel = [];
       $scope.snippets = {};
+      $scope.selectedCategory = "privilege escalation"
 
       var rootElement = _getRoot($scope.treeModel);
       $scope.$watch('files', function () {
@@ -258,12 +259,26 @@ $scope.removeElement = function() {
 }
 
 $scope.changedSnippet = function(selectedSnippet){
-  $scope.selectedElement.content = $scope.selectedElement.content + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
-  // TODO CHECK IF FIRST LINE starts with FROM refactor with regex
-  const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
-  const newImage = selectedSnippet.image
-  const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
-  $scope.selectedElement.content = newContent
+  
+  if($scope.selectedElement.content.match(/^FROM.*/)){
+    $scope.selectedElement.content = $scope.selectedElement.content + "\n\n" + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
+    const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
+    const newImage = selectedSnippet.image
+    const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
+    $scope.selectedElement.content = newContent
+  }
+  else{
+    $scope.selectedElement.content = "FROM " + selectedSnippet.image + "\n\n" + $scope.selectedElement.content  + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
+  }
+}
+
+$scope.undoChangeSnippet = function(selectedSnippet){
+  $scope.selectedElement.content = $scope.selectedElement.content.replace(selectedSnippet.code, "")
+  $scope.selectedElement.content = $scope.selectedElement.content.replace("#" + selectedSnippet.name + "\n", "")
+}
+
+$scope.changedCategory = function(category){
+  $scope.selectedCategory = category
 }
 
 $scope.nodeSelected = function(e, data) {
