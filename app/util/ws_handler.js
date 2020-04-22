@@ -100,6 +100,44 @@ function manageDockerUp(ws, jsonMessage) {
     sendProgressMessage(ws, dataline);
   });
 }
+function manageWiresharkRun(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  dockerActions.wiresharkRun(body, err => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
+
+function manageWiresharkStop(ws, jsonMessage) {
+  dockerActions.wiresharkStop(err => {
+    sendResponse(ws, err);
+  })
+}
+
+function manageKaliRun(ws, jsonMessage) {
+  dockerActions.kaliRun(err => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
+function manageCaptureRun(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  dockerActions.captureRun(body, err => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
+function manageHttpdRun(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  dockerActions.httpdRun(body, err => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
 
 function manageDockerDown(ws, jsonMessage) {
   const body = jsonMessage.body;
@@ -205,6 +243,21 @@ exports.init = function init(server) {
           break;
         case 'docker_up':
           manageDockerUp(ws, jsonMessage);
+          break;
+        case 'wireshark_run':
+          manageWiresharkRun(ws, jsonMessage);
+          break;
+        case 'wireshark_stop':
+          manageWiresharkStop(ws, jsonMessage);
+          break;
+        case 'kali_run':
+          manageKaliRun(ws, jsonMessage);
+          break;
+        case 'capture_run':
+          manageCaptureRun(ws, jsonMessage);
+          break;
+        case 'httpd_run':
+          manageHttpdRun(ws, jsonMessage);
           break;
         case 'docker_build':
           manageDockerBuild(ws, jsonMessage);

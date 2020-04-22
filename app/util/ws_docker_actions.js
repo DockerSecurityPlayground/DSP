@@ -14,7 +14,6 @@ const async = require('async');
 const Checker = require('./AppChecker');
 const LabStates = require('./LabStates');
 const appUtils = require('../util/AppUtils');
-const di = require('mydockerjs').imageMgr;
 const fs = require('fs');
 const rimraf = require('rimraf');
 const service_prefix="dsp_hacktool"
@@ -83,7 +82,7 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
         cb(err);
       }
     },
-    (cb) => di.isImageInstalled(params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag, cb),
+    (cb) => imageMgr.isImageInstalled(params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag, cb),
     (isImageInstalled, cb) => {
       if (isImageInstalled) {
         log.info('Image already installed');
@@ -270,7 +269,66 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
       else callback(null);
     });
 };
+exports.httpdRun  = function httpdRun(body, callback, notifyCallback) {
+  log.info("[WS DOCKER ACTIONS] Start Httpd Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(body, ['hostPort'], cb),
+    (cb) => dockerTools.isHttpdServiceInstalled(cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) 
+        cb(null, "");
+      else  {
+        dockerTools.installHttpdService(cb, notifyCallback);
+      }
+    }, (data, cb) => {
+        dockerTools.runHttpdService(cb, body.hostPort, notifyCallback);
+    }], (err) => callback(err));
+}
 
+exports.captureRun  = function captureRun(body, callback, notifyCallback) {
+  log.info("[WS DOCKER ACTIONS] Start Capture Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(body, ['machinesToBeSniffed', 'lab'], cb),
+    (cb) => dockerTools.isTcpdumpInstalled(cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) 
+        cb(null, "");
+      else  {
+        dockerTools.installTcpdump(cb, notifyCallback);
+      }
+    }, (data, cb) => {
+      dockerTools.runTcpdump(cb, body.lab, body.machinesToBeSniffed, body.sessionName, notifyCallback);
+    }], (err) => callback(err));
+}
+exports.kaliRun  = function kaliRun(callback, notifyCallback) {
+  log.info("[WS DOCKER ACTIONS] Start Kali Service");
+  async.waterfall([
+    (cb) => dockerTools.isKaliServiceInstalled(cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) 
+        cb(null, "");
+      else 
+        dockerTools.installKaliService(cb, notifyCallback);
+    }, (data, cb) => {
+      dockerTools.runKaliService(cb);
+    }], (err) => callback(err));
+}
+
+exports.wiresharkRun  = function wiresharkRun(body, callback, notifyCallback) {
+  log.info("[WS DOCKER ACTIONS] Start Wireshark Service");
+  async.waterfall([
+    (cb) => Checker.checkParams(body, ['hostPort'], cb),
+    (cb) => dockerTools.isWiresharkInstalled(cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) 
+        cb(null, "");
+      else 
+        dockerTools.installWireshark(cb, notifyCallback);
+    }, (data, cb) => {
+      const hostPort = body.hostPort;
+      dockerTools.runWireshark(cb, hostPort, notifyCallback, notifyCallback);
+    }], (err) => callback(err));
+}
 exports.composeDown = function composeDown(params, body, callback, notifyCallback) {
   log.info('[COMPOSE DOWN]');
   let config;

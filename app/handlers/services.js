@@ -130,6 +130,66 @@ function startService(req, res) {
     });
 }
 
+function _isRun(req, res, methodName) {
+  dockerServices[methodName]((err, isRun) => {
+    AppUtils.response(methodName, res, err, {"isRun": isRun});
+  });
+}
+
+function _stop(req, res, methodName) {
+  dockerServices[methodName](((err) => {
+      AppUtils.response(methodName, res, err, null, true);
+  }))
+}
+
+function isKaliRun(req, res) {
+  log.info("[DOCKER TOOLS] Is Kali Run");
+  _isRun(req, res, "isKaliServiceRun");
+}
+
+function stopKali(req, res) {
+  log.info("[DOCKER TOOLS] Stop Kali Run");
+  _stop(req, res, "stopKaliService");
+}
+
+function isHttpdRun(req, res) {
+  log.info("[DOCKER TOOLS] Is Httpd Run");
+  _isRun(req, res, "isHttpdServiceRun");
+}
+
+function isWiresharkRun(req, res) {
+  log.info("[DOCKER TOOLS] Is Wireshark Run");
+  dockerServices.isWiresharkRun((err, isRun) => {
+      AppUtils.response('Wireshark Run', res, err, {"isRun": isRun});
+  })
+}
+
+function stopHttpd(req, res) {
+  log.info("[DOCKER TOOLS] Stop Httpd");
+  _stop(req, res, "stopHttpdService");
+}
+
+function stopWireshark(req, res) {
+  log.info("[DOCKER TOOLS] Stop Wireshark");
+  dockerServices.stopWireshark(((err) => {
+      AppUtils.response('Start Service Request', res, err, null, true);
+  }))
+}
+
+function isTcpdumpRun(req, res) {
+  log.info("[DOCKER TOOLS] Is Tcpdump Run");
+  dockerServices.isTcpdumpRun((err, isRun) => {
+      AppUtils.response('Tcpdump Run', res, err, {"isRun": isRun});
+  })
+}
+
+function stopTcpdump(req, res) {
+  log.info("[DOCKER TOOLS] Stop Tcpdump");
+  dockerServices.stopTcpdump(((err) => {
+      AppUtils.response('Stop Service Request', res, err, null, true);
+  }))
+}
+
 function stopService(req, res) {
   log.info("[DOCKER TOOLS] Stop Service");
   async.waterfall([
@@ -353,6 +413,14 @@ exports.detachNetwork = detachNetwork;
 exports.setAsDefault = setAsDefault;
 exports.getListHackTools = getListHackTools;
 exports.deleteHackTool = deleteHackTool;
+exports.isHttpdRun = isHttpdRun;
+exports.stopHttpd = stopHttpd;
+exports.isKaliRun = isKaliRun;
+exports.stopKali = stopKali;
+exports.isWiresharkRun = isWiresharkRun;
+exports.stopWireshark = stopWireshark;
+exports.isTcpdumpRun = isTcpdumpRun;
+exports.stopTcpdump = stopTcpdump;
 
 // exports.getListImages = getListImages;
 // exports.dirExists = dirExists;

@@ -1,14 +1,39 @@
-var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketService, incrementNumber, dockerAPIService, dockerImagesService) {
+var DSP_DockerToolsCtrl  = function($scope, $location, Notification, SafeApply, SocketService, incrementNumber, dockerAPIService, dockerImagesService) {
   function sleep (time) {
       return new Promise((resolve) => setTimeout(resolve, time));
   }
+  const host = $location.host();
+  const httpdProtocol = "http";
+  $scope.httpdUrl = httpdProtocol + "://" + host + ":" + $scope.httpdPort;
+
+  $scope.clearManagedLogs = function () {
+    $scope.managedServicesLogs = "";
+  }
+
+  // // Kali set state
+  // dockerAPIService.isRun("kali")
+  // .then(function successCb(data) {
+  //   $scope.isKaliRun = data.data.data.isRun;
+  // }, function errorCb() {
+  //   Notification("Error in check kali status", 'error');
+  // })
+
+  // // Httpd set state
+  // dockerAPIService.isRun("httpd")
+  // .then(function successCb(data) {
+    
+  //   $scope.isHttpdRun = data.data.data.isRun;
+  // }, function errorCb() {
+  //   Notification("Error in check httpd status", 'error');
+  // })
+
   $scope.init = function init() {
     console.log("=== INIT DOCKER TOOLS CONTROLLER ===");
     $scope.listServices = [];
     $scope.activeTab = "";
     $scope.showPorts = false;
     $scope.showEnv = false;
-    $scope.showTools = false;
+    $scope.showTools = true;
     $scope.hackToolMode = {
       val : "oneline"
     }
@@ -20,6 +45,8 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketServi
     $scope.currentEnvironment = {name: '', value: ''};
     $scope.currentContainer = {};
     $scope.hackToolNotify = "";
+
+
     // dockerImagesService.get(function(images) {
     //   $scope.imageList = images
     // });
@@ -51,6 +78,7 @@ var DSP_DockerToolsCtrl  = function($scope, Notification, SafeApply, SocketServi
 // $scope.setOneLineNetwork = function setOneLineNetwork(networkName){
 //  $scope.currentContainer.OneLineNetwork = networkName;
 // }
+
 
   $scope.setNetwork = function() {
   }

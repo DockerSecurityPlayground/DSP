@@ -162,10 +162,13 @@
                 </div>
               </div>
             </uib-tab>
-            <uib-tab index="2" heading="Hack Tools">
+            <uib-tab ng-if="isLabRun" index="2" select="updateManagedServices()" heading="Managed Services">
+              <div ng-include="'views/managed-tools.html'"> </div>
+            </uib-tab>
+            <uib-tab ng-if="isLabRun" index="3" heading="Hack Tools">
               <div ng-include="'views/services.html'"> </div>
             </uib-tab>
-            <uib-tab index="3" heading="Network Elements">
+            <uib-tab ng-if="isLabRun" index="4" heading="Network Elements">
               <h4 class="text-center">Containers</h4>
               <hr>
               <div class="list-group">
@@ -189,6 +192,9 @@
                   </div>
                 </div>
               </div>
+            </uib-tab>
+            <uib-tab ng-if="isLabRun" index="5" heading="Monitoring">
+              <div ng-include="'views/monitoring.html'"> </div>
             </uib-tab>
           </uib-tabset>
 
