@@ -16,11 +16,17 @@
 		},
 		{ 
 			"name": "PATH priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y vim nano build-essential\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN mkdir /script && chmod 777 /script\nRUN echo \"H4sIANmxlV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaWCYiUgt5YLAOY/YRtMAAAA\" | base64 -d | gunzip > /script/shell_ps.c\nRUN echo \"H4sIAGKylV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaXkxBIF/dzidL2SihIloEQtFwARCX6IVgAAAA==\"| base64 -d | gunzip > /script/shell_cat_msg.c\nRUN echo \"H4sIAL6ylV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaXkxBIF/dSSZP2CxOLi8hQloFwtFwBU3KN1WQAAAA==\" | base64 -d | gunzip > /script/shell_cat_etcpasswd.c\nRUN echo \"H4sIADSzlV4AA1POzEvOKU1JVbApzcssLknRy7DjKsvPTFHITczM09DkqubiLE4tKc1M0TDQtAaz0+HsyuKS1FwNpcwUJSC3losLAPy2BrFMAAAA\" | base64 -d | gunzip > /script/shell_id.c\nRUN echo \"H4sIAJizlV4AAyupKMktTk/LzEnl4gIAxNFhSQwAAAA=\" | base64 -d | gunzip > /msg.txt\nRUN gcc /script/shell_ps.c -o /script/shell_ps\nRUN gcc /script/shell_id.c -o /script/shell_id\nRUN gcc /script/shell_cat_etcpasswd.c -o /script/shell_cat_etcpasswd\nRUN gcc /script/shell_cat_msg.c -o /script/shell_cat_msg\nRUN chmod u+s /script/shell_ps\nRUN chmod u+s /script/shell_id\nRUN chmod u+s /script/shell_cat_msg\nRUN chmod u+s /script/shell_cat_etcpasswd\nUSER user1\n", "description": "Dockerfile configuration for privilege escalation using PATH environment variable", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "alpine adduser", "code": "RUN adduser -D test-user && echo test-user:test-password | chpasswd", "description": "Dockerfile configuration for privilege escalation using PATH environment variable", "category": "Alpine Configuration", "image": "alpine:latest" 
 		}
 	],
  	"categories": [
 		{
 			"name": "privilege escalation", "description": "Code snippets for docker containers privilege escalation misconfigurations" 
+		},
+		{
+			"name": "Alpine Configuration", "description": "Some Alpine Configuration" 
 		}
 	] 
 }
