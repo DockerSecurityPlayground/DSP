@@ -1,0 +1,71 @@
+<style>
+.terminal {
+  background-color: black;
+  border: 1px solid #000;
+  color: white;
+  padding: 8px;
+}
+</style>
+
+<!-- <div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl"> -->
+<div id="manageComponent" ng-controller="ManagedToolsCtrl">
+  <!-- <br> -->
+  <!-- currentContainer : {{currentContainer.name}} -->
+  <!-- <br> -->
+  <!-- <h3 class="text-center" > <a href="#" ng-click="showServices = !showServices"> Hack Tools </a> </h3> -->
+  <div> 
+    <!-- DSP Managed services-->
+    <h5>DSP Managed Service</h5>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Main </th>
+          <th scope="col">Info </th>
+          <th scope="col">Configurable Options</th>
+          <th scope="col">Command</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+       <td>httpd</td> 
+       <td>A httpd service to download data<br> from Hack Tools(i.e. pcap sessions)<br>
+          Navigate httpd <a target="_blank" href="{{httpdUrl}}">here </a> <br>
+      </td> 
+       <td>
+          Host Port: 
+          <input type="text" class="form-control input-sm" id="httpd" ng-model="httpdPort"> </input>
+       </td> 
+       <td>
+        <button ng-click="stopHttpd()" ng-if="httpdService.isRun" class="btn btn-sm btn-danger"> Stop </button>
+        <button ng-click="startHttpd()" ng-if="!httpdService.isRun" class="btn btn-sm btn-success"> Run </button>
+       </td> 
+      </tr>
+      <tr>
+       <td>kali</td> 
+       <td>kali service<br>
+      </td> 
+       <td>
+            <!-- <form>
+              <div ng-repeat="n in networkList">
+                <i> {{n.name}} </i>
+                <button type="button" class="btn btn-sm btn-primary" ng-if="!containerHasNetwork('kali',n)" ng-click="attachNetwork('kali',n)">   Attach</button>
+                <button type="button" class="btn btn-sm btn-warning" ng-if="containerHasNetwork('kali',n)" ng-click="detachNetwork('kali',n)">   Detach</button>
+              </div>
+            </form> -->
+       </td> 
+       <td>
+        <button ng-click="stopKali()" ng-if="kaliService.isRun" class="btn btn-sm btn-danger"> Stop </button>
+        <button ng-click="startKali()" ng-if="!kaliService.isRun" class="btn btn-sm btn-success"> Run </button>
+       </td> 
+      </tr>
+
+      </tbody>
+    </table>
+
+    <div class="row">
+    <div class="col-sm-11">
+      <div class="ace-run" ng-if="managedServicesLogs" ui-ace="{ theme: 'terminal' }" ng-model="managedServicesLogs" > </div>
+      <button ng-click="clearManagedLogs()" class="btn btn-sm float-right"> Clear</button>
+      </div>
+</div> <!-- END  SHOW SERVICES-->
+</div> <!-- END CONTROLLER -->

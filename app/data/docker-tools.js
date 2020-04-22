@@ -1,4 +1,5 @@
 const dockerJS = require('mydockerjs').docker;
+const di = require('mydockerjs').imageMgr;
 const _ = require('underscore');
 const appUtils = require('../util/AppUtils.js');
 const log = appUtils.getLogger();
@@ -7,6 +8,27 @@ const oneline_prefix="dsp_oneline"
 const allowedNetworks = ['external', 'public', 'default'];
 const routerIDs = ['router', 'firewall'];
 const async = require('async');
+
+const DSP_VOLUME_NAME = `dsp_volume`;
+const DSP_TARGET_VOLUME_NAME = `/dsp`;
+
+const KALI_SERVICE_IMAGE = "dockersecplayground/kali:latest"
+const KALI_SERVICE_NAME = `${service_prefix}_managed_kali`;
+
+const BROWSER_SERVICE_IMAGE = "dockersecplayground:hackbrowser"
+const BROWSER_SERVICE_NAME = `${service_prefix}_managed_browser`;
+
+const WIRESHARK_SERVICE_NAME = `${service_prefix}_managed_wireshark`;
+const WIRESHARK_IMAGE_NAME = "ffeldhaus/wireshark"
+const WIRESHARK_VOLUME_NAME = `/home/wireshark`;
+
+const TCPDUMP_SERVICE_NAME = `${service_prefix}_managed_tcpdump`;
+const TCPDUMP_IMAGE_NAME = "itsthenetwork/alpine-tcpdump";
+const TCPDUMP_CMD = "-i any -s 65535 -w "
+
+const HTTPD_SERVICE_NAME = `${service_prefix}_managed_httpd`;
+const HTTPD_SERVICE_IMAGE =  "httpd:2.4"
+const HTTPD_VOLUME_NAME =  "/usr/local/apache2/htdocs/"
 
 const HACK_TOOLS_CONFIG_FILE = require('../../config/hack_tools.json');
 const hackTools = HACK_TOOLS_CONFIG_FILE.images;
@@ -69,6 +91,214 @@ function startService(nameService, callback) {
     nameService = `${service_prefix}_${nameService}`;
   }
   dockerJS.start(nameService, callback)
+}
+function runHttpdService(callback, hostPort, notifyCallback) {
+  const ports = {};
+  ports["80"] = hostPort;
+  
+  dockerJS.run(HTTPD_SERVICE_IMAGE, callback, {
+    ports:ports,
+    detached: true,
+    volumes: [{
+      hostPath: DSP_VOLUME_NAME,
+      containerPath: HTTPD_VOLUME_NAME
+    }],
+    name: HTTPD_SERVICE_NAME,
+  });
+}
+
+function runWireshark(callback, hostPort, notifyCallback) {
+  const ports = {}
+  ports["14500"] = hostPort
+  
+  dockerJS.run(WIRESHARK_IMAGE_NAME, callback, {
+    ports: ports,
+    volumes: [{
+      hostPath: DSP_VOLUME_NAME,
+      containerPath: WIRESHARK_VOLUME_NAME
+    }],
+    name: WIRESHARK_SERVICE_NAME,
+    cap_add: "NET_ADMIN",
+    detached: true,
+    environments: [{
+      name: "XPRA_PW",
+      value: "wireshark"
+    }]
+  }, notifyCallback);
+}
+
+function _getTcpdumpServices(callback) {
+  dockerJS.ps((err, services) => {
+    if (err) 
+      callback(err);
+    else {
+      services = JSON.parse(services);
+      
+      const names = services.map((s) => s.Names[0].slice(1)).filter((ss) => ss.startsWith(TCPDUMP_SERVICE_NAME))
+      callback(null, names)
+    }
+  })
+}
+
+function _runTcpdump(callback, lab, service, sessionName, notifyCallback) {
+  const containerName = `${lab.toLowerCase()}_${service}_1`
+  dockerJS.run(TCPDUMP_IMAGE_NAME, callback, {
+    name: TCPDUMP_SERVICE_NAME + "_" + service,
+    net: `container:${containerName}`,
+    rm: true,
+    detached: true,
+    cmd: `${TCPDUMP_CMD} /dsp/${sessionName}_${service}.pcap`,
+    volumes: [{
+      hostPath: DSP_VOLUME_NAME,
+      containerPath: DSP_TARGET_VOLUME_NAME
+    }]
+
+
+  });
+}
+
+function runTcpdump(callback, lab, machinesToBeSniffed, sessionName, notifyCallback) {
+  if (!sessionName) {
+    const ts = Date.now();
+    const date_ob = new Date(ts);
+    const date = date_ob.getDate();
+    const month = date_ob.getMonth() + 1;
+    const year = date_ob.getFullYear();
+    const second = date_ob.getMilliseconds();
+    sessionName = year + "-" + month + "-" + date + "-" + second;
+  }
+  const machines = Object.keys(_.omit(machinesToBeSniffed, (v, k, object) => v == false));
+  async.each(machines, (m, c) => {
+    _runTcpdump(c, lab, m, sessionName, notifyCallback);
+  }, (err) => callback(err))
+}
+
+function isHttpdServiceInstalled(callback) {
+  di.isImageInstalled(HTTPD_SERVICE_IMAGE, callback);
+}
+function isWiresharkInstalled(callback) {
+  di.isImageInstalled(WIRESHARK_IMAGE_NAME, callback);
+}
+function isTcpdumpInstalled(callback) {
+  di.isImageInstalled(TCPDUMP_IMAGE_NAME, callback);
+}
+
+function installHttpdService(callback, notifyCallback) {
+  di.pullImage(HTTPD_SERVICE_IMAGE, "latest", callback, notifyCallback)
+}
+
+function stopHttpdService(callback) {
+  dockerJS.rm(HTTPD_SERVICE_NAME, callback, true);
+}
+
+function stopKaliService(callback) {
+  dockerJS.rm(KALI_SERVICE_NAME, callback, true);
+}
+
+function runKaliService(callback) {
+  dockerJS.run(KALI_SERVICE_IMAGE, callback, {
+    detached: true,
+    volumes: [{
+      hostPath: DSP_VOLUME_NAME,
+      containerPath: DSP_TARGET_VOLUME_NAME
+    }],
+    name: KALI_SERVICE_NAME,
+  });
+}
+
+function runBrowserService(callback) {
+  dockerJS.run(BROWSER_SERVICE_IMAGE, callback, {
+    detached: true,
+    volumes: [{
+      hostPath: DSP_VOLUME_NAME,
+      containerPath: DSP_TARGET_VOLUME_NAME
+    }],
+    name: BROWSER_SERVICE_NAME,
+  });
+}
+
+function isBrowserServiceRun(callback) {
+  dockerJS.isRunning(BROWSER_SERVICE_NAME, (err, isRun) => {
+    callback(err, isRun);
+ })
+}
+
+function isBrowserServiceInstalled(callback) {
+  di.isImageInstalled(BROWSER_SERVICE_IMAGE, callback);
+}
+
+function stopBrowserService(callback) {
+  dockerJS.rm(BROWSER_SERVICE_NAME, callback, true);
+}
+function installProxyService(callback, notifyCallback) {
+  di.pullImage(BROWSER_SERVICE_IMAGE, "latest", callback, notifyCallback)
+}
+
+function isKaliServiceRun(callback) {
+  dockerJS.isRunning(KALI_SERVICE_NAME, (err, isRun) => {
+    callback(err, isRun);
+ })
+}
+
+function isKaliServiceInstalled(callback) {
+  di.isImageInstalled(KALI_SERVICE_IMAGE, callback);
+}
+
+function installKaliService(callback, notifyCallback) {
+  di.pullImage(KALI_SERVICE_IMAGE, "latest", callback, notifyCallback)
+}
+
+function installWireshark(callback, notifyCallback) {
+  di.pullImage(WIRESHARK_IMAGE_NAME, "latest", callback, notifyCallback)
+}
+
+function installTcpdump(callback, notifyCallback) {
+  di.pullImage(TCPDUMP_IMAGE_NAME, "latest", callback, notifyCallback)
+}
+
+function isHttpdServiceRun(callback) {
+  dockerJS.isRunning(HTTPD_SERVICE_NAME, (err, isRun) => {
+    callback(err, isRun);
+ })
+}
+function isTcpdumpRun(callback) {
+  _getTcpdumpServices((err, services) => {
+    console.log("Services");
+    console.log(services);
+    
+    
+    if (err) 
+      callback(err);
+    else {
+      callback(null, services.length > 0);
+      }
+  });
+}
+
+function stopWireshark(callback) {
+  dockerJS.rm(WIRESHARK_SERVICE_NAME, callback, true);
+}
+function stopTcpdump(callback) {
+  _getTcpdumpServices((err, services) => {
+    console.log("SERVICES");
+    console.log(services);
+    
+    
+    if (err) 
+      callback(err);
+    else {
+      async.each(services, (s, c) => {
+        log.info(`Deleting ${s}`);
+        dockerJS.rm(s, c, true);
+      }, (err) => callback(err))
+    }
+  })
+}
+
+function isWiresharkRun(callback) {
+  dockerJS.isRunning(WIRESHARK_SERVICE_NAME, (err, isRun) => {
+    callback(err, isRun);
+ })
 }
 
 function stopService(nameService, callback) {
@@ -341,6 +571,9 @@ module.exports = {
   isService,
   startService,
   stopService,
+  stopWireshark,
+  stopTcpdump,
+  stopHttpdService,
   removeService,
   get,
   // getDefaultOptions,
@@ -351,5 +584,27 @@ module.exports = {
   findRouterIp,
   runService,
   setDefaultGW,
-  deleteHackTool
+  deleteHackTool,
+  isWiresharkRun,
+  isTcpdumpRun,
+  isHttpdServiceRun,
+  isWiresharkInstalled,
+  isTcpdumpInstalled,
+  isHttpdServiceInstalled,
+  installWireshark,
+  installTcpdump,
+  installHttpdService,
+  runWireshark,
+  runHttpdService,
+  runTcpdump,
+  isKaliServiceRun,
+  isKaliServiceInstalled,
+  stopKaliService,
+  runKaliService,
+  installKaliService,
+  installProxyService,  
+  isBrowserServiceInstalled,
+  isBrowserServiceRun,
+  stopBrowserService,
+  runBrowserService
 }

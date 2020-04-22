@@ -1,0 +1,69 @@
+<script> 
+$( document ).ready(function() {
+  console.log("INIT MONITORING SERVICE");
+  // var appScope = angular.element(document.getElementById("serviceComponent")).scope()
+  // appScope.init();
+});
+
+</script>
+<style>
+.terminal {
+  background-color: black;
+  border: 1px solid #000;
+  color: white;
+  padding: 8px;
+}
+</style>
+
+<!-- <div id="serviceComponent" ng-show="labState.state === 'active' " ng-controller="DockerToolsCtrl"> -->
+<div id="monitoringComponent" ng-controller="MonitorCtrl">
+  <br>
+  <div class="row">
+    <div class="col-sm-1">
+      <i> Wireshark Service </i>
+    </div>
+    <div class="col-sm-4">
+      <div class="form-group form-inline">
+        <label for="host-port">Host Port: </label>
+        <input type="text" class="form-control input-sm" id="host-port" ng-model="hostPort"> </input>
+      </div>
+    </div>
+    <div class="col-sm-3">
+    <div ng-if="!isWiresharkRun && !isWiresharkInProgress">
+        <button ng-click="startWireshark()" title="Start" class="btn btn-sm btn-success">Start</a>
+    </div>
+    <div ng-if="isWiresharkRun">
+        <button title="Stop" ng-click="stopWireshark()" class="btn btn-sm btn-danger">Stop</a>
+    </div>
+  </div>
+  <div class="col-sm-3" ng-if="isWiresharkRun" > <a class="btn btn-primary" href="{{wiresharkUrl}}" target="_blank"> Go In Wireshark </a></div>
+  <div class="col-sm-3 ace-run" ng-if="wiresharkLogs" ui-ace="{ theme: 'terminal' }" ng-model="wiresharkLogs" >
+  </div>
+</div>
+<small>If Wireshark connection is refused, please Restart Wireshark Service</small>
+<hr>
+<!-- Capture section-->
+<h6>Capture Name</h6>
+    <input type="text" class="form-control input-sm" id="capture-name" ng-model="captureName"> </input>
+<h6>Machines to be sniffed</h6>
+<!-- <select class="form-control" ng-model="selectedMachine" ng-options="c for c in labMachines"></select> -->
+  <div class="btn-group">
+        <p ng-repeat="c in labMachines"><label class="btn btn-default btn-sm" ng-model="machinesToBeSniffed[c]" uib-btn-checkbox>{{c}}</label></p>
+    </div>
+
+<br>
+<div class="row">
+  <div class="col-sm-10">
+  <button ng-if="!isTcpdumpCapturing" ng-click="startCapture()" class="btn btn-sm btn-success float-right"> Start Capture</button>
+  <button ng-if="isTcpdumpCapturing" ng-click="stopCapture()" class="btn btn-sm btn-danger float-right"> Stop Capture</button>
+  </div>
+</div>
+<hr>
+<div class="row">
+ <div class="col-sm-11">
+  <div class="ace-run" ng-if="captureLogs" ui-ace="{ theme: 'terminal' }" ng-model="captureLogs" > </div>
+  <button ng-click="clearCaptureLogs()" class="btn btn-sm float-right"> Clear</button>
+  </div>
+ </div>
+
+</div> <!-- END DIV SERVICE -->

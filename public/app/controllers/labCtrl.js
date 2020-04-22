@@ -213,6 +213,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
                 dockerAPIService.loadGeneralLab(vm.repoName, vm.lab.name, 0, function (data) {
                   $scope.labState = data.state === 'STOPPED' ? playProto : stopProto;
                   $scope.action = data.state === 'STOPPED' ? $scope.startLab : $scope.stopLab;
+                  $scope.isLabRun = data.state === 'STOPPED' ? false : true;
                   console.log("ONLOAD CANVAS");
                   $scope.listContainers = data.clistToDraw;
                   onLoadCanvas(data)
@@ -530,6 +531,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   const playProto = { actionLabel: "Start lab", actionClass: "fa fa-fw fa-play", statusLabel: "Lab is inactive", actionButton: "btn btn-success", state: 'inactive', statusClass: "bs-callout bs-callout-danger ", statusIcon: 'fa fa-fw fa-stop' }
   const loadingProto = { actionLabel: "Loading", actionClass: "fa fa-fw fa-spinner fa-pulse", statusLabel: "Loading...", actionButton: "btn btn-warning", state: 'loading', statusClass: "bs-callout bs-callout-warning", statusIcon: 'fa fa-fw fa-spinner fa-pulse' }
   const stopProto = { actionLabel: "Stop lab", actionButton: "btn btn-danger", actionClass: "fa fa-fw fa-stop", statusLabel: "Lab is active", state: 'active', statusClass: "bs-callout bs-callout-success", statusIcon: 'fa fa-fw fa-check' }
+  const isLabRun = false;
 
   var ansi_up = new AnsiUp;
 
@@ -577,6 +579,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
         //Set state on stop
         $scope.labState = stopProto
         $scope.action = $scope.stopLab
+        $scope.isLabRun = true;
         _initNetworkList();
         //End load action
         completeLoad()
@@ -621,6 +624,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
           //labState to play proto
           $scope.labState = playProto
           $scope.action = $scope.startLab
+          $scope.isLabRun = false;
           _initNetworkList()
         }
         else if (data.status === 'error') {
@@ -634,6 +638,11 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
 
   //Nothing to do
   $scope.loading = function loading() { }
+
+  $scope.updateManagedServices = function updateManagedServices() {
+    console.log("Updat managed services");
+    dockerAPIService.updateManagedServices();
+  }
 
 
   function startLoad() {

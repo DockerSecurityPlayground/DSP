@@ -19,6 +19,7 @@ var api = '/dsp_v1/docker_network/' ;
   const unknownStatus = "<b class='text-danger'>Unknown </b>";
 
   var listServices;
+
   function getServices() {
         return $http.get(dsp_running_services);
   }
@@ -87,6 +88,8 @@ var api = '/dsp_v1/docker_network/' ;
 
 
 	return {
+    kaliService : {"isRun" : false},
+    httpdService : {"isRun": false},
 		saveLab:function saveLab(labName, cld, clnd, nl, graphJSON, icv) {
 			var data = {
 				networkList : nl,
@@ -201,6 +204,46 @@ var api = '/dsp_v1/docker_network/' ;
     stopService: function stopService(containerName) {
       return $http.put(dsp_running_services+"stop/"+containerName);
     },
+    isWiresharkRun: function() {
+      return $http.get(dsp_running_services+ "wireshark");
+    },
+    stopWireshark: function() {
+      return $http.delete(dsp_running_services+ "wireshark");
+    },
+    isRun: function(serviceName) {
+      return $http.get(dsp_running_services + serviceName);
+    },
+    updateManagedServices: function() {
+      const self = this;
+      self.isRun("kali")
+        .then(function successCb(data) {
+          self.kaliService.isRun = data.data.data.isRun;
+        }, function errorCb() {
+          Notification("Error in check kali status", 'error');
+        })
+      self.isRun("httpd")
+        .then(function successCb(data) {
+          self.httpdService.isRun = data.data.data.isRun;
+        }, function errorCb() {
+          Notification("Error in check httpd status", 'error');
+        })
+      
+    },
+    stopHackTool: function(serviceName) {
+      return $http.delete(dsp_running_services+ serviceName);
+    },
+    stopCapture: function() {
+      return this.stopHackTool("tcpdump")
+    },
+    stopKali: function() {
+      return this.stopHackTool("kali")
+    },
+    isKaliRun: function() {
+      return this.isRun("kali")
+    },
+    isTcpdumpRun: function() {
+      return this.isRun("tcpdump")
+    },
     deleteHackTool: function(containerName) {
       return $http.delete(dsp_hack_tools + "/" + containerName);
     },
@@ -223,6 +266,7 @@ var api = '/dsp_v1/docker_network/' ;
     },
     getServices :     getServices,
     initServices : function initServices(cb) {
+      
       getServices()
         .then(function successCallback(response) {
           _initServices(response.data.data)
