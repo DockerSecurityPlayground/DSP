@@ -8,18 +8,26 @@
         <tr>
           <th>Name</th>
           <th>Repository URL</th>
+          <th>SSH Key Path</th>
           <th>&nbsp;</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="r in repos">
-          <td>{{r.name}}</td>
+          <td>{{r.name}}  <span uib-popover="Repo is Private" popover-trigger="'mouseenter'" ng-class="r.isPrivate ? 'fa  fa-fw fa-lock' : 'fa fa-fw fa-lock-open'" ></span></td>
           <td><a href="{{r.url}}" target="_blank">{{r.url}}</a></td>
+          <td>{{r.sshKeyPath}}</td>
           <td class="text-right">
             <div class="btn-group btn-group-xs">
               <a class="editing-components btn btn-default">
+                <span uib-popover="Edit" popover-trigger="'mouseenter'" ng-click="editRepositoryClick(r)" class="fa fa-fw fa-edit"> </span>
+              </a>
+              <a class="editing-components btn btn-default">
                 <span uib-popover="Update" popover-trigger="'mouseenter'" ng-click="updateRepository(r)" class="fa fa-fw fa-download"> </span>
               </a>
+              <!-- <a class="editing-components btn btn-default">
+                <span uib-popover="Push to remote" popover-trigger="'mouseenter'" ng-click="pushRepository(r)" class="fa fa-fw fa-upload"> </span>
+              </a> -->
               <a class="editing-components btn btn-danger">
                 <span uib-popover="Remove" popover-trigger="'mouseenter'" class="fa fa-fw fa-remove" ng-click="removeRepository(r)"> </span>
               </a>
@@ -36,22 +44,44 @@
         </tr>
       </tfoot>
     </table>
-
     <p>&nbsp;</p>
 
     <div ng-show="areReposUploading" class="alert alert-info"> Uploading Repositories, pls wait... </div>
 
-    <form name="githubForm" class="form-horizontal">
-      <h3>Add GitHub Repository</h3>
+    <form name="githubForm" class="form-horizontal" >
+      <h3>{{githubFormHeader}}</h3>
       <div class="row">
         <div class="col-sm-3">
           <label for="name"> Name </label>
-          <input type="text" placeholder="Repository name" class="form-control" name="name" id="githubName" ng-model=repo.name>
+          <input type="text" placeholder="Repository name" class="form-control" name="name" id="githubName" ng-model=repo.name ng-readonly=readOnlyFields>
         </div>
         <div class="col-sm-9">
-          <label for="url"> URL </label>
+          <label for="githubURL"> URL </label>
           <input type="text" placeholder="Repository URL" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
-            id="githubURL" ng-model=repo.url>
+            id="githubURL" ng-model=repo.url ng-readonly=readOnlyFields>
+        </div>
+      </div>
+      <div class="row">
+        <br>
+        <div class="col-sm-3">
+          <span>Is private?</span>
+          <label class="switch">
+            <input type="checkbox"  ng-click="checkRepoPrivate()"  ng-model=repo.isPrivate>
+          </label>
+        </div>
+      </div>
+      <div class="row" id="gitauthrow" ng-show="isPrivateCheckbox">
+        <div class="col-sm-3">
+          <label for="username"> Username </label>
+          <input type="text" placeholder="{{usernamePlaceholder}}" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/" ng-readonly=readOnlyUsername>
+        </div>
+        <div class="col-sm-3">
+          <label for="token"> Token </label>
+          <input type="text" placeholder="{{tokenPlaceholder}}" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
+        </div>
+        <div class="col-sm-6">
+          <label for="sshKeyPath"> SSH key path </label>
+          <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=repo.sshKeyPath>
         </div>
       </div>
 
@@ -60,8 +90,14 @@
         <div ng-show='isLoadingGit' class="alert alert-info"> Inserting Repo</div>
       </div>
       <div class="py-4">
-        <button class="btn btn-success" ng-click="addRepository()" ng-disabled="githubForm.$invalid || isRepoUploading">
-          <i class="fa fa-fw fa-plus"></i> Add repo
+        <div ng-show="isEditing" class="alert alert-info"> Check, pls wait...  </div>
+      </div>
+      <div class="py-4">
+        <button class="btn btn-success" ng-click="updateAddButton.text == 'Add repo' ? addRepository() : editRepository()" ng-disabled="githubForm.$invalid || isRepoUploading" >
+          <i class="fa fa-fw fa-plus"></i> {{updateAddButton.text}}
+        </button>
+        <button class="btn btn-success btn-danger" ng-click="clearGithubForm()" ng-disabled="!githubForm.$dirty">
+          <i class="fa fa-fw fa-minus"></i> Discard
         </button>
       </div>
 

@@ -45,6 +45,7 @@ function sendProgressMessage(ws, message) {
 function manageInstallation(ws, jsonMessage) {
   installationHandler.installation(
     jsonMessage.config,
+    jsonMessage.repo,
     // End callback
     (err) => {
       sendResponse(ws, err);
@@ -182,6 +183,44 @@ function manageUpdateApplication(ws) {
   });
 }
 
+function manageEditRepository(ws, jsonMessage) {
+  wsGitHandler.editRepository(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
+function managePullPersonalRepo(ws, jsonMessage){
+  log.info('[WS_HANDLER] Pulling Personal Repo');
+  wsGitHandler.pullPersonalRepo((err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
+function managePushPersonalRepo(ws, jsonMessage){
+  log.info('[WS_HANDLER] Pushing Personal Repo');
+  wsGitHandler.pushPersonalRepo(jsonMessage.body, (err) => {
+    if (err) {
+      log.error(err);
+      sendResponse(ws, new Error(err));
+    } else {
+      // Restart command
+      sendResponse(ws, null);
+    }
+  });
+}
+
 exports.init = function init(server) {
   const wss = new WebSocket.Server({
     server,
@@ -230,8 +269,17 @@ exports.init = function init(server) {
         case 'add_project':
           manageAddProject(ws, jsonMessage);
           break;
+        case 'edit_repository':
+          manageEditRepository(ws,jsonMessage);
+          break;
         case 'update_application':
           manageUpdateApplication(ws, jsonMessage);
+          break;
+        case 'pull_personal_repo':
+          managePullPersonalRepo(ws, jsonMessage);
+          break;
+        case 'push_personal_repo':
+          managePushPersonalRepo(ws, jsonMessage);
           break;
         default:
           log.error(`in web socket message: ${jsonMessage.action} is no registered`);

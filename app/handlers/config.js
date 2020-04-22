@@ -39,9 +39,10 @@ function updateConfig(req, res) {
         cb(Checker.errorLabNoStopped(labsWrong));
       }
       else if (req.body.config.githubURL) {
-        JoiAppConditions.check(req.body.config.githubURL, 'url', (err) => {
+        Checker.checkGitUrl(req.body.config.githubURL, (err) => {
           cb(err);
         });
+
       } else cb(null);
     },
     // Get config data

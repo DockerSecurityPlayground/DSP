@@ -1,15 +1,20 @@
 var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, RegexService, $http, $scope, $window,Notification) {
-  $scope.installView =  { 
+  $scope.installView =  {
           showButton : true,
           showLoading : false
 
-  }
-  
-  $scope.config={ 
+  };
+
+  $scope.config={
           mainDir : 'dsp',
-          name : '', 
+          name : '',
           githubURL: ""
-  }
+  };
+  $scope.repo = {
+    isPrivate : false,
+    username : '',
+    token : '',
+  };
 
   $scope.notify = ' Installation and download DSP Projects... Pls wait ';
   $scope.nameRegex = RegexService.nameRegex
@@ -17,7 +22,8 @@ var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, Re
   SocketService.manage(
     JSON.stringify({
             action:'installation',
-            config: $scope.config
+            config: $scope.config,
+            repo: $scope.repo,
           }),
     function(event) {
           var data = JSON.parse(event.data);
@@ -29,9 +35,9 @@ var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, Re
               setTimeout(function() {
                 // Close socket
                 SocketService.close();
-                $window.location.href = '/index.html' 
+                $window.location.href = '/index.html'
               }, 3000);
-          }	
+          }
           else if(data.status === 'error') {
             $scope.installView.showButton = true;
             $scope.installView.showLoading = false;
@@ -63,9 +69,9 @@ var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, Re
     //      setTimeout(function() {
     //        // Close socket
     //        socket.close();
-    //        $window.location.href = '/index.html' 
+    //        $window.location.href = '/index.html'
     //      }, 3000);
-    //  }	
+    //  }
 
     //  else if(data.status === 'error') {
     //                  $scope.installView.showButton = true;
@@ -83,7 +89,12 @@ var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, Re
     //}
             $scope.installView.showButton = false;
             $scope.installView.showLoading = true;
+	};
 
-	}	
+  $scope.isPrivateCheckbox = false;
+
+  $scope.checkRepoPrivate = function (){
+    $scope.isPrivateCheckbox =  !$scope.isPrivateCheckbox;
+  };
 
 }
