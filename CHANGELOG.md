@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.6.0] - 2020 - 04 - 22
 - Added snippet function in Dockerfile
+- Implemented private git repository support
 
 ## [3.5.1] - 2020 - 04 - 17
 - Added network graph enchancements
