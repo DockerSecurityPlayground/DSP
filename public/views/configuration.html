@@ -45,10 +45,20 @@
       </div>
 
       <div class="form-group">
-        <label for="sshKeyPath">{{config.githubURL.includes('@') ? 'SSH Key Path:' : 'Username'}}</label>
-        <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
-               ng-model="config.githubURL.includes('@') ? config.sshKeyPath : config.username"
-               ng-required="false" ng-readonly="true">
+        <div ng-if="config.githubURL.includes('@')">
+          <label for="sshKeyPath">SSH Key Path:</label>
+          <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
+                ng-model="config.sshKeyPath"
+                ng-required="false" ng-readonly="true">
+
+        </div>
+        <div ng-if="!config.githubURL.includes('@')">
+          <label for="sshKeyPath">Username:</label>
+          <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
+                ng-model="config.username"
+                ng-required="false" ng-readonly="true">
+        </div>
+
         <div class="text-muted small">Current Git Auth Data</div>
       </div>
 
@@ -138,7 +148,7 @@
             </div>
             <div class="col-sm-3">
               <label for="token"> Token </label>
-              <input type="text" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
+              <input type="password" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
             </div>
             <div class="col-sm-6">
               <label for="sshKeyPath"> SSH key path </label>
