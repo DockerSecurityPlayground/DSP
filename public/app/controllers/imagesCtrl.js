@@ -341,7 +341,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
       Notification("Success");
       $location.url('/dockerfile/' + $scope.dockerFileToCreate.name);
     },function errorCallback(response) {
-      Notification({message: response.data.message}, 'error');
+      Notification({message: "Error in Create Dockerfile (are you using - in name?)"}, 'error');
     })
   }
 

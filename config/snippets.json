@@ -1,0 +1,32 @@
+{"snippets": [
+		{ 
+			"name": "/etc/passwd priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y vim python php-cli whois openssl\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN chmod o=rw /etc/passwd\nUSER user1\n", "description": "Configuration that makes the file /etc/passwd editable", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "ld_preload priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y sudo vim build-essential\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN echo 'user1 ALL=(root) NOPASSWD: /usr/bin/find' | sudo EDITOR='tee -a' visudo\nRUN echo 'Defaults env_keep += LD_PRELOAD' | sudo EDITOR='tee -a' visudo\nUSER user1\n", "description": "Dockerfile configuration for ld_preload privilege escalation", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "suid priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y vim nano build-essential\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN chmod u+s /bin/cp\nRUN chmod u+s /usr/bin/find\nRUN chmod u+s /usr/bin/vim.basic\nRUN chmod u+s /bin/nano\nRUN echo \"H4sIANIThl4AA1XKMQrDMAxA0Tk6hbEXe6m7J+QuSSwaQa2GSB5MyN1rL4VOHx7fEW/vktBMook+j30G96PC1PTfpErUeqB0BmI1eSH2AS4YBLVQ8i9U7A1hbFZFMXsbV+K4LrLbrmc7TzbPEW74AlJpq/+DAAAA\" | base64 -d | gunzip > /asroot.c\nRUN gcc /asroot.c -o /shell\nRUN chmod u+s /shell\nUSER user1\n", "description": "Dockerfile configuration for a few suid binaries: cp, find, vim, nano and custom /shell", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "sudo priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y sudo vim python-minimal less man ftp socat build-essential\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN echo \"H4sIABMZhl4AA1NWVNBPyszTT0oszuDiQjABbaBnUxgAAAA=\" | base64 -d | gunzip > /asroot.sh\nRUN echo \"H4sIAKYZhl4AA1NWVNAvLS7ST8rM0y+oLMnIz+PiyswtyC8qUcgv5uLKL9YrriwuSc3VUAIrSUoszlDS5AIAkslS8TYAAAA=\" | base64 -d | gunzip > /asroot.py\nRUN echo \"H4sIANIThl4AA1XKMQrDMAxA0Tk6hbEXe6m7J+QuSSwaQa2GSB5MyN1rL4VOHx7fEW/vktBMook+j30G96PC1PTfpErUeqB0BmI1eSH2AS4YBLVQ8i9U7A1hbFZFMXsbV+K4LrLbrmc7TzbPEW74AlJpq/+DAAAA\" | base64 -d | gunzip > /asroot.c\nRUN gcc /asroot.c -o /shell\nRUN echo 'user1 ALL=(root) NOPASSWD: /usr/bin/find, /usr/bin/perl, /usr/bin/python, /usr/bin/less, /usr/bin/awk, /usr/bin/man, /usr/bin/vim, /usr/bin/env, /usr/bin/ftp, /usr/bin/scp, /usr/bin/socat, /asroot.py, /asroot.sh, /shell' | sudo EDITOR='tee -a' visudo\nUSER user1\n", "description": "Dockerfile configuration for privilege escalation abusing sudo rights: find, perl, python, less, awk, man, vim, env, ftp, scp, socat and custom shells", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "cronjobs priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y sudo cron python-minimal tar\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN echo \"H4sIALOhlV4AAzWLSQqAMAwA73lFxENV0Nz9jUrAgl1IU7G/8S2+zIJ4G4aZtqGchFbrif2JsegePFgXgyiG9FMqCVTKDM/93NVPVSi7zojDUZD24Ji2gxefIw1oeuBr46jfUJfaT3xZ7Xp4AeAd5NVzAAAA\" | base64 -d | gunzip > /tmp/cleanup.py\nRUN mkdir -p /home/cleanup /var/backups/ /var/www/html\nRUN echo \"H4sIALOhlV4AAzWLSQqAMAwA73lFxENV0Nz9jUrAgl1IU7G/8S2+zIJ4G4aZtqGchFbrif2JsegePFgXgyiG9FMqCVTKDM/93NVPVSi7zojDUZD24Ji2gxefIw1oeuBr46jfUJfaT3xZ7Xp4AeAd5NVzAAAA\" | base64 -d | gunzip > /var/www/html/cleanup.py\nRUN sed -i '$ i */2 *   * * *   root    /tmp/cleanup.py' /etc/crontab\nRUN sed -i '$ i */1 *   * * *   root    tar -zcf /var/backups/html.tgz /var/www/html/*' /etc/crontab\nRUN chmod 777 /var/www/html\nUSER user1\nENTRYPOINT service cron restart\n", "description": "Dockerfile configuration for privilege escalation using linux scheduled cron jobs", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "PATH priv_esc", "code": "ENV DEBIAN_FRONTEND=noninteractive\nRUN apt-get update && apt-get install -y vim nano build-essential\nRUN useradd user1\nRUN echo 'user1:pass123' | chpasswd\nRUN mkdir /script && chmod 777 /script\nRUN echo \"H4sIANmxlV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaWCYiUgt5YLAOY/YRtMAAAA\" | base64 -d | gunzip > /script/shell_ps.c\nRUN echo \"H4sIAGKylV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaXkxBIF/dzidL2SihIloEQtFwARCX6IVgAAAA==\"| base64 -d | gunzip > /script/shell_cat_msg.c\nRUN echo \"H4sIAL6ylV4AA1POzEvOKU1JVbApzcssLknRy7Dj4irLz0xRyE3MzNPQ5Krm4ixOLSnNTNEw0LQGs9Ph7MriktRcDaXkxBIF/dSSZP2CxOLi8hQloFwtFwBU3KN1WQAAAA==\" | base64 -d | gunzip > /script/shell_cat_etcpasswd.c\nRUN echo \"H4sIADSzlV4AA1POzEvOKU1JVbApzcssLknRy7DjKsvPTFHITczM09DkqubiLE4tKc1M0TDQtAaz0+HsyuKS1FwNpcwUJSC3losLAPy2BrFMAAAA\" | base64 -d | gunzip > /script/shell_id.c\nRUN echo \"H4sIAJizlV4AAyupKMktTk/LzEnl4gIAxNFhSQwAAAA=\" | base64 -d | gunzip > /msg.txt\nRUN gcc /script/shell_ps.c -o /script/shell_ps\nRUN gcc /script/shell_id.c -o /script/shell_id\nRUN gcc /script/shell_cat_etcpasswd.c -o /script/shell_cat_etcpasswd\nRUN gcc /script/shell_cat_msg.c -o /script/shell_cat_msg\nRUN chmod u+s /script/shell_ps\nRUN chmod u+s /script/shell_id\nRUN chmod u+s /script/shell_cat_msg\nRUN chmod u+s /script/shell_cat_etcpasswd\nUSER user1\n", "description": "Dockerfile configuration for privilege escalation using PATH environment variable", "category": "privilege escalation", "image": "ubuntu:18.04" 
+		},
+		{ 
+			"name": "alpine adduser", "code": "RUN adduser -D test-user && echo test-user:test-password | chpasswd", "description": "Dockerfile configuration for privilege escalation using PATH environment variable", "category": "Alpine Configuration", "image": "alpine:latest" 
+		}
+	],
+ 	"categories": [
+		{
+			"name": "privilege escalation", "description": "Code snippets for docker containers privilege escalation misconfigurations" 
+		},
+		{
+			"name": "Alpine Configuration", "description": "Some Alpine Configuration" 
+		}
+	] 
+}

@@ -8,6 +8,7 @@ const app = express();
 const http = require('http');
 const fs = require('fs');
 const labels = require('./app/handlers/labels');
+const snippets = require('./app/handlers/snippets')
 const labs = require('./app/handlers/labs');
 const configHandler = require('./app/handlers/config');
 const networkHandler = require('./app/handlers/network');
@@ -117,6 +118,9 @@ app.put('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.editDockerFile);
 app.get('/dsp_v1/dockerfiles', dockerfilesHandler.getDockerFiles);
 app.get('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.getDockerFile);
 app.delete('/dsp_v1/dockerfiles/:dockerfile', dockerfilesHandler.deleteDockerFile);
+
+//Api snippets
+app.get('/dsp_v1/snippets/', snippets.allSnippets);
 
 //Api Hack Tools
 app.get('/dsp_v1/hack_tools/', serviceHandler.getListHackTools);

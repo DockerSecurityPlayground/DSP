@@ -173,6 +173,8 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
     $scope.selectedElement.content = contentDockerfile;
   }
 }
+
+
       var $ctrl = this;
       $scope.notify = "";
       this.$onInit = function() {
@@ -187,6 +189,11 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
             Notification({message: response.data.message}, 'error');
           });
 
+        dockerAPIService.getSnippets()
+          .then(function successCallback(response){
+            $scope.snippetList = response.data.data.snippets;
+            console.log("scope snippets", $scope.snippetList);
+          });
       };
 
       // console.log(dockerfile);
@@ -194,6 +201,8 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
       $scope.newFile = "";
       $scope.log = '';
       $scope.treeModel = [];
+      $scope.snippets = {};
+      $scope.selectedCategory = "privilege escalation"
 
       var rootElement = _getRoot($scope.treeModel);
       $scope.$watch('files', function () {
@@ -247,6 +256,29 @@ $scope.removeElement = function() {
     // angular.copy(newTreeModel, $scope.treeModel);
     // });
   }
+}
+
+$scope.changedSnippet = function(selectedSnippet){
+  
+  if($scope.selectedElement.content.match(/^FROM.*/)){
+    $scope.selectedElement.content = $scope.selectedElement.content + "\n\n" + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
+    const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
+    const newImage = selectedSnippet.image
+    const newContent = $scope.selectedElement.content.replace(previousImage, "FROM " + newImage)
+    $scope.selectedElement.content = newContent
+  }
+  else{
+    $scope.selectedElement.content = "FROM " + selectedSnippet.image + "\n\n" + $scope.selectedElement.content  + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
+  }
+}
+
+$scope.undoChangeSnippet = function(selectedSnippet){
+  $scope.selectedElement.content = $scope.selectedElement.content.replace(selectedSnippet.code, "")
+  $scope.selectedElement.content = $scope.selectedElement.content.replace("#" + selectedSnippet.name + "\n", "")
+}
+
+$scope.changedCategory = function(category){
+  $scope.selectedCategory = category
 }
 
 $scope.nodeSelected = function(e, data) {

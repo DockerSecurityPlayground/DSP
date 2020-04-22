@@ -8,6 +8,7 @@ _MEI*
 *.log
 npm-debug.log*
 snippets
+.vscode
 
 # Runtime data
 pids

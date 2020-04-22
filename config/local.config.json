@@ -3,6 +3,7 @@
     "enableLogin": false,
     "dsp_reponame": "dsp_repo",
     "name_labelfile": "labels.json",
+    "name_snippetsfile": "snippets.json",
     "static_content": "../public/",
     "applicationRepo": "https://github.com/giper45/DockerSecurityPlayground.git",
     "repos": [
