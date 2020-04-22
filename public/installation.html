@@ -25,7 +25,7 @@
 
   <base href="/">
   <script>
-    //ANGULAR COMPONENT REGISTRATION 
+    //ANGULAR COMPONENT REGISTRATION
     angular.module("myApp", ['ngAnimate', 'ngSanitize', 'ngWebSocket', 'ui.bootstrap', 'ui-notification'])
       .service('ServerResponse', dsp_server_response)
       .service('SafeApply', SafeApply)
@@ -61,18 +61,18 @@
     <div id="page-inner">
       <!--
       <div class="row">
-        <div class="col-sm-4"> 
+        <div class="col-sm-4">
             <h3>Avatar</h3>
         <img src="assets/img/avatar.jpeg" class="user-image img-responsive"/>
         </div>
-        <div class="col-sm-8"> 
-         <b> Upload your image </b>	
+        <div class="col-sm-8">
+         <b> Upload your image </b>
         <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" id="avatar" accept="image/*" name="avatar"/> 
+        <input type="file" id="avatar" accept="image/*" name="avatar"/>
         <br>
         <button class="btn btn-success" id="Button1">Upload</button>
         </form>
-    
+
         </div>
         </div>
         <hr>
@@ -96,16 +96,49 @@
             </div>
 
             <div class="form-group">
+              <label for="gitEmail">Git Email</label>
+              <input type="text" class="form-control" id="gitEmail" name="gitEmail" ng-model=config.email
+                     ng-required="true" ng-readonly="false" ng-pattern="email">
+              <div class="text-muted small">Email for git</div>
+            </div>
+
+            <div class="form-group">
               <label for="github_project">Github directory:</label>
               <input type="text" class="form-control" id="name" ng-model=config.githubURL>
               <div class="text-muted small">Set your Github remote repository if you want to synchronize your projects remotely </div>
+            </div>
+
+            <div class="row">
+              <br>
+              <div class="col-sm-3">
+                <span>Is private?</span>
+                <label class="switch">
+                  <input type="checkbox"  ng-click="checkRepoPrivate()"  ng-model=repo.isPrivate>
+                </label>
+              </div>
+            </div>
+
+            <div class="row" id="gitauthrow" ng-show="isPrivateCheckbox">
+              <div class="col-sm-3">
+                <label for="username"> Username </label>
+                <input type="text" placeholder="Username" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/">
+              </div>
+              <div class="col-sm-3">
+                <label for="token"> Token </label>
+                <input type="text" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token>
+              </div>
+              <div class="col-sm-6">
+                <label for="sshKeyPath"> SSH key path </label>
+                <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=config.sshKeyPath>
+              </div>
             </div>
             <!-- <div class="form-group">
                     <label for="ports">Ports to exclude</label>
                     <input type="text" class="form-control" id="name" ng-model=config.portsToExclude>
                     <div class="text-muted small">Ports that you use in your host and want to exclude from DSP usage (ex: 80,21)</div>
-                  </div> 
+                  </div>
             -->
+            <hr class="py-5">
             <button type="submit" ng-show="installView.showButton" ng-click="install()" class="btn btn-success">Install</button>
           </form>
           <br>

@@ -12,13 +12,31 @@ const LabStates = require('./LabStates.js');
 const dockerManager = require('../data/docker-images.js');
 const imageMgr = require('mydockerjs').imageMgr;
 
+
 // Clone a project in the main directory
-function cloneProject(nameProject, githubUrl, callback) {
+function cloneProject(repo, callback) {
   const log = appUtils.getLogger();
+  const githubUrl = repo.url;
+  let params = { reponame: repo.name };
   log.info('Cloning...');
-  log.info(nameProject);
+  log.info(repo.name);
   log.info(githubUrl);
-  repogitData.clone(githubUrl, { reponame: nameProject },
+
+  //Make params for git clone private repo
+  if (repo.hasOwnProperty("isPrivate") && repo.isPrivate){
+    log.info('Repo is private');
+    params.isPrivate = repo.isPrivate;
+    if (repo.hasOwnProperty("sshKeyPath") && repo.sshKeyPath) {
+      params.sshKeyPath = repo.sshKeyPath;
+    } else if (repo.hasOwnProperty("username") && repo.hasOwnProperty("token") && repo.username && repo.token) {
+      params.username = repo.username;
+      params.token = repo.token;
+    } else {
+      log.error("No AUTH");
+    }
+  }
+
+  repogitData.clone(githubUrl, params,
       (error, response) => {
         log.info('clone finish');
         if (error) callback(error);
@@ -73,10 +91,11 @@ function buildImages(repoName, callback, notifyCallback) {
   }
 }
 // Clone projects, intialize states then build images by looking at the "update.sh script" inside the repository directory
-function initRepository(nameProject, githubUrl, callback, notifyCallback) {
+function initRepository(repo, callback, notifyCallback) {
   const log = appUtils.getLogger();
+  const nameProject = repo.name;
   async.waterfall([
-    (cb) => cloneProject(nameProject, githubUrl, cb),
+    (cb) => cloneProject(repo, cb),
     (res, cb) => LabStates.initStates(nameProject, cb),
     //(cb) => dockerManager.getImagesAllLabs(nameProject, cb),
    //(data, cb) => {
@@ -102,9 +121,22 @@ function initRepository(nameProject, githubUrl, callback, notifyCallback) {
     // (cb) => buildImages(nameProject, cb, notifyCallback),
   ], (err) => callback(err));
 }
+
+function updateRepoUrl(repo, callback){
+  const log = appUtils.getLogger();
+  const nameProject = repo.name;
+  if(repo.username && repo.token && repo.username !== '' && repo.token !== ''){
+    repogitData.updateRepoUrl(repo.name, repo.username, repo.token, repo.url, (error) =>{
+      if (error) callback(error);
+      else callback(null);
+    });
+  }else
+    callback(null);
+}
 // exports.getLocalConfigSync = getLocalConfigSync;
 
 module.exports = {
   initRepository,
-  buildImages
+  buildImages,
+  updateRepoUrl
 };

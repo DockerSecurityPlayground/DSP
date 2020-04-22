@@ -44,7 +44,7 @@ exports.createConfig = (nameConfig, config, callback) => {
   }
 };
 
-exports.createDSP = (nameConfig, callback, notifyCallback) => {
+exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
   log.info('Creating DSP directories');
   try {
     const configDir = path.join(appRoot.toString(), 'config', nameConfig);
@@ -69,7 +69,16 @@ exports.createDSP = (nameConfig, callback, notifyCallback) => {
     // Synchronization with github
     else {
       log.info('Synchronization with GITHUB, clone user repository');
-      gitUtils.initRepository(config.name, config.githubURL, (err) => {
+
+      let dspRepo = {
+        name: config.name,
+        url: config.githubURL,
+        isPrivate : repo.isPrivate,
+        username : repo.username,
+        token : repo.token,
+        sshKeyPath: config.sshKeyPath,
+      };
+      gitUtils.initRepository( dspRepo, (err) => {
         if (err) callback(err);
         else {
           log.info('Success in sync');
@@ -86,7 +95,8 @@ exports.createDSP = (nameConfig, callback, notifyCallback) => {
 exports.initRepos = (callback, notifyCallback) => {
   const repos = localConfig.config.repos;
   async.eachSeries(repos, (item, c) => {
-    gitUtils.initRepository(item.name, item.url, c, notifyCallback);
+
+    gitUtils.initRepository({'name' : item.name,'url' : item.url}, c, notifyCallback);
   },
   (err) => callback(err));
 };

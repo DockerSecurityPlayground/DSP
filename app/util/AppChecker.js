@@ -132,7 +132,27 @@ function initErrors() {
       name: 'alphabetic',
       defaultMessage: 'Only alphabetic name allowed',
       code: 1008,
-    }
+    },
+    {
+      name: 'invalidHttpAuth',
+      defaultMessage: 'Expected Username and Token',
+      code: 1009,
+    },
+    {
+      name: 'invalidSshAuth',
+      defaultMessage: 'Expected SSH key path',
+      code: 1010,
+    },
+    {
+      name: 'invalidGitUrl',
+      defaultMessage: 'Invalid Git Url',
+      code: 1010,
+    },
+    {
+      name: 'invalidEmail',
+      defaultMessage: 'Invalid Email Address',
+      code: 1011,
+    },
   ];
 
 
@@ -294,5 +314,49 @@ module.exports = {
     });
   },
 
+  checkGitUrl(data, callback){
+    const myRegEx  = /((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/i;
+    let isValid = myRegEx.test(data);
+    if(isValid) {
+      callback(null);
+    } else {
+      callback(new Errors.invalidGitUrl());
+    }
+  },
+
+  checkEmail(data, callback){
+    const myRegEx  = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
+    let isValid = myRegEx.test(data);
+    if(isValid) {
+      callback(null);
+    } else {
+      callback(new Errors.invalidEmail());
+    }
+  },
+
+
+
+  checkIfRepoIsPrivateAndValid(repo, isUpdate, callback) {
+    const url = repo.url;
+    if (repo.hasOwnProperty('isPrivate') && repo.isPrivate) {
+      if (url.includes('http://') || url.includes('https://')) {
+        if (!isUpdate) {
+          if (!(repo.hasOwnProperty('username') && repo.hasOwnProperty('token') && repo.username && repo.token)) {
+            return callback(new Errors.invalidHttpAuth());
+          }
+        }
+        repo.sshKeyPath = null;
+      } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:(([\\w]+)\\/([\\w_\\-]+))+.git)')) {
+        if (!(repo.hasOwnProperty('sshKeyPath') && repo.sshKeyPath)) {
+          return callback(new Errors.invalidSshAuth());
+        }
+        repo.username = null;
+        repo.token = null;
+      } else {
+        return callback(new Errors.invalidGitUrl());
+      }
+    }
+   return  callback(null);
+  },
 };
 

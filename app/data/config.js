@@ -56,7 +56,11 @@ const updateConfig = function updateConfig(data, callback) {
       const config = {
         name: data.name,
         mainDir: path.normalize(data.mainDir),
-        githubURL: data.githubURL };
+        githubURL: data.githubURL,
+        sshKeyPath: data.sshKeyPath,
+        username: data.username,
+        email: data.email,
+      };
       cb(null, config);
     },
     // Write new config data
