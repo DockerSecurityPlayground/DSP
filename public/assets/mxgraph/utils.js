@@ -90,6 +90,7 @@ function Graph__setRemoveHandler(canRemove) {
 
 
 function graphEditCallback(oldName, obj, newObj) {
+  Graph__log("graphEditCallback()");
   var theCell = theGraph.getModel().getCell(oldName);
   // Fix for network
   if (!theCell) {
@@ -467,6 +468,8 @@ function mxInitGraph(graph, appScope) {
   // Called when the connection is created
   var mxCreateEdge = mxConnectionHandler.prototype.createEdge;
   mxConnectionHandler.prototype.createEdge = function(value, source, target, style) {
+    Graph__log("createEdge()")
+    
     Model__AppScope.attachNetwork(target.name, source.name);
     return mxCreateEdge.apply(this, arguments);
   }

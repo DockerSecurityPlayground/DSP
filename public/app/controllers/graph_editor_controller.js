@@ -206,6 +206,8 @@ window.location.href = urlToGo;
   var networkInEditing = null;
   // Called when the edit is finished
   $scope.editNetworkElement = function() {
+    console.log("[graph_editor_controller] editNetworkElement");
+    
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
 
     // Update network in network list
@@ -213,11 +215,8 @@ window.location.href = urlToGo;
     networkToEdit.name = $scope.n.name;
     networkToEdit.subnet = s;
     networkToEdit.listIP = NetworkManagerService.genList(networkToEdit.subnet)
-    console.log("network to edit");
-    console.log(networkToEdit);
-
     // Callback to graphedit
-    $scope.graphEditTerminatedCallback($scope.n.name, networkInEditing, $scope.n);
+    $scope.graphEditTerminatedCallback(networkInEditing.name, networkInEditing, $scope.n);
     // Reset current container
 
     // Don't show the network panel
