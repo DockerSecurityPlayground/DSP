@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.6.1] - 2020 - 04 - 25
+- Fixed error in subnet change
+
 ## [3.6.0] - 2020 - 04 - 22
 - Added snippet function in Dockerfile
 - Implemented private git repository support
