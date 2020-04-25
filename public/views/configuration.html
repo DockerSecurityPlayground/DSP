@@ -36,11 +36,18 @@
                ng-required="true" ng-readonly="false" ng-pattern="email">
         <div class="text-muted small">Email for git</div>
       </div>
+      <button type="submit" ng-disabled="formConfig.$invalid" ng-click="updateConfig()" class="btn btn-primary">
+        <i class="fa fa-fw fa-refresh"></i> Update
+      </button>
+    </form>
 
+    <hr class="py-5" />
+    <h3> Current Git Data </h3>
+    <form name="gitConfigUrl">
       <div class="form-group">
         <label for="gitUrl">Git URL:</label>
         <input type="text" class="form-control" id="gitUrl" name="gitUrl" ng-model=config.githubURL
-             ng-required="false" ng-readonly="true">
+               ng-required="false" ng-readonly="true">
         <div class="text-muted small">Current Git Repo URL</div>
       </div>
 
@@ -48,26 +55,22 @@
         <div ng-if="config.githubURL.includes('@')">
           <label for="sshKeyPath">SSH Key Path:</label>
           <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
-                ng-model="config.sshKeyPath"
-                ng-required="false" ng-readonly="true">
+                 ng-model="config.sshKeyPath"
+                 ng-required="false" ng-readonly="true">
+          <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
 
         </div>
         <div ng-if="!config.githubURL.includes('@')">
           <label for="sshKeyPath">Username:</label>
           <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
-                ng-model="config.username"
-                ng-required="false" ng-readonly="true">
+                 ng-model="config.username"
+                 ng-required="false" ng-readonly="true">
         </div>
-
-        <div class="text-muted small">Current Git Auth Data</div>
-      </div>
-
-      <button type="submit" ng-disabled="formConfig.$invalid" ng-click="updateConfig()" class="btn btn-primary">
-        <i class="fa fa-fw fa-refresh"></i> Update
-      </button>
-      <button type="submit" ng-disabled="formConfig.$invalid" ng-click="pullPersonalRepo()" class="btn btn-primary">
-        <i class="fa fa-fw fa-download"></i> Pull Personal Repo
-      </button>
+          <div class="text-muted small">Current Git Auth Data</div>
+        </div>
+        <button type="submit" ng-disabled="formConfig.$invalid" ng-click="pullPersonalRepo()" class="btn btn-primary">
+          <i class="fa fa-fw fa-download"></i> Pull Personal Repo
+        </button>
     </form>
 
     <div class="py-4">
@@ -153,6 +156,7 @@
             <div class="col-sm-6">
               <label for="sshKeyPath"> SSH key path </label>
               <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=repo.sshKeyPath>
+              <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
             </div>
           </div>
 

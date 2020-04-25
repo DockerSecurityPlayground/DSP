@@ -74,7 +74,10 @@ exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
         sshKeyPath: config.sshKeyPath,
       };
       gitUtils.initRepository( dspRepo, (err) => {
-        if (err) callback(err);
+        if (err) {
+          fs.rmdirSync(homeDSP, { recursive: true });
+          callback(err);
+        }
         else {
           log.info('Success in sync');
           initUserRepo(homeDSP, config);

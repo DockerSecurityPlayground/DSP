@@ -59,7 +59,7 @@ module.exports = {
             gitClient = gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
           } else if (params.username && params.token) {
             url = strings.add(url, `${params.username}:${params.token}@`, '//'); // It doesn't contain a username
-          } else {
+          } else if (url.includes('http') ) {
             callback(new Error('If repository is private auth is required'));
           }
         }
