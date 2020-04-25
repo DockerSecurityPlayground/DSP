@@ -89,10 +89,16 @@ function Graph__setRemoveHandler(canRemove) {
 }
 
 
-function graphEditCallback(obj, newObj) {
-  var theCell = theGraph.getModel().getCell(obj.name);
+function graphEditCallback(oldName, obj, newObj) {
+  var theCell = theGraph.getModel().getCell(oldName);
+  // Fix for network
+  if (!theCell) {
+    theCell = theGraph.getModel().getCell(obj.name);
+    console.log(theCell);
+    
+  }
   // Update the cell name
-  Graph__update(theCell, newObj.name, obj.name);
+  Graph__update(theCell, newObj.name, oldName);
 }
 
 function _incrementID(id, names, stringBase) {

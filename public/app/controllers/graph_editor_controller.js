@@ -217,7 +217,7 @@ window.location.href = urlToGo;
     console.log(networkToEdit);
 
     // Callback to graphedit
-    $scope.graphEditTerminatedCallback(networkInEditing, $scope.n);
+    $scope.graphEditTerminatedCallback($scope.n.name, networkInEditing, $scope.n);
     // Reset current container
 
     // Don't show the network panel
@@ -394,7 +394,7 @@ window.location.href = urlToGo;
     } else {
       containerManager.setContainer($scope.currentContainer, containerToEdit);
       // Callback to graphedit
-      $scope.graphEditTerminatedCallback(containerToEdit, $scope.currentContainer);
+      $scope.graphEditTerminatedCallback(oldName, containerToEdit, $scope.currentContainer);
       // Reset current container
       containerManager.resetCurrent($scope.imageList, $scope.networkList);
       $scope.isAddContainer = true;

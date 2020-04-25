@@ -56,22 +56,27 @@ function graphRenameProperty(cells, oldName, newName) {
 // Update the name of the cell
 function Graph__update(cell, newName, oldName) {
   Graph__log("Graph__update()")
+  console.log("CELL")
+  console.log(cell);
+  console.log(cell.children);
+  
   var label = cell.value;
   var $html = $('<div />',{html:label});
   if(Model__AppScope)
     var container = Model__AppScope.getContainer(newName);
-  
-  
-  cell.children.forEach(function (interface) {
-    if (interface.edges) {
-      edge = interface.edges[0];
-      const network = _.findWhere(edge.parent.children, {type: "Network"})
-      if (container && container.networks) {
-      const containerNetwork = container.networks[network.name];
-      Graph__setEdgeLabel(theGraph, edge, containerNetwork)
-      }
+
+    if (cell.type == NETWORK_ELEMENT_TYPE) {
+      cell.children.forEach(function (interface) {
+        if (interface.edges) {
+          edge = interface.edges[0];
+          const network = _.findWhere(edge.parent.children, {type: "Network"})
+          if (container && container.networks) {
+          const containerNetwork = container.networks[network.name];
+          Graph__setEdgeLabel(theGraph, edge, containerNetwork)
+          }
+        }
+      })
     }
-  })
   // replace "Headline" with "whatever" => Doesn't work
   $html.find('h5').html(newName);
   // Info setting
