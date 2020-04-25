@@ -6,6 +6,7 @@ const appUtils = require('../util/AppUtils');
 const gitUtils = require('../util/GitUtils');
 const async = require('async');
 const localConfig = require('../../config/local.config.json');
+const rimraf = require('rimraf');
 
 const log = appUtils.getLogger();
 
@@ -75,7 +76,9 @@ exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
       };
       gitUtils.initRepository( dspRepo, (err) => {
         if (err) {
-          fs.rmdirSync(homeDSP, { recursive: true });
+          rimraf(homeDSP, function () {
+            log.error("Removed repo dir because has occurred error in git clone");
+          });
           callback(err);
         }
         else {
