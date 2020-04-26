@@ -97,7 +97,8 @@ var DSP_DockerToolsCtrl  = function($scope, $location, Notification, SafeApply, 
     $scope.currentContainer.isInteractive = true;
     $scope.currentContainer.isOneLine = false;
     $scope.currentContainer.isDaemonized = true;
-    $scope.currentContainer.command = "/bin/bash"
+    // $scope.currentContainer.command = "/bin/bash"
+    $scope.currentContainer.command = '/bin/sh -c "[ -e /bin/bash ] && /bin/bash || /bin/sh"';
     $scope.currentContainer.environments = [];
     // $scope.currentContainer.environments = [{
     //     name: 'ip',

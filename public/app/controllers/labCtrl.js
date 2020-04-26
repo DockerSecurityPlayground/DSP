@@ -293,17 +293,23 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   $scope.goToContainer = function goToContainer(nameContainer, dc = "true") {
     console.log(nameContainer)
     console.log(dc)
+    const size = {
+      width: window.innerWidth || document.body.clientWidth,
+      height: window.innerHeight || document.body.clientHeight
+    }
+
     $http.post('/dsp_v1/dockershell', {
       namerepo: vm.repoName,
       namelab: vm.lab.name,
       dockername: nameContainer,
-      dockercompose: dc
+      dockercompose: dc,
+      size: size
     })
       .then(
         function success(response) {
           console.log("SUCCESS");
           var windowReference = window.open();
-          windowReference.location = "docker_socket.html";
+          windowReference.location = "docker_socket.html?serviceName="+nameContainer;
           // window.open('docker_socket.html', '_blank');
         },
         function error(err) {

@@ -309,13 +309,15 @@ function dockershellcontainer(req, res) {
     (cb) => Checker.checkParams(req.body, ['namerepo', 'namelab', 'dockername', 'dockercompose'], cb),
     (cb) => configData.getConfig(cb),
     (config, cb) => {
-      const dockerInfos = {
+      let dockerInfos = {
       mainPath: config.mainDir,
       nameRepo : req.body.namerepo,
       labName : req.body.namelab,
       dockerName : req.body.dockername,
       dockercompose : req.body.dockercompose
       }
+      if (req.body.size)
+        dockerInfos["size"] = req.body.size;
       cb(null, dockerInfos);
     },
     (dockerInfos, cb) => {

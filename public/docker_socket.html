@@ -1,9 +1,21 @@
 <!doctype html>
+<script>
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+const serviceName = getUrlParameter("serviceName");
+document.title = serviceName;
+
+
+
+</script>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Webshell - The WebTTY Terminal Emulator</title>
     <script src="/webshell/hterm_all.js"></script>
     <script src="/webshell/socket.io/socket.io.js"></script>
     <script src="/webshell/webshell.js"></script>
