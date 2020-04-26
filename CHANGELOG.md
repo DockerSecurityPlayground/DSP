@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 ## [3.6.2] - 2020 - 04 - 26
 - Fixed title in docker containers
 - Fixed width and title
+- Fixed width height in ports to improve usability
+- Removed label in graph sidebar to improve usability
 
 ## [3.6.1] - 2020 - 04 - 25
 - Fixed error in subnet change
