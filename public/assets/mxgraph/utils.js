@@ -139,12 +139,33 @@ function Model__NetworkCreate() {
 }
 
 
+function  Graph__OnLoadedCanvas() {
+  //Called after that graph has been loaded
+  Graph__log("Graph__OnLoadedCanvas()");
+  console.log(theGraph.model.cells);
+  const ports = _.values(theGraph.model.cells).filter(function (c) {
+    return c.type == "Interface";
+  });
+  theGraph.getModel().beginUpdate();
+  ports.forEach(function (p) {
+    var portGeometry = theGraph.model.getGeometry(p);
+    var newGeometry = new mxGeometry(portGeometry.x, portGeometry.y, PORT_SIZE, PORT_SIZE);
+    newGeometry.width = PORT_SIZE;
+    newGeometry.height = PORT_SIZE;
+    p.setGeometry(newGeometry);
+  });
+  theGraph.getModel().endUpdate();
+  
+}
+
 function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
-  var doc = mxUtils.parseXml(canvasXML);
-  var codec = new mxCodec(doc);
-  codec.decode(doc.documentElement, theGraph.getModel());
-  Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
-  Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
+  Graph__log("canvasLoadedCallback()");
+  // var doc = mxUtils.parseXml(canvasXML);
+  // var codec = new mxCodec(doc);
+  // codec.decode(doc.documentElement, theGraph.getModel());
+  // Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
+  // Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
+  // Graph__OnLoadedCanvas();
 }
 
 
@@ -165,9 +186,8 @@ function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCre
   // Creates the image which is used as the sidebar icon (drag source)
   var img = document.createElement('img');
   img.setAttribute('src', Graph__NetworkElementImage);
-  // img.style.width = '48px';
-  // img.style.height = '48px';
-  img.title = 'Drag this to the diagram to create a new vertex';
+  img.style.width = '120px';
+  img.title = labelText;
   var ele = document.createElement('div');
   ele.innerHTML = labelText;
   var dragContainer = document.createElement('div');
@@ -180,7 +200,7 @@ function _addSidebarElment(graph, sidebar, icon, labelText, fnCreateModel, fnCre
   ele.classList.add("sidebar-inner")
   ele.classList.add("no-selection")
   dragContainer.appendChild(img);
-  dragContainer.appendChild(ele);
+  // dragContainer.appendChild(ele);
   sidebar.appendChild(dragContainer);
   sidebar.appendChild(document.createElement("hr"))
 

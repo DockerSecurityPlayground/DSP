@@ -8,6 +8,7 @@ var NETWORK_ELEMENT_TYPE = "NetworkElement";
 var NETWORK_TYPE = 'Network';
 var NETWORK_WIDTH = 140;
 var NETWORK_HEIGHT = 140;
+var PORT_SIZE = 24;
 var theParent = null;
 var Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
@@ -136,16 +137,16 @@ function Graph__addPort(graph, v1, value, x, y, width, height, style, offsetX, o
 
 function Graph__addFirstPort(graph, v1, name) {
   // Graph__addPort(graph, v1, 'Trigger', 0, 0.25, 16, 16, 'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
-  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name }, 0, 0.25, PORT_SIZE, PORT_SIZE, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -8);
 }
 function Graph__addSecondPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, 16, 16, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 0, 0.75, PORT_SIZE, PORT_SIZE, 'port;image=/editors/images/ethernet.png;align=right;imageAlign=right;spacingRight=18', -6, -4);
 }
 function Graph__addThirdPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, 16, 16, 'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -8);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.25, PORT_SIZE, PORT_SIZE, 'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -8);
 }
 function Graph__addFourthPort(graph, v1, name) {
-  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, 16, 16,'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -4);
+  Graph__addPort(graph, v1, {type: 'Interface', name: name}, 1, 0.75, PORT_SIZE, PORT_SIZE,'port;image=/editors/images/ethernet.png;spacingLeft=18', -8, -4);
 }
 
 
