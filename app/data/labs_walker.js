@@ -276,6 +276,7 @@ const DSPWalk = stampit(MyEmitter)
             });
           }, () => {
             r.labs = arrLabs;
+            r.isCollapsed = true;
             repocallback(null);
           });
         },
