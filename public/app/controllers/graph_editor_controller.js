@@ -77,6 +77,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
             $scope.isComposeVisible = false
           // Container created, update canvas
           if (Graph__isValidXML($scope.canvas)) {
+            console.log("Is valid XML");
             var networkNames = $scope.networkList.map(a => a.name)
             var containerNames = containerManager.containerListToDraw.map( c => c.name);
             $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);

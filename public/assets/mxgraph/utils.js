@@ -160,12 +160,12 @@ function  Graph__OnLoadedCanvas() {
 
 function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
   Graph__log("canvasLoadedCallback()");
-  // var doc = mxUtils.parseXml(canvasXML);
-  // var codec = new mxCodec(doc);
-  // codec.decode(doc.documentElement, theGraph.getModel());
-  // Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
-  // Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
-  // Graph__OnLoadedCanvas();
+  var doc = mxUtils.parseXml(canvasXML);
+  var codec = new mxCodec(doc);
+  codec.decode(doc.documentElement, theGraph.getModel());
+  Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
+  Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
+  Graph__OnLoadedCanvas();
 }
 
 

@@ -1,17 +1,7 @@
 <!-- <div style="background-color:white; height:1000px;overflow:scroll;"> -->
 <div style="background-color:white; height:100%; overflow:scroll">
   <link rel="stylesheet" type="text/css" href="../assets/css/tab_graph.css">
-  <div  ng-repeat="(key,c) in containerListNotToDraw"	>
-    <h4 id="{{c.name}}" class="text-center " >
-
-      <!-- <b> {{c}} </b> -->
-    <b> {{c.name}}  </b>
-    <a href="#" ng-click="onClickEditContainer(key)" style="margin-left:20px" class="fa fa-pencil"> </a>
-    <a href="#" ng-click="deleteContainer(key)" style="margin-left:20px" class="fa fa-remove"> </a>
-    <a href="#" ng-click="copyContainer(key)" style="margin-left:20px" class="fa fa-files-o"> </a>
-    <br>
-    </h4>
-  </div>
+  
   <button type="submit" class="btn btn-default" ng-disabled="form_add_container.$invalid" ng-click="editContainer()"> 
     <i class="glyphicon glyphicon-floppy-saved"> </i>    Edit
   </button> 
