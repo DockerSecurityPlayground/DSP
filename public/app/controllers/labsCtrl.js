@@ -1,4 +1,4 @@
-var dsp_LabsCtrl = function(AjaxService, CurrentLabService , BreadCrumbs, WalkerService, $location) {
+var dsp_LabsCtrl = function($scope, AjaxService, CurrentLabService , BreadCrumbs, WalkerService, $location) {
 	console.log("labsCtrl")
 	var self = this; 
 	self.username = ''
@@ -8,6 +8,7 @@ var dsp_LabsCtrl = function(AjaxService, CurrentLabService , BreadCrumbs, Walker
 	self.filteredLabels = []	;
 	self.filteredRepos = []
 
+	
 	BreadCrumbs.breadCrumbs('/labs')
 	CurrentLabService.resetLab()
 	var urlRedirect =  '/lab/use/';
@@ -66,4 +67,20 @@ var dsp_LabsCtrl = function(AjaxService, CurrentLabService , BreadCrumbs, Walker
 		}
 
 	}
+
+	$scope.showRunning = function () {
+		var ret
+		_.each(self.repos, function(e){			
+			if(_.findWhere(e.labs, {state: "RUNNING"}) !== undefined){
+				console.log(_.findWhere(e.labs, {state: "RUNNING"}))
+				ret = true
+				return ret
+			}
+			else
+				ret = false				
+		})
+		return ret
+
+	}
+
 }
