@@ -14,6 +14,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
   $scope.dockerFileToCreate = { name : "testdocker"};
   function init() {
     // All images if query string is allimages
+    $scope.showSpinner = true
     if ($location.search().allimages && $location.search().allimages == 'true') {
       $scope.imagePanel = "all_images";
     }
@@ -43,6 +44,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
 
               })
               imageList.push(images[e]);
+              $scope.showSpinner = false
             });
             $scope.imageList = imageList
             initAllImages()
@@ -56,6 +58,7 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
         function errorCallback(response) {
           Notification({message:"Sorry,  error in loading docker images"}, 'error');
         })
+        
     dockerAPIService.getDockerFiles()
     .then(function success(response) {
       $scope.dockerFiles = response.data.data.dockerfiles;
