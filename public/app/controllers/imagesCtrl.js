@@ -44,9 +44,9 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
 
               })
               imageList.push(images[e]);
-              $scope.showSpinner = false
             });
             $scope.imageList = imageList
+            $scope.showSpinner = false
             initAllImages()
             console.log($location.hash());
             $timeout(function(){$anchorScroll()});
