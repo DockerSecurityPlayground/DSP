@@ -4,12 +4,12 @@
   <a href="/"><img src="assets/img/dsp_logo.png" class="user-image img-responsive" /></a>
 </div>
 
-<div ng-repeat="r in repos" class="lab pb-2">
+<div ng-repeat="r in WalkerService.repos" class="lab pb-2">
   <div class="panel panel-default">
-    <div class="panel-heading" ng-click="r.isCollapsed= !r.isCollapsed" >
+    <div class="panel-heading" ng-click="isCollapsed[$index]= !isCollapsed[$index]" >
       <i class="fa fa-fw fa-cubes"></i> {{r.name}} {{r.version }} labs
     </div>
-    <div class="list-group" uib-collapse="r.isCollapsed">
+    <div class="list-group" uib-collapse="isCollapsed[$index]">
       <a ng-repeat="lab in r.labs" href="/lab/use/{{r.name}}/{{lab.name}}" class="list-group-item">
         <div class="text-ellipsis" title="{{lab.name}}">
             <i class="fa fa-fw fa-cube"></i>

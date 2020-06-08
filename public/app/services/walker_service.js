@@ -10,6 +10,10 @@ var dsp_WalkerService = function($log) {
     self.version = version
   }
 
+  self.update = function(repos) {
+    self.repos = repos;
+  }
+
   self.repoNewLab = function(newLab) {
     var repoUser = self.getUserRepo()  
     if (!repoUser) {
@@ -126,3 +130,4 @@ var dsp_WalkerService = function($log) {
     }
   }
 }
+

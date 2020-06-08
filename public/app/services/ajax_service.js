@@ -46,6 +46,23 @@ self.configExists = function() {
   return (self.config !== undefined);
 
 }
+
+self.update = function() {
+
+  $http.get(apiUrl+"all")
+  .then(
+    function successCallback(response) {
+  
+            console.log("Update AjaxService")
+            console.log(response.data)
+            WalkerService.update(response.data.data.repos)
+    },
+    function errorCallback(response) {
+            console.log("Error in acquisition all")
+            Notification('Server error:'+ response.data.message, 'error');
+    })
+}
+
 self.init = function(onSuccess) {
   //Load user configuration
   if(!self.config) {
@@ -188,3 +205,5 @@ self.init = function(onSuccess) {
       });
   }
 }
+
+
