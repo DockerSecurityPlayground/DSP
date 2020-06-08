@@ -2,7 +2,7 @@
 <div id="page-wrapper" >
   <h6 ng-show=showRunning()> <i class="fa fa-fw fa-play"></i> Running </h6>
     <div class="btn-group" ng-repeat="r in ctrl.repos"> 
-      <button ng-repeat="l in r.labs | filter :{state:'RUNNING'}" type="button" class="btn btn-primary btn-sm mr-3" href="#" ng-click="ctrl.getURL(r.name, l.name)" title="Open {{l.name }} lab">{{l.name}}</button>
+      <button ng-repeat="l in r.labs | filter :{state:'RUNNING'}" type="button" class="btn btn-primary btn-sm mr-3" href="#" ng-click="ctrl.getURL(r.name, l.name)" title="Open {{l.name }} lab">{{r.name}}/{{l.name}}</button>
     </div>
   
   <h1><i class="fa fa-fw fa-server"></i> Labs </h1>
