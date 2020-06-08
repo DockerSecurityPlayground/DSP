@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.6.5] - 2020 - 06 - 08
+- Updated application dependencies in package.json
+
 ## [3.6.4] - 2020 - 05 - 05
 - Fixed bug in network graph  
 - Fixed bug in network commands
