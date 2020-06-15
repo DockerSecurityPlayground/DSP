@@ -10,6 +10,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.isRunning = false;
   $scope.isCreated = false;
   $scope.log = ""
+  $scope.imageDownload = {};
   $scope.environment = {name: "Name",
     value: "Value"
   };
@@ -747,6 +748,91 @@ window.location.href = urlToGo;
     setDefaultAction($scope.currentContainer.selectedImage);
 
   }
+
+  $scope.downloadNewImage = function downloadNewImage(i) {
+    var ni = {}
+    ni.name = i;
+    ni.disabled = false;
+    $scope.downloadImage(ni);
+  }
+
+  $scope.downloadImage = function downloadImage(p) {
+    $scope.imageDownload = p
+    if ($scope.imageDownload.disabled == true) {
+      console.log(p.name + " already in downloading")
+    } else {
+      $scope.imageDownload.isVisible = true;
+      $scope.imageDownload.isExtracting = false;
+      var ids = [];
+      var total = 0;
+      imageSep = p.name.split(":")
+      nameToDownload = imageSep[0]
+      tagToDownload = imageSep[1]
+      // p.disabled = true
+      //disableAllImages(p.name, true)
+      SocketService.manage(JSON.stringify({
+        action : 'download_images',
+        params : {
+          name : nameToDownload,
+          tag : tagToDownload
+        }
+      }), function(event) {
+        var data = JSON.parse(event.data);
+        if(data.status === 'success')  {
+          console.log("Success")
+          //log.content = "";
+          $scope.imageDownload.progress=""
+          $scope.imageDownload.isVisible = false
+          //successAll(p.name, true)
+          $scope.imageDownload.textType = "text-success"
+          Notification({message: " Image successfully downloaded!"}, 'success');
+          $scope.updateImages();
+        }
+        else if(data.status === 'error') {
+          Notification('Some error in download image', 'error');
+          console.log(data)
+          // $scope.responseError = $scope.responseErrorHeader + data.message;
+        }
+        else {
+          console.log("IMAGES");
+          //log.content += data.message;
+          console.log(data.message);
+          var message = JSON.parse(data.message);
+          if(message.status == 'Pulling fs layer'){
+            var obj = {'id': message.id,'percentage': 0};
+            ids.push(obj);
+          }
+          if(message.status == 'Downloading'){
+            _.each(ids, function(element){
+              if(message.id == element.id){
+                var normalized = (100 / ids.length);
+                element.percentage = ((message.progressDetail.current * normalized) / message.progressDetail.total) - element.percentage;
+                total += element.percentage;
+              }
+            })
+          }
+          if(message.status == 'Download complete'){
+
+            _.each(ids, function(element){
+              if(message.id == element.id){
+                var normalized = (100 / ids.length)
+                element.percentage = normalized - element.percentage;
+                total += element.percentage;
+              }
+            })
+          }
+          if(total > 99)
+          {
+            $scope.imageDownload.isExtracting = true;
+          }
+          $scope.imageDownload.progress = total;
+          console.log($scope.imageDownload.progress)
+          //p.progress = dockerAPIService.formatPullLog(data.message);
+        }
+      })
+    }
+  }
+
   //Set argument of action to default
   $scope.defaultArgs = function(action) {
     if (action && action.args)

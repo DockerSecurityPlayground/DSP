@@ -85,7 +85,22 @@
             </button>
           </div>
         </div>
-
+        <form class="pb-5">
+          <div class="row form-group">
+            <label class="control-label col-sm-2 label_style text-left" for="download">Image Name:</label>           
+            <div class="col-sm-6">
+              <input type="text" class="form-control" id="download" ng-model="imageToDownload">
+            </div>
+            <div class="col-sm-3">
+              <button class="btn btn-default" ng-click="downloadNewImage(imageToDownload)"> <span class="fa fa-fw fa-download"></span> Download</button>
+            </div>
+            <div ng-switch="imageDownload.isExtracting" ng-show="imageDownload.isVisible" class="col-sm-offset-2 col-sm-6">
+              <md-progress-linear md-mode="determinate" value="{{imageDownload.progress}}" ng-switch-default>
+              </md-progress-linear>
+              <md-progress-linear md-mode="indeterminate" ng-switch-when="true"></md-progress-linear>
+            </div>
+          </div>
+        </form>
         <div class="row">
           <div class="col-sm-2 col-sm-offset-2">
             <button class="btn btn-primary" ng-click="goToImageRepository()"> <i class="glyphicon glyphicon-new-window"> </i> Images </button>
