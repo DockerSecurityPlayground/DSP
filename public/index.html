@@ -74,6 +74,7 @@
   <script src="app/components/dsp_dockerfileComponent.js"> </script>
   <script src="app/components/dsp_copyInContainer.js"> </script>
   <script src="app/components/dsp_dockerfileComponent.js"> </script>
+  <script src="app/components/dsp_imagesDownloadComponent.js"> </script>
 
 
   <!--CUSTOMS ANGULAR COMPONENTS -->
@@ -232,6 +233,7 @@
       .component('copyFromContainerComponent', dsp_copyFromContainer)
       .component('copyInContainerComponent', dsp_copyInContainer)
       .component('dockerfileComponent', dsp_dockerfileComponent)
+      .component('imagesComponent', dsp_imagesDownloadComponent)
       .config(function (NotificationProvider, $routeProvider, $locationProvider, $httpProvider, $mdThemingProvider, cfpLoadingBarProvider) {
         NotificationProvider.setOptions({
           delay: 3500,

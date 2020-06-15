@@ -150,6 +150,9 @@ var api = '/dsp_v1/docker_network/' ;
     areImagesInstalled : function areImagesInstalled(repoName, labName) {
       return $http.get(dsp_images_docker + repoName + "/" + labName + "?checkInstallation=true")
     },
+    getLabImages : function getLabImages(repoName, labName) {
+      return $http.get(dsp_images_docker + repoName + "/" + labName)
+    },
     getDSPImages : function getDSPImages() {
             return $http.get(dsp_images_docker)
     },
