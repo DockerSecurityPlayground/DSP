@@ -786,7 +786,8 @@ window.location.href = urlToGo;
           //successAll(p.name, true)
           $scope.imageDownload.textType = "text-success"
           Notification({message: " Image successfully downloaded!"}, 'success');
-          $scope.updateImages();
+          $scope.updateImages(p);
+          //$scope.changedImage(p)
         }
         else if(data.status === 'error') {
           Notification('Some error in download image', 'error');
@@ -1242,12 +1243,14 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
     var dockerName = iName.replace(":latest", "");
     window.open('/dockerfile/' + dockerName, '_blank');
   }
-  $scope.updateImages = function() {
+  $scope.updateImages = function(p) {
     dockerAPIService.getDockerImages()
       .then(function successCallback(response) {
         var imageList = response.data.data
         $scope.imageList = imageList
-        containerManager.init($scope.imageList)
+        console.log(imageList)
+        var image = _.findWhere(imageList,{name: p.name})
+        containerManager.update(image)
         Notification("Images updated", 'success');
 
       }, function errorCallback(response) {
