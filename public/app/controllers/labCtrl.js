@@ -583,6 +583,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
       var data = JSON.parse(event.data);
       if (data.status === 'success') {
         //Set state on stop
+        AjaxService.update()
         $scope.labState = stopProto
         $scope.action = $scope.stopLab
         $scope.isLabRun = true;
@@ -631,6 +632,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
           $scope.labState = playProto
           $scope.action = $scope.startLab
           $scope.isLabRun = false;
+          AjaxService.update();
           _initNetworkList()
         }
         else if (data.status === 'error') {

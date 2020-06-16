@@ -34,7 +34,7 @@
           <table class="table table-sm">
             <tbody>
 
-              <tr id="{{li.nameLab}}" ng-repeat="li in i.lab_images">
+              <tr id="{{i.repoName}}_{{li.nameLab}}" ng-repeat="li in i.lab_images">
 
                 <td>
                   <h5>
@@ -57,7 +57,7 @@
                           </a>
                         </div>
                         <div ng-if="!p.contains && !p.toBuild" class="col-sm-3">
-                          <a title="Download image" href="#" id="downloadImage" class="btn btn-default btn-xs" ng-class="{disabled : p.disabled}"  ng-click="downloadImage(p, li.log)">
+                          <a title="Download image" id="downloadImage" class="btn btn-default btn-xs" ng-class="{disabled : p.disabled}"  ng-click="downloadImage(p, li.log)">
                               <i class="fa fa-fw fa-download"></i> Download image
                           </a>
                         </div>
