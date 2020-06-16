@@ -9,13 +9,19 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
-## [3.7.0] - 2020 - 06 - 16
+## [3.7.0] - 2020 - 06 - 16  
 ### Fixed  
 - Anchor on images page for 2 labs that belong to different repositories
 - Update tree on the left when the user adds a new lab or when a lab is stopped
 - Network Graph issues (i.e. select element on the left)
 
-
+### Added   
+- Drop down labs menu collapsed by default in sidebar  
+- Running labs in homepage  
+- Loading images spinner in Images Manager  
+- Labs state in sidebar drop down menus  
+- Download lab missing images from lab view  
+- Download user defined Docker Image from edit container view  
 
 
 ## [3.6.5] - 2020 - 06 - 08
