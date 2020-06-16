@@ -20,21 +20,21 @@
             <li class="list-group-item borderless" ng-repeat="li in images">
               <div class="row">
                 <div class="{{ li.textType }} col-sm-9" style="font-family: monospace">{{ li.name }}</div>
-                <div ng-if="!li.contains && li.toBuild" class="col-sm-3">
-                  <a title="Build image" href="#" id="downloadImage" class="btn btn-xs btn-primary" ng-class="{disabled : li.disabled}" ng-click="buildImage(p, i.repoName, li.log)">
-                    <i class="fa fa-fw fa-download"></i> Build image
-                  </a>
-                </div>
-                <div ng-if="!p.contains && !p.toBuild" class="col-sm-3">
+                <div ng-if="!li.contains && !li.toBuild" class="col-sm-3">
                   <a title="Download image" href="#" id="downloadImage" class="btn btn-default btn-xs" ng-class="{disabled : li.disabled}"  ng-click="downloadImage(li, li.log)">
                       <i class="fa fa-fw fa-download"></i> Download image
                   </a>
                 </div>
-                <div ng-if=p.contains class="col-sm-3">
-                  <a title="Delete image" href="#" id="delAction" class="btn btn-xs btn-danger" ng-click="delImage(p)">
-                      <i class="fa fa-fw fa-times"></i> Delete image
+                <!--<div ng-if="!li.contains && li.toBuild" class="col-sm-3">
+                  <a title="Build image" href="#" id="downloadImage" class="btn btn-xs btn-primary" ng-class="{disabled : li.disabled}" ng-click="buildImage(p, i.repoName, li.log)">
+                    <i class="fa fa-fw fa-download"></i> Build image
                   </a>
                 </div>
+                <div ng-if=li.contains class="col-sm-3">
+                  <a title="Delete image" href="#" id="delAction" class="btn btn-xs btn-danger" ng-click="delImage(li)">
+                      <i class="fa fa-fw fa-times"></i> Delete image
+                  </a>
+                </div>-->
 
               </div>
               <div ng-switch="li.isExtracting" ng-show="li.isVisible" class="row">

@@ -103,7 +103,17 @@ var dsp_imagesDownloadComponent  =
               p.isVisible = false
               successAll(p.name, true)
               p.textType = "text-success"
-              CurrentLabService.noImages = false;
+              dockerImagesService.areImagesInstalled($routeParams.repo, $routeParams.namelab)
+              .then(function success(data) {
+                var areInstalled = data.data.data.areInstalled;
+                if(!areInstalled) {
+                  CurrentLabService.noImages = true;
+                }
+                else {
+                  CurrentLabService.noImages = false;
+                }
+              })
+              
             }
             else if(data.status === 'error') {
               Notification('Some error in download image', 'error');
