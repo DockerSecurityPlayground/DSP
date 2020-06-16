@@ -767,9 +767,13 @@ window.location.href = urlToGo;
       var total = 0;
       imageSep = p.name.split(":")
       nameToDownload = imageSep[0]
-      tagToDownload = imageSep[1]
-      // p.disabled = true
-      //disableAllImages(p.name, true)
+      if(imageSep.length === 1){
+        tagToDownload = "latest";
+        p.name = p.name + ":latest"
+      }
+      else {
+        tagToDownload = imageSep[1];
+      }   
       SocketService.manage(JSON.stringify({
         action : 'download_images',
         params : {
