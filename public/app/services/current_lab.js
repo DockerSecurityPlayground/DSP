@@ -1,6 +1,7 @@
 function dsp_currentLab()  { 
 
 this.currentLab = {};
+this.noImages;
 
 
 

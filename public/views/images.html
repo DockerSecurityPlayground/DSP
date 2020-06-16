@@ -26,7 +26,9 @@
 
       <h2> Repo Images </h2>
       <p>&nbsp;</p>
-
+      <div ng-show="showSpinner" layout="row" layout-sm="column" layout-align="space-around">
+        <md-progress-circular md-mode="indeterminate" md-diameter="96"></md-progress-circular>
+      </div>
       <div class="list-group">
         <div ng-repeat="i in imageList" class="panel panel-default">
           <div class="panel-heading"><i class="fa fa-fw fa-server"></i> {{ i.repoName }} labs</div>

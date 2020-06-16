@@ -2,7 +2,7 @@ var dsp_AjaxService= function($http, $q, $log, WalkerService, Notification, $loc
   var name_repo= ''
   var apiUrl = "/dsp_v1/"
   var self = this
-
+  
   self.config
   self.loaded = false
   self.projectLabels = { labels : [] }

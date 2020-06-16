@@ -1,0 +1,57 @@
+<style>
+  .adjust-label {
+    padding-top: 4px
+  }
+
+  .log-panel {
+    height: 100px;
+  }
+</style>
+<table class="table table-sm">
+    <tbody>
+      <tr id="{{ctrl.lab.name}}" >
+        <td>
+          <button class="btn btn-success" ng-click="downloadAll()">
+            <i class="fa fa-download"></i> Download All Images
+          </button>
+        </td>
+        <td>
+          <ul class="list-group">
+            <li class="list-group-item borderless" ng-repeat="li in images">
+              <div class="row">
+                <div class="{{ li.textType }} col-sm-9" style="font-family: monospace">{{ li.name }}</div>
+                <div ng-if="!li.contains && !li.toBuild" class="col-sm-3">
+                  <a title="Download image" href="#" id="downloadImage" class="btn btn-default btn-xs" ng-class="{disabled : li.disabled}"  ng-click="downloadImage(li, li.log)">
+                      <i class="fa fa-fw fa-download"></i> Download image
+                  </a>
+                </div>
+                <!--<div ng-if="!li.contains && li.toBuild" class="col-sm-3">
+                  <a title="Build image" href="#" id="downloadImage" class="btn btn-xs btn-primary" ng-class="{disabled : li.disabled}" ng-click="buildImage(p, i.repoName, li.log)">
+                    <i class="fa fa-fw fa-download"></i> Build image
+                  </a>
+                </div>
+                <div ng-if=li.contains class="col-sm-3">
+                  <a title="Delete image" href="#" id="delAction" class="btn btn-xs btn-danger" ng-click="delImage(li)">
+                      <i class="fa fa-fw fa-times"></i> Delete image
+                  </a>
+                </div>-->
+
+              </div>
+              <div ng-switch="li.isExtracting" ng-show="li.isVisible" class="row">
+                <br>
+                <md-progress-linear md-mode="determinate" value="{{li.progress}}" ng-switch-default>
+                </md-progress-linear>
+                <md-progress-linear md-mode="indeterminate" ng-switch-when="true"></md-progress-linear>
+                <!-- <textarea ng-if=p.progress class="form-control" rows="5" id="comment">
+                            {{ p.progress }} 
+                        </textarea> -->
+              </div>
+              <div ng-show="li.log.content" class="log-panel" ui-ace="{ theme: 'terminal', mode: 'yaml' }" ng-model=li.log.content></div>
+            </li>
+          </ul>
+          <!-- <div ng-show="selectedElement.type === 'textfile'" class="col-sm-9" ui-ace="{ -->
+          
+        </td>
+      </tr>
+    </tbody>
+  </table>

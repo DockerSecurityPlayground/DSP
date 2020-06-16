@@ -12,12 +12,12 @@ function dsp_imagesService(dockerAPIService, Notification) {
   this.areImagesInstalled = function(repoName, labName, cb) {
       return dockerAPIService.areImagesInstalled(repoName, labName, cb)
   }
-  this.getByLab = function(cb, refresh = false) {
+  this.getByLab = function(repoName, labName, cb, refresh = false) {
     console.log("GET DSP IMAGES");
     if (this.LabImages && !refresh) {
       cb(this.LabImages);
     } else {
-      dockerAPIService.getDSPImages()
+      dockerAPIService.getLabImages(repoName, labName)
       .then(function successCallback(response) {
         this.LabImages = response.data.data.images;
         // var cbs = this.onDownloadCallbacks.values();

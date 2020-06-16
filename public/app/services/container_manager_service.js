@@ -30,6 +30,12 @@ function init(imageList)
 	currentContainer.selectedImage  = imageList[0]
 
 }
+
+function update(image)
+{
+	currentContainer.selectedImage = image;
+}
+
 function setContainer(container, dest) {
 		 angular.copy(container, dest)
 		dest.selectedImage =container.selectedImage
@@ -184,6 +190,7 @@ return {
 		var size = clnd.length
 		return size
 	},
+	update: update,
 	newNetworkOccurred : function newNetworkOccurred(n) {
 
 	//update networkList of currentContainer

@@ -44,6 +44,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   vm.buttonAction = buttonCreateProto
   //Button action import or delete
   vm.deleteImportButton = buttonDeleteProto
+  $scope.CurrentLabService = CurrentLabService;
   vm.editVisible = false
   vm.repos,
     vm.lab = {},
@@ -154,8 +155,8 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
                     var areInstalled = data.data.data.areInstalled;
                     if (!areInstalled) {
                       console.log("NOT INSTALLED");
-                      $scope.noImages = true;
-                      vm.editVisible = false
+                      CurrentLabService.noImages = true;
+                      vm.editVisible = false;                    
                     } else {
                       dockerImagesService.get(function (images) {
                         $scope.interactiveImageList = images;

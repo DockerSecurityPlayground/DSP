@@ -70,7 +70,7 @@
               <span class="{{ctrl.labState.actionClass}}"></span> {{ctrl.buttonAction.label}}
             </button>
           </div>
-          <div ng-show="ctrl.exists && !noImages">
+          <div ng-show="ctrl.exists && !CurrentLabService.noImages">
             <button ng-disabled="labState.actionLabel === 'Loading'" class="{{labState.actionButton}}" id="labState" href="#" ng-click="action()">
               <span class="{{labState.actionClass}}"></span> {{labState.actionLabel}}
             </button>
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <div ng-show="noImages === true" class="bs-callout bs-callout-warning">
+    <div ng-show="CurrentLabService.noImages === true" class="bs-callout bs-callout-warning">
       <h4><i class="fa fa-warning text-warning"></i> Some images are not installed</h4>
       <i class="fa fa-angle-right"></i> Go to the <a href="/images#{{ctrl.repoName}}_{{ctrl.lab.name}}">Images Manager</a>
     </div>
@@ -113,6 +113,12 @@
       <!-- Endo panel edit options -->
 
     </div>
+    <div ng-show="CurrentLabService.noImages === true" class="panel panel-default">
+      <div class="panel-heading"><h5><i class="fa fa-fw fa-download"></i> Download Images</h5></div>
+      <div class="panel-body">
+        <images-component download="download"></images-component>
+      </div>
+    </div>
 
     <div class="panel panel-default">
       <div class="panel-heading"><i class="fa fa-fw fa-info"></i> Goal</div>
@@ -135,7 +141,7 @@
       </div>
     </div>
 
-    <div ng-show="!noImages">
+    <div ng-show="!CurrentLabService.noImages">
 
       <div class="panel panel-default">
         <div class="panel-heading"><i class="fa fa-fw fa-cube"></i> Container</div>
