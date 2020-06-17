@@ -17,17 +17,21 @@ function initShellCommand(callback, dockerPath = "") {
   const containerName = dockerShell.dockerName;
   if (dockerShell.dockercompose === "true") {
     dockerComposer.exec(dockerPath, containerName, "/bin/ls -1 /bin", (err, output) => {
-      
-      
+
+
+      if (output) {
       const binCommands = output.split("\n");
       shellCommand = binCommands.includes("bash") || binCommands.includes("bash\r") ? "/bin/bash" : "/bin/sh";
       callback(err, shellCommand)
+      }
     });
   } else {
     dockerJS.exec(containerName, "/bin/ls -1 /bin", (err, output) => {
-      const binCommands = output.split("\n");
-      shellCommand = binCommands.includes("bash") || binCommands.includes("bash\r") ? "/bin/bash" : "/bin/sh";
-      callback(err, shellCommand)
+      if (output) {
+        const binCommands = output.split("\n");
+        shellCommand = binCommands.includes("bash") || binCommands.includes("bash\r") ? "/bin/bash" : "/bin/sh";
+        callback(err, shellCommand)
+      }
     });
   }
 }
@@ -75,7 +79,7 @@ exports.init = function init(httpserv) {
       log.info((new Date()) + ' Connection accepted.');
       log.info(dockerShell);
       if (dockerShell && dockerShell.mainPath && dockerShell.nameRepo && dockerShell.labName && dockerShell.dockerName) {
-        
+
         // DockerCompose operation
         if (dockerShell.dockercompose === "true") {
           const composePath = path.join(dockerShell.mainPath, dockerShell.nameRepo, dockerShell.labName);
@@ -85,7 +89,7 @@ exports.init = function init(httpserv) {
                 log.error(`Error: ${err}`);
               } else {
                 var entrypoint = { script:"docker-compose", args: ['-f', dockerPath, 'exec', dockerShell.dockerName, shellCommand] };
-                execTerm(socket, entrypoint); 
+                execTerm(socket, entrypoint);
               }
           }, composePath);
         }
@@ -96,7 +100,7 @@ exports.init = function init(httpserv) {
                 log.error(`Error: ${err}`);
               } else {
                 var entrypoint = { script:"docker", args: ['exec', '-i', '-t', dockerShell.dockerName, shellCommand] };
-                execTerm(socket, entrypoint); 
+                execTerm(socket, entrypoint);
               }
           });
         }
