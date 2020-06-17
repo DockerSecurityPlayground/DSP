@@ -9,9 +9,10 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
-## [3.7.1] - 2020 - 06 - 17  
+## [3.7.2] - 2020 - 06 - 17  
 ### Fixed  
 - DSP crashes in command line if already does not exist  
+- Edit network even if lab is run
 
 
 ## [3.7.0] - 2020 - 06 - 16  

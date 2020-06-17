@@ -57,8 +57,10 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       if(!createNew) {
         ////When imageList it's loded load lab
         dockerAPIService.loadLab($scope.labName, true, function(data) {
-          
+
           $scope.canvas = data.canvasJSON;
+          $scope.isRunning = data.state === "RUNNING" ? true : false;
+          $scope.isCreated = true;
 
           $scope.repoName = data.repoName;
           //TOREFACT gh.loadGraphicJSON(canvasJSON)
@@ -209,7 +211,7 @@ window.location.href = urlToGo;
   // Called when the edit is finished
   $scope.editNetworkElement = function() {
     console.log("[graph_editor_controller] editNetworkElement");
-    
+
     var s = $scope.subnet.first+"."+$scope.subnet.two+"."+$scope.subnet.three+"."+$scope.subnet.four
 
     // Update network in network list
@@ -774,7 +776,7 @@ window.location.href = urlToGo;
       }
       else {
         tagToDownload = imageSep[1];
-      }   
+      }
       SocketService.manage(JSON.stringify({
         action : 'download_images',
         params : {
