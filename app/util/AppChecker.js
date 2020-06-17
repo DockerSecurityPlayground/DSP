@@ -347,12 +347,13 @@ module.exports = {
         }
         repo.sshKeyPath = null;
       } else if (url.toLowerCase().match('(([\\w]+)@([\\w]+)(\\.([\\w]+))+:(([\\w]+)\\/([\\w_\\-]+))+.git)')) {
-        if (!(repo.hasOwnProperty('sshKeyPath') && repo.sshKeyPath)) {
+        //Use default config in .ssh/config
+        /*if (!(repo.hasOwnProperty('sshKeyPath') && repo.sshKeyPath)) {
           return callback(new Errors.invalidSshAuth());
-        }
+        }*/
         repo.username = null;
         repo.token = null;
-      } else {
+      } else{
         return callback(new Errors.invalidGitUrl());
       }
     }

@@ -28,7 +28,7 @@ function cloneProject(repo, callback) {
     params.isPrivate = repo.isPrivate;
     if (repo.hasOwnProperty("sshKeyPath") && repo.sshKeyPath) {
       params.sshKeyPath = repo.sshKeyPath;
-    } else if (repo.hasOwnProperty("username") && repo.hasOwnProperty("token") && repo.username && repo.token) {
+    }else if (repo.hasOwnProperty("username") && repo.hasOwnProperty("token") && repo.username && repo.token) {
       params.username = repo.username;
       params.token = repo.token;
     } else {
