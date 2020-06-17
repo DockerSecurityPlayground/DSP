@@ -99,6 +99,7 @@ function runHttpdService(callback, hostPort, notifyCallback) {
   dockerJS.run(HTTPD_SERVICE_IMAGE, callback, {
     ports:ports,
     detached: true,
+    cap_add: "NET_ADMIN",
     volumes: [{
       hostPath: DSP_VOLUME_NAME,
       containerPath: HTTPD_VOLUME_NAME
@@ -198,6 +199,7 @@ function stopKaliService(callback) {
 function runKaliService(callback) {
   dockerJS.run(KALI_SERVICE_IMAGE, callback, {
     detached: true,
+    cap_add: "NET_ADMIN",
     volumes: [{
       hostPath: DSP_VOLUME_NAME,
       containerPath: DSP_TARGET_VOLUME_NAME
@@ -209,6 +211,7 @@ function runKaliService(callback) {
 function runBrowserService(callback) {
   dockerJS.run(BROWSER_SERVICE_IMAGE, callback, {
     detached: true,
+    cap_add: "NET_ADMIN",
     volumes: [{
       hostPath: DSP_VOLUME_NAME,
       containerPath: DSP_TARGET_VOLUME_NAME
