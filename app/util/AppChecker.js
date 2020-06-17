@@ -4,6 +4,7 @@ const JoiChecker = require('help-nodejs').checker.JoiChecker();
 const appUtils = require('./AppUtils.js');
 const Joi = require('joi');
 const du = require('mydockerjs').dockerUtils;
+const jsonfile = require('jsonfile');
 const path = require('path');
 const fs = require('fs');
 const isValidPath = require('is-valid-path');
@@ -233,6 +234,10 @@ module.exports = {
                 else {
                   const userPath = path.join(appUtils.getHome(), config.mainDir, config.name);
                   if (!fs.existsSync(userPath)) { cb(new Error(`${userPath} dir not found! Pls delete config_user.json and reinstall `)); }
+                  if (!fs.existsSync(path.join(userPath, "labels.json"))) {
+                    log.warn('labels.json file does not exists, create it');
+                    jsonfile.writeFileSync(path.join(userPath, "labels.json"), { labels: [] });
+                  }
                   if (!fs.existsSync(path.join(userPath, ".dockerfiles"))) {
                     log.warn('.dockerfiles directory does not exists, create it');
                     fs.mkdirSync(path.join(userPath, ".dockerfiles"));
