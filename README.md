@@ -15,32 +15,38 @@ in penetration testing and network security, but its flexibility allows you the
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
 labs**. For more information look at the [Labs Managment]() page.   
 
-## DSP Features  
--  Graphic Editor of docker-compose  
--  Docker Image and Dockerfile Management  
--  GIT Integration  
--  DSP Repository with a set of network security scenarios  
+## How To Use
+Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) to learn how to use DSP.
+You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki) documentation to understand how you can use DSP.   
+Follow Installation and Start steps to run DSP.   
 
-## Guide
-Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A?view_as=subscriber) to learn how to use DSP.
+## Installation And Start   
+### Docker-Mode   
+You can use DSP Image provided at the following [link](https://github.com/giper45/dsp-docker-image)  
+```   
+git clone https://github.com/giper45/dsp-docker-image  
+cd dsp-docker-image  
+docker-compose up
+```   
 
 
-## Prerequisites
+### Normal-Mode
+1. Install DSP Requirements:   
+
 * Nodejs (v 7 or later)
 * git
 * docker
 * docker-compose
 * compiler tools (g++, c, c++)
 
-## Installation
-Install prerequisites and run: 
+
+2. Install node dependencies and run: 
 
 ```
 npm install
 ```      
 
-## Start  
-Run 
+3. Run:  
 
 ```
 npm start  
@@ -48,7 +54,8 @@ npm start
 To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
 
 
-With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.   
+With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.     
+
 
 ## Update the application: 
 When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
@@ -77,7 +84,12 @@ It is important that all images that you use should be available to other users,
 
 If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
 
-In DSP you can manage multiple user repositories (Repositories tab) 
+In DSP you can manage multiple user repositories (Repositories tab)   
+## DSP Features  
+-  Graphic Editor of docker-compose  
+-  Docker Image and Dockerfile Management  
+-  GIT Integration  
+-  DSP Repository with a set of network security scenarios  
 
 ### Troubleshooting during installation   
 If you have error regarding **node-pty** module, try to:   
@@ -88,24 +100,6 @@ If you have error regarding **node-pty** module, try to:
 If you have a problem you can use Issue section.   
 You can also write you problem to the Google Group:   
 https://groups.google.com/forum/#!forum/dockersecurityplayground
-
-
-### Vagrant Environment   
-In the project, there is also a vagrant environment with an Ubuntu box with DSP installed:  
-```
-cd vagrant
-vagrant up
-vagrant ssh 
--> cd /home/vagrant/DockerSecurityPlayground
--> npm start  
-```   
-Now you can use DSP ( http://localhost:8080 ).
-
-
-## WIKI Documentation 
-For documentation about DSP usage go to Wiki page:
-https://github.com/giper45/DockerSecurityPlayground/wiki  
-
 
    
 ## Docker Wrapper Image  
