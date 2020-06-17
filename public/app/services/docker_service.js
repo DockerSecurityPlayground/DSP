@@ -1,3 +1,5 @@
+const { log } = require("async");
+
 DockerAPIService : function DockerAPIService($log, $http, containerManager, Notification)
 {
 var api = '/dsp_v1/docker_network/' ;
@@ -90,6 +92,7 @@ var api = '/dsp_v1/docker_network/' ;
 	return {
     kaliService : {"isRun" : false},
     httpdService : {"isRun": false},
+    browserService : {"isRun": false},
 		saveLab:function saveLab(labName, cld, clnd, nl, graphJSON, icv) {
 			var data = {
 				networkList : nl,
@@ -230,7 +233,15 @@ var api = '/dsp_v1/docker_network/' ;
         }, function errorCb() {
           Notification("Error in check httpd status", 'error');
         })
-      
+      self.isRun("browser")
+        .then(function successCb(data) {
+          console.log("IN LOG SERVICE")
+          console.log(data.data);
+          
+          self.browserService.isRun = data.data.data.isRun;
+        }, function errorCb() {
+          Notification("Error in check browser status", 'error');
+        })
     },
     stopHackTool: function(serviceName) {
       return $http.delete(dsp_running_services+ serviceName);
@@ -240,6 +251,12 @@ var api = '/dsp_v1/docker_network/' ;
     },
     stopKali: function() {
       return this.stopHackTool("kali")
+    },
+    stopBrowser: function() {
+      return this.stopHackTool("browser")
+    },
+    isBrowserRun: function() {
+      return this.isRun("browser");
     },
     isKaliRun: function() {
       return this.isRun("kali")

@@ -15,7 +15,7 @@ const DSP_TARGET_VOLUME_NAME = `/dsp`;
 const KALI_SERVICE_IMAGE = "dockersecplayground/kali:latest"
 const KALI_SERVICE_NAME = `${service_prefix}_managed_kali`;
 
-const BROWSER_SERVICE_IMAGE = "dockersecplayground:hackbrowser"
+const BROWSER_SERVICE_IMAGE = "dockersecplayground/hackbrowser:v1.0"
 const BROWSER_SERVICE_NAME = `${service_prefix}_managed_browser`;
 
 const WIRESHARK_SERVICE_NAME = `${service_prefix}_managed_wireshark`;
@@ -208,10 +208,14 @@ function runKaliService(callback) {
   });
 }
 
-function runBrowserService(callback) {
+function runBrowserService(callback, hostPort) {
+  const ports = {}
+  ports["5800"] = hostPort
   dockerJS.run(BROWSER_SERVICE_IMAGE, callback, {
+    ports: ports,
     detached: true,
     cap_add: "NET_ADMIN",
+    shmSize: "2g",
     volumes: [{
       hostPath: DSP_VOLUME_NAME,
       containerPath: DSP_TARGET_VOLUME_NAME
@@ -234,7 +238,7 @@ function stopBrowserService(callback) {
   dockerJS.rm(BROWSER_SERVICE_NAME, callback, true);
 }
 function installProxyService(callback, notifyCallback) {
-  di.pullImage(BROWSER_SERVICE_IMAGE, "latest", callback, notifyCallback)
+  di.pullImage(BROWSER_SERVICE_IMAGE, "v1.0", callback, notifyCallback)
 }
 
 function isKaliServiceRun(callback) {
@@ -249,6 +253,10 @@ function isKaliServiceInstalled(callback) {
 
 function installKaliService(callback, notifyCallback) {
   di.pullImage(KALI_SERVICE_IMAGE, "latest", callback, notifyCallback)
+}
+
+function installBrowserService(callback, notifyCallback) {
+  di.pullImage(BROWSER_SERVICE_IMAGE, "v1.0", callback, notifyCallback)
 }
 
 function installWireshark(callback, notifyCallback) {
@@ -608,6 +616,7 @@ module.exports = {
   installProxyService,  
   isBrowserServiceInstalled,
   isBrowserServiceRun,
+  installBrowserService,
   stopBrowserService,
   runBrowserService
 }

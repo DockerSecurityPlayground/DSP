@@ -4,13 +4,16 @@ var DSP_ManagedToolsCtrl  = function($scope, $location, Notification, SafeApply,
   }
   $scope.kaliService = dockerAPIService.kaliService;
   $scope.httpdService = dockerAPIService.httpdService;
+  $scope.browserService = dockerAPIService.browserService;
   $scope.httpdPort = 8081;
+  $scope.browserPort = 5800;
   $scope.managedServicesLogs = "";
 
 
   const host = $location.host();
   const httpdProtocol = "http";
   $scope.httpdUrl = httpdProtocol + "://" + host + ":" + $scope.httpdPort;
+  $scope.browserUrl = httpdProtocol + "://" + host + ":" + $scope.browserPort;
 
   $scope.clearManagedLogs = function () {
     $scope.managedServicesLogs = "";
@@ -51,11 +54,49 @@ var DSP_ManagedToolsCtrl  = function($scope, $location, Notification, SafeApply,
   }
   $scope.stopKali = function stopKali() {
     console.log("Stop Kali service");
-    dockerAPIService.stopKali("httpd")
+    dockerAPIService.stopKali()
     .then(function successCallback(response) {
       $scope.kaliService.isRun = false;
       dockerAPIService.initServices(() => {});
       Notification("Service kali stopped")
+    }, function errorCallback(error) {
+      Notification(error.data.message, 'error');
+    });
+  }
+
+  $scope.startBrowser = function startBrowser() {
+    console.log("Start browser")
+    SocketService.manage(JSON.stringify({
+      action: 'browser_run',
+      body: {
+        hostPort: $scope.browserPort
+      }
+    }), function(event) {
+      const data = JSON.parse(event.data)
+      switch (data.status) {
+        case 'success':
+          Notification("Browser Started");
+          $scope.browserService.isRun = true;
+          $scope.managedServicesLogs = "";
+          dockerAPIService.initServices(() => {});
+          break;
+        case 'error':
+          Notification("Browser start error: "+ event.data, 'error');
+          break;
+        // Notification
+        default:
+        $scope.managedServicesLogs += data.message;
+        break;
+      }
+    });
+  }
+  $scope.stopBrowser = function stopBrowser() {
+    console.log("Stop Browser service");
+    dockerAPIService.stopBrowser()
+    .then(function successCallback(response) {
+      $scope.browserService.isRun = false;
+      dockerAPIService.initServices(() => {});
+      Notification("Service browser stopped")
     }, function errorCallback(error) {
       Notification(error.data.message, 'error');
     });

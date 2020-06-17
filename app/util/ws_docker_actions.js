@@ -313,6 +313,24 @@ exports.kaliRun  = function kaliRun(callback, notifyCallback) {
       dockerTools.runKaliService(cb);
     }], (err) => callback(err));
 }
+exports.browserRun  = function browserRun(body, callback, notifyCallback) {
+  log.info("[WS DOCKER ACTIONS] Start Browser Service");
+  async.waterfall([
+    (cb) => dockerTools.isBrowserServiceInstalled(cb),
+    (isImageInstalled, cb) => {
+      if (isImageInstalled) 
+        cb(null, "");
+      else  {
+        log.info("Install Browser service");
+        
+        dockerTools.installBrowserService(cb, notifyCallback);
+      }
+    }, (data, cb) => {
+      const hostPort = body.hostPort;
+      dockerTools.runBrowserService(cb, hostPort);
+    }], (err) => callback(err));
+}
+
 
 exports.wiresharkRun  = function wiresharkRun(body, callback, notifyCallback) {
   log.info("[WS DOCKER ACTIONS] Start Wireshark Service");

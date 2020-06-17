@@ -123,6 +123,15 @@ function manageKaliRun(ws, jsonMessage) {
     sendProgressMessage(ws, dataline);
   });
 }
+function manageBrowserRun(ws, jsonMessage) {
+  const body = jsonMessage.body;
+  dockerActions.browserRun(body, err => {
+    sendResponse(ws, err);
+  }, (dataline) => {
+    sendProgressMessage(ws, dataline);
+  });
+}
+
 function manageCaptureRun(ws, jsonMessage) {
   const body = jsonMessage.body;
   dockerActions.captureRun(body, err => {
@@ -291,6 +300,9 @@ exports.init = function init(server) {
           break;
         case 'kali_run':
           manageKaliRun(ws, jsonMessage);
+          break;
+        case 'browser_run':
+          manageBrowserRun(ws, jsonMessage);
           break;
         case 'capture_run':
           manageCaptureRun(ws, jsonMessage);

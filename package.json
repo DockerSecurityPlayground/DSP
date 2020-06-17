@@ -1,7 +1,7 @@
 {
   "name": "docker-security-playground",
   "description": "A playground platform for the penetration testing students",
-  "version": "3.7.3",
+  "version": "3.7.4",
   "private": true,
   "keywords": [
     "docker"
@@ -52,7 +52,7 @@
     "method-override": "^2.3.8",
     "mocha": "^7.2.0",
     "multer": "^1.4.1",
-    "mydockerjs": "^2.12.0",
+    "mydockerjs": "^2.12.1",
     "ncp": "^2.0.0",
     "node-cmd": "^3.0.0",
     "node-pty": "^0.9.0",

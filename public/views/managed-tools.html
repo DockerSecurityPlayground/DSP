@@ -58,6 +58,19 @@
         <button ng-click="startKali()" ng-if="!kaliService.isRun" class="btn btn-sm btn-success"> Run </button>
        </td> 
       </tr>
+      <tr>
+       <td>browser</td> 
+       <td>browser service. Navigate <a target="_blank" href="{{browserUrl}}">here </a><br>
+      </td> 
+       <td>
+          Host Port: 
+          <input type="text" class="form-control input-sm" id="browser" ng-model="browserPort"> </input>
+       </td> 
+       <td>
+        <button ng-click="stopBrowser()" ng-if="browserService.isRun" class="btn btn-sm btn-danger"> Stop </button>
+        <button ng-click="startBrowser()" ng-if="!browserService.isRun" class="btn btn-sm btn-success"> Run </button>
+       </td> 
+      </tr>
 
       </tbody>
     </table>

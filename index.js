@@ -164,6 +164,8 @@ app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 app.get('/dsp_v1/services', serviceHandler.getServices);
 app.post('/dsp_v1/services/:nameservice', serviceHandler.runService);
 app.put('/dsp_v1/services/start/:nameservice', serviceHandler.startService);
+app.get('/dsp_v1/services/browser', serviceHandler.isBrowserRun);
+app.delete('/dsp_v1/services/browser', serviceHandler.stopBrowser);
 app.get('/dsp_v1/services/httpd', serviceHandler.isHttpdRun);
 app.delete('/dsp_v1/services/httpd', serviceHandler.stopHttpd);
 app.get('/dsp_v1/services/kali', serviceHandler.isKaliRun);

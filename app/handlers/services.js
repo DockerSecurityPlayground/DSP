@@ -152,6 +152,16 @@ function stopKali(req, res) {
   _stop(req, res, "stopKaliService");
 }
 
+function stopBrowser(req, res) {
+  log.info("[DOCKER TOOLS] Stop Browser Run");
+  _stop(req, res, "stopBrowserService");
+}
+
+
+function isBrowserRun(req, res) {
+  log.info("[DOCKER TOOLS] Is Browser Run");
+  _isRun(req, res, "isBrowserServiceRun");
+}
 function isHttpdRun(req, res) {
   log.info("[DOCKER TOOLS] Is Httpd Run");
   _isRun(req, res, "isHttpdServiceRun");
@@ -414,9 +424,11 @@ exports.setAsDefault = setAsDefault;
 exports.getListHackTools = getListHackTools;
 exports.deleteHackTool = deleteHackTool;
 exports.isHttpdRun = isHttpdRun;
+exports.isBrowserRun = isBrowserRun;
 exports.stopHttpd = stopHttpd;
 exports.isKaliRun = isKaliRun;
 exports.stopKali = stopKali;
+exports.stopBrowser = stopBrowser;
 exports.isWiresharkRun = isWiresharkRun;
 exports.stopWireshark = stopWireshark;
 exports.isTcpdumpRun = isTcpdumpRun;
