@@ -102,7 +102,7 @@ function _addDir(f) {
           toAppend.isExecutable = false;
         }
         else toAppend.state= {
-          'opened' : true,
+          'opened' : false,
           'selected' : false
         };
         treeModel.push(toAppend);
@@ -181,7 +181,12 @@ function _addCopyOptionToDockerfile(filename, treeModel) {
         // Initialization: take the project
         dockerAPIService.getDockerfile(this.dockerfile.name)
           .then(function successCallback(response) {
-            $scope.treeModel = response.data.data;
+            $scope.treeModel = response.data.data.map(function (e) {
+              if (e.type === "dir") {
+                e.state.opened = false;
+              }
+              return e;
+            });
             console.log(response.data.data);
             _selectDockerfile($scope.treeModel);
 
@@ -259,7 +264,7 @@ $scope.removeElement = function() {
 }
 
 $scope.changedSnippet = function(selectedSnippet){
-  
+
   if($scope.selectedElement.content.match(/^FROM.*/)){
     $scope.selectedElement.content = $scope.selectedElement.content + "\n\n" + "#" + selectedSnippet.name + "\n" + selectedSnippet.code
     const previousImage = $scope.selectedElement.content.substring(0,$scope.selectedElement.content.indexOf("\n\n"))
