@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.
 ### Fixed  
 - Upload directories closed by default. 
 
+## [3.7.5] - 2020 - 07 - 15
+### Fixed  
+- Disable require for email field during installation;
+
 ## [3.7.4] - 2020 - 06 - 17  
 ### Fixed  
 - DSP crashes in command line if already does not exist  
