@@ -14,6 +14,10 @@
       {
         "name": "NetworkSecurity_Unina",
         "url": "https://github.com/NS-unina/DSP_Repo.git"
+      },
+      {
+        "name": "DSP_Templates",
+        "url": "https://github.com/giper45/DSP_Repo.git"
       }
     ]
   }

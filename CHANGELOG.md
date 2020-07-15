@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ### Added  
 - goal and solution editing in lab usage interface;   
 - Restart button on edit network container  
+- DSP Repo to official repositories
  
 ## [3.7.5] - 2020 - 07 - 03  
 ### Fixed  
