@@ -7,6 +7,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   $scope.yamlfile='';
   $scope.active = 0
   $scope.showYamlFile = false;
+  $scope.isRestarting = false;
   $scope.isRunning = false;
   $scope.isCreated = false;
   $scope.log = ""
@@ -1325,6 +1326,12 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
     });
   }
 
+  $scope.restart = function() {
+    $scope.isRestarting = true;
+    $scope.active = 2;
+    $scope.stop($scope.run);
+  }
+
   // Docker actions
   $scope.run = function() {
             // namerepo : $scope.nameRepo,
@@ -1346,10 +1353,12 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
           case 'success':
             Notification("Run finished!", 'success');
             $scope.isRunning = true;
+            $scope.isRestarting = false;
             break;
           case 'error':
             Notification({message: data.message}, 'error');
             $scope.isRunning = false;
+            $scope.isRestarting = false;
             break;
           default:
             $scope.log += data.message;
@@ -1358,7 +1367,7 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
       });
     }
 
-  $scope.stop = function() {
+  $scope.stop = function(cb) {
     // Set active tab on log
     $scope.active = 2;
     SocketService.manage(JSON.stringify({
@@ -1375,6 +1384,7 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
             Notification("Stoppe!", 'success');
             $scope.isRunning = false;
             $scope.log = "";
+            if (cb) cb();
             break;
           case 'error':
             Notification({message: data.message}, 'error');

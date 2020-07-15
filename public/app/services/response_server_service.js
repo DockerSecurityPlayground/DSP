@@ -1,4 +1,10 @@
 var dsp_server_response= function(Notification) {
+  this.success = function(response) {
+    Notification("Success", 'success');
+  }
+  this.error = function(response) {
+         Notification('Server error:' + response.data.message, 'error');
+  }
   this.manage = function(promise, callbackSuccess, callbackError) {
     promise
             .then(

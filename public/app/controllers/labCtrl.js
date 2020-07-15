@@ -9,8 +9,11 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   var buttonGoImage = { action: goToImages, label: "Images", class: "btn btn-lg btn-primary", icon: '' }
   var buttonCreateProto = { action: goToCreateNetwork, label: "Create Docker Network", class: "btn  btn-lg btn-success", icon: '' }
   var onLoadCanvas;
+  var oldGoal = "";
+  var oldSolution = "";
   const warningMessageHeader = 'WARNING: ';
   const networkEmptyMessage = 'Network is empty! Have you drawn the containers?';
+  $scope.currentName = "";
   $scope.tags = [{
       name: "{{hostname}}",
       description: "it is converted to hostname (i.e. localhost) "
@@ -63,7 +66,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
     $scope.imageList = [];
   $scope.interactiveImageList = [];
   $scope.listTools = [];
-  toEditName = '';
+  var toEditName = '';
   $scope.listContainers = {};
   $scope.init = function () {
     console.log("DSP_INIT");
@@ -132,15 +135,24 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
     //Use
     else if (action === 'use') {
       vm.buttonAction = '';
+    vm.isGoalEditShowed = false;
+    vm.isSolutionEditShowed = false;
       BreadCrumbs.breadCrumbs('/lab/use', $routeParams.namelab);
       AjaxService.init()
         .dAll
         .then(function (res) {
           vm.repos = WalkerService.repos
           var labname = $routeParams.namelab
+          $scope.currentName = labname;
           var rname = $routeParams.repo;
           var username = AjaxService.config.name;
           CurrentLabService.updateLab(rname, labname);
+          var repo = WalkerService.getUserRepo();
+          if (repo) {
+            var lab = WalkerService.findLab(rname, labname);
+            vm.labels = lab.labels;
+          }
+
           AjaxService.checkExistenceLab(rname, labname)
             .then(function successCallback(response) {
               var exists = response.data.data
@@ -466,7 +478,8 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   vm.goToNetwork = function goToNetwork() {
 
       // $location.url('/network/'+vm.lab.name);
-      window.location.href = '/network/' + vm.lab.name;
+      // window.location.href = '/network/' + vm.lab.name;
+      window.open('/network/' + vm.lab.name, '_blank');
       // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
       // window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
   }
@@ -657,5 +670,53 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
     cfpLoadingBar.complete();
   }
 
+  $scope.changeLabName = function() {
+    Notification('Lab Name Changed', 'success');
+  }
+  $scope.editGoal = function() {
+    vm.isGoalEditShowed = true;
+    oldGoal = vm.lab.goal;
+  }
+  $scope.saveGoal = function() {
+    vm.isGoalEditShowed = false;
+    console.log(vm.lab);
+    
+    AjaxService.editLab(vm.lab, vm.lab.name, vm.labels)
+    .then(ServerResponse.success,
+      
+      // function successCallback(response) {
+      // Notification("Goal Saved")
+    //  }
+    function errorCallback(resp) {
+      ServerResponse.error(resp);
+      vm.lab.goal = oldGoal;
+    })
+  }
+
+  $scope.cancelGoal = function() {
+    vm.isGoalEditShowed = false;
+    vm.lab.goal = oldGoal;
+  }
+
+  $scope.editSolution = function() {
+    vm.isSolutionEditShowed = true;
+    oldSolution = vm.lab.solution;
+  }
+
+  $scope.saveSolution = function() {
+    vm.isSolutionEditShowed = false;
+    
+    AjaxService.editLab(vm.lab, vm.lab.name, vm.labels)
+    .then(ServerResponse.success,
+    function errorCallback(resp) {
+      ServerResponse.error(resp);
+      vm.lab.solution = oldSolution;
+    });
+  }
+
+  $scope.cancelSolution = function() {
+    vm.isSolutionEditShowed = false;
+    vm.lab.solution = oldSolution;
+  }
 }
 

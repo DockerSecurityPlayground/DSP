@@ -158,3 +158,6 @@ footer {
 .nav-third-level > li > a:before  {
   left:40px;
 }
+.single-line br {
+    display: none
+}

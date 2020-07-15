@@ -1,5 +1,3 @@
-const { log } = require("async");
-
 DockerAPIService : function DockerAPIService($log, $http, containerManager, Notification)
 {
 var api = '/dsp_v1/docker_network/' ;

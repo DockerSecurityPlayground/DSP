@@ -121,11 +121,10 @@ function wantToRename(req) {
 //      cb(null);
 //    },
 function saveInformation(req, res) {
-  log.info('[IN SAVE INFORMATIONS]');
+  log.info('[IN SAVE INFORMATION]');
   let newName;
   let oldName;
   let infos;
-  // log.info(req.body);
   async.waterfall([
     // Check values and save informations
     (cb) => checkParams(req.params, req.body, cb),

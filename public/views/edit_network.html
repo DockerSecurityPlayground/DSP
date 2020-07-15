@@ -92,9 +92,13 @@
         <div class="row lateral_options">
           <div class="col-sm-3" > <a ng-click="goBack()" class="btn btn-primary">   <span class="glyphicon glyphicon-arrow-left"></span> Back</a> </div>
           <div class="col-sm-3" > <a onclick="MX__Save()" class="btn btn-default">   <span class="glyphicon glyphicon-floppy-save"></span> Save</a> </div>
-          <div class="col-sm-3" ng-show="!isRunning && isCreated"> <a ng-click="run()" class="btn btn-default">   <span class="glyphicon glyphicon-play"></span> Run</a> </div>
-          <div class="col-sm-3" ng-show="isRunning" > <a ng-click="stop()" class="btn btn-default">   <span class="glyphicon glyphicon-stop"></span> Stop</a> </div>
-        </div>
+          <div class="col-sm-3" ng-show="!isRestarting"> <a ng-click="restart()" class="btn btn-default">   <span class="glyphicon glyphicon-play"></span> Restart</a> </div>
+          <div ng-show="isRestarting" class="col-sm-3 text-warning ">
+            <span class="fa fa-fw fa-spinner fa-pulse"></span> Restarting...
+            <!-- <div class="col-sm-3" ng-show="!isRunning && isCreated"> <a ng-click="run()" class="btn btn-default">   <span class="glyphicon glyphicon-play"></span> Run</a> </div>
+            <div class="col-sm-3" ng-show="isRunning" > <a ng-click="stop()" class="btn btn-default">   <span class="glyphicon glyphicon-stop"></span> Stop</a> </div> -->
+          </div>
+          </div>
       </div>
     </div>
     <div class="row">

@@ -38,7 +38,9 @@
         <i class="fa fa-fw fa-cube fa-4x media-object"></i> 
       </div>
       <div class="media-body">
-        <h3 class="media-heading">{{ctrl.lab.name}}</h3>
+        {{currentName}}
+        <!-- <h3 class="media-heading" class="single-line" on-finish="changeLabName()" contenteditable="true" ng-model="currentName">{{ctrl.lab.name}}</h3> -->
+        <h3 class="media-heading" class="single-line" ng-model="currentName">{{ctrl.lab.name}}</h3>
         <p>{{ctrl.lab.description}}</p>
         <ul class="list-inline">
           <li ng-repeat="label in ctrl.lab.labels">
@@ -121,12 +123,64 @@
     </div>
 
     <div class="panel panel-default">
-      <div class="panel-heading"><i class="fa fa-fw fa-info"></i> Goal</div>
+      <div class="panel-heading"><i class="fa fa-fw fa-info"></i> Goal <span class="float-right"> 
+        <div ng-show="ctrl.actionVisible">
+        <div ng-show="!ctrl.isGoalEditShowed">
+              <a ng-click="editGoal()" class="btn btn-default btn-xs"> <i class="fa fa-fw fa-edit"></i></a>
+        </div>
+              <div ng-show="ctrl.isGoalEditShowed">
+                <a ng-click="saveGoal()"  class="btn btn-default btn-xs"> <i class="fa fa-fw fa-save"></i></a>
+                <a ng-click="cancelGoal()" class="btn btn-default btn-xs"> <i class="fa fa-fw fa-close"></i></a>
+                </div>
+              </div>
+      </span></div>
       <div class="panel-body">
-        <div ng-bind-html="ctrl.tinymceHtmlGoal"></div>
+        <!-- Goal-->
+        <div ng-bind-html="ctrl.lab.goal" ng-show="!ctrl.isGoalEditShowed"></div>
+        <!-- Edit Goal-->
+        <div class="row" ng-show='ctrl.isGoalEditShowed'>	
+          <div class="row"> 
+                <ul class="col-sm-offset-9 nav nav-tabs">
+                      <li 
+                    ng-class="{'active' : !ctrl.isGoalPreviewOpen}">
+                        <a href="#"
+                          ng-click="ctrl.isGoalPreviewOpen = false  ">
+                        Edit
+                      </a>
+                    </li>
+
+                      <li
+                    ng-class="{'active' : ctrl.isGoalPreviewOpen}">
+                        <a href="#"
+                          ng-click="ctrl.isGoalPreviewOpen = true  "
+                          >
+                        Preview
+                      </a>
+                    </li>
+                  </ul> 
+              </div>	  
+            <div class="form-group">
+          <div ng-show='!ctrl.isGoalPreviewOpen' class="col-sm-12">
+          <textarea ui-tinymce="tinymceOptions"
+                  rows="20"
+                  ng-change="ctrl.updatePreviewGoal()"
+            ng-model="ctrl.lab.goal">
+          </textarea>
+            <!--<input type="name" class="form-control" ng-model="ctrl.lab.goal" id="goal" > -->
+          </div>
+        </div>
+                <div ng-show='ctrl.isGoalPreviewOpen'>
+                    <h4>  Preview </h4>
+                    <div ng-bind-html="ctrl.previewGoal"></div> 
+                    <hr>
+                </div>
+          </div>
+
+
+
       </div>
     </div>
-
+    
     <div class="panel panel-default">
       <div class="panel-heading">
         <i class="fa fa-fw fa-terminal"></i> Logs
@@ -210,16 +264,64 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-md-11">
+            <div class="col-md-8">
               <i class="fa fa-fw fa-map"></i> Solution
             </div>
-            <div class="col-md-1 text-right">
+            <div class="col-md-4 text-right">
               <a ng-click="isSolutionShowed = !isSolutionShowed" href="#" title="Show/Hide the solution" class="btn btn-default btn-xs"><i ng-class="isSolutionShowed ? 'fa fa-fw fa-eye-slash' : 'fa fa-fw fa-eye' "></i></a>
+        <div ng-show="ctrl.actionVisible">
+            <div ng-show="!ctrl.isSolutionEditShowed">
+                          <a ng-click="editSolution()" class="btn btn-default btn-xs"> <i class="fa fa-fw fa-edit"></i></a>
+                    </div>
+              <div ng-show="ctrl.isSolutionEditShowed">
+                <a ng-click="saveSolution()"  class="btn btn-default btn-xs"> <i class="fa fa-fw fa-save"></i></a>
+                <a ng-click="cancelSolution()" class="btn btn-default btn-xs"> <i class="fa fa-fw fa-close"></i></a>
+             </div>
+        </div>
             </div>
           </div>
         </div>
-        <div class="panel-body" ng-show="isSolutionShowed" >
-          <div class="large_div" ng-bind-html="ctrl.tinymceHtmlSolution"></div>
+        <div class="panel-body" ng-show="isSolutionShowed || ctrl.isSolutionEditShowed" >
+          <div class="large_div" ng-show="!ctrl.isSolutionEditShowed" ng-bind-html="ctrl.lab.solution"></div>
+
+          <div class="row" ng-show='ctrl.isSolutionEditShowed'>	
+                    <div class="row"> 
+                          <ul class="col-sm-offset-9 nav nav-tabs">
+                                <li 
+                              ng-class="{'active' : !ctrl.isSolutionPreviewOpen}">
+                                  <a href="#"
+                                    ng-click="ctrl.isSolutionPreviewOpen = false  ">
+                                  Edit
+                                </a>
+                              </li>
+
+                                <li
+                              ng-class="{'active' : ctrl.isSolutionPreviewOpen}">
+                                  <a href="#"
+                                    ng-click="ctrl.isSolutionPreviewOpen = true  "
+                                    >
+                                  Preview
+                                </a>
+                              </li>
+                            </ul> 
+                        </div>	  
+                      <div class="form-group">
+                    <div ng-show='!ctrl.isSolutionPreviewOpen' class="col-sm-12">
+                    <textarea ui-tinymce="tinymceOptions"
+                            rows="20"
+                            ng-change="ctrl.updatePreviewSolution()"
+                      ng-model="ctrl.lab.solution">
+                    </textarea>
+                      <!--<input type="name" class="form-control" ng-model="ctrl.lab.goal" id="goal" > -->
+                    </div>
+                  </div>
+                          <div ng-show='ctrl.isSolutionPreviewOpen'>
+                              <h4>  Preview </h4>
+                              <div ng-bind-html="ctrl.previewSolution"></div> 
+                              <hr>
+                          </div>
+                    </div>
+
         </div>
       </div>
 
