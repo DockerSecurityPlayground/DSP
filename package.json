@@ -1,7 +1,7 @@
 {
   "name": "docker-security-playground",
   "description": "A playground platform for the penetration testing students",
-  "version": "3.7.6",
+  "version": "3.7.7",
   "private": true,
   "keywords": [
     "docker"
@@ -28,7 +28,7 @@
     "app-root-path": "^2.2.1",
     "async": "^2.6.2",
     "body-parser": "1.x",
-    "bunyan": "^1.8.10",
+    "bunyan": "^1.8.14",
     "bunyan-request-logger": "^2.0.0",
     "chai-json": "^0.1.0",
     "command-exists": "^1.2.9",
@@ -52,7 +52,7 @@
     "method-override": "^2.3.8",
     "mocha": "^7.2.0",
     "multer": "^1.4.1",
-    "mydockerjs": "^2.12.1",
+    "mydockerjs": "^2.14.1",
     "ncp": "^2.0.0",
     "node-cmd": "^3.0.0",
     "node-pty": "^0.9.0",
@@ -67,11 +67,12 @@
     "spyfs": "^1.0.2",
     "stampit": "^3.1.2",
     "underscore": "^1.10.2",
+    "valid-url": "^1.0.9",
     "walker": "^1.0.7",
     "zip-dir": "^1.0.2"
   },
   "devDependencies": {
-    "all-contributors-cli": "^6.15.0",
+    "all-contributors-cli": "^6.16.1",
     "chai": "^4.2.0",
     "chai-fs": "^1.0.0",
     "chai-http": "^4.2.0",
@@ -83,7 +84,7 @@
     "eslint-config-hapi": "^11.1.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-hapi": "^4.0.0",
-    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",

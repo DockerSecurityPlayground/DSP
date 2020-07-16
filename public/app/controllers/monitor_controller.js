@@ -6,7 +6,7 @@ var DSP_MonitorCtrl  = function($scope, $routeParams, $location, Notification, S
 
   
   
-  $scope.hostPort = 14000;
+  $scope.hostPort = 14500;
   const host = $location.host();
   const protocol = "https";
   $scope.captureName = "";

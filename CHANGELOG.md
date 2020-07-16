@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.7.7] - 2020 - 07 - 16  
+### Changed   
+- Changed network_mode to host for wireshark monitoring serviec 
 ## [3.7.6] - 2020 - 07 - 15
 ### Fixed  
 - Disable require for email field during installation;  
