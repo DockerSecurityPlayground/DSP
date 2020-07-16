@@ -110,10 +110,10 @@ function runHttpdService(callback, hostPort, notifyCallback) {
 
 function runWireshark(callback, hostPort, notifyCallback) {
   const ports = {}
-  ports["14500"] = hostPort
+  // ports["14500"] = hostPort
   
   dockerJS.run(WIRESHARK_IMAGE_NAME, callback, {
-    ports: ports,
+    // ports: ports,
     volumes: [{
       hostPath: DSP_VOLUME_NAME,
       containerPath: WIRESHARK_VOLUME_NAME
@@ -121,6 +121,7 @@ function runWireshark(callback, hostPort, notifyCallback) {
     name: WIRESHARK_SERVICE_NAME,
     cap_add: "NET_ADMIN",
     detached: true,
+    networkHost: true,
     environments: [{
       name: "XPRA_PW",
       value: "wireshark"
