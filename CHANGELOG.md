@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.7.7] - 2020 - 07 - 16  
 ### Changed   
-- Changed network_mode to host for wireshark monitoring serviec 
+- Changed network_mode to host for wireshark monitoring service
 ## [3.7.6] - 2020 - 07 - 15
 ### Fixed  
 - Disable require for email field during installation;  
