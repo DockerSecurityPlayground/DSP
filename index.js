@@ -26,6 +26,7 @@ const healthChecker = require('./app/util/HealthLabState.js');
 const errorHandler = require('express-error-handler');
 
 const port = +process.env.PORT || 8080;
+const host = process.env.HOSTNAME || "127.0.0.1";
 // var upload = multer({ dest: "uploads/" });
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -262,8 +263,8 @@ dockerSocket.init(server);
 // Set COMPOSE_INTERACTIVE_NO_CLI=1
 process.env.COMPOSE_INTERACTIVE_NO_CLI = 1
 
-server.listen(port, () => {
+server.listen(port, host, () => {
   if (localConfig.config.test) { log.warn('Testing mode enabled'); }
-  log.info(`Server listening on port ${port}`);
+  log.info(`Server listening on ${host}:${port}`);
 });
 
