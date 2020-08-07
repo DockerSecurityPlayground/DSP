@@ -98,9 +98,6 @@ If you have error regarding **node-pty** module, try to:
 
 ### Any question ?  
 If you have a problem you can use Issue section.   
-You can also write you problem to the Google Group:   
-https://groups.google.com/forum/#!forum/dockersecurityplayground
-
    
 ## Docker Wrapper Image  
 DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
