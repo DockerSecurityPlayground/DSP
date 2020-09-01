@@ -89,6 +89,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "jiin995",
+      "name": "Gabriele Previtera",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/6164845?v=4",
+      "profile": "https://github.com/jiin995",
+      "contributions": [
+        "code",
+        "talk"
+      ]
     }
   ],
   "contributorsPerLine": 7
