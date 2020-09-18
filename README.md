@@ -13,7 +13,7 @@ rules, and security issues by installing DSP in your PC.
 -  **Manage a set of docker-compose project** . Main goal of DSP is to learn 
 in penetration testing and network security, but its flexibility allows you the 
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
-labs**. For more information look at the [Labs Managment]() page.   
+labs**.  
 
 ## How To Use
 Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) to learn how to use DSP.
