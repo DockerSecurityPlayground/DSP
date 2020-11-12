@@ -18,7 +18,7 @@ function initUserRepo(homeDSP, config) {
   const dockerfileDIR = path.join(homeDSP, config.name, '.dockerfiles');
   const labelsJSON = path.join(homeDSP, config.name, 'labels.json');
   const snippetsJSON = path.join(homeDSP, config.name, 'snippets.json')
-  if (!fs.existsSync(dspID)) fs.writeFileSync(dspID);
+  if (!fs.existsSync(dspID)) fs.writeFileSync(dspID, '');
   // Create .data directory
   if (!fs.existsSync(dataDIR)) fs.mkdirSync(dataDIR);
   // Create .dockerfiles directory
