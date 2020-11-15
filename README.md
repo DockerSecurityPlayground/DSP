@@ -21,16 +21,6 @@ You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki
 Follow Installation and Start steps to run DSP.   
 
 ## Installation And Start   
-### Docker-Mode   
-You can use DSP Image provided at the following [link](https://github.com/giper45/dsp-docker-image)  
-```   
-git clone https://github.com/giper45/dsp-docker-image  
-cd dsp-docker-image  
-docker-compose up
-```   
-
-
-### Normal-Mode
 1. Install DSP Requirements:   
 
 * Nodejs (v 7 or later)
