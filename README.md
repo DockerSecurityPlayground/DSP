@@ -33,6 +33,8 @@ Follow Installation and Start steps to run DSP.
 2. Install node dependencies and run: 
 
 ```
+git clone https://github.com/giper45/DockerSecurityPlayground.git
+cd DockerSecurityPlayground
 npm install
 ```      
 
