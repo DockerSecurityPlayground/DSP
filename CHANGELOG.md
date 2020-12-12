@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.7.9] - 2020 - 12 - 12  
+###  
+- Removed com and com.docker labels when a lab is saved.   
+
 ## [3.7.8] - 2020 - 07 - 28
 ### Added  
 - Support hostname

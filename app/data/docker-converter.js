@@ -73,6 +73,13 @@ function JDCgetCapabilities(selectedImage) {
     return [];
   }
   else {
+    // Exclude com.docker and com labels
+    const labelKeys = Object.keys(selectedImage.labels);
+    labelKeys.forEach((lk) => {
+      if (lk.startsWith("com.docker") || lk == "com") {
+        delete selectedImage.labels[lk];
+      }
+    })
     const convertedLabels = dot.object(selectedImage.labels);
     if (convertedLabels && convertedLabels.caps_add) {
       const convertedCaps = convertedLabels.caps_add.split(',');
