@@ -1,7 +1,7 @@
 {
   "name": "docker-security-playground",
   "description": "A playground platform for the penetration testing students",
-  "version": "3.7.9",
+  "version": "3.7.10",
   "private": true,
   "keywords": [
     "docker"
