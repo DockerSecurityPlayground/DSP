@@ -49,13 +49,27 @@ To start the application. This will launch a server listening on 8080 (or anothe
 
 With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.     
 
+### Troubleshooting   
+If you have the following error: 
+``` 
+ERR! typeerror Error: Missing required argument #1  
+```  
+during npm install  .
+
+
+
 
 ## Update the application: 
 When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
 ```
 npm run update
 ```  
-
+You need to update nodejs:  
+``` 
+sudo apt-get install -y python-software-properties
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash
+sudo apt-get install nodejs
+```
 
 
 ## Official Repository  
