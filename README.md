@@ -49,13 +49,81 @@ To start the application. This will launch a server listening on 8080 (or anothe
 
 With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.     
 
+### Troubleshooting  
+#### During dependencies installation   
+
+If you have error regarding **node-pty** module, try to:   
+- Install build-essentials : (In Ubuntu: apt install -y build-essentials)  
+- Use nodejs LTS (note-pty has some isseus, as shown [here](https://github.com/microsoft/node-pty/issues/319) 
+
+If you have the following error: 
+``` 
+ERR! typeerror Error: Missing required argument #1  
+```  
+You need to update nodejs:  
+``` 
+sudo apt-get install -y python-software-properties
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash
+sudo apt-get install nodejs
+```
+
+#### During DSP installation
+If you have the following error during the installation:   
+``` 
+[2020-12-14T10:18:21.854Z]  INFO: DockerSecurityPlayground/1536 on vagrant: [DOCKER ACTIONS - DOWNLOAD IMAGE]
+events.js:174
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: connect EACCES /var/run/docker.sock
+    at PipeConnectWrap.afterConnect [as oncomplete] (net.js:1107:14)
+Emitted 'error' event at:
+    at Socket.socketErrorListener (_http_client.js:401:9)
+    at Socket.emit (events.js:198:13)
+    at emitErrorNT (internal/streams/destroy.js:91:8)
+    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+```   
+
+Verify 2 things:   
+1. docker is installed   
+2. current user is in `docker` group   
+
+To test it:   
+``` 
+docker ps   
+``` 
+DO NOT USE SUDO if you are running DSP with normaal user.   
+If you have the following error:   
+```  
+vagrant@vagrant:~/git/DockerSecurityPlayground$ docker ps
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json: dial unix /var/run/docker.sock: connect: permission denied
+```   
+You need to add your user to group docker:   
+https://docs.docker.com/engine/install/linux-postinstall/  
+```  
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+```  
+Log-out and log-in  
+Now you need to clean DSP:   
+```  
+npm run uninstall  
+```  
+And now everything should work.  
+
 
 ## Update the application: 
 When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
 ```
 npm run update
 ```  
-
+## Clean DSP   
+If something goes wrong, you can reset DSP to factory by using the following command:   
+``` 
+npm run uninstall  
+```   
+This will delete everything, and you can start DSP from the installation step. 
 
 
 ## Official Repository  
@@ -83,11 +151,6 @@ In DSP you can manage multiple user repositories (Repositories tab)
 -  Docker Image and Dockerfile Management  
 -  GIT Integration  
 -  DSP Repository with a set of network security scenarios  
-
-### Troubleshooting during installation   
-If you have error regarding **node-pty** module, try to:   
-- Install build-essentials : (In Ubuntu: apt install -y build-essentials)  
-- Use nodejs LTS (note-pty has some isseus, as shown [here](https://github.com/microsoft/node-pty/issues/319) 
 
 ### Any question ?  
 If you have a problem you can use Issue section.   
