@@ -9,9 +9,15 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
-## [3.7.10] - 2020 - 12 - 14  
+## [3.7.11] - 2020 - 12 - 23
+### Fixed  
+Issue on manage multiple networks
+
+## [3.7.10] - 2020 - 12 - 18
 ### Changed   
 HOSTNAME -> DSP_IFACE environment variable to avoid conflicts.   
+
+
 ## [3.7.9] - 2020 - 12 - 12  
 ###  
 - Removed com and com.docker labels when a lab is saved.   
