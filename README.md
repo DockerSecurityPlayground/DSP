@@ -159,8 +159,15 @@ If you have a problem you can use Issue section.
 DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
 Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)
 
+## Tests   
+To run a test:   
+``` 
+mocha test/<test-nodejs-file.js>   
+```   
+tests use helper.start() method to initialize the test environment:   
+*  A test config is created   
+* homedir directory is mocked, in this way it is possible to use internal dsp directory for tests.   
 
- 
 
 ## Error Debug
 
