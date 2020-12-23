@@ -57,7 +57,6 @@ function graphRenameProperty(cells, oldName, newName) {
 // Update the name of the cell
 function Graph__update(cell, newName, oldName) {
   Graph__log("Graph__update()")
-  console.log("CELL")
   console.log(cell);
   console.log(cell.children);
   
@@ -67,10 +66,12 @@ function Graph__update(cell, newName, oldName) {
     var container = Model__AppScope.getContainer(newName);
 
     if (cell.type == NETWORK_ELEMENT_TYPE) {
+      // Get network connectors
       cell.children.forEach(function (interface) {
         if (interface.edges) {
           edge = interface.edges[0];
-          const network = _.findWhere(edge.parent.children, {type: "Network"})
+          var networkName = edge.target.id;
+          const network = _.findWhere(edge.parent.children, {id: networkName});
           if (container && container.networks) {
           const containerNetwork = container.networks[network.name];
           Graph__setEdgeLabel(theGraph, edge, containerNetwork)
@@ -258,7 +259,6 @@ function Graph__isValidXML(canvasXML) {
 function Graph__NetworkCreate(graph, obj, x, y) {
   Graph__log("Graph__NetworkCreate")
   var parent = graph.getDefaultParent();
-  console.log(parent);
   var model = graph.getModel();
   var v1 = null;
   model.beginUpdate();
