@@ -489,7 +489,6 @@ function mxInitGraph(graph, appScope) {
   var mxCreateEdge = mxConnectionHandler.prototype.createEdge;
   mxConnectionHandler.prototype.createEdge = function(value, source, target, style) {
     Graph__log("createEdge()")
-    
     Model__AppScope.attachNetwork(target.name, source.name);
     return mxCreateEdge.apply(this, arguments);
   }
@@ -519,18 +518,16 @@ function mxInitGraph(graph, appScope) {
     if (edge.source && edge.source.parent ) {
       containerName = edge.source.parent.id;
       const container = Model__AppScope.getContainer(containerName);
-      const network = _.findWhere(edge.parent.children, {type: "Network"})
-      // Get container element
+      // Get container new network
+      if (container.newNetwork) {
+        // const containerNetwork = container.networks[network.name];
+        const containerNetwork = container.networks[container.newNetwork];
+        // Only if isDynamic is defined
+        Graph__setEdgeLabel(theGraph, edge, containerNetwork);
+      }
       
       
-      const containerNetwork = container.networks[network.name];
-      // Only if isDynamic is defined
-      Graph__setEdgeLabel(theGraph, edge, containerNetwork);
-      // const networkName = edge.target.id; 
-      // const ip = container.networks[networkName];
-      // console.log(ip);
-      
-      
+
 
     }
     // const containerElement = edge.source.parent;
