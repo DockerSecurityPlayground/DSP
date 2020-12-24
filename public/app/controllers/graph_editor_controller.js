@@ -92,26 +92,6 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           }
         })
       }
-            // // Create networks
-            // for (var i = 0; i < networkNames.length; i++) {
-            //    Graph__NetworkCreate(theGraph, networkNames[i], 200, i*100);
-            // }
-            // // Create elements
-            // for (var i = 0; i < containerNames.length; i++) {
-            //    Graph__ElementCreate(theGraph, containerNames[i], 1, i*100);
-            //   var createdElement = Graph__getElement(containerNames[i]);
-            //   var children = createdElement.children;
-            //   var currentAttachedNetwork = 0;
-            //   var MAX_NETWORK_ATTACHMENTS = 4;
-            //   // Get networks
-            //   var c = _.findWhere(containerManager.containerListToDraw, {name: containerNames[i]});
-            //   _.each(c.networks, (n, networkName) => {
-            //     Graph__AddConnection(containerNames[i], networkName, currentAttachedNetwork++);
-
-
-              // })
-            // }
-          // }
       else {
         $scope.networkList =  NetworkManagerService.getNetworks()
       }
@@ -550,6 +530,8 @@ window.location.href = urlToGo;
 
     container.networks[nameNetwork].ip = ip
     container.networks[nameNetwork].isChecked = true
+    // To fix issue #65 we store newNetwork
+    container.newNetwork = nameNetwork;
 
     NetworkManagerService.useAddress(ip)
   }
