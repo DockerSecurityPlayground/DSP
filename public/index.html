@@ -33,6 +33,12 @@
 
   <script src="assets/js/angular-animate.min.js"></script>
   <script src="assets/js/angular-sanitize.min.js"></script>
+  <!-- Markdown libraries-->
+  <!-- <script src="assets/js/markdown-it.min.js"></script>
+  <script src="assets/js/ng-markdownit.min.js"></script> -->
+  <script src="assets/js/marked.js"></script>
+
+
   <script src="assets/js/angular-ui-notification.min.js"></script>
   <script src="assets/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
   <script src="assets/js/angular-route-min.js"></script>
@@ -209,6 +215,25 @@
             }
         };
     })
+   .directive('iiMdPreview', function() {
+      return {
+        // template: "<div><textarea class='MdPreview-markdown' name='{{textareaName}}' ng-model='markdown' ng-change='md2Html()'></textarea><div class='MdPreview-html' ng-bind-html='htmlSafe' /></div>",
+        template: "<div class='MdPreview-html' ng-bind-html='htmlSafe' /></div>",
+        restrict: 'C',
+        replace: true,
+        // controller: dsp_LabsCtrl,
+        
+        link: function(scope, element, attrs) {
+          if (attrs.url) {
+            scope.initFromUrl(attrs.url);
+          }
+          if (attrs.text) {
+            scope.initFromText(attrs.text);
+          }
+          scope.textareaName = attrs.textareaName;
+        }
+      };
+  })
       .directive('onFinishRender', ['$timeout', '$parse', function ($timeout, $parse) {
         return {
           restrict: 'A',

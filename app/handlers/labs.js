@@ -47,6 +47,7 @@ function checkParams(params, body, callback) {
 
 // User walker to explore all project
 function getAll(req, res) {
+  log.info('[GET ALL]');
   configData.getConfig((err, conf) => {
     if (err) httpHelper.response(res, err);
     else {
@@ -111,6 +112,14 @@ function getInformation(req, res) {
     (err, results) => appUtils.response('GET INFORMATION', res, err, results));// End waterfall
 }
 
+function getLabUserInformation(req, res) {
+  log.info('[IN GET LAB USER INFORMATION]');
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['labname'], cb),
+    (cb) => labsData.getLabUserInformation(req.params.labname, cb)
+  ], (err, results) => appUtils.response('GET LAB USER INFORMATION', res, err, results));
+}
+
 
 function wantToRename(req) {
   return (req.body.name && req.body.name !== req.params.labname);
@@ -148,6 +157,7 @@ function saveInformation(req, res) {
         description: infos.description || '',
         goal: infos.goal || '',
         solution: infos.solution || '',
+        readme : infos.readme 
       };
       // log.info('Info received:');
       // log.info(JSON.stringify(i));
@@ -373,6 +383,7 @@ exports.deleteLab = deleteLab;
 exports.getAll = getAll;
 exports.getLabs = getLabs;
 exports.getInformation = getInformation;
+exports.getLabUserInformation = getLabUserInformation;
 exports.saveInformation = saveInformation;
 exports.newLab = newLab;
 exports.copyLab = copyLab;

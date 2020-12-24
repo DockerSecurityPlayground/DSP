@@ -143,10 +143,18 @@ self.init = function(onSuccess) {
   return 	$http.get(url)
   }
 
+  self.getUserLab = function(nameLab) {
+   return $http.get(apiUrl+"userlab/"+nameLab)
+  }
+  self.getLabInfo = function(nameRepo, nameLab) {
+    console.log("[+] AjaxService Get Lab Info");
+   return $http.get(apiUrl+"labs/"+nameRepo + "/" + nameLab)
+  }
+
+
   self.deleteLab = function(nameToDelete) {
    return $http.delete(apiUrl+"labs/"+nameToDelete)
   }
-
   self.newLab = function(l, labels) {
 
           return $http.post('/dsp_v1/labs/'+l.name,
@@ -172,7 +180,8 @@ self.init = function(onSuccess) {
     informations:  {
             description : lab.description || '',
             goal : lab.goal || '',
-            solution : lab.solution || ''
+            solution : lab.solution || '',
+            readme: lab.readme 
     },
     name: lab.name
     }

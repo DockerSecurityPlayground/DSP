@@ -252,7 +252,7 @@ const DSPWalk = stampit(MyEmitter)
                 }
               },
               state(c) {
-                log.info(`Taking state of ${r.name}/${l.name}`);
+                // log.info(`Taking state of ${r.name}/${l.name}`);
                 const state = LabStates.getState(r.name, l.name, c);
               },
               labels(c) {

@@ -216,12 +216,12 @@ function _isRepoPath(thePath) {
   );
 }
 function getImagesAllLabs(namerepo, callback) {
-  log.info("[Docker Images] Get Images All Labs");
+  // log.info("[Docker Images] Get Images All Labs");
   let images = [];
   let lab_images = [];
   let allImages = [];
   let imagesToBuild;
-  log.info("[Docker Images] Get All Images");
+  // log.info("[Docker Images] Get All Images");
   async.waterfall([
     (cb) => dockerFiles.getImageNames(cb),
     (imb, cb) => {
@@ -271,7 +271,7 @@ function getImagesAllLabs(namerepo, callback) {
     },
     (labsPath, cb) => {
       async.each(labsPath, (lb, c) => {
-        log.info(`[Docker Images] Get Lab ${path.basename(lb)} Images`);
+        // log.info(`[Docker Images] Get Lab ${path.basename(lb)} Images`);
 
         getImagesLab(namerepo, path.basename(lb), allImages, imagesToBuild, (err, data) => {
           if (err) {
@@ -345,7 +345,7 @@ function getImagesAllRepos(callback) {
     .on('end', () => {
       async.eachSeries(repoPaths, (r, c) => {
         let rb = path.basename(r);
-        log.info(`[Docker Images] Find ${rb} repository`);
+        // log.info(`[Docker Images] Find ${rb} repository`);
         getImagesAllLabs(rb, (err, images) => {
           if(err) {
             log.error(err);

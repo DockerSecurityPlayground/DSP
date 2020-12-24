@@ -41,7 +41,6 @@
         {{currentName}}
         <!-- <h3 class="media-heading" class="single-line" on-finish="changeLabName()" contenteditable="true" ng-model="currentName">{{ctrl.lab.name}}</h3> -->
         <h3 class="media-heading" class="single-line" ng-model="currentName">{{ctrl.lab.name}}</h3>
-        <p>{{ctrl.lab.description}}</p>
         <ul class="list-inline">
           <li ng-repeat="label in ctrl.lab.labels">
             <span class="label label-primary" style="background-color:{{label.color}}"><i class="fa fa-fw fa-tag"></i> {{label.name}}</span>
@@ -202,7 +201,14 @@
         <div class="panel-body">
 
           <uib-tabset active="active">
-            <uib-tab index="0" heading="Graph">
+            <uib-tab  index="0" heading="Description">
+                <p>{{ctrl.lab.description}}</p>
+                <div class='iiMdPreview' text="{{readme}}"></div>
+              <!-- GRAPH CANVAS -->
+              <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
+              <!-- END GRAPH CANVAS -->
+            </uib-tab>
+            <uib-tab index="1" heading="Graph">
               <br>
               <!-- GRAPH CANVAS -->
               <div id="graphContainer"></div>
@@ -212,7 +218,7 @@
               <br>
               <!-- END GRAPH CANVAS -->
             </uib-tab>
-            <uib-tab index="1" heading="Docker-Compose">
+            <uib-tab index="2" heading="Docker-Compose">
               <br>
               <h4 class="text-center"> Docker Compose </h4>
               <div ng-show="yamlfile !== ''" class="row">
@@ -222,13 +228,13 @@
                 </div>
               </div>
             </uib-tab>
-            <uib-tab ng-if="isLabRun" index="2" select="updateManagedServices()" heading="Managed Services">
+            <uib-tab ng-if="isLabRun" index="3" select="updateManagedServices()" heading="Managed Services">
               <div ng-include="'views/managed-tools.html'"> </div>
             </uib-tab>
-            <uib-tab ng-if="isLabRun" index="3" heading="Hack Tools">
+            <uib-tab ng-if="isLabRun" index="4" heading="Hack Tools">
               <div ng-include="'views/services.html'"> </div>
             </uib-tab>
-            <uib-tab ng-if="isLabRun" index="4" heading="Network Elements">
+            <uib-tab ng-if="isLabRun" index="5" heading="Network Elements">
               <h4 class="text-center">Containers</h4>
               <hr>
               <div class="list-group">
@@ -253,7 +259,7 @@
                 </div>
               </div>
             </uib-tab>
-            <uib-tab ng-if="isLabRun" index="5" heading="Monitoring">
+            <uib-tab ng-if="isLabRun" index="6" heading="Monitoring">
               <div ng-include="'views/monitoring.html'"> </div>
             </uib-tab>
           </uib-tabset>

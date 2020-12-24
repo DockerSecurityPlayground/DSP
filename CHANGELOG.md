@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
  Different vertical size image canvas
  New terminal on a new tab in visual editor
 
+## [3.8.0] - 2020 - 12 - 24   
+### Added   
+README support: now lab editors can add a README and could it can be seen on main page of lab projects. 
+
+
 ## [3.7.11] - 2020 - 12 - 23
 ### Fixed  
 Issue on manage multiple networks

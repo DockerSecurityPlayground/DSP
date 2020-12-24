@@ -10,6 +10,7 @@ const _ = require('underscore');
 const appUtils = require('../util/AppUtils');
 const LabStates = require('../util/LabStates.js');
 const c = require('../../config/local.config.json');
+const log = appUtils.getLogger();
 
 function renameLab(oldName, newName, cb) {
 // banally return if equal
@@ -197,6 +198,7 @@ function saveLabels(labName, labels, callback) {
 }
 
 function saveInformation(name, information, callback) {
+  log.info("[Save Information]");
   let userPath;
   // log.info('in save information')
   async.waterfall([
@@ -208,6 +210,14 @@ function saveInformation(name, information, callback) {
     //  const repoName = path.basename(userPath);
     //  LabStates.editState(repoName, name, { repoName, labName: name }, cb);
       cb(null);
+    },
+    // If user sends readme, update readme
+    (cb) => {
+      if (information.readme) {
+        log.info("[+] Update readme");
+        const readmeFile = path.join(userPath, name, 'README.md');
+        fs.writeFile(readmeFile, information.readme, cb);
+      } else cb(null);
     },
     // Now save here
     (cb) => {
@@ -228,19 +238,49 @@ function saveInformation(name, information, callback) {
 
 
 function getInformation(nameRepo, nameLab, callback) {
+  let labName = "";
   async.waterfall([
     // Get config userpath
     (cb) => config.getConfig(cb),
     // Read json information file
     (cfile, cb) => {
-      const informationFile = path.join(appUtils.getHome(), cfile.mainDir, nameRepo, nameLab, 'information.json');
+      labName = path.join(appUtils.getHome(), cfile.mainDir, nameRepo, nameLab);
+      const informationFile = path.join(labName, 'information.json');
       jsonfile.readFile(informationFile, cb);
-    }],
+    }, (jsonDescription, cb) => {
+      const readmeFile = path.join(labName, 'README.md');
+      appUtils.getFile(readmeFile, (err, content) => {
+        // Warn that something wrong in the readme
+        if (err)  {
+          log.warn("README does not exist or is not readable");
+          cb(null, jsonDescription);
+        } else {
+          jsonDescription.readme = content.toString();
+          cb(null, jsonDescription);
+        }
+      })
+    }
+  ],
     (err, jsonDescription) => {
       if (err) callback(err);
       else callback(null, jsonDescription);
     });
 }
+
+function getLabUserInformation(nameLab, callback) {
+  async.waterfall([
+    // Get config userpath
+    (cb) => config.getConfig(cb),
+    // Read json information file
+    (cfile, cb) => {
+      const repoName  = cfile.name;
+      getInformation(repoName, nameLab, cb);
+    }], (err, jsonDescription) => {
+      if (err) callback(err); 
+      else callback(null, jsonDescription)
+    });
+}
+
 exports.newLab = newLab;
 exports.deleteLab = deleteLab;
 exports.saveLabels = saveLabels;
@@ -248,4 +288,5 @@ exports.saveLabels = saveLabels;
 exports.renameLab = renameLab;
 exports.saveInformation = saveInformation;
 exports.getInformation = getInformation;
+exports.getLabUserInformation = getLabUserInformation;
 exports.getLabs = getLabs;

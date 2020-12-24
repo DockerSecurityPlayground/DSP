@@ -8,18 +8,11 @@ const homedir = require('homedir');
 const errors = require('errors');
 const fs = require('fs');
 const httpHelper = require('help-nodejs').httpHelper;
-const cpFile = require('cp-file');
 const ncp = require('ncp').ncp;
 const localConfig = require('../../config/local.config.json').config;
 
 function copyFile(source, target, cb) {
-  cpFile(source, target)
-    .then(() => {
-      cb(null);
-    },
-    (err) => {
-      cb(err);
-    });
+  fs.copyFile(source, target, 0, cb);
 }
 
 function getDirs(srcpath) {
@@ -133,6 +126,16 @@ module.exports = {
         copyFile(srcPath, dstPath, cb);
       }
       else cb(new Error('Unknown file type'));
+    });
+  },
+  getFile(srcPath, cb) {
+    fs.stat(srcPath, (err, stats) => {
+      if (err) cb(err); 
+      else if (stats.isDirectory()) {
+        cb(new Error("Not file"));
+      } else {
+        fs.readFile(srcPath, cb);
+      }
     });
   },
   path_userconfig: pathUserConfig,

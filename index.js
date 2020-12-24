@@ -141,6 +141,7 @@ app.post('/dsp_v1/all/', labs.importLab);
 // Api labs
 app.get('/dsp_v1/labs/:repo', labs.getLabs);
 app.get('/dsp_v1/labs/:repo/:labname', labs.getInformation);
+app.get('/dsp_v1/userlab/:labname', labs.getLabUserInformation);
 app.put('/dsp_v1/labs/:labname', labs.saveInformation);
 app.post('/dsp_v1/labs/:labname', (req, res) => {
   if (req.query.wantToCopy) {

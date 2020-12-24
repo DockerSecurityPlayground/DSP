@@ -2,6 +2,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const labsData = require('../../app/data/labs.js');
 const path = require('path');
+const appRoot = require('app-root-path');
 const fs = require('fs');
 const jsonfile = require('jsonfile');
 const helper = require('../helper');
@@ -23,7 +24,7 @@ describe('LABS TEST', () => {
   it('Should give all labs', (done) => {
     labsData.getLabs(helper.userRepo(), (err, data) => {
       const sorted = _.sortBy(data);
-      const defaultLabs = _.sortBy(['test', 'test2', 'toEditLab', 'existentLab']);
+      const defaultLabs = _.sortBy(['test', 'test2', 'testreadme', 'testreadmedir', 'toEditLab', 'existentLab']);
       expect(err).to.be.null;
       expect(sorted).to.be.eql(defaultLabs);
       done();
@@ -117,10 +118,47 @@ describe('LABS TEST', () => {
       expect(infos.solution).to.be.eql(infoNew.solution);
       expect(infos.goal).to.be.eql(infoNew.goal);
       expect(infos.author).to.be.eql("gx1");
+      expect(infos.readme).to.be.undefined;
       done();
     });
   });
 
+  it('Should give information + readme', (done) => {
+    const infoNew =
+      {
+        description: 'testDescription',
+        goal: 'testGoal',
+        solution: 'testSolution',
+      };
+    labsData.getInformation(helper.userRepoName(), 'testreadme', (err, infos) => {
+      const readmeContent = fs.readFileSync(path.join(appRoot.toString(), 'test', 'data', 'README.md'));
+      expect(err).to.be.null;
+      expect(infos.description).to.be.eql(infoNew.description);
+      expect(infos.solution).to.be.eql(infoNew.solution);
+      expect(infos.goal).to.be.eql(infoNew.goal);
+      expect(infos.author).to.be.eql("gx1");
+      expect(infos.readme).to.be.eql(readmeContent);
+      done();
+    });
+  });
+
+  it('Should give information without readme if readme is a dir', (done) => {
+    const infoNew =
+      {
+        description: 'testDescription',
+        goal: 'testGoal',
+        solution: 'testSolution',
+      };
+    labsData.getInformation(helper.userRepoName(), 'testreadmedir', (err, infos) => {
+      expect(err).to.be.null;
+      expect(infos.description).to.be.eql(infoNew.description);
+      expect(infos.solution).to.be.eql(infoNew.solution);
+      expect(infos.goal).to.be.eql(infoNew.goal);
+      expect(infos.author).to.be.eql("gx1");
+      expect(infos.readme).to.be.undefined;
+      done();
+    });
+  });
   // Rename exceptions
   it("Should throw an error if try to rename a lab that don't exists", (done) => {
     const pathTest = path.join(helper.userRepo(), 'cicciolino');

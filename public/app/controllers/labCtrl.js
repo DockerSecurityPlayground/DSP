@@ -1,4 +1,4 @@
-var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, containerManager, WalkerService, Notification) {
+var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService, dockerImagesService, dockerAPIService, $routeParams, $sce, SafeApply, $document, $uibModal, $location, $http, cfpLoadingBar, CurrentLabService, CleanerService, BreadCrumbs, AjaxService, $sce, containerManager, WalkerService, Notification) {
   console.log("=== INIT LAB CONTROLLER ===");
   var userDir;
   var vm = this;
@@ -15,11 +15,11 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   const networkEmptyMessage = 'Network is empty! Have you drawn the containers?';
   $scope.currentName = "";
   $scope.tags = [{
-      name: "{{hostname}}",
-      description: "it is converted to hostname (i.e. localhost) "
-    }, {
-      name: "{{url}}",
-      description: "it is converted to DSP url (i.e. http://localhost )"
+    name: "{{hostname}}",
+    description: "it is converted to hostname (i.e. localhost) "
+  }, {
+    name: "{{url}}",
+    description: "it is converted to DSP url (i.e. http://localhost )"
   }]
 
   $scope.registerCallback = function (cb) {
@@ -28,7 +28,30 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
 
   $scope.trustedHtml = function (plainText) {
     return $sce.trustAsHtml(plainText);
-}
+  }
+
+  $scope.markdown = "";
+  // MARKDOWN Functions
+    $scope.md2Html = function() {
+      $scope.html = $window.marked($scope.markdown);
+      $scope.htmlSafe = $sce.trustAsHtml($scope.html);
+    };
+
+  // On change markdown variable, update information
+  $scope.$watch('markdown', function(newValue, oldValue) {
+    vm.lab.readme = $scope.markdown;
+    // Update preview
+    SafeApply.exec($scope, function() {
+      $scope.initFromText(newValue);
+    });
+  });
+
+  $scope.initFromText = function(text) {
+        $scope.markdown = text;
+        return $scope.md2Html();
+  };
+
+    // MARKDOWN End
 
 
   $scope.tinymceOptions = {
@@ -36,9 +59,23 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
       // put logic here for keypress and cut/paste changes
     },
     inline: false,
-    plugins: 'advlist autolink link image lists charmap print preview',
+    plugins: 'textpattern advlist autolink link image lists charmap print preview',
     skin: 'lightgray',
-    theme: 'modern'
+    theme: 'modern',
+    // textpattern_patterns: [
+    //      {start: '*', end: '*', format: 'italic'},
+    //      {start: '**', end: '**', format: 'bold'},
+    //      {start: '#', format: 'h1'},
+    //      {start: '##', format: 'h2'},
+    //      {start: '###', format: 'h3'},
+    //      {start: '####', format: 'h4'},
+    //      {start: '#####', format: 'h5'},
+    //      {start: '######', format: 'h6'},
+    //      {start: '1. ', cmd: 'InsertOrderedList'},
+    //      {start: '* ', cmd: 'InsertUnorderedList'},
+    //      {start: '- ', cmd: 'InsertUnorderedList'}
+    // ]
+
   };
 
   vm.tinymceHtmlGoal = ''
@@ -57,13 +94,17 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   vm.previewGoal = '';
   vm.isRunning;
   vm.exists = true;
+
+  vm.isReadme = true;
+  vm.isReadmePreviewOpen = false;
+
   vm.isGoalEditShowed = true;
   vm.isSolutionEditShowed = true;
   vm.isSolutionPreviewOpen = false;
   vm.isGoalPreviewOpen = false;
   vm.noImages = false;
   vm.actionVisible = true,
-    $scope.imageList = [];
+  $scope.imageList = [];
   $scope.interactiveImageList = [];
   $scope.listTools = [];
   var toEditName = '';
@@ -81,6 +122,40 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
         })
 
     var action = $routeParams.action;
+    function initLabInformation(reponame) {
+      console.log("Init lab information")
+      var labname = $routeParams.namelab;
+      AjaxService.getLabInfo(reponame, labname)
+        .then(function (res) {
+          const information = res.data.data;
+          console.log(information)
+          if (information.readme) {
+            SafeApply.exec($scope, function() {
+              $scope.initFromText(information.readme);
+
+            });
+          }
+        }, function (err) {
+          Notification({ message: "Server error: " + err.data.message }, 'error');
+      })
+    }
+
+    function initLabUserInformation() {
+      var labname = $routeParams.namelab;
+      AjaxService.getUserLab(labname)
+        .then(function (res) {
+          console.log("SUCCESS");
+          const information = res.data.data;
+          if (information.readme) {
+            SafeApply.exec($scope, function() {
+              $scope.initFromText(information.readme);
+
+            });
+          }
+        }, function (err) {
+          Notification({ message: "Server error: " + err.data.message }, 'error');
+      })
+    }
     if (action === 'new') {
       //		console.log("action new")
       $scope.lab_action_btn = { text: "Create", class: "btn btn-success" }
@@ -96,6 +171,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
       $scope.lab_action_form = 'editlab'
       //Update in edit breadcrumbs
       BreadCrumbs.breadCrumbs('/lab/edit', $routeParams.namelab);
+      initLabUserInformation();
       AjaxService.init()
         .dAll
         .then(function (res) {
@@ -135,9 +211,10 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
     //Use
     else if (action === 'use') {
       vm.buttonAction = '';
-    vm.isGoalEditShowed = false;
-    vm.isSolutionEditShowed = false;
+      vm.isGoalEditShowed = false;
+      vm.isSolutionEditShowed = false;
       BreadCrumbs.breadCrumbs('/lab/use', $routeParams.namelab);
+      initLabInformation($routeParams.repo);
       AjaxService.init()
         .dAll
         .then(function (res) {
@@ -322,7 +399,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
         function success(response) {
           console.log("SUCCESS");
           var windowReference = window.open();
-          windowReference.location = "docker_socket.html?serviceName="+nameContainer;
+          windowReference.location = "docker_socket.html?serviceName=" + nameContainer;
           // window.open('docker_socket.html', '_blank');
         },
         function error(err) {
@@ -332,7 +409,7 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   }
 
   $scope.getContainer = function getContainer(name) {
-     return  containerManager.getContainer(name)
+    return containerManager.getContainer(name)
   }
 
   $scope.copyFromContainer = function (nameContainer, dc = "true") {
@@ -477,11 +554,11 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
   }
   vm.goToNetwork = function goToNetwork() {
 
-      // $location.url('/network/'+vm.lab.name);
-      // window.location.href = '/network/' + vm.lab.name;
-      window.open('/network/' + vm.lab.name, '_blank');
-      // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
-      // window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
+    // $location.url('/network/'+vm.lab.name);
+    // window.location.href = '/network/' + vm.lab.name;
+    window.open('/network/' + vm.lab.name, '_blank');
+    // window.location.href='docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit';
+    // window.open('docker_graph_editor.html?nameRepo='+ vm.repoName+ '&namelab=' + vm.lab.name + '&action=edit', '_blank');
   }
 
   function openConfirmDelete() {
@@ -670,51 +747,51 @@ var dsp_LabCtrl = function ($scope, ServerResponse, $log, SocketService, dockerI
     cfpLoadingBar.complete();
   }
 
-  $scope.changeLabName = function() {
+  $scope.changeLabName = function () {
     Notification('Lab Name Changed', 'success');
   }
-  $scope.editGoal = function() {
+  $scope.editGoal = function () {
     vm.isGoalEditShowed = true;
     oldGoal = vm.lab.goal;
   }
-  $scope.saveGoal = function() {
+  $scope.saveGoal = function () {
     vm.isGoalEditShowed = false;
     console.log(vm.lab);
-    
+
     AjaxService.editLab(vm.lab, vm.lab.name, vm.labels)
-    .then(ServerResponse.success,
-      
-      // function successCallback(response) {
-      // Notification("Goal Saved")
-    //  }
-    function errorCallback(resp) {
-      ServerResponse.error(resp);
-      vm.lab.goal = oldGoal;
-    })
+      .then(ServerResponse.success,
+
+        // function successCallback(response) {
+        // Notification("Goal Saved")
+        //  }
+        function errorCallback(resp) {
+          ServerResponse.error(resp);
+          vm.lab.goal = oldGoal;
+        })
   }
 
-  $scope.cancelGoal = function() {
+  $scope.cancelGoal = function () {
     vm.isGoalEditShowed = false;
     vm.lab.goal = oldGoal;
   }
 
-  $scope.editSolution = function() {
+  $scope.editSolution = function () {
     vm.isSolutionEditShowed = true;
     oldSolution = vm.lab.solution;
   }
 
-  $scope.saveSolution = function() {
+  $scope.saveSolution = function () {
     vm.isSolutionEditShowed = false;
-    
+
     AjaxService.editLab(vm.lab, vm.lab.name, vm.labels)
-    .then(ServerResponse.success,
-    function errorCallback(resp) {
-      ServerResponse.error(resp);
-      vm.lab.solution = oldSolution;
-    });
+      .then(ServerResponse.success,
+        function errorCallback(resp) {
+          ServerResponse.error(resp);
+          vm.lab.solution = oldSolution;
+        });
   }
 
-  $scope.cancelSolution = function() {
+  $scope.cancelSolution = function () {
     vm.isSolutionEditShowed = false;
     vm.lab.solution = oldSolution;
   }

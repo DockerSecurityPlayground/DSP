@@ -55,4 +55,29 @@ describe('Test Util ', () => {
       done();
     });
   });
+  it('Should get file', (done) => {
+    const content = fs.readFileSync(path.join(basePath, 'helloworld.txt'));
+    const src = path.join(basePath, 'helloworld.txt');
+    AppUtils.getFile(src, (err, ret) => {
+      expect(err).to.be.null;
+      expect(ret).to.be.eql(content);
+      done();
+      // expect(ret).to.be.file().and.equal(src);
+    });
+  });
+
+  it('Shouold give error is getFile is not exist', (done) => {
+    AppUtils.getFile(path.join(basePath, 'helloDirNot'), (err) => {
+      expect(err).not.to.be.null;
+      done();
+    })
+  });
+
+  it('Shouold give error is getFile is not a file', (done) => {
+    AppUtils.getFile(path.join(basePath, 'helloDir'), (err) => {
+      expect(err).not.to.be.null;
+      done();
+    })
+
+  });
 });
