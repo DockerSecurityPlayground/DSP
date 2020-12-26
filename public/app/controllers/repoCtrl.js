@@ -1,4 +1,4 @@
-var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, AjaxService, dockerAPIService, FetchFileFactory) {
+var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, AjaxService, dockerAPIService, FetchFileFactory, $anchorScroll) {
   console.log("In repositories")
   var imageList = [];
   //$scope.urlPattern = RegexService.urlRegex;
@@ -142,6 +142,9 @@ var dsp_RepoCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService
   }
 
   $scope.editRepositoryClick = function (repo) {
+    // Go to gitform
+    $location.hash("gitform");
+    $anchorScroll();
     $scope.clearGithubForm();
     $scope.repo.name = repo.name;
     $scope.repo.url = repo.url;

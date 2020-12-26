@@ -45,18 +45,17 @@
     <h3> Current Git Data </h3>
     <form name="gitConfigUrl">
       <div class="form-group">
-        <label for="gitUrl">Git URL:</label>
-        <input type="text" class="form-control" id="gitUrl" name="gitUrl" ng-model=config.githubURL
-               ng-required="false" ng-readonly="true">
-        <div class="text-muted small">Current Git Repo URL</div>
+        <label for="gitUrl">Current Git Repo URL</label>
+        <div id="gitUrl" name="gitUrl" ng-model=config.githubURL><b>{{config.githubURL}}</b></div>
+        <!-- <input type="text" class="form-control" id="gitUrl" name="gitUrl" ng-model=config.githubURL
+               ng-required="false" ng-readonly="true"> -->
+        <div class="text-muted small">DSP User git repository. Update with the form below to chante dsp repository</div>
       </div>
 
       <div class="form-group">
         <div ng-if="config.githubURL.includes('@')">
-          <label for="sshKeyPath">SSH Key Path:</label>
-          <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
-                 ng-model="config.sshKeyPath"
-                 ng-required="false" ng-readonly="true">
+          <label for="sshKeyPath">SSH Key Path</label>
+        <div id="sshKeyPath" ng-model=config.sshKeyPath><b>{{config.sshKeyPath}}</b></div>
           <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
 
         </div>
@@ -72,7 +71,38 @@
           <i class="fa fa-fw fa-download"></i> Pull Personal Repo
         </button>
     </form>
+   <h4> Change your github remote project</h4>
+<div class="form-group">
+        <form name="githubForm">
+          <!-- <label for="github_project">Change your github remote project</label> -->
+          <!--<input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
+            id="githubURL" ng-model=repo.gitUrlToEdit>-->
+          <input type="text" class="form-control" name="githubURL" ng-required="true" id="githubURL"
+                 ng-pattern = "/((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/"
+                 ng-model=repo.gitUrlToEdit>
+          <div class="text-muted small">Change repository</div>
+          <div class="row" id="gitauthrow" >
+            <div class="col-sm-3">
+              <label for="username"> Username </label>
+              <input type="text" placeholder="Username" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/" ng-readonly=readOnlyUsername>
+            </div>
+            <div class="col-sm-3">
+              <label for="token"> Token </label>
+              <input type="password" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
+            </div>
+            <div class="col-sm-6">
+              <label for="sshKeyPath"> SSH key path </label>
+              <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=repo.sshKeyPath>
+              <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
+            </div>
+          </div>
 
+          <div ng-show='isLoadingGit' class="alert alert-info"> Loading new github</div>
+          <br>
+          <button class="btn btn-warning" ng-click="openEditGithub()" ng-disabled="githubForm.$invalid"> Change repo
+          </button>
+        </form>
+        </div>
     <div class="py-4">
       <div ng-show="isRepoUploading" class="alert alert-info"> Uploading Repo, pls wait... </div>
     </div>
@@ -135,37 +165,7 @@
         <!-- <div style='margin-top:10px' class="text-muted small">Press this to update all main Lab Projects</div> -->
       </div>
 
-      <div class="form-group">
-        <form name="githubForm">
-          <label for="github_project">Change your github remote project</label>
-          <!--<input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
-            id="githubURL" ng-model=repo.gitUrlToEdit>-->
-          <input type="text" class="form-control" name="githubURL" ng-required="true" id="githubURL"
-                 ng-pattern = "/((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/"
-                 ng-model=repo.gitUrlToEdit>
-          <div class="text-muted small">Change repository</div>
-          <div class="row" id="gitauthrow" >
-            <div class="col-sm-3">
-              <label for="username"> Username </label>
-              <input type="text" placeholder="Username" class="form-control" name="username" id="username" ng-model=repo.username ng-pattern="/^[a-zA-Z0-9]*$/" ng-readonly=readOnlyUsername>
-            </div>
-            <div class="col-sm-3">
-              <label for="token"> Token </label>
-              <input type="password" placeholder="Token" class="form-control" name="token" id="token" ng-model=repo.token ng-readonly=readOnlyToken>
-            </div>
-            <div class="col-sm-6">
-              <label for="sshKeyPath"> SSH key path </label>
-              <input type="text" placeholder="SSH key path" class="form-control" name="sshKeyPath" id="sshKeyPath" ng-model=repo.sshKeyPath>
-              <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
-            </div>
-          </div>
-
-          <div ng-show='isLoadingGit' class="alert alert-info"> Loading new github</div>
-          <br>
-          <button class="btn btn-warning" ng-click="openEditGithub()" ng-disabled="githubForm.$invalid"> Change repo
-          </button>
-        </form>
-        </div>
+      
 
         <!-- <form ng-show='isRepoSynchronized'>
         <div class="form-group" >

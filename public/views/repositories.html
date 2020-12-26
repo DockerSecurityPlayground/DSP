@@ -22,9 +22,10 @@
           <td>{{r.sshKeyPath}}</td>
           <td class="text-right">
             <div class="btn-group btn-group-xs">
-              <a class="editing-components btn btn-default">
+              <!-- TBD Fixe repo issues -->
+              <!-- <a class="editing-components btn btn-default">
                 <span uib-popover="Edit" popover-trigger="'mouseenter'" ng-click="editRepositoryClick(r)" class="fa fa-fw fa-edit"> </span>
-              </a>
+              </a> -->
               <a class="editing-components btn btn-default">
                 <span uib-popover="Update" popover-trigger="'mouseenter'" ng-click="updateRepository(r)" class="fa fa-fw fa-download"> </span>
               </a>
@@ -51,6 +52,7 @@
 
     <div ng-show="areReposUploading" class="alert alert-info"> Uploading Repositories, pls wait... </div>
 
+    <a id="gitform"></a>
     <form name="githubForm" class="form-horizontal" >
       <h3>{{githubFormHeader}}</h3>
       <div class="row">
