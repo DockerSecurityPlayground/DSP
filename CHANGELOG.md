@@ -1,17 +1,25 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-
-## [Unreleased]
+## [Next development]
  * Fix of Angular WebSocket Code during installation long running
  * Fix the filterImage bug in edit container page OK
  * Fix the .data bug (delete when .data is empty)
  * Different vertical size image canvas
- * New terminal on a new tab in visual editor
+ * New terminal on a new tab in visual editor  
 
-## [3.8.0] - 2020 - 12 - 24   
+## [Unreleased]
+### Fixed   
+ * Intermittent on header   
+ * Labs ng-repeat to show properly each lab    
+ * Readme if exist, graph otherwise
+ * Removed sidebar 
+
 ### Added   
-README support: now lab editors can add a README and could it can be seen on main page of lab projects. 
+ * README support: now lab editors can add a README and could it can be seen on main page of lab projects. 
+ * Upload lab support: now dsp can take labs from other sources 
+
+<!-- ## [3.8.0] - 2020 - 12 - 24    -->
 
 
 ## [3.7.11] - 2020 - 12 - 23

@@ -272,11 +272,10 @@ function getImagesAllLabs(namerepo, callback) {
     (labsPath, cb) => {
       async.each(labsPath, (lb, c) => {
         // log.info(`[Docker Images] Get Lab ${path.basename(lb)} Images`);
-
         getImagesLab(namerepo, path.basename(lb), allImages, imagesToBuild, (err, data) => {
           if (err) {
             // Do not block other images
-            log.error(`${path.basename(lb)} Lab has not network.json file!`);
+            // log.error(`${path.basename(lb)} Lab has not network.json file!`);
             data = [];
           }
           let nameLab = path.basename(lb)

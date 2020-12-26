@@ -25,9 +25,10 @@ function checkNetworkDescription(labPath) {
   const networkFile = path.join(labPath, 'network.json');
   const dockerComposeFile = path.join(labPath, 'docker-compose.yml');
   const pathName = getPathName(labPath);
-  if (!fs.existsSync(networkFile)) {
-    log.warn(`${pathName} doesn't have a network.json file!`);
-  }
+  // This is noot relevant because we can import projects now
+  // if (!fs.existsSync(networkFile)) {
+  //   log.warn(`${pathName} doesn't have a network.json file!`);
+  // }
 
   if (!fs.existsSync(dockerComposeFile)) {
     log.warn(`${pathName} doesn't have a docker-compose.yml file!`);

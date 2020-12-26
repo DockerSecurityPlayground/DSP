@@ -150,8 +150,10 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
               AjaxService.isReadOnlyLab(reponame, labname)
               .then(function (res) {
                 $scope.isImported = res.data.data;
-                // Update only if it located on index 1 (graph)
-                $scope.active = $scope.active ? 2 : 0;
+                if ($scope.isImported)
+                  // Update only if it not exist readme ( located on index 1 - graph)
+                  $scope.active = $scope.active ? 2 : 0;
+
               }, function (err) {
 
                 });
