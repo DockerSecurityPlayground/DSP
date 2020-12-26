@@ -22,7 +22,7 @@
 
         <ul class="list-inline">
           <li ng-repeat="label in lab.labels">
-            <span style="background-color:{{label.color}}" class="label label-primary"><i class="fa fa-fw fa-tag"></i> {{label.name}}</span>
+            <span style="background-color:{{label.color}}" class="label label-primary"><i class="fa fa-fw fa-tag"></i>  {{label.name | limitTo: 15}}{{label.name.length > 15 ? '...' :''}}</span>
           </li>
         </ul>
       </a>
