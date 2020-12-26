@@ -3,11 +3,11 @@ All notable changes to this project will be documented in this file.
 
 
 ## [Unreleased]
- Fix of Angular WebSocket Code during installation long running
- Fix the filterImage bug in edit container page OK
- Fix the .data bug (delete when .data is empty)
- Different vertical size image canvas
- New terminal on a new tab in visual editor
+ * Fix of Angular WebSocket Code during installation long running
+ * Fix the filterImage bug in edit container page OK
+ * Fix the .data bug (delete when .data is empty)
+ * Different vertical size image canvas
+ * New terminal on a new tab in visual editor
 
 ## [3.8.0] - 2020 - 12 - 24   
 ### Added   
