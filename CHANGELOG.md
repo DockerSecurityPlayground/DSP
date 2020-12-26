@@ -8,12 +8,15 @@ All notable changes to this project will be documented in this file.
  * Different vertical size image canvas
  * New terminal on a new tab in visual editor  
 
-## [Unreleased]
+## [master]
 ### Fixed   
  * Intermittent on header   
  * Labs ng-repeat to show properly each lab    
  * Readme if exist, graph otherwise
  * Removed sidebar 
+
+### Removed  
+ * repo image panel: it requires too much response time. Now users can see not downloaded images in lab section. 
 
 ### Added   
  * README support: now lab editors can add a README and could it can be seen on main page of lab projects. 

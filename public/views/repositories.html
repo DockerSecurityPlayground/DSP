@@ -3,6 +3,9 @@
   <p>&nbsp;</p>
 
   <div id="page-inner">
+      <div ng-show="isRepoUploading" layout="row" layout-sm="column" layout-align="space-around">
+        <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+      </div>
     <table class="table table-striped">
       <thead>
         <tr>

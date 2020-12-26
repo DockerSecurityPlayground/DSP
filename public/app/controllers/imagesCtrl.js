@@ -1,6 +1,7 @@
 var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexService, BreadCrumbs, SocketService, $uibModal, Constants, ServerResponse, Notification,$http,CurrentLabService , $location, $anchorScroll, $timeout, AjaxService, dockerAPIService, FetchFileFactory) {
   var imageList = [];
-  $scope.imagePanel = "repo_images"
+  // $scope.imagePanel = "repo_images"
+  $scope.imagePanel = "all_images"
   $scope.dockerFilterName = "";
   $scope.dockerFiles = [];
   $scope.typeImports = ["None", "Dockerfile", "Git"];
