@@ -5,6 +5,7 @@ const chaiFS = require('chai-fs');
 const appRoot = require('app-root-path');
 const AppUtils = require('../../app/util/AppUtils.js');
 const path = require('path');
+const baseUtilDir = path.join(appRoot.toString(), 'test', 'util');
 
 
 // const basePath = path.join(appRoot.path, 'test', 'util');
@@ -21,7 +22,7 @@ describe('Test Util ', () => {
     mock({
       '/basePath': {
         'helloworld.txt': 'filecontent',
-        'helloDir': {/** empty directory */}
+        'helloDir': {/** empty directory */},
       }
     });
     const dst = path.join(basePath, 'twoHello.txt');
@@ -44,6 +45,16 @@ describe('Test Util ', () => {
         .and.equal(src);
       done();
     });
+  });
+
+  it('Should check if it is a yaml file', () => {
+    const yaml = "test:\n  services"
+    expect(AppUtils.isYaml(yaml)).be.ok;
+  });
+  it('Should check if it is an invalid yaml file', () => {
+    const html = "<html><b>hello</b></html>"
+    expect(AppUtils.isYaml(html)).be.false;
+
   });
   it('Should copy dir', (done) => {
     const src = path.join(basePath, 'helloDir');

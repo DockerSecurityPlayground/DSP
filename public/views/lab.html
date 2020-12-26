@@ -104,7 +104,7 @@
             </a>
           </div>
           <div class="col-sm-6" ng-show="ctrl.editVisible">
-            <a href="#" ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)" class="fa fa-cloud btn btn-warning">
+            <a href="#" ng-if="!isImported"  ng-click="ctrl.goToNetwork(ctrl.repoName, ctrl.lab.name)" class="fa fa-cloud btn btn-warning">
               Edit Network
             </a>
           </div>
@@ -114,6 +114,13 @@
       <!-- Endo panel edit options -->
 
     </div>
+    <br>
+    <!-- Show only if alert is not closed, lab is imported and ctrl action is not visible (lab not belonging to user)-->
+    <div uib-alert ng-if="!isAlertClosed && isImported && ctrl.actionVisible"  class="alert-info" close="closeAlert()"> 
+      It seems that this lab is imported. You cannot Edit Network.
+
+    </div>
+
     <div ng-show="CurrentLabService.noImages === true" class="panel panel-default">
       <div class="panel-heading"><h5><i class="fa fa-fw fa-download"></i> Download Images</h5></div>
       <div class="panel-body">
@@ -201,14 +208,14 @@
         <div class="panel-body">
 
           <uib-tabset active="active">
-            <uib-tab  index="0" heading="Description">
+            <uib-tab  ng-if="markdown" index="0" heading="Description">
                 <p>{{ctrl.lab.description}}</p>
                 <div class='iiMdPreview' text="{{readme}}"></div>
               <!-- GRAPH CANVAS -->
               <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
               <!-- END GRAPH CANVAS -->
             </uib-tab>
-            <uib-tab index="1" heading="Graph">
+            <uib-tab ng-if="!isImported" index="1" heading="Graph">
               <br>
               <!-- GRAPH CANVAS -->
               <div id="graphContainer"></div>

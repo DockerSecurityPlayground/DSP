@@ -216,7 +216,9 @@ function newState(repoName, labName, state, callback) {
           else jsonfile.writeFile(jsf, jsonArray, cb);
         });
       }
-    }], (err) => callback(err));
+    }], (err) => { 
+      callback(err);
+    })
 }
 
 function removeState(repoName, labName, callback) {

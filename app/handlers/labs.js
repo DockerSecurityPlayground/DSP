@@ -13,7 +13,12 @@ const ncp = require('ncp').ncp;
 const dockerFiles = require('../data/docker_filesToCopy.js');
 const pathExists = require('path-exists');
 const appUtils = require('../util/AppUtils.js');
+const multipart = require('connect-multiparty');
 const LabStates = require('../util/LabStates.js');
+const util = require('util');
+// const BusBoy = require('busboy');
+
+
 
 const _ = require('underscore');
 
@@ -157,7 +162,7 @@ function saveInformation(req, res) {
         description: infos.description || '',
         goal: infos.goal || '',
         solution: infos.solution || '',
-        readme : infos.readme 
+        readme: infos.readme
       };
       // log.info('Info received:');
       // log.info(JSON.stringify(i));
@@ -281,7 +286,8 @@ function importLab(req, res) {
       userPath = path.join(appUtils.getHome(), configJSON.mainDir, configJSON.name);
       pathExists(destPath)
         .then(exists => {
-          cb(null, exists)}
+          cb(null, exists)
+        }
         );
     },
     (exists, cb) => {
@@ -378,7 +384,37 @@ function importLab(req, res) {
   });
 }
 
+// Upload a new docker-compose repository containing a new project
+function uploadCompose(req, res) {
+  let e = null;
+  async.waterfall([
+    // Check params
+    (cb) => {
+      Checker.checkParams(req.params, ['labname'], cb);
+    }, (cb) => {
+      log.info("[UPLOAD COMPOSE")
+      // const busboy = new BusBoy({headers: req.headers});
+      req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+        try {
+          // const stream = fs.createReadStream(file)
+          labsData.newLabFromCompose(req.params.labname, file, true, (err) => {
+            e = err;
+          });
+        } catch (err2) {
+          cb(err2);
+        }
+      });
+      req.busboy.on('finish', function () {
+        cb(e)
+      });
+      req.pipe(req.busboy);
+    }
+  ], (err) => appUtils.response('[UPLOAD COMPOSE]', res, err));
+}
 
+
+
+exports.uploadCompose = uploadCompose;
 exports.deleteLab = deleteLab;
 exports.getAll = getAll;
 exports.getLabs = getLabs;

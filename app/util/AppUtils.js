@@ -1,7 +1,9 @@
 const appRoot = require('app-root-path');
 const path = require('path');
+const randomstring = require('randomstring');
 const jsonfile = require('jsonfile');
 const pathExists = require('path-exists');
+const yaml = require('js-yaml');
 const Walker = require('walker');
 const logger = require('bunyan-request-logger');
 const homedir = require('homedir');
@@ -33,72 +35,72 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-    return `${appRoot.path}/config/config_user.json`;
+  return `${appRoot.path}/config/config_user.json`;
 }
 function getRealLogger() {
-    const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
-    return logger({
-      name: 'DockerSecurityPlayground',
-      streams: [
-        {
-          level: 'info',
-          stream: process.stdout
-        },
-        {
-          level: 'info',
-          type: 'rotating-file',
-          period: '1h',
-          count: 1,
-          path: logPath
-        },
-        {
-          level: 'debug',
-          type: 'rotating-file',
-          period: '1h',
-          count: 1,
-          path: logPath
-        },
-        {
-          level: 'error',
-          stream: process.stderr
-        },
-        {
-          level: 'error',
-          type: 'rotating-file',
-          period: '1h',
-          count: 1,
-          path: logPath
-        },
-        {
-          level: 'warn',
-          path: logPath
-        },
-        {
-          level: 'warn',
-          type: 'rotating-file',
-          period: '1h',
-          count: 1,
-          path: logPath
-        }]
-    });
+  const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
+  return logger({
+    name: 'DockerSecurityPlayground',
+    streams: [
+      {
+        level: 'info',
+        stream: process.stdout
+      },
+      {
+        level: 'info',
+        type: 'rotating-file',
+        period: '1h',
+        count: 1,
+        path: logPath
+      },
+      {
+        level: 'debug',
+        type: 'rotating-file',
+        period: '1h',
+        count: 1,
+        path: logPath
+      },
+      {
+        level: 'error',
+        stream: process.stderr
+      },
+      {
+        level: 'error',
+        type: 'rotating-file',
+        period: '1h',
+        count: 1,
+        path: logPath
+      },
+      {
+        level: 'warn',
+        path: logPath
+      },
+      {
+        level: 'warn',
+        type: 'rotating-file',
+        period: '1h',
+        count: 1,
+        path: logPath
+      }]
+  });
 }
 function getNoLogger() {
-    return logger({
-      name: 'DockerSecurityPlayground',
-      streams: [
-        {
-          level: 'info',
-          stream: process.stdout
-        },
-        {
-          level: 'error',
-          stream: process.stderr
-        },
-        {
-          level: 'warn',
-          stream: process.stdout
-        }]
-    });
+  return logger({
+    name: 'DockerSecurityPlayground',
+    streams: [
+      {
+        level: 'info',
+        stream: process.stdout
+      },
+      {
+        level: 'error',
+        stream: process.stderr
+      },
+      {
+        level: 'warn',
+        stream: process.stdout
+      }]
+  });
 }
 // exports.getLocalConfigSync = getLocalConfigSync;
 module.exports = {
@@ -115,7 +117,8 @@ module.exports = {
             callback(new errors.errorDirAlreadyExists());
           } else {
             fs.rename(oldPath, newPath, (err) => callback(err));
-          } });
+          }
+        });
     } else callback(null);
   },
   copy(srcPath, dstPath, cb) {
@@ -130,7 +133,7 @@ module.exports = {
   },
   getFile(srcPath, cb) {
     fs.stat(srcPath, (err, stats) => {
-      if (err) cb(err); 
+      if (err) cb(err);
       else if (stats.isDirectory()) {
         cb(new Error("Not file"));
       } else {
@@ -140,7 +143,7 @@ module.exports = {
   },
   path_userconfig: pathUserConfig,
   getConfigSync() {
-  return jsonfile.readFileSync(this.path_userconfig());
+    return jsonfile.readFileSync(this.path_userconfig());
   },
 
   getLogger() {
@@ -206,13 +209,30 @@ module.exports = {
     else if (respo) {
       // log.info(`Success, server response: ${JSON.stringify(respo)}`);
     } else log.info('Success');
-     httpHelper.response(res, err, respo);
+    httpHelper.response(res, err, respo);
   },
   // Returns true if is a lab
   isDSPDir(dir, callback) {
     const filename = path.join(dir, '.dsp');
     pathExists(filename).then((exists) => {
       callback(exists);
+    });
+  },
+  isYaml(yc) {
+    let ret = true;
+    try {
+      const compose = yaml.load(yc);
+      ret = typeof compose == "object";
+    } catch (err) {
+      ret = false;
+    } finally {
+      return ret;
+    }
+  },
+  getRandomName() {
+    return randomstring.generate({
+      length : 10, 
+      charset: 'alphabetic'
     });
   },
   //Returns home of the user

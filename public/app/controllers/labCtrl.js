@@ -14,6 +14,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   const warningMessageHeader = 'WARNING: ';
   const networkEmptyMessage = 'Network is empty! Have you drawn the containers?';
   $scope.currentName = "";
+  $scope.active = 0;
+  $scope.isAlertClosed = false;
   $scope.tags = [{
     name: "{{hostname}}",
     description: "it is converted to hostname (i.e. localhost) "
@@ -21,6 +23,11 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     name: "{{url}}",
     description: "it is converted to DSP url (i.e. http://localhost )"
   }]
+
+  $scope.closeAlert = function () {
+    $scope.isAlertClosed = true;
+
+  }
 
   $scope.registerCallback = function (cb) {
     onLoadCanvas = cb;
@@ -52,6 +59,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   };
 
     // MARKDOWN End
+    $scope.isImported = false;
 
 
   $scope.tinymceOptions = {
@@ -87,10 +95,10 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.CurrentLabService = CurrentLabService;
   vm.editVisible = false
   vm.repos,
-    vm.lab = {},
-    vm.labels = [],
-    // Preview on the labs
-    vm.previewSolution = '';
+  vm.lab = {},
+  vm.labels = [],
+  // Preview on the labs
+  vm.previewSolution = '';
   vm.previewGoal = '';
   vm.isRunning;
   vm.exists = true;
@@ -122,19 +130,31 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         })
 
     var action = $routeParams.action;
+    // USE MODE
     function initLabInformation(reponame) {
       console.log("Init lab information")
       var labname = $routeParams.namelab;
       AjaxService.getLabInfo(reponame, labname)
         .then(function (res) {
           const information = res.data.data;
-          console.log(information)
           if (information.readme) {
             SafeApply.exec($scope, function() {
               $scope.initFromText(information.readme);
 
             });
+            // Otherwise, set index to graph index
+          } else {
+            $scope.active = 1;
           }
+              // It means that is an imported compose
+              AjaxService.isReadOnlyLab(reponame, labname)
+              .then(function (res) {
+                $scope.isImported = res.data.data;
+                // Update only if it located on index 1 (graph)
+                $scope.active = $scope.active ? 2 : 0;
+              }, function (err) {
+
+                });
         }, function (err) {
           Notification({ message: "Server error: " + err.data.message }, 'error');
       })

@@ -151,6 +151,10 @@ self.init = function(onSuccess) {
    return $http.get(apiUrl+"labs/"+nameRepo + "/" + nameLab)
   }
 
+  self.isReadOnlyLab = function(reponame, labname) {
+    return $http.get(apiUrl + 'docker_network/is-imported/' + reponame + "/" + labname);
+  }
+
 
   self.deleteLab = function(nameToDelete) {
    return $http.delete(apiUrl+"labs/"+nameToDelete)
@@ -200,6 +204,7 @@ self.init = function(onSuccess) {
       })
 
   }
+
 
   self.getProjects = function() {
       return $http.get(apiUrl+'git-repos');

@@ -8,6 +8,7 @@ const Checker = require('../util/AppChecker');
 const LabStates = require('../util/LabStates');
 const fs = require('fs');
 const appUtils = require('../util/AppUtils.js');
+const { getNetwork } = require('mydockerjs/lib/docker');
 
 function networkExists(namerepo, namelab, callback) {
   async.waterfall([
@@ -15,17 +16,17 @@ function networkExists(namerepo, namelab, callback) {
     (config, cb) => {
       const pathToSearch = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'network.json');
       pathExists(pathToSearch)
-  .then((exists) => {
-    cb(null, exists);
-  },
-(error) => {
-  cb(error);
-});
+        .then((exists) => {
+          cb(null, exists);
+        },
+          (error) => {
+            cb(error);
+          });
     },
   ],
-  (err, exists) => {
-    callback(err, exists);
-  });
+    (err, exists) => {
+      callback(err, exists);
+    });
 }
 
 function filterNetwork(theNetwork) {
@@ -71,29 +72,41 @@ function get(namerepo, namelab, callback) {
       });
     },
   ],
-(err, results) => {
-  if (err) { callback(err); } else callback(null, results);
-});
+    (err, results) => {
+      if (err) { callback(err); } else callback(null, results);
+    });
 }
 
-function save(namelab, data, yamlfile, callback) {
+function isImported(namerepo, namelab, callback) {
+  async.waterfall([
+    (cb) => get(namerepo, namelab, cb),
+    (networkInfo, cb) => {
+      let isImported = true;
+      // TBD: canvasJSON is a valid mxgraph structure
+      if (networkInfo && networkInfo.canvasJSON && (typeof networkInfo.canvasJSON == "string") && networkInfo.canvasJSON !== "IMPORTED") {
+        isImported = false;
+      }
+      cb(null, isImported);
+    }
+  ], (err, isImported) => {
+    if (err && err.code == 'ENOENT') {
+      isImported = true;
+      err = null;
+    }
+    callback(err, isImported)
+  });
+}
+
+function saveWithoutCompose(namelab, data, callback) {
   const log = appUtils.getLogger();
   async.waterfall([
     // Verify
     (cb) => Checker.checkParams(data, ['networkList', 'canvasJSON', 'clistToDraw', 'clistNotToDraw'], cb),
-// Get user path
+    // Get user path
     (cb) => {
       configData.getUserPath(cb);
     },
-// Save docker-compose.yml
-    (userPath, cb) => {
-      const networkfile = path.join(userPath, namelab, 'docker-compose.yml');
-      fs.writeFile(networkfile, yamlfile, (err) => {
-        if (err) cb(err);
-        else cb(null, userPath);
-      });
-    },
-// Save networks.json
+    // Save networks.json
     (userPath, cb) => {
       const networkfile = path.join(userPath, namelab, 'network.json');
       const userName = path.basename(userPath);
@@ -109,10 +122,49 @@ function save(namelab, data, yamlfile, callback) {
       });
     }
   ],
-// Returns yaml file
-(err) => {
-  if (err) { callback(err); } else callback(null, yamlfile);
-});
+    // Returns yaml file
+    (err) => {
+      if (err) { callback(err); } else callback(null, null);
+    });
+}
+
+function save(namelab, data, yamlfile, callback) {
+  const log = appUtils.getLogger();
+  async.waterfall([
+    // Verify
+    (cb) => Checker.checkParams(data, ['networkList', 'canvasJSON', 'clistToDraw', 'clistNotToDraw'], cb),
+    // Get user path
+    (cb) => {
+      configData.getUserPath(cb);
+    },
+    // Save docker-compose.yml
+    (userPath, cb) => {
+      const networkfile = path.join(userPath, namelab, 'docker-compose.yml');
+      fs.writeFile(networkfile, yamlfile, (err) => {
+        if (err) cb(err);
+        else cb(null, userPath);
+      });
+    },
+    // Save networks.json
+    (userPath, cb) => {
+      const networkfile = path.join(userPath, namelab, 'network.json');
+      const userName = path.basename(userPath);
+
+      dockerFiles.cleanPath(data.clistToDraw, userName);
+      // Update stop state
+      log.info(`Update stop state of ${userName}/${namelab}`);
+      LabStates.setStopState(userName, namelab, (err) => {
+        if (err) cb(err);
+        else {
+          jsonfile.writeFile(networkfile, data, cb);
+        }
+      });
+    }
+  ],
+    // Returns yaml file
+    (err) => {
+      if (err) { callback(err); } else callback(null, yamlfile);
+    });
 }
 
 function canDeleteFile(filename, callback) {
@@ -149,8 +201,8 @@ function canDeleteFile(filename, callback) {
         }
         // End watefall
       }], (err) => {
-      c(err);
-    });
+        c(err);
+      });
   },
     // End async series
     (err) => {
@@ -160,6 +212,8 @@ function canDeleteFile(filename, callback) {
 
 
 exports.save = save;
+exports.saveWithoutCompose = saveWithoutCompose;
 exports.get = get;
+exports.isImported = isImported;
 exports.networkExists = networkExists;
 exports.canDeleteFile = canDeleteFile;

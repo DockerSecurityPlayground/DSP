@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const path = require('path');
 const multipart = require('connect-multiparty');
+const busboy = require('connect-busboy');
+
 
 const app = express();
 const http = require('http');
@@ -36,6 +38,7 @@ const dockerSocket = require('./app/util/docker_socket');
 
 // const webshellConfigFile =
 const log = AppUtils.getLogger();
+app.use(busboy());
 // Initialize the checker
 Checker.init((err) => {
   if (err) {
@@ -55,9 +58,10 @@ Checker.isInstalled((isInstalled) => {
   }
 });
 
-app.use(multipart({
-  uploadDir: localConfig.tmpDir
-}));
+// app.use(multipart({
+//   uploadDir: localConfig.tmpDir
+// }));
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -138,7 +142,9 @@ app.delete('/dsp_v1/labels/:repo/:labelname', labels.deleteLabel);
 // get all the repositories in main dir
 app.get('/dsp_v1/all/', labs.getAll);
 app.post('/dsp_v1/all/', labs.importLab);
+
 // Api labs
+app.post('/api/upload-docker-compose/:labname', labs.uploadCompose);
 app.get('/dsp_v1/labs/:repo', labs.getLabs);
 app.get('/dsp_v1/labs/:repo/:labname', labs.getInformation);
 app.get('/dsp_v1/userlab/:labname', labs.getLabUserInformation);
@@ -159,6 +165,7 @@ app.post('/dsp_v1/config', configHandler.updateConfig);
 
 // Api docker network
 app.get('/dsp_v1/docker_network/:namerepo/:namelab', networkHandler.get);
+app.get('/dsp_v1/docker_network/is-imported/:namerepo/:namelab', networkHandler.isImported);
 app.get('/dsp_v1/docker_network/:namelab', networkHandler.getUser);
 app.post('/dsp_v1/docker_network/:namelab', networkHandler.save);
 
@@ -200,15 +207,16 @@ app.post('/dsp_v1/dir_exists', networkHandler.dirExists);
 // Manage repositories
 
 // Only for avatar
-app.post('/upload', upload.single('avatar'), (req, res) => {
-  if (req.file && req.file.buffer) {
-    const buffer = req.file.buffer;
-    const wstream = fs.createWriteStream('./public/assets/img/avatar.jpeg');
-    wstream.write(buffer);
-    wstream.end();
-  }
-  res.redirect('/');
-});
+// app.post('/upload', upload.single('avatar'), (req, res) => {
+//   if (req.file && req.file.buffer) {
+//     const buffer = req.file.buffer;
+//     const wstream = fs.createWriteStream('./public/assets/img/avatar.jpeg');
+//     wstream.write(buffer);
+//     wstream.end();
+//   }
+//   res.redirect('/');
+// });
+
 
 
 // File manager chooser
@@ -242,21 +250,6 @@ app.use(errorHandler({ server }));
 //    res.end(`${JSON.stringify(helpers.invalid_resource())}\n`);
 //  }
 
-
-/**
- * Initialise the server and start listening when we're ready!
- */
-// project_init.init( (err, results) => {
-
-
-//    if (err) {
-//        console.error("** FATAL ERROR ON STARTUP: ");
-//        console.error(err);
-//        process.exit(-1);
-//    }
-// });
-
-// error handler
 
 // Initialize web socket handler
 webSocketHandler.init(server);

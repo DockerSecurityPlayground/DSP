@@ -1,4 +1,5 @@
 const appRoot = require('app-root-path');
+const execSync = require('child_process').execSync;
 const path = require('path');
 const jsonfile = require('jsonfile');
 const fs = require('fs');
@@ -48,6 +49,7 @@ const rmdir = (dir) => {
   }
 };
 
+
 const copy = (src, dest) => {
   const oldFile = fs.createReadStream(src);
   const newFile = fs.createWriteStream(dest);
@@ -72,6 +74,9 @@ const copyDir = (src, dest) => {
 module.exports = {
   localhost,
   api,
+  exec(cmd) {
+    execSync(cmd, {stdio: 'inherit'});
+  },
   testConfig() {
     return jsonfile.readFileSync(path.join(appRoot.toString(), 'config', 'test_user.json'));
   },
@@ -153,6 +158,7 @@ module.exports = {
       name: 'test',
       mainDir: 'testDSPDir',
       githubURL: 'https://github.com/giper45/DSP_Repo.git',
+      tmpDir: path.join(appRoot.toString(), 'test', 'tmpDir')
     };
     // Create file config
     const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
@@ -172,6 +178,7 @@ module.exports = {
     // jsonfile.writeFileSync(testConfigPath, testConfig);
     // simpleGit(testConfig.mainDir).silent(false).clone(testConfig.githubURL, testConfig.name, ['-q'], cb);
   },
+
   end() {
     const projectTestDir = path.join(appRoot.toString(), 'test', 'testDSPDir');
     if (fs.existsSync(projectTestDir)) {

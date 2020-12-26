@@ -1,0 +1,29 @@
+version: '2'
+services:
+  element_0:
+    image: 'mysql:5.6'
+    stdin_open: true
+    tty: true
+    networks:
+      network_0: {}
+      network_2: {}
+  element_1:
+    image: 'mysql:5.6'
+    stdin_open: true
+    tty: true
+    networks:
+      network_1: {}
+networks:
+  network_0:
+    ipam:
+      config:
+        - subnet: 193.20.1.1/24
+  network_1:
+    ipam:
+      config:
+        - subnet: 193.20.2.1/24
+  network_2:
+    ipam:
+      config:
+        - subnet: 193.20.3.1/24
+

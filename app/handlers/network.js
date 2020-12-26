@@ -98,6 +98,18 @@ function get(req, res) {
   ], (err, response) => AppUtils.response('NETWORK GET', res, err, response));
 }
 
+function isImported(req, res) {
+  async.waterfall([
+    (cb) => Checker.checkParams(req.params, ['namelab', 'namerepo'], cb),
+    (cb) => networkData.isImported(req.params.namerepo, req.params.namelab, cb),
+    // (networkInfo, cb) => {
+    //   // TBD OTHER VALIDATION
+    //   // If networkList not valid 
+    //   cb(null, !(networkInfo.networkList && networkInfo.networkList.length > 0));
+    // }
+  ], (err, response) => AppUtils.response('IS LAB IMPORTED', res, err, response));
+}
+
 function getUser(req, res) {
   let namerepo;
   async.waterfall([
@@ -357,6 +369,7 @@ function dirExists(req, res) {
 
 exports.save = save;
 exports.get = get;
+exports.isImported = isImported;
 exports.getUser = getUser;
 exports.getListImages = getListImages;
 exports.dirExists = dirExists;
