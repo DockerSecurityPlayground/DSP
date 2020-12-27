@@ -1,13 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-
-## [Next development]
+## Next Developments 
  * Fix of Angular WebSocket Code during installation long running
- * Fix the filterImage bug in edit container page OK
+ * New terminal on a new tab in visual editor     
  * Fix the .data bug (delete when .data is empty)   
+
+## [3.8.0]
+ * Fix the filterImage bug in edit container page OK
  * Fix label if does not exist in lab 
  * Different vertical size image canvas
- * New terminal on a new tab in visual editor  
+ * Changed dsp port (18181)   
+ * Added vulhub repository during installation
+ * Fixed some size typo in images.html section
 
 ## [master]
 ### Fixed   

@@ -12,6 +12,10 @@
         "url": "https://github.com/giper45/DSP_Projects.git"
       },
       {
+        "name": "vulhub",
+        "url": "https://github.com/DockerSecurityPlayground/dsp-vulhub"
+      },
+      {
         "name": "NetworkSecurity_Unina",
         "url": "https://github.com/NS-unina/DSP_Repo.git"
       },

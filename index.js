@@ -27,7 +27,7 @@ const localConfig = require('./config/local.config.json');
 const healthChecker = require('./app/util/HealthLabState.js');
 const errorHandler = require('express-error-handler');
 
-const port = +process.env.PORT || 8080;
+const port = +process.env.PORT || 18181;
 const host = process.env.DSP_IFACE || "127.0.0.1";
 // var upload = multer({ dest: "uploads/" });
 const storage = multer.memoryStorage();

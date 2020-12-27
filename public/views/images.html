@@ -114,11 +114,11 @@
       <ul class="list-group">
         <li class="list-group-item borderless" ng-repeat="ele in allImages">
           <div ng-if=ele.contains class="row">
-            <div class="col-sm-11">
+            <div class="col-sm-10">
                 <i class="fa fa-fw fa-clone"></i> <span ng-class="ele.textType" class="text-monospace">{{ ele.name }}</span>
             </div>
             <div class="col-sm-1">
-              <a href="#" id="delAction" ng-click="delImage(ele)" class="btn btn-danger"><i class="fa fa-fw fa-times"></i> Delete</a>
+              <a href="#" id="delAction" ng-click="delImage(ele)" class="btn btn-sm btn-danger"><i class="fa fa-fw fa-times"></i> Delete</a>
             </div>
           </div>
         </li>
