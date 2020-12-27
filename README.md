@@ -48,6 +48,13 @@ To start the application. This will launch a server listening on 8080 (or anothe
 
 
 With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.     
+I suggest you to run dsp on a Ubuntu virtual machine and expose on 0.0.0.0 interface.  
+If you want to expose on another interface, change DSP_IFACE environment variable:
+```
+export DSP_IFACE="0.0.0.0"
+```
+Now you can use dsp on Remote interface.  
+
 
 ### Troubleshooting  
 #### During dependencies installation   
@@ -93,7 +100,7 @@ To test it:
 ``` 
 docker ps   
 ``` 
-DO NOT USE SUDO if you are running DSP with normaal user.   
+DO NOT USE SUDO if you are running DSP with normal user.   
 If you have the following error:   
 ```  
 vagrant@vagrant:~/git/DockerSecurityPlayground$ docker ps
