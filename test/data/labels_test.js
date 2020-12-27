@@ -1,8 +1,9 @@
 const expect = require('chai').expect;
 const labelsPath = require('../../app/data/labels.js');
-const path = require('path');
 const appRoot = require('app-root-path');
 const promises = require('help-nodejs').promises;
+const os = require('os');
+const path = require('path');
 const jsonfile = require('jsonfile');
 const helper = require('../helper');
 
@@ -79,6 +80,7 @@ describe('labelsTest', () => {
       });
     });
   });
+
 
   // Save
   it('should save a label', (done) => {
@@ -184,6 +186,23 @@ describe('labelsTest', () => {
     labelsPath.createLabel('hre', example, (err) => {
       expect(err).not.be.null;
       done();
+    });
+  });
+  it('should give false for a label that does not exist', (done) => {
+    labelsPath.existsLabel(path.join(os.tmpdir(), "notexistentlabel.json"), (err, isExistent) => {
+      expect(err).to.be.null;
+      expect(isExistent).to.be.false;
+      done();
+    });
+  });
+  it('should give true for a label that does exist', (done) => {
+    labelsPath.existsLabel(path.join(os.tmpdir(), "notexistentlabel.json"), (err, isExistent) => {
+      const existentLabel = path.join(appRoot.toString(), "test", "data", "labels.json");
+      labelsPath.existsLabel(existentLabel, (err, isExistent) => {
+        expect(err).to.be.null;
+        expect(isExistent).to.be.ok;
+        done();
+      });
     });
   });
   // Clean

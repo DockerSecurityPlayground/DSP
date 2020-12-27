@@ -1,5 +1,6 @@
 const appRoot = require('app-root-path');
 const path = require('path');
+const os = require('os');
 const randomstring = require('randomstring');
 const jsonfile = require('jsonfile');
 const pathExists = require('path-exists');
@@ -238,6 +239,21 @@ module.exports = {
   //Returns home of the user
   getHome() {
     return homedir();
+  },
+  // Store file in random name and restore
+  storeTmpFile(pathFile, callback) {
+    const randomName = this.getRandomName();
+    fs.copyFile(pathFile, path.join(os.tmpdir(), randomName), (err) =>  callback(err, randomName));
+  }, 
+  removeTmpFile(randomName, callback) {
+    fs.unlink(path.join(os.tmpdir(), randomName), callback);
+
+  }, 
+  restoreTmpFile(randomName, originalPath, callback) {
+    // Copy file in original path and remove tmp file
+    fs.copyFile(path.join(os.tmpdir(), randomName), originalPath, (err) =>   { 
+       (err) ? callback(err) : fs.unlink(randomName, callback);
+    });
   }
 };
 

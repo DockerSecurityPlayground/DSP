@@ -28,15 +28,15 @@
 
           <ui-select multiple sortable="true" ng-model="ctrl.filteredLabels" theme="bootstrap" class="form-control" title="Choose a label">
             <ui-select-match placeholder="Label filter">{{$item.name}}</ui-select-match>
-            <ui-select-choices repeat="item in ctrl.labelProjects ">
+            <ui-select-choices  repeat="item in ctrl.labelProjects ">
               <div class="label label-success" style="background-color:{{item.color}}" ng-bind-html="item.name "></div>
               <small ng-bind-html="item.description "></small>
             </ui-select-choices>
           </ui-select>
           <br>
-          <ui-select multiple sortable="true" ng-model="ctrl.filteredRepos" theme="bootstrap" class="form-control" title="Choose a repo">
+          <ui-select multiple sortable="true" ng-model="ctrl.filteredRepos" theme="bootstrap" title="Choose a repo">
             <ui-select-match placeholder="Repo filter">{{$item.name}}</ui-select-match>
-            <ui-select-choices repeat="item in ctrl.repos ">
+            <ui-select-choices disabled repeat="item in ctrl.repos ">
               {{item.name}}
             </ui-select-choices>
           </ui-select>

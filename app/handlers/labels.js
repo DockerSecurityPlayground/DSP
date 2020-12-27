@@ -118,6 +118,9 @@ function updateLabel(req, res) {
   // Returns { labels: [] }
   (err) => AppUtils.response('UPDATE LABEL', res, err, req.body));
 }
+
+
+
 function addLabel(req, res) {
   const log = AppUtils.getLogger();
   log.info('[UPDATE LABEL]');

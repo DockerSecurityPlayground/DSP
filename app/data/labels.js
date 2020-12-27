@@ -5,6 +5,8 @@ const _ = require('underscore');
 const path = require('path');
 const AppUtils = require('../util/AppUtils.js');
 
+const ERR_NOT_FOUND = new Error('labels not found');
+
 const log = AppUtils.getLogger();
 // It takes jsonArr and a new label and updates jsonArr
 function updateLabel(jsonArr, data) {
@@ -53,8 +55,20 @@ const initLabels = function initLabels(labelName, cb) {
   jsonfile.writeFile(labelName, obj, cb);
 };
 
+
+const existsLabel = function existsLabel(labelname, callback) {
+  getLabels(labelname, (err, res) => {
+    if (err) {
+      console.log(err.toString());
+      // Is error label not found? label does not exist return false, otherwise forward error
+     (err == ERR_NOT_FOUND) ? callback(null, false) : callback(err);
+    } else callback(null, true);
+  });
+}
+
 //  Get user labels object : {labels : [] }
 const getLabels = function getLabels(labelname, callback) {
+  log.info(`[DATA get labels of ${labelname}]`);
   async.waterfall([
     // If success open JSON File
     (cb) => jsonfile.readFile(labelname, cb),
@@ -62,14 +76,14 @@ const getLabels = function getLabels(labelname, callback) {
   // Ok it's terminated with an   array of objects
   (err, arrayJSON) => {
     if (!arrayJSON || !arrayJSON.labels) {
-      callback(new Error('label not found'));
+      callback(ERR_NOT_FOUND);
     } else callback(err, arrayJSON.labels);
   });
 };
 // Create more labels  if then it's a lab label editing
 // Else it's a repo label edit
 const createLabels = function createLabels(labelname, arr, callback) {
-  log.info('[DATA CREATE LABELS]');
+  log.info(`[DATA CREATE ${labelname} LABELS]`);
   // console.trace()
   labelname = labelname || '';
   async.waterfall([
@@ -122,9 +136,13 @@ const getLabel = function getLabel(labelfile, name, callback) {
 
 const _replaceLabel = function _replaceLabel(labelfile, labelname, newLabel, callback) {
   async.waterfall([
-    (cb) => {
+    (cb) => existsLabel(labelfile, cb),
+    (exists, cb) => {
+        (!exists) ? initLabels(labelfile) : {};
+        cb(null);
     // Find labels from labelfile
-      getLabels(labelfile, (err, json) => {
+    }, (cb) =>  {
+    getLabels(labelfile, (err, json) => {
         if (err) cb(err);
         else cb(null, json);
       });
@@ -148,7 +166,10 @@ const _replaceLabel = function _replaceLabel(labelfile, labelname, newLabel, cal
     },
   ],
   (err, results) => {
-    if (err) callback(err);
+    if (err)  { 
+      callback(err);
+
+    }
     else callback(err, results);
   });
 };
@@ -156,16 +177,22 @@ const _replaceLabel = function _replaceLabel(labelfile, labelname, newLabel, cal
 // changeLabel function
 const changeLabel = function changeLabel(labelfile, labelname, newLabel, callback) {
   let oldLabels;
+  let tmpLabelName = "";
   const repodir = path.dirname(labelfile);
+  log.info("[DATA Change Label]");
   async.waterfall([
     // Save old labels
-    (cb) => getLabels(labelfile, cb),
-    (labels, cb) => {
-      oldLabels = labels;
-      cb(null);
+    (cb) => AppUtils.storeTmpFile(labelfile, cb),
+    (randomName, cb) =>  {
+      tmpLabelName = randomName;
+      _replaceLabel(labelfile, labelname, newLabel, cb);
     },
+    // (cb) => getLabels(labelfile, cb),
+    // (labels, cb) => {
+    //   oldLabels = labels;
+    //   cb(null);
+    // },
     // Update repo
-    (cb) => _replaceLabel(labelfile, labelname, newLabel, cb),
     // Find labs
     (results, cb) => labsData.getLabs(repodir, cb),
     // Update for each
@@ -181,8 +208,9 @@ const changeLabel = function changeLabel(labelfile, labelname, newLabel, callbac
     (err) => {
        // If some error restore old labels
       if (err) {
-        jsonfile.writeFileSync(labelfile, { labels: oldLabels });
-        callback(err);
+        // TBD: Restore other labels in labs
+        AppUtils.restoreTmpFile(tmpLabelName, labelfile, callback)
+        // callback(err);
       } else callback(null);
     });
 };
@@ -237,6 +265,7 @@ exports.initLabels = initLabels;
 exports.deleteLabel = deleteLabel;
 exports.getLabels = getLabels;
 exports.getLabel = getLabel;
+exports.existsLabel = existsLabel;
 exports.changeLabel = changeLabel;
 exports.createLabel = createLabel;
 exports.createLabels = createLabels;
