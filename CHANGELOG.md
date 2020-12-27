@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Next development]
  * Fix of Angular WebSocket Code during installation long running
  * Fix the filterImage bug in edit container page OK
- * Fix the .data bug (delete when .data is empty)
+ * Fix the .data bug (delete when .data is empty)   
+ * Fix label if does not exist in lab 
  * Different vertical size image canvas
  * New terminal on a new tab in visual editor  
 
