@@ -44,10 +44,10 @@ npm install
 ```
 npm start  
 ```
-To start the application. This will launch a server listening on 8080 (or another if you set have setted ENV variable in index.js file) port of your localhost.
+To start the application. This will launch a server listening on 18181 (or another if you set have set PORT environment variable) port of your localhost.
 
 
-With your favourite browser go to http://localhost:8080. You'll be redirected on installation page, set parameters and click install.     
+With your favourite browser go to http://localhost:18181. You'll be redirected on installation page, set parameters and click install.     
 I suggest you to run dsp on a Ubuntu virtual machine and expose on 0.0.0.0 interface.  
 If you want to expose on another interface, change DSP_IFACE environment variable:
 ```
@@ -55,6 +55,63 @@ export DSP_IFACE="0.0.0.0"
 ```
 Now you can use dsp on Remote interface.  
 
+
+
+
+## Update the application: 
+When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
+```
+npm run update
+```  
+## Clean DSP   
+If something goes wrong, you can reset DSP to factory by using the following command:   
+``` 
+npm run uninstall  
+```   
+This will delete everything, and you can start DSP from the installation step. 
+
+
+## Official Repository  
+[DSP_Projects](https://github.com/giper45/DSP_Projects.git) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
+
+## How can I **share my labs with the world** ?
+   
+During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
+DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
+So, the easiest way to share labs is the following:    
+
+1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
+2. During the installation set github directory param to your forked repository.     
+3.  Now create your labs and share it!   
+
+It is important that all images that you use should be available to other users, so:   
+- You can publish on docker hub so other users can pull your images in order to use your labs.   
+- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
+
+If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
+
+In DSP you can manage multiple user repositories (Repositories tab)   
+## DSP Features  
+-  Graphic Editor of docker-compose  
+-  Docker Image and Dockerfile Management  
+-  GIT Integration  
+-  DSP Repository with a set of network security scenarios  
+
+### Any question ?  
+If you have a problem you can use Issue section.   
+   
+## Docker Wrapper Image  
+DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
+Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)
+
+## Tests   
+To run a test:   
+``` 
+mocha test/<test-nodejs-file.js>   
+```   
+tests use helper.start() method to initialize the test environment:   
+*  A test config is created   
+* homedir directory is mocked, in this way it is possible to use internal dsp directory for tests.   
 
 ### Troubleshooting  
 #### During dependencies installation   
@@ -119,64 +176,7 @@ npm run uninstall
 ```  
 And now everything should work.  
 
-
-## Update the application: 
-When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
-```
-npm run update
-```  
-## Clean DSP   
-If something goes wrong, you can reset DSP to factory by using the following command:   
-``` 
-npm run uninstall  
-```   
-This will delete everything, and you can start DSP from the installation step. 
-
-
-## Official Repository  
-[DSP_Projects](https://github.com/giper45/DSP_Projects.git) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
-
-## How can I **share my labs with the world** ?
-   
-During the installation you can create a local environment that has not link with git, or you can associate a personal repository the the application. This is very useful if you want to share your work with other people.   
-DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
-So, the easiest way to share labs is the following:    
-
-1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
-2. During the installation set github directory param to your forked repository.     
-3.  Now create your labs and share it!   
-
-It is important that all images that you use should be available to other users, so:   
-- You can publish on docker hub so other users can pull your images in order to use your labs.   
-- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
-
-If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
-
-In DSP you can manage multiple user repositories (Repositories tab)   
-## DSP Features  
--  Graphic Editor of docker-compose  
--  Docker Image and Dockerfile Management  
--  GIT Integration  
--  DSP Repository with a set of network security scenarios  
-
-### Any question ?  
-If you have a problem you can use Issue section.   
-   
-## Docker Wrapper Image  
-DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
-Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)
-
-## Tests   
-To run a test:   
-``` 
-mocha test/<test-nodejs-file.js>   
-```   
-tests use helper.start() method to initialize the test environment:   
-*  A test config is created   
-* homedir directory is mocked, in this way it is possible to use internal dsp directory for tests.   
-
-
-## Error Debug
+### MacOS error
 
 
 MacOS ECONNRESET error: 
