@@ -3,14 +3,20 @@
 <div id="dsp_logo" class="text-center">
   <a href="/"><img src="assets/img/dsp_logo.png" class="user-image img-responsive" /></a>
 </div>
-
+<div class="form-group input-group">
+            <input type="text" class="form-control" ng-model="filterName" placeholder="Name lab">
+            <span class="input-group-btn">
+              <div class="btn btn-default"><i class="fa fa-search"></i>
+              </div>
+            </span>
+          </div>
 <div ng-repeat="r in WalkerService.repos" class="lab pb-2">
   <div class="panel panel-default">
     <div class="panel-heading" ng-click="isCollapsed[$index]= !isCollapsed[$index]" >
       <i class="fa fa-fw fa-cubes"></i> {{r.name}} {{r.version }} labs
     </div>
     <div class="list-group" uib-collapse="isCollapsed[$index]">
-      <a ng-repeat="lab in r.labs" href="/lab/use/{{r.name}}/{{lab.name}}" class="list-group-item">
+      <a ng-repeat="lab in r.labs | filter : {name:filterName}" href="/lab/use/{{r.name}}/{{lab.name}}" class="list-group-item">
         <div class="text-ellipsis" title="{{lab.name}}">
             <i class="fa fa-fw fa-cube"></i>
             <i ng-class="r.name === currentLab.repoName && lab.name === currentLab.name ?  'fa fa-fw fa-angle-right' : '' " aria-hidden="true"></i>
