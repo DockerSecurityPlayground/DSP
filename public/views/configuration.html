@@ -23,17 +23,22 @@
       <div class="form-group">
         <label for="dir">Directory projects:</label>
         <input type="text" class="form-control" id="mainDir" name="mainDir" ng-model=config.mainDir
-          ng-required="true" ng-pattern="filetypePattern">
+                                                             ng-required="true" ng-pattern="filetypePattern">
         <div class="text-muted small">Main directory for DSP (path starts by homedir)</div>
       </div>
       <div ng-show="formConfig.mainDir.$invalid" class='alert alert-danger'>
         Invalid main dir: no space, no empty, only alphanumeric characters
       </div>
-
+      <div class="form-group">
+        <label for="dir">Docker Repository </label>
+        <input type="text" class="form-control" id="dockerRepo" name="dockerRepo" ng-model=config.dockerRepo
+                                                             ng-required="false">
+        <div class="text-muted small">Your docker repository</div>
+      </div>
       <div class="form-group">
         <label for="gitEmail">Git Email</label>
         <input type="text" class="form-control" id="gitEmail" name="gitEmail" ng-model=config.email
-               ng-required="true" ng-readonly="false" ng-pattern="email">
+                                                              ng-required="false" ng-readonly="false" ng-pattern="email">
         <div class="text-muted small">Email for git</div>
       </div>
       <button type="submit" ng-disabled="formConfig.$invalid" ng-click="updateConfig()" class="btn btn-primary">
@@ -48,38 +53,38 @@
         <label for="gitUrl">Current Git Repo URL</label>
         <div id="gitUrl" name="gitUrl" ng-model=config.githubURL><b>{{config.githubURL}}</b></div>
         <!-- <input type="text" class="form-control" id="gitUrl" name="gitUrl" ng-model=config.githubURL
-               ng-required="false" ng-readonly="true"> -->
-        <div class="text-muted small">DSP User git repository. Update with the form below to chante dsp repository</div>
+          ng-required="false" ng-readonly="true"> -->
+          <div class="text-muted small">DSP User git repository. Update with the form below to chante dsp repository</div>
       </div>
 
       <div class="form-group">
         <div ng-if="config.githubURL.includes('@')">
           <label for="sshKeyPath">SSH Key Path</label>
-        <div id="sshKeyPath" ng-model=config.sshKeyPath><b>{{config.sshKeyPath}}</b></div>
+          <div id="sshKeyPath" ng-model=config.sshKeyPath><b>{{config.sshKeyPath}}</b></div>
           <div class="text-muted small">By default the key configured in .ssh / config will be used</div>
 
         </div>
         <div ng-if="!config.githubURL.includes('@')">
           <label for="sshKeyPath">Username:</label>
           <input type="text" class="form-control" id="sshKeyPath" name="sshKeyPath"
-                 ng-model="config.username"
-                 ng-required="false" ng-readonly="true">
+                                                                  ng-model="config.username"
+                                                                  ng-required="false" ng-readonly="true">
         </div>
-          <div class="text-muted small">Current Git Auth Data</div>
-        </div>
-        <button type="submit" ng-disabled="formConfig.$invalid" ng-click="pullPersonalRepo()" class="btn btn-primary">
-          <i class="fa fa-fw fa-download"></i> Pull Personal Repo
-        </button>
+        <div class="text-muted small">Current Git Auth Data</div>
+      </div>
+      <button type="submit" ng-disabled="formConfig.$invalid" ng-click="pullPersonalRepo()" class="btn btn-primary">
+        <i class="fa fa-fw fa-download"></i> Pull Personal Repo
+      </button>
     </form>
-   <h4> Change your github remote project</h4>
-<div class="form-group">
-        <form name="githubForm">
-          <!-- <label for="github_project">Change your github remote project</label> -->
-          <!--<input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
-            id="githubURL" ng-model=repo.gitUrlToEdit>-->
+    <h4> Change your github remote project</h4>
+    <div class="form-group">
+      <form name="githubForm">
+        <!-- <label for="github_project">Change your github remote project</label> -->
+        <!--<input type="text" class="form-control" name="githubURL" ng-required="true" ng-pattern="urlPattern"
+          id="githubURL" ng-model=repo.gitUrlToEdit>-->
           <input type="text" class="form-control" name="githubURL" ng-required="true" id="githubURL"
-                 ng-pattern = "/((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/"
-                 ng-model=repo.gitUrlToEdit>
+                                                                                      ng-pattern = "/((git@[\w]+(\.{1}[\w]{1,})+:)|(https:\/\/([\w]+(\.{1}[\w]{1,})+)\/))([\w_-]+\/{0,1})+(\.git)/"
+                                                                                      ng-model=repo.gitUrlToEdit>
           <div class="text-muted small">Change repository</div>
           <div class="row" id="gitauthrow" >
             <div class="col-sm-3">
@@ -101,8 +106,8 @@
           <br>
           <button class="btn btn-warning" ng-click="openEditGithub()" ng-disabled="githubForm.$invalid"> Change repo
           </button>
-        </form>
-        </div>
+      </form>
+    </div>
     <div class="py-4">
       <div ng-show="isRepoUploading" class="alert alert-info"> Uploading Repo, pls wait... </div>
     </div>
@@ -112,7 +117,7 @@
       <div class="form-group">
         <label for="gitUrl">Commit Message</label>
         <input type="text" class="form-control" id="commitMessage" name="commitMessage" ng-model="commitMessage"
-               ng-required="true" ng-readonly="false">
+                                                                                        ng-required="true" ng-readonly="false">
         <div class="text-muted small">Commit message for push</div>
       </div>
       <button type="submit" ng-disabled="formPush.$invalid" ng-click="pushPersonalRepo()" class="btn btn-primary">
@@ -122,31 +127,31 @@
     <hr class="py-5">
 
     <!--
-  <div class="row">
-    <div class="col-sm-4">
-    <h3> Application Managment</h3>
-    </div>
-    <div class="col-sm-8">
-    <div class="row">
+      <div class="row">
+      <div class="col-sm-4">
+      <h3> Application Managment</h3>
+      </div>
+      <div class="col-sm-8">
+      <div class="row">
       <div class="col-sm-12"><p>
-          <button type="submit"
-              ng-click="updateApplication()"
-              ng-disabled="isAppUpdating || isAppRestarting"
-              class="btn btn-primary">Update Docker Security Playground</button>  </p></div>
-    </div>
-    <div class="row">
+      <button type="submit"
+      ng-click="updateApplication()"
+      ng-disabled="isAppUpdating || isAppRestarting"
+      class="btn btn-primary">Update Docker Security Playground</button>  </p></div>
+      </div>
+      <div class="row">
       <div class="col-sm-12"><p>
-        <button
-           type="submit"
-           ng-click="restartApplication()"
-           ng-disabled="isAppUpdating || isAppRestarting"
-           class="btn btn-danger">
-            Reinstall Docker Security Playground
-        </button></p> </div>
-    </div>
-    <div ng-show="isAppUpdating" class="alert alert-success col-sm-5"> Update, pls wait...</div>
-    </div>
-  </div>
+      <button
+      type="submit"
+      ng-click="restartApplication()"
+      ng-disabled="isAppUpdating || isAppRestarting"
+      class="btn btn-danger">
+      Reinstall Docker Security Playground
+      </button></p> </div>
+      </div>
+      <div ng-show="isAppUpdating" class="alert alert-success col-sm-5"> Update, pls wait...</div>
+      </div>
+      </div>
     -->
 
     <div ng-show="isReposUploading" class="alert alert-info"> Projects in upload, pls wait... </div>
@@ -157,74 +162,74 @@
     </div>
 
 
-      <h3>Labs Managment</h3>
+    <h3>Labs Managment</h3>
 
-      <div class="my-5">
-        <button class="btn btn-default" ng-click="manageImages()"><i class="fa fa-fw fa-clone"></i> Manage Images</button>
-        <button class="btn btn-default" ng-click="manageRepos()"><i class="fa fa-fw fa-th-list"></i> Manage Repos </button>
-        <!-- <div style='margin-top:10px' class="text-muted small">Press this to update all main Lab Projects</div> -->
+    <div class="my-5">
+      <button class="btn btn-default" ng-click="manageImages()"><i class="fa fa-fw fa-clone"></i> Manage Images</button>
+      <button class="btn btn-default" ng-click="manageRepos()"><i class="fa fa-fw fa-th-list"></i> Manage Repos </button>
+      <!-- <div style='margin-top:10px' class="text-muted small">Press this to update all main Lab Projects</div> -->
+    </div>
+
+
+
+    <!-- <form ng-show='isRepoSynchronized'>
+      <div class="form-group" >
+      <label for="username">Username:</label>
+      <input type="text" class="form-control" ng-model="repoUsername" id="name">
+      <div class="text-muted small">Your git username</div>
       </div>
 
-      
+      <div class="form-group">
+      <label for="dir">Password</label>
+      <input type="password" class="form-control" id="password" ng-model="repoPassword">
+      <div class="text-muted small">Your git password</div>
+      </div>
 
-        <!-- <form ng-show='isRepoSynchronized'>
-        <div class="form-group" >
-          <label for="username">Username:</label>
-          <input type="text" class="form-control" ng-model="repoUsername" id="name">
-          <div class="text-muted small">Your git username</div>
-        </div>
-
-        <div class="form-group">
-          <label for="dir">Password</label>
-          <input type="password" class="form-control" id="password" ng-model="repoPassword">
-          <div class="text-muted small">Your git password</div>
-        </div>
-
-        <button type="submit" ng-click="updateRepository()" class="btn btn-success">Update git repository</button>
+      <button type="submit" ng-click="updateRepository()" class="btn btn-success">Update git repository</button>
       </form>
-  -->
+    -->
 
-      </div>
-    </div>
-
-
+  </div>
+</div>
 
 
-    <!-- REPO DATA MANAGMENT -->
-    <!-- <hr class="py-5" /> 
- 
-    <h3> Data Managment </h3>
-    <div class="bs-callout bs-callout-primary">
-      <h4><i class="fa fa-fw fa-info-circle text-primary"></i> Info</h4>
-      Here you can upload files you want to upload in the containers. They'll be saved in data dir of your repo (hidden file <code>.data</code>)
-    </div>
 
-    <p class="row my-5">
-      <div class="col-sm-6 text-center">
-        <button ng-click="uploadFile()" class="btn btn-default">
-          <i class="fa fa-fw fa-upload"></i> Upload
-        </button>
-      </div>
-      <div class="col-sm-6 text-center">
-        <div ng-click="deleteFile()" class="btn btn-danger">
-          <i class="fa fa-fw fa-remove"></i> Delete
-        </div>
-      </div>
-    </p>
 
-    <p>&nbsp;</p>
+<!-- REPO DATA MANAGMENT -->
+<!-- <hr class="py-5" /> 
 
-    <div ng-show="errorDelete !== ''" class="alert alert-danger text-center"> {{errorDelete}} </div>
-    <div class="row">
-      <div class="col-sm-5 tree-browser">
-        <js-tree tree-events="select_node:nodeSelected" tree-ajax="/api/tree/" tree-core="tree_core" tree-plugins="dnd">
-        </js-tree>
-      </div>
-      <div id="treeRepo" class="col-sm-5 tree-browser">
-        <js-tree tree-events="select_node:nodeLabSelected" tree-core="tree_core" tree-plugins="dnd" tree-data="scope"
-          tree-model="labTreeModel"></js-tree>
-      </div>
-    </div>
+  <h3> Data Managment </h3>
+  <div class="bs-callout bs-callout-primary">
+  <h4><i class="fa fa-fw fa-info-circle text-primary"></i> Info</h4>
+  Here you can upload files you want to upload in the containers. They'll be saved in data dir of your repo (hidden file <code>.data</code>)
+  </div>
+
+  <p class="row my-5">
+  <div class="col-sm-6 text-center">
+  <button ng-click="uploadFile()" class="btn btn-default">
+  <i class="fa fa-fw fa-upload"></i> Upload
+  </button>
+  </div>
+  <div class="col-sm-6 text-center">
+  <div ng-click="deleteFile()" class="btn btn-danger">
+  <i class="fa fa-fw fa-remove"></i> Delete
+  </div>
+  </div>
+  </p>
+
+  <p>&nbsp;</p>
+
+  <div ng-show="errorDelete !== ''" class="alert alert-danger text-center"> {{errorDelete}} </div>
+  <div class="row">
+  <div class="col-sm-5 tree-browser">
+  <js-tree tree-events="select_node:nodeSelected" tree-ajax="/api/tree/" tree-core="tree_core" tree-plugins="dnd">
+  </js-tree>
+  </div>
+  <div id="treeRepo" class="col-sm-5 tree-browser">
+  <js-tree tree-events="select_node:nodeLabSelected" tree-core="tree_core" tree-plugins="dnd" tree-data="scope"
+  tree-model="labTreeModel"></js-tree>
+  </div>
+  </div>
   </div> END ROW JS TREE -->
   <!-- /. PAGE INNER  -->
-</div>
+  </div>

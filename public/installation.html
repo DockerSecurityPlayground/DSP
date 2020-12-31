@@ -94,7 +94,11 @@
               <input type="text" class="form-control" id="dirProject" name="dirProject" ng-required="true" ng-style="{'border-color':installation.dirProject.$invalid  === true ? 'red': ''}" ng-model=config.mainDir>
               <div class="text-muted small">Main directory for DSP (path starts by homedir)</div>
             </div>
-
+            <div class="form-group">
+              <label for="name">Docker Repository:</label>
+              <input type="text" class="form-control" name="name" ng-required='true' ng-pattern=nameRegex ng-style="{'border-color':installation.name.$invalid  === true ? 'red': ''}" ng-model=config.dockerRepo id="name">
+              <div class="text-muted small">Docker repository (default: dockersecplayground)</div>
+            </div>
             <div class="form-group">
               <label for="gitEmail">Git Email</label>
               <input type="text" class="form-control" id="gitEmail" name="gitEmail" ng-model=config.email

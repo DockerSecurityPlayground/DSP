@@ -23,6 +23,7 @@ const oneline_prefix="dsp_oneline"
 // CONSTANTS
 const SERVICE_PREFIX="dsp_hacktool"
 const ONELINE_PREFIX="dsp_oneline"
+const DEFAULT_TAG = "latest";
 
 const HACK_TOOL_PATH = path.join(appRoot.toString(), "hacktool_volume");
 const HACK_TOOL_CONTAINER_PATH = "/shared";
@@ -43,27 +44,47 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
 }
 
 exports.build = function build(params, body, callback, notifyCallback) {
-  const DOCKER_USERNAME = "dockersecplayground/"
+  const DOCKER_USERNAME = "dockersecplayground"
+  const DOCKER_TAG = "latest";
+  console.log(params);
+
+  let up = "";
+  let imageTag = "";
+  let dockerRepo = "";
   async.waterfall([
     (cb) => Checker.checkParams(params, ['dockerfile'], cb),
-    (cb) => {
-      if (!params.repo) {
-        configData.getUserPath(cb);
-      } else {
-        configData.getMainDir((err, mainDir) => {
-          if (err) {
-            cb(err);
-          } else {
-            cb(null, path.join(mainDir, params.repo));
-          }
-        });
-      };
+    (cb) => configData.getConfig(cb),
+    // Only in user path
+    (config, cb) => {
+      up = path.join(appUtils.getHome(), config.mainDir, config.name);
+      // By default dockersecplayground
+      dockerRepo = config.dockerRepo ? config.dockerRepo : DOCKER_USERNAME;
+      imageTag = params.tagImage &&  params.tagImage !== "" ? params.tagImage : DOCKER_TAG;
+      cb(null);
     },
-    (up, cb) => cb(null, path.join(up, '.dockerfiles', params.dockerfile)),
+    // (cb) => {
+    //   if (!params.repo) {
+    //     configData.getUserPath(cb);
+    //   } else {
+    //     configData.getMainDir((err, mainDir) => {
+    //       if (err) {
+    //         cb(err);
+    //       } else {
+    //         cb(null, path.join(mainDir, params.repo));
+    //       }
+    //     });
+    //   };
+    // },
+    (cb) => cb(null, path.join(up, '.dockerfiles', params.dockerfile)),
     (dockerfilePath, cb) => {
-      dockerManager.build(dockerfilePath, DOCKER_USERNAME + params.dockerfile, cb, notifyCallback)
-    }
-  ], (err) => callback(err))
+      dockerManager.taggedBuild(dockerfilePath, `${dockerRepo}/${params.dockerfile}`, imageTag, cb, notifyCallback)
+    },
+    (output, cb) => {
+      if (params.needToPush) {
+        log.info("Push image");
+        imageMgr.pushImage(`${dockerRepo}/${params.dockerfile}`, imageTag, cb, notifyCallback);
+      } else cb(null);
+    }], (err) => callback(err))
 }
 
 exports.dockerRun = function dockerRun(params, callback, notifyCallback){
@@ -90,20 +111,20 @@ exports.dockerRun = function dockerRun(params, callback, notifyCallback){
       } else {
         log.info("Image not installed, pull image");
         imageMgr.pullImage(params.currentContainer.selectedImage.name, params.currentContainer.selectedImage.tag, cb, notifyCallback);
-    };
-  },
+      };
+    },
     (cb) => {
       let image = params.currentContainer.selectedImage.name + ":" + params.currentContainer.selectedImage.tag;
       const options = {
-       // name: SERVICE_PREFIX + "_" + params.currentContainer.selectedImage.label,
-       name: ONELINE_PREFIX + "_" + params.currentContainer.name,
-       rm : true,
-       cmd: params.currentContainer.command,
-       net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : [],
-       volumes: [{
+        // name: SERVICE_PREFIX + "_" + params.currentContainer.selectedImage.label,
+        name: ONELINE_PREFIX + "_" + params.currentContainer.name,
+        rm : true,
+        cmd: params.currentContainer.command,
+        net: (params.currentContainer.OneLineNetworks instanceof Array) ? params.currentContainer.OneLineNetworks : [],
+        volumes: [{
           hostPath: HACK_TOOL_PATH,
           containerPath: HACK_TOOL_CONTAINER_PATH}
-       ]
+        ]
       }
       const dockerOptions = _.extend(chosenHackTool.default_options, options)
       dockerManager.run(image, callback, dockerOptions, notifyCallback, notifyCallback);
@@ -275,7 +296,7 @@ exports.httpdRun  = function httpdRun(body, callback, notifyCallback) {
     (cb) => Checker.checkParams(body, ['hostPort'], cb),
     (cb) => dockerTools.isHttpdServiceInstalled(cb),
     (isImageInstalled, cb) => {
-      if (isImageInstalled) 
+      if (isImageInstalled)
         cb(null, "");
       else  {
         dockerTools.installHttpdService(cb, notifyCallback);
@@ -291,7 +312,7 @@ exports.captureRun  = function captureRun(body, callback, notifyCallback) {
     (cb) => Checker.checkParams(body, ['machinesToBeSniffed', 'lab'], cb),
     (cb) => dockerTools.isTcpdumpInstalled(cb),
     (isImageInstalled, cb) => {
-      if (isImageInstalled) 
+      if (isImageInstalled)
         cb(null, "");
       else  {
         dockerTools.installTcpdump(cb, notifyCallback);
@@ -305,9 +326,9 @@ exports.kaliRun  = function kaliRun(callback, notifyCallback) {
   async.waterfall([
     (cb) => dockerTools.isKaliServiceInstalled(cb),
     (isImageInstalled, cb) => {
-      if (isImageInstalled) 
+      if (isImageInstalled)
         cb(null, "");
-      else 
+      else
         dockerTools.installKaliService(cb, notifyCallback);
     }, (data, cb) => {
       dockerTools.runKaliService(cb);
@@ -318,11 +339,11 @@ exports.browserRun  = function browserRun(body, callback, notifyCallback) {
   async.waterfall([
     (cb) => dockerTools.isBrowserServiceInstalled(cb),
     (isImageInstalled, cb) => {
-      if (isImageInstalled) 
+      if (isImageInstalled)
         cb(null, "");
       else  {
         log.info("Install Browser service");
-        
+
         dockerTools.installBrowserService(cb, notifyCallback);
       }
     }, (data, cb) => {
@@ -338,9 +359,9 @@ exports.wiresharkRun  = function wiresharkRun(body, callback, notifyCallback) {
     (cb) => Checker.checkParams(body, ['hostPort'], cb),
     (cb) => dockerTools.isWiresharkInstalled(cb),
     (isImageInstalled, cb) => {
-      if (isImageInstalled) 
+      if (isImageInstalled)
         cb(null, "");
-      else 
+      else
         dockerTools.installWireshark(cb, notifyCallback);
     }, (data, cb) => {
       const hostPort = body.hostPort;

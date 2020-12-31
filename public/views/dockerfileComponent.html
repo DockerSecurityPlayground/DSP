@@ -17,6 +17,14 @@
 </style>
 <div class="modal-header">
   <!-- <h3 class="modal-title" id="modal-title">{{$ctrl.dockerfile.name}}</h3> -->
+  <div class="row">
+          <div class="col col-sm-1 col-sm-offset-9">
+            <button type="button" class="btn btn-warning" ng-click="goToImages()">
+              Come Back
+            </button>
+          </div>
+
+  </div>
 
   <div class="modal-body" id="modal-body">
     <div class="btn btn-default" ngf-select="upload($files)" ngf-multiple="true">Add File</div>
@@ -82,21 +90,25 @@
         <!-- </p> -->
 
         <div class="row">
-          <div class="col col-sm-6 col-sm-offset-3">
+          <div class="col col-sm-2">
+           <input type="checkbox" ng-model="needToPush"/>Push image?
+          </div>
+        <div class="col col-sm-4">
+          <label class="control-label" for="tag">Tag image:   </label>
+          <input name="tag" class="form-check-input" type="text" ng-model=tagImage > 
+        </div>
+          <div class="col col-sm-4 col-sm-offset-1">
             <button type="button" class="btn btn-success" ng-click="saveDockerfile()">
-              <span class="glyphicon glyphicon-floppy-save"></span> Save Image and Build
+              <span class="glyphicon glyphicon-floppy-save"></span> Save and Build Image
             </button>
             <!-- <button type="button" class="btn btn-primary" ng-click="run()"> -->
             <!--   <span class="glyphicon glyphicon-play"></span> Run Test -->
             <!-- </button> -->
           </div>
+
           <!-- <div ng-show="notify !== ''" class="alert alert-info" id="notify" ng-bind-html="notify"> -->
-          <div class="col col-sm-1 col-sm-offset-1">
-            <button type="button" class="btn btn-warning" ng-click="goToImages()">
-              Come Back
-            </button>
           </div>
-          </div>
+          <br>
           <br />
           <div ng-show="notify" class="row">
             <div class="col col-sm-offset-10">

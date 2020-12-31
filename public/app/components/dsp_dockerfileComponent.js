@@ -12,6 +12,8 @@ var dsp_dockerfileComponent  =
     // },
     controller: function ($http, $scope, $location, Notification, Upload, $timeout, safeApplyService, SocketService, dockerAPIService) {
 /*
+ *
+ *
  * n
  *
         "id": "root",
@@ -22,6 +24,8 @@ var dsp_dockerfileComponent  =
           'opened' : true,
           'selected' : true
         }*/
+
+$scope.needToPush = true;
 function _addDir(f) {
 }
 
@@ -302,6 +306,8 @@ $scope.nodeSelected = function(e, data) {
   })
 }
 
+
+$scope.tagImage = "latest";
 $scope.goToImages = function() {
   $location.url('/images');
 }
@@ -352,6 +358,8 @@ $scope.build = function() {
     action : 'docker_build',
     params : {
       dockerfile : $ctrl.dockerfile.name,
+      needToPush: $scope.needToPush,
+      tagImage: $scope.tagImage
     }
   }), function(event) {
     var data = JSON.parse(event.data);

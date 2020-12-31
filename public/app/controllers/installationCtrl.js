@@ -8,7 +8,8 @@ var dsp_InstallationCtrl = function(ServerResponse, SocketService, SafeApply, Re
   $scope.config={
           mainDir : 'dsp',
           name : '',
-          githubURL: ""
+          githubURL: "",
+    dockerRepo: 'dockersecplayground'
   };
   $scope.repo = {
     isPrivate : false,

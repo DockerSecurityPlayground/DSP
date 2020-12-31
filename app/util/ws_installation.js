@@ -31,6 +31,11 @@ function installation(config, repo, callback, notifyCallback) {
         } else cb(null);
       },
       (cb) => {
+        if (config.dockerRepo){
+          Checker.checkAlphabetic(config.dockerRepo, cb);
+        } else cb(null);
+      },
+      (cb) => {
         if (config.sshKeyPath){
           fs.access(config.sshKeyPath, fs.constants.F_OK, cb);
         } else cb(null);

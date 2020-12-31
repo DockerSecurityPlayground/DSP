@@ -56,6 +56,7 @@ const updateConfig = function updateConfig(data, callback) {
       const config = {
         name: data.name,
         mainDir: path.normalize(data.mainDir),
+        dockerRepo: data.dockerRepo ? data.dockerRepo : "",
         githubURL: data.githubURL,
         sshKeyPath: data.sshKeyPath,
         username: data.username,
