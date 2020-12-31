@@ -102,7 +102,7 @@ If you have a problem you can use Issue section.
    
 ## Docker Wrapper Image  
 DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
-Look at the [doc](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/dsp_wrapper_image)
+Look at the [doc](https://github.com/giper45/DockerSecurityPlayground/wiki/Docker-Wrapper-Image)
 
 ## Tests   
 To run a test:   
