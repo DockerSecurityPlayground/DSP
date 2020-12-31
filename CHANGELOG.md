@@ -5,14 +5,6 @@ All notable changes to this project will be documented in this file.
  * New terminal on a new tab in visual editor     
  * Fix the .data bug (delete when .data is empty)   
 
-## [3.8.0]
- * Fix the filterImage bug in edit container page OK
- * Fix label if does not exist in lab 
- * Different vertical size image canvas
- * Changed dsp port (18181)   
- * Added vulhub repository during installation
- * Fixed some size typo in images.html section
-
 ## [master]
 ### Fixed   
  * Intermittent on header   
@@ -25,7 +17,18 @@ All notable changes to this project will be documented in this file.
 
 ### Added   
  * README support: now lab editors can add a README and could it can be seen on main page of lab projects. 
- * Upload lab support: now dsp can take labs from other sources 
+ * Upload lab support: now dsp can take labs from other sources   
+ 
+
+## [3.8.0] - 2020 - 12- 31
+ * Fix the filterImage bug in edit container page OK
+ * Fix label if does not exist in lab 
+ * Different vertical size image canvas
+ * Changed dsp port (18181)   
+ * Added vulhub repository during installation
+ * Fixed some size typo in images.html section   
+ * Avoid removing ports when the element image is changed  
+
 
 <!-- ## [3.8.0] - 2020 - 12 - 24    -->
 

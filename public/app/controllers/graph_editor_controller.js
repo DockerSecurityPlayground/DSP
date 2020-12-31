@@ -712,7 +712,7 @@ window.location.href = urlToGo;
     //Every time delete actions form currentContainer
     var oldActions = $scope.currentContainer.actions;
     $scope.currentContainer.actions = [];
-    $scope.currentContainer.ports = {};
+    // $scope.currentContainer.ports = {};
     var imageActions = image.actions;
     // If contains the same action name copy in new image
     _.each(oldActions, function(act) {
