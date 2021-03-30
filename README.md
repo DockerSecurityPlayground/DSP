@@ -16,6 +16,12 @@ in penetration testing and network security, but its flexibility allows you the
 **creation**, **graphic editing** and **managment run / stop** of all your **docker-compose
 labs**.  
 
+
+## Cite this work
+If you use Docker Security Playground for your research activity, cite the following paper published by the IEEE (Institute of Electrical and Electronics Engineers) 
+https://ieeexplore.ieee.org/document/8169747
+
+
 ## How To Use
 Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) to learn how to use DSP.
 You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki) documentation to understand how you can use DSP.   
