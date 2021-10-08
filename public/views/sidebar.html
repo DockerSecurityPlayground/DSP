@@ -1,5 +1,5 @@
 <!-- /. NAV TOP  -->
-
+<div id="side-bar">
 <div id="dsp_logo" class="text-center">
   <a href="/"><img src="assets/img/dsp_logo.png" class="user-image img-responsive" /></a>
 </div>
@@ -9,7 +9,7 @@
               <div class="btn btn-default"><i class="fa fa-search"></i>
               </div>
             </span>
-          </div>
+          </div>        
 <div ng-repeat="r in WalkerService.repos" class="lab pb-2">
   <div class="panel panel-default">
     <div class="panel-heading" ng-click="isCollapsed[$index]= !isCollapsed[$index]" >
@@ -34,6 +34,7 @@
       </a>
     </div>
   </div>
+</div>
 </div>
 
 <!-- /. NAV SIDE  -->
