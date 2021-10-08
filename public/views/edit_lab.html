@@ -65,6 +65,16 @@
 
           </div>
         </div>
+
+        <div class="row form-group">
+          <label class="control-label col-sm-2" for="description">Difficulty</label>
+          <div class="col-sm-10">
+            <select name="difficultySelect" id="difficultySelect" ng-model="ctrl.lab.difficulty" title="Choose a difficulty">
+              <option ng-repeat="option in difficulty.availableOptions track by option.id" >{{option.name}}</option>
+            </select>
+          </div>
+        </div>
+
         <br>
         <b> Template Guide</b><br>
         You can use the following keywords in Description and Goal:
