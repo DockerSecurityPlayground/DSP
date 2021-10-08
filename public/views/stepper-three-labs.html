@@ -1,0 +1,39 @@
+<div class="step">
+  </br></br></br>
+    <md-card ng-init="step2.disabled = true; step3.disabled = true; step4.disabled = true; selected = 0">
+      <md-steppers  md-selected="selected" md-stretch-steppers="always">
+        <md-step label="Lab1" md-complete="step1.completed">
+          <md-content>
+            <iframe id="iframe0" name="myIframe0" frameborder="5" width="1500" height="1500"></iframe>
+            <md-button type="submit" class="md-raised md-primary" ng-click="selected = 1; step1.completed=true; step2.disabled=false">NEXT</md-button>
+          </md-content>
+        </md-step>
+        <md-step label="Lab2" md-complete="step2.completed" ng-disabled="step2.disabled">
+          <md-content>
+            <iframe id="iframe1" name="myIframe1" frameborder="5" width="1500" height="1500"></iframe>
+            <md-button class="md-raised md-primary" ng-click="selected = 0">PREV</md-button>
+            <md-button class="md-raised md-primary" ng-click="selected = 2; step2.completed=true; step3.disabled=false">NEXT</md-button>
+          </md-content>
+        </md-step>
+        <md-step label="Lab3" md-complete="step3.completed" ng-disabled="step3.disabled">
+          <md-content>
+            <iframe id="iframe2" name="myIframe2" frameborder="5" width="1500" height="1500"></iframe>
+            <md-button class="md-raised md-primary" ng-click="selected = 1">PREV</md-button>
+            <md-button class="md-raised md-primary" ng-click="selected = 3; step3.completed=true; step4.disabled=false">NEXT</md-button>
+          </md-content>
+        </md-step>
+        <md-step label="End" md-complete="step4.completed" ng-disabled="step4.disabled">
+          <md-content>
+            <h1>
+            &nbsp All done!
+            </h1>
+            <h5> </br>&nbsp You have completed this training path. </br> &nbsp You can go back through the labs or select another training.
+            </h5>
+            <md-button class="md-raised md-primary" ng-click="selected = 2">PREV</md-button>
+            <md-button id="doneButton" class="md-raised md-primary" ng-click="step2.disabled = true; step3.disabled = true; step4.disabled = true;
+             step1.completed=false; step2.completed=false; step3.completed=false; step4.completed=false; selected = 0">DONE</md-button>
+          </md-content>
+        </md-step>
+      </md-steppers>
+    </md-card>
+  </div>
