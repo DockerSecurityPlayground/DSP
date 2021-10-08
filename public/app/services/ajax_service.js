@@ -166,7 +166,8 @@ self.init = function(onSuccess) {
                      informations:
                           { description : l.description,
                             goal : l.goal ,
-                            solution : l.solution
+                            solution : l.solution,
+                            difficulty : l.difficulty
                           },
                   //Selected labels
                      labels : labels
@@ -185,7 +186,8 @@ self.init = function(onSuccess) {
             description : lab.description || '',
             goal : lab.goal || '',
             solution : lab.solution || '',
-            readme: lab.readme 
+            readme: lab.readme,
+            difficulty : lab.difficulty || 'Medium'
     },
     name: lab.name
     }
@@ -219,5 +221,3 @@ self.init = function(onSuccess) {
       });
   }
 }
-
-
