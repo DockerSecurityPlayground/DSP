@@ -222,6 +222,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.updatePreviewSolution();
                 vm.updatePreviewGoal();
                 vm.labels = labToUse.labels || []
+                vm.lab.difficulty = labToUse.informations.difficulty;
               }
             }
           }
@@ -347,6 +348,18 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.lab.solution = CleanerService.parse(labToUse.informations.solution);
                 vm.tinymceHtmlGoal = $sce.trustAsHtml(vm.lab.goal);
                 vm.tinymceHtmlSolution = $sce.trustAsHtml(vm.lab.solution);
+                vm.lab.difficulty = labToUse.informations.difficulty;
+                if (vm.lab.difficulty=='Beginner') {
+                  vm.lab.color='green';
+                } else if (vm.lab.difficulty=='Medium'){
+                  vm.lab.color='orange';
+                } else if (vm.lab.difficulty=='Advanced') {
+                  vm.lab.color='red';
+                } else if (vm.lab.difficulty=='Expert') {
+                  vm.lab.color='purple';
+                } else {
+                  vm.lab.color='silver';
+                }
               }
               else {
                 vm.lab.description = '';
@@ -354,6 +367,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.lab.solution = '';
                 vm.tinymceHtmlGoal = '';
                 vm.tinymceHtmlSolution = '';
+                vm.lab.difficulty = 'Medium';
               }
             }
             // dockerImagesService.getByLab(function(images) {
@@ -497,6 +511,14 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     $location.url(urlToGo);
   }
 
+  $scope.difficulty = {
+    availableOptions: [
+      {id: '1', name: 'Beginner'},
+      {id: '2', name: 'Medium'},
+      {id: '3', name: 'Advanced'},
+      {id: '4', name: 'Expert'},
+    ]};
+
   vm.labAction = function labAction() {
     var l = vm.lab;
     //New lab
@@ -539,7 +561,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
             informations: {
               description: vm.lab.description || '',
               goal: vm.lab.goal || '',
-              solution: vm.lab.solution || ''
+              solution: vm.lab.solution || '',
+              difficulty: vm.lab.difficulty || 'Medium'
             },
             labels: vm.labels
           })
