@@ -34,6 +34,13 @@
             </ui-select-choices>
           </ui-select>
           <br>
+          <ui-select multiple sortable="true" ng-model="ctrl.filteredDifficulty" theme="bootstrap" title="Choose a difficulty">
+            <ui-select-match placeholder="Filter by difficulty">{{$item.name}}</ui-select-match>
+            <ui-select-choices repeat="option.name as option in difficulty.availableOptions">
+              <div>{{option.name}}</div>
+            </ui-select-choices>
+          </ui-select>
+          <br>
           <ui-select multiple sortable="true" ng-model="ctrl.filteredRepos" theme="bootstrap" title="Choose a repo">
             <ui-select-match placeholder="Repo filter">{{$item.name}}</ui-select-match>
             <ui-select-choices disabled repeat="item in ctrl.repos ">
@@ -56,7 +63,7 @@
           <table class="table table-hover">
             <tbody>
 
-              <tr ng-repeat="l in r.labs | filter :{name:filterName} | filter:ctrl.hasLabel">
+              <tr ng-repeat="l in r.labs | filter :{name:filterName} | filter:ctrl.hasLabel | filter:ctrl.difficultyCheck">
                 <td>
                   <h5><i class="fa fa-fw fa-cube"></i> <a href="#" ng-click="ctrl.getURL(r.name, l.name)" title="Open {{l.name }} lab"> {{l.name }}</a></h5>
                   {{l.informations.description}}
