@@ -1,0 +1,73 @@
+<html>
+<head>
+
+    <title>Training</title>
+    <meta name="description">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="assets/architecturetree/css/tree.css" />
+    
+</head>
+
+<body>
+  <div id="graph"> <!-- View the graph-->
+    <h1><i class="fa fa-book"></i> Training</h1>
+    <p>&nbsp;</p>
+
+    <div class="texbox panel panel-default">
+      <div class="panel-body">
+        <form id="tex_form">
+          <p style="text-align: justify;">
+          Welcome to the <b>Training section.</b> Here you can take your pick from a variety of attack scenarios and test your Network Security skills!<br><b>Start immediately</b> by clicking on the path of your interest within the graph.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+    <div class="filters panel panel-default">
+      <div class="panel-heading">FILTER</div>
+      <div class="panel-body">
+        <form id="filter_form">
+          <b>Topic</b>
+            <div class="input-group" id="topicFilter">
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Buffer Overflow"> <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 3px;" > Buffer Overflow </span>
+             <br />
+             <label class="switch">
+              <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Denial of Service"> <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 3px;" > Denial of Service</span>
+              <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Password Cracking"> <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 3px;" > Password Cracking </span>
+             <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Privilege Escalation"> <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 4px;" > Privilege Escalation </span>
+             <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Web Hacking"> <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 4px;" > Web Hacking</span>
+             <br />
+            </div>
+            <hr>
+            <b>Difficulty</b>
+            <div class="input-group" id="difficultyFilter">
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Beginner" > <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 3px;" > Beginner </span>
+             <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Medium" > <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 3px;" > Medium </span>
+             <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Advanced" > <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 4px;" > Advanced </span>
+             <br />
+             <label class="switch">
+             <input style="padding-top: 10px;" type="checkbox" name="checkb" value="Expert" > <span class="slider round"></span></label>&nbsp&nbsp <span style="vertical-align: 4px;" > Expert </span>
+             <br />
+            </div> 
+        </form>
+      </div>
+    </div>
+  </div>
+
+<div id="stepp" ng-include="ctrl.numlab==2 && 'views/stepper-two-labs.html' || 'views/stepper-three-labs.html'"></div>
+
+</body>
+</html>
