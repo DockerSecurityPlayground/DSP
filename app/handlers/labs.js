@@ -162,7 +162,8 @@ function saveInformation(req, res) {
         description: infos.description || '',
         goal: infos.goal || '',
         solution: infos.solution || '',
-        readme: infos.readme
+        readme: infos.readme,
+        difficulty: infos.difficulty || 'Medium'
       };
       // log.info('Info received:');
       // log.info(JSON.stringify(i));
@@ -209,7 +210,8 @@ function newLab(req, res) {
       const i = {
         description: infos.description || '',
         goal: infos.goal || '',
-        solution: infos.solution || ''
+        solution: infos.solution || '',
+        difficulty: infos.difficulty || 'Medium'
       };
       labsData.newLab(req.params.labname, i, cb);
     },
