@@ -7,8 +7,16 @@ var dsp_LabsCtrl = function($scope, AjaxService, CurrentLabService , BreadCrumbs
 	self.allLabs = []
 	self.filteredLabels = []	;
 	self.filteredRepos = []
+	self.filteredDifficulty = [];
+		
+	$scope.difficulty = {
+		availableOptions: [
+		  {id: 1, name: 'Beginner'},
+		  {id: 2, name: 'Medium'},
+		  {id: 3, name: 'Advanced'},
+		  {id: 4, name: 'Expert'},
+		]};
 
-	
 	BreadCrumbs.breadCrumbs('/labs')
 	CurrentLabService.resetLab()
 	var urlRedirect =  '/lab/use/';
@@ -66,6 +74,18 @@ var dsp_LabsCtrl = function($scope, AjaxService, CurrentLabService , BreadCrumbs
 			return ret
 		}
 
+	}
+
+	// Filter by difficulty
+	self.difficultyCheck = function difficultyCheck(lab) {
+		
+		if(_.isEmpty(self.filteredDifficulty))
+			return true;
+
+		else if(_.indexOf(self.filteredDifficulty, lab.informations.difficulty) !== -1)
+				{
+					return true;
+				}
 	}
 
 	$scope.showRunning = function () {
