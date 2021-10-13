@@ -260,7 +260,7 @@ function newLab(name, information, callback) {
       infos.description = '';
       infos.goal = '';
       infos.solution = '';
-      infos.description = 'Medium';
+      infos.difficulty = 'Medium';
       infos.author = userName;
       infos = _.extend(infos, information);
 
