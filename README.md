@@ -92,7 +92,7 @@ So, the easiest way to share labs is the following:
 
 It is important that all images that you use should be available to other users, so:   
 - You can publish on docker hub so other users can pull your images in order to use your labs.   
-- You can provide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
+- You can prov[ide dockerfiles inside the .docker-images directory, so users can use build.sh to build your images and use your repo.
 
 If you need a "private way" to share labs you should share the repository in other ways, at current time there is no support to share private repositories. 
 
@@ -219,7 +219,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 
 
 ## Links
-- [Landing Page] (https://secsi.it/docker-security-playground/)
+- [Landing Page](https://secsi.it/docker-security-playground/)
 -  [![Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.toolswatch.org/2018/05/black-hat-arsenal-usa-2018-the-w0w-lineup/)  
 - [DSP Vagrant Box used in Blackhat Session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
 - [Blackhat scenario in Gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git)  
