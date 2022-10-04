@@ -27,7 +27,31 @@ Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) t
 You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki) documentation to understand how you can use DSP.   
 Follow Installation and Start steps to run DSP.   
 
-## Installation And Start   
+## Installation And Start     
+### For debian distros   
+For Debian distributions (i.e. Ubuntu, Kali, ecc.) the suggested method is to use the *debian package repository* hosted on github.io:   
+```   
+sudo apt install -y curl
+curl -s --compressed "https://dockersecurityplayground.github.io/ppa/KEY.gpg" | sudo apt-key add -
+sudo curl -s --compressed -o /etc/apt/sources.list.d/dsp.list "https://dockersecurityplayground.github.io/ppa/dsp.list"
+sudo apt update
+sudo apt install -y dsp   
+```   
+
+The package: 
+* Install docker and docker-compose  
+* Install latest stable nodejs
+* Install dsp   
+* Creates a dsp user on the target machine    
+
+When the installation is complete, you can run dsp by using the systemd command:   
+```  
+systemctl start dsp   
+```   
+
+DSP will run on "http://localhost:18181"  
+
+### Developer Installation
 1. Install DSP Requirements:   
 
 * Nodejs (v 7 or later)
