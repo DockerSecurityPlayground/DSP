@@ -41,7 +41,7 @@
     "dot-object": "^1.9.0",
     "errors": "^0.3.0",
     "executable": "^4.1.1",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-error-handler": "^1.1.0",
     "file-type": "^16.1.0",
     "forever": "^1.0.1",
