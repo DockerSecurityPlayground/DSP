@@ -110,7 +110,7 @@ During the installation you can create a local environment that has not link wit
 DSP Repository must have several requirements, so I have created a base DSP Repo Template that you can use to create your personal repository.   
 So, the easiest way to share labs is the following:    
 
-1. Fork the DSP_Repo project: [https://github.com/giper45/DSP_Repo.git](https://github.com/giper45/DSP_Repo.git) 
+1. Fork the NS-Unina project: [https://github.com/NS-unina/DSP_Repo.git](https://github.com/NS-unina/DSP_Repo.git) 
 2. During the installation set github directory param to your forked repository.     
 3.  Now create your labs and share it!   
 
