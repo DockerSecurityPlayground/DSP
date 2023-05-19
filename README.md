@@ -17,10 +17,6 @@ in penetration testing and network security, but its flexibility allows you the
 labs**.  
 
 
-## Cite this work
-If you use Docker Security Playground for your research activity, cite the following paper published by the IEEE (Institute of Electrical and Electronics Engineers) 
-https://ieeexplore.ieee.org/document/8169747
-
 
 ## How To Use
 Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) to learn how to use DSP.
@@ -217,6 +213,19 @@ MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save
 Other info here: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors)  
 
 
+### node-pty issues
+The application is based on [node-pty](https://github.com/microsoft/node-pty) pseudoterminal, that is subjected to several compilation errors. 
+In order to compile you need to install the compilation toolchain for Ubuntu: 
+``` 
+apt-get install -y build-essential
+``` 
+
+And the `XCode` for macOS users. 
+
+
+Please, follow the library documentation guide to fix the compilation errors that could occurr when you run `npm install` command. 
+Here some potential issues: 
+* `error: no template named 'remove_cv_t' in namespace 'std'; did you mean 'remove_cv'?` : try to use the `C++ v17` : `env CXXFLAGS="-std=c++17"  npm i ` 
 
 ## Contributing
 
@@ -269,6 +278,11 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 Thanks to **Giuseppe Criscuolo** and **Alessandro Placido Luise** for the logo design
 ## Changelog   
 Got to [CHANGELOG.md](CHANGELOG.md) to see al the version changes.   
+
+## Cite this work
+If you use Docker Security Playground for your research activity, cite the following paper published by the IEEE (Institute of Electrical and Electronics Engineers) 
+https://ieeexplore.ieee.org/document/8169747
+
 
 ## License
 This project is under the **MIT license**
