@@ -294,10 +294,15 @@ window.location.href = urlToGo;
       var ph = parseInt(optionalPort.host);
 
       if (pc < 1 || pc > 65535 || ph < 1 || ph > 65535) throw new Error('Out of range');
+      // // Fix issue #115
+      if (!$scope.currentContainer.ports) {
+        $scope.currentContainer.ports = {}
+      }
       $scope.optionalPorts.push(optionalPort);
       $scope.currentContainer.ports[optionalPort.container] = optionalPort.host;
     }
     catch (e) {
+      console.log(e)
       Notification({message:"Pls insert correct values"}, 'error');
     }
   }

@@ -20,6 +20,9 @@ All notable changes to this project will be documented in this file.
  * Upload lab support: now dsp can take labs from other sources   
  
 
+## [3.8.2] - 2023 - 09- 18
+* Fix problem with empty ports 
+* Update the docs 
 ## [3.8.0] - 2020 - 12- 31
  * Fix the filterImage bug in edit container page OK
  * Fix label if does not exist in lab 
