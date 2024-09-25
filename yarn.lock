@@ -1987,12 +1987,17 @@ download-file@^0.1.5:
   dependencies:
     mkdirp "^0.5.0"
 
-dtrace-provider@~0.8, dtrace-provider@0.2.8:
+dtrace-provider@~0.8:
   version "0.8.8"
   resolved "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.8.8.tgz"
   integrity sha512-b7Z7cNtHPhH9EJhNNbbeqTcXB8LGFFZhq1PGgEvpeHlzd36bhbdTWoE/Ba/YguqpBSlAPKnARWhVlhunCMwfxg==
   dependencies:
     nan "^2.14.0"
+
+dtrace-provider@0.2.8:
+  version "0.2.8"
+  resolved "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.2.8.tgz"
+  integrity sha512-wufYnYt4ISHnT9MEiRgQ3trXuolt7mICTa/ckT+KYHR667K9H82lmI8KM7zKUJ8l5I343A34wJnvL++1TJn1iA==
 
 duplexer@~0.1.1:
   version "0.1.2"
