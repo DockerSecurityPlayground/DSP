@@ -129,7 +129,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     first:"193",
     two:"20",
     three:"0",
-    four:"1"
+    four:"0"
   };
   /* Array of
    *
@@ -405,6 +405,8 @@ window.location.href = urlToGo;
       containerManager.resetCurrent($scope.imageList, $scope.networkList)
       $scope.isAddContainer = true
       $scope.showEditContainer = false;
+      console.log($scope.filterImage)
+      $scope.filterImage = ""
     }
   $scope.containerExists = function elementExists(nameContainer) {
     if(_.findWhere($scope.containerListToDraw, {name: nameContainer})) {

@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
  * New terminal on a new tab in visual editor     
  * Fix the .data bug (delete when .data is empty)   
 
-## [master]
+## [3.8.3]
 ### Fixed   
  * Intermittent on header   
  * Labs ng-repeat to show properly each lab    
  * Readme if exist, graph otherwise
  * Removed sidebar 
+ * Network issue for .0/24 instead of .1/24
 
 ### Removed  
  * repo image panel: it requires too much response time. Now users can see not downloaded images in lab section. 
