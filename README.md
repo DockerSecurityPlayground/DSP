@@ -23,6 +23,14 @@ Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) t
 You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki) documentation to understand how you can use DSP.   
 Follow Installation and Start steps to run DSP.   
 
+# Running it in a docker container
+
+```sh
+docker compose up 
+```
+access it with your local ip (localhost:18181) 
+
+## How it works 
 
 The package: 
 * Install docker and docker-compose  
@@ -72,7 +80,6 @@ If you want to expose on another interface, change DSP_IFACE environment variabl
 export DSP_IFACE="0.0.0.0"
 ```
 Now you can use dsp on Remote interface.  
-
 
 
 

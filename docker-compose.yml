@@ -1,0 +1,8 @@
+services:
+  dsp:
+    build: .
+    container_name: dsp-app
+    ports:
+      - "18181:18181"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
