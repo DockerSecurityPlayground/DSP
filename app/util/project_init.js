@@ -125,7 +125,7 @@ exports.createConfig = (nameConfig, config, callback) => {
     jsonfile.writeFileSync(configDir, config);
     callback(null);
   } catch (err) {
-    log.info('SOME ERROR');
+    log.error(`Failed to create config at ${configDir}: ${err.message}`);
     callback(err);
   }
 };

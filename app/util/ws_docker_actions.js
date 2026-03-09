@@ -46,7 +46,6 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
 exports.build = function build(params, body, callback, notifyCallback) {
   const DOCKER_USERNAME = "dockersecplayground"
   const DOCKER_TAG = "latest";
-  console.log(params);
 
   let up = "";
   let imageTag = "";

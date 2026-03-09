@@ -150,10 +150,8 @@ exports.docker_stdout = function dockerStdout(pid, f) {
 };
 
 exports.print = function print(err, data) {
-  if (err) {
-    console.log(err)
-  }
-  else console.log(data)
+  // Removed console.log to prevent stdout pollution
+  // Use proper logger if needed
 }
 // Each log line call the f function
 exports.docker_logs = function dockerLogs(pid, f) {

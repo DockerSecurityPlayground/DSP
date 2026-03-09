@@ -59,7 +59,6 @@ const initLabels = function initLabels(labelName, cb) {
 const existsLabel = function existsLabel(labelname, callback) {
   getLabels(labelname, (err, res) => {
     if (err) {
-      console.log(err.toString());
       // Is error label not found? label does not exist return false, otherwise forward error
      (err == ERR_NOT_FOUND) ? callback(null, false) : callback(err);
     } else callback(null, true);
