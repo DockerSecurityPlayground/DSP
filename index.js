@@ -23,6 +23,7 @@ const treeRoutes = require('./app/handlers/tree_routes.js');
 const Checker = require('./app/util/AppChecker.js');
 const multer = require('multer');
 const webSocketHandler = require('./app/util/ws_handler.js');
+const wsInstallationHandler = require('./app/util/ws_installation.js');
 const localConfig = require('./config/local.config.json');
 const healthChecker = require('./app/util/HealthLabState.js');
 const errorHandler = require('express-error-handler');
@@ -38,6 +39,54 @@ const dockerSocket = require('./app/util/docker_socket');
 
 // const webshellConfigFile =
 const log = AppUtils.getLogger();
+
+function isTruthyEnv(value) {
+  if (!value) {
+    return false;
+  }
+  const normalized = String(value).trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function startAutoInstallationIfEnabled() {
+  if (!isTruthyEnv(process.env.DSP_AUTOINSTALL)) {
+    return;
+  }
+
+  Checker.isInstalled((installed) => {
+    if (installed) {
+      log.info('DSP_AUTOINSTALL enabled, installation skipped because DSP is already installed');
+      return;
+    }
+
+    let config;
+    try {
+      config = AppUtils.getConfigSync();
+    } catch (err) {
+      log.error(`DSP_AUTOINSTALL enabled but cannot read config file at ${AppUtils.path_userconfig()}: ${err.message}`);
+      return;
+    }
+
+    log.info(`DSP_AUTOINSTALL enabled, starting automatic installation using ${AppUtils.path_userconfig()}`);
+    wsInstallationHandler.installation(
+      config,
+      {},
+      (err) => {
+        if (err) {
+          log.error(`Automatic installation failed: ${err.message}`);
+        } else {
+          log.info('Automatic installation completed successfully');
+        }
+      },
+      (progressLine) => {
+        if (progressLine) {
+          log.info(progressLine.toString().trim());
+        }
+      }
+    );
+  });
+}
+
 app.use(busboy());
 // Initialize the checker
 Checker.init((err) => {
@@ -45,6 +94,7 @@ Checker.init((err) => {
     console.error(err.message);
     throw err;
   }
+  startAutoInstallationIfEnabled();
 });
 // If is installed start the healtChecker
 Checker.isInstalled((isInstalled) => {

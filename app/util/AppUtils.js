@@ -36,7 +36,16 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-  return `${appRoot.path}/config/config_user.json`;
+  const defaultPath = path.join(appRoot.path, 'config', 'config_user.json');
+  const customPath = process.env.DSP_CONFIG_PATH;
+
+  if (!customPath || !customPath.trim()) {
+    return defaultPath;
+  }
+
+  return path.isAbsolute(customPath)
+    ? path.normalize(customPath)
+    : path.normalize(path.join(appRoot.path, customPath));
 }
 function getRealLogger() {
   const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
