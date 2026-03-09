@@ -688,7 +688,13 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         namelab: vm.lab.name
       }
     }), function (event) {
-      var data = JSON.parse(event.data);
+      try {
+        var data = JSON.parse(event.data.trim());
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        Notification('Error parsing server response: ' + e.message, 'error');
+        return;
+      }
       if (data.status === 'success') {
         //Set state on stop
         AjaxService.update()
@@ -731,7 +737,13 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
       }
     }),
       function (event) {
-        var data = JSON.parse(event.data);
+        try {
+          var data = JSON.parse(event.data.trim());
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          Notification('Error parsing server response: ' + e.message, 'error');
+          return;
+        }
         if (data.status === 'success') {
           dockerAPIService.detachAllServices();
           //Complete spinner
