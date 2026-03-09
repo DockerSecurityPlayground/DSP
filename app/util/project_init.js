@@ -11,6 +11,24 @@ const rimraf = require('rimraf');
 const log = appUtils.getLogger();
 
 
+function ensureMainDir(homeDSP) {
+  if (!fs.existsSync(homeDSP)) {
+    fs.mkdirSync(homeDSP);
+    return;
+  }
+
+  const stat = fs.statSync(homeDSP);
+  if (!stat.isDirectory()) {
+    throw new Error(`Path exists and is not a directory: ${homeDSP}`);
+  }
+
+  const existingEntries = fs.readdirSync(homeDSP);
+  if (existingEntries.length > 0) {
+    throw new Error(`Directory already exists and is not empty: ${homeDSP}`);
+  }
+}
+
+
 function initUserRepo(homeDSP, config) {
   // Create .dsp inside user dir
   const dspID = path.join(homeDSP, config.name, '.dsp');
@@ -51,8 +69,8 @@ exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
     const configDir = path.join(appRoot.toString(), 'config', nameConfig);
     const config = jsonfile.readFileSync(configDir);
     const homeDSP = path.join(appUtils.getHome(), config.mainDir);
-    // Create main directory
-    fs.mkdirSync(homeDSP);
+    // Allow install into a pre-created but empty main directory.
+    ensureMainDir(homeDSP);
     // Create json file labStates
     jsonfile.writeFileSync(path.join(homeDSP, 'lab_states.json'), []);
     // Create first version file
