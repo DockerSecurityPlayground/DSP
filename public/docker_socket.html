@@ -7,6 +7,8 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 const serviceName = getUrlParameter("serviceName");
+const embedMode = getUrlParameter("embed") === "1";
+window.DSP_EMBED_MODE = embedMode;
 document.title = serviceName;
 
 

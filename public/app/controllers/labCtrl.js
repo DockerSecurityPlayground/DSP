@@ -117,6 +117,18 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.listTools = [];
   var toEditName = '';
   $scope.listContainers = {};
+  $scope.inlineShell = {
+    activeContainer: '',
+    url: null
+  };
+
+  $scope.getShellAllowedContainers = function getShellAllowedContainers() {
+    const containers = Array.isArray($scope.listContainers)
+      ? $scope.listContainers
+      : Object.values($scope.listContainers || {});
+
+    return containers.filter((c) => c && c.isShellEnabled !== false);
+  };
   $scope.init = function () {
     console.log("DSP_INIT");
 
@@ -421,7 +433,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         function success(response) {
           console.log("SUCCESS");
           var windowReference = window.open();
-          windowReference.location = "docker_socket.html?serviceName=" + nameContainer;
+          windowReference.location = "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer);
           // window.open('docker_socket.html', '_blank');
         },
         function error(err) {
@@ -429,6 +441,35 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
           Notification({ message: "Server error: " + err.data.message }, 'error');
         });
   }
+
+  $scope.openContainerShellInline = function openContainerShellInline(nameContainer, dc = 'true') {
+    const size = {
+      width: window.innerWidth || document.body.clientWidth,
+      height: window.innerHeight || document.body.clientHeight
+    };
+
+    $http.post('/dsp_v1/dockershell', {
+      namerepo: vm.repoName,
+      namelab: vm.lab.name,
+      dockername: nameContainer,
+      dockercompose: dc,
+      size: size
+    })
+      .then(
+        function success() {
+          $scope.inlineShell.activeContainer = nameContainer;
+          $scope.inlineShell.url = "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer) + "&embed=1&t=" + Date.now();
+        },
+        function error(err) {
+          Notification({ message: "Server error: " + err.data.message }, 'error');
+        }
+      );
+  };
+
+  $scope.closeInlineShell = function closeInlineShell() {
+    $scope.inlineShell.activeContainer = '';
+    $scope.inlineShell.url = null;
+  };
 
   $scope.getContainer = function getContainer(name) {
     return containerManager.getContainer(name)

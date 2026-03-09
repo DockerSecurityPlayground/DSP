@@ -60,8 +60,17 @@ socket.on('output', function(data) {
 });
 
 socket.on('exit', function(redirectPath) {
-  console.log("Logout!");
-  location.href = redirectPath;
+    var isEmbedMode = !!window.DSP_EMBED_MODE;
+    if (isEmbedMode) {
+        if (term && term.io) {
+            term.io.writeUTF16('\r\n\r\n[Shell closed]\r\n');
+        }
+        return;
+    }
+    console.log("Logout!");
+    if (redirectPath) {
+        location.href = redirectPath;
+    }
 });
 
 socket.on('disconnect', function() {

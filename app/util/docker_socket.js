@@ -1,11 +1,13 @@
 const server = require('socket.io');
-const pty = require('node-pty');
+const { execFile } = require('child_process');
 const path = require('path');
+const Docker = require('dockerode');
 const AppUtils = require('../util/AppUtils');
 const dockerJS = require('../lib/mydockerjs').docker;
 const dockerComposer = require('../lib/mydockerjs').dockerComposer;
 const { execSync } = require('child_process');
 const log = AppUtils.getLogger();
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 function dockerComposeV2Installed() {
   try {
@@ -56,44 +58,92 @@ function initShellCommand(callback, dockerPath = "") {
     });
   }
 }
-function execTerm(socket, entrypoint) {
-  // Initiate session
-  var term;
+function resolveContainerId(composePath, serviceName, callback) {
+  if (dockerShell.dockercompose !== 'true') {
+    callback(null, dockerShell.dockerName);
+    return;
+  }
 
-  log.info(`[WEBSOCKET SHELL] spawning: ${entrypoint.script} ${entrypoint.args.join(' ')}`);
-  term = pty.spawn(entrypoint.script, entrypoint.args, {
-      name: 'xterm-256color',
-      cols: (dockerShell.size && dockerShell.size.width) ? dockerShell.size.width : 80,
-      rows: (dockerShell.size && dockerShell.size.height) ? dockerShell.size.height : 30
-  });
+  const cmd = dockerComposeV2Installed() ? 'docker' : 'docker-compose';
+  const args = dockerComposeV2Installed()
+    ? ['compose', '-f', path.join(composePath, 'docker-compose.yml'), 'ps', '-q', serviceName]
+    : ['-f', path.join(composePath, 'docker-compose.yml'), 'ps', '-q', serviceName];
 
-  // Loop
-  term.on('data', function(data) {
-      socket.emit('output', data);
-  });
-  term.on('exit', function(code) {
-      log.info((new Date()) + " PID=" + term.pid + " ENDED");
-    //docker_graph_action.html?nameRepo=giper&namelab=pppp&reponame=giper
-socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`)
-  });
-  term.on('error', (err) => {
-    log.error(`[WEBSOCKET SHELL] terminal error: ${err.message}`);
-    socket.emit('output', `\r\n[terminal-error] ${err.message}\r\n`);
-  });
-  socket.on('resize', function(data) {
-    try {
-      if (data.col && data.row)
-        term.resize(data.col, data.row);
-    } catch(e) {
-      log.warn(`log exception: ${1}`, e.message)
+  execFile(cmd, args, (err, stdout, stderr) => {
+    if (err) {
+      callback(new Error(stderr || err.message));
+      return;
     }
+    const containerId = (stdout || '').trim();
+    if (!containerId) {
+      callback(new Error(`Container ID not found for service '${serviceName}'`));
+      return;
+    }
+    callback(null, containerId);
   });
-  socket.on('input', (data) => {
-      term.write(data);
+}
+
+function execTerm(socket, containerRef, shellCommand) {
+  const cmd = [shellCommand, '-i'];
+  log.info(`[WEBSOCKET SHELL] docker exec on ${containerRef}: ${cmd.join(' ')}`);
+
+  const container = docker.getContainer(containerRef);
+  container.exec({
+    AttachStdin: true,
+    AttachStdout: true,
+    AttachStderr: true,
+    Tty: true,
+    Cmd: cmd,
+    Env: ['TERM=xterm-256color']
+  }, (err, execInstance) => {
+    if (err) {
+      log.error(`[WEBSOCKET SHELL] create exec error: ${err.message}`);
+      socket.emit('output', `\r\nError: ${err.message}\r\n`);
+      socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`);
+      return;
+    }
+
+    execInstance.start({ hijack: true, stdin: true, Tty: true }, (startErr, stream) => {
+      if (startErr) {
+        log.error(`[WEBSOCKET SHELL] start exec error: ${startErr.message}`);
+        socket.emit('output', `\r\nError: ${startErr.message}\r\n`);
+        socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`);
+        return;
+      }
+
+      stream.on('data', (data) => {
+        socket.emit('output', data.toString('utf8'));
+      });
+
+      stream.on('error', (streamErr) => {
+        log.error(`[WEBSOCKET SHELL] stream error: ${streamErr.message}`);
+      });
+
+      stream.on('end', () => {
+        socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`);
+      });
+
+      socket.on('input', (data) => {
+        if (stream.writable) {
+          stream.write(data);
+        }
+      });
+
+      socket.on('resize', (data) => {
+        if (data && data.row && data.col) {
+          execInstance.resize({ h: data.row, w: data.col }, () => {});
+        }
+      });
+
+      socket.on('disconnect', () => {
+        try {
+          stream.end();
+        } catch (e) {
+          log.debug(`[WEBSOCKET SHELL] disconnect cleanup: ${e.message}`);
+        }
+      });
+    });
   });
-  socket.on('disconnect', function() {
-    term.end();
-});
 }
 
 exports.init = function init(httpserv) {
@@ -110,20 +160,19 @@ exports.init = function init(httpserv) {
         // DockerCompose operation
         if (dockerShell.dockercompose === "true") {
           const composePath = path.join(dockerShell.mainPath, dockerShell.nameRepo, dockerShell.labName);
-          const dockerPath = path.join(composePath, 'docker-compose.yml');
           initShellCommand((err, shellCommand) => {
               if(err) {
                 log.error(`Error: ${err}`);
               } else {
-                var entrypoint;
-                if (dockerComposeV2Installed()) {
-                  // Use Docker Compose v2 (docker compose)
-                  entrypoint = { script:"docker", args: ['compose', '-f', dockerPath, 'exec', dockerShell.dockerName, shellCommand] };
-                } else {
-                  // Use Docker Compose v1 (docker-compose)
-                  entrypoint = { script:"docker-compose", args: ['-f', dockerPath, 'exec', dockerShell.dockerName, shellCommand] };
-                }
-                execTerm(socket, entrypoint);
+                resolveContainerId(composePath, dockerShell.dockerName, (resolveErr, containerId) => {
+                  if (resolveErr) {
+                    log.error(`[WEBSOCKET SHELL] resolve container error: ${resolveErr.message}`);
+                    socket.emit('output', `\r\nError: ${resolveErr.message}\r\n`);
+                    socket.emit('exit', `lab/use/${dockerShell.nameRepo}/${dockerShell.labName}`);
+                    return;
+                  }
+                  execTerm(socket, containerId, shellCommand);
+                });
               }
           }, composePath);
         }
@@ -133,8 +182,7 @@ exports.init = function init(httpserv) {
               if(err) {
                 log.error(`Error: ${err}`);
               } else {
-                var entrypoint = { script:"docker", args: ['exec', '-i', '-t', dockerShell.dockerName, shellCommand] };
-                execTerm(socket, entrypoint);
+                execTerm(socket, dockerShell.dockerName, shellCommand);
               }
           });
         }

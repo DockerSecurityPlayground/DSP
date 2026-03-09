@@ -982,7 +982,7 @@ window.location.href = urlToGo;
           first: ss[0],
           two: ss[1],
           three: ss[2],
-          four: ss[3]
+          four: "0"
         }
         $scope.n.more_validation = "###";
       } else {

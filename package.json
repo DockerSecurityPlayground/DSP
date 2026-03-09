@@ -58,7 +58,6 @@
     "multer": "^1.4.5-lts.1",
     "ncp": "^2.0.0",
     "node-cmd": "^5.0.0",
-    "node-pty": "^1.1.0",
     "node-stream-zip": "^1.15.0",
     "path-exists": "^4.0.0",
     "ps-node": "^0.1.6",

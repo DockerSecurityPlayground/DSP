@@ -71,8 +71,10 @@ const api = {
               _.each(rt, (r) => {
                 if (r) {
                 const d = { name: r };
+                // Handle Docker 28.x+ which omits empty fields
+                // Ensure labels is always an object, even if Labels field is missing, null, or undefined
                 d.labels = {};
-                if (!_.isEmpty(image.Labels)) {
+                if (image.Labels && typeof image.Labels === 'object' && !Array.isArray(image.Labels)) {
                   d.labels = image.Labels;
                 }
                 if (!_.isEmpty(image.Id)) {

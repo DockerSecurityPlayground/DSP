@@ -6,8 +6,8 @@ const dockerCapabilities = require('./docker_capabilities.js');
 
 // Return JSON Docker Compose Template
 function JDCTemplate() {
+  // Note: 'version' field is obsolete in Docker Compose v2.x and removed to avoid warnings
   return {
-    version: '2',
     services: {},
     networks: {} };
 }
@@ -153,22 +153,45 @@ function JDCGetServices(containers) {
 function JDCGetNetworks(networkList) {
   const allNetworks = {};
   _.each(networkList, (e) => {
-    const subnetString = `${e.subnet}/24`;
+    // Normalize subnet: ensure network address (last octet = 0) for /24 networks
+    let subnet = e.subnet;
+    
+    // If subnet doesn't include CIDR notation, normalize and add /24
+    if (!subnet.includes('/')) {
+      // Extract first 3 octets and set last to 0 for network address
+      const octets = subnet.split('.');
+      if (octets.length === 4) {
+        octets[3] = '0';
+        subnet = octets.join('.');
+      }
+      subnet = `${subnet}/24`;
+    } else {
+      // If it already has CIDR notation, normalize the network address
+      const [ip, mask] = subnet.split('/');
+      const octets = ip.split('.');
+      if (octets.length === 4) {
+        octets[3] = '0';
+        subnet = `${octets.join('.')}/${mask}`;
+      }
+    }
+    
     allNetworks[e.name] = {
       ipam: {
-        config: [{ subnet: subnetString }] } };
+        config: [{ subnet: subnet }] } };
   });
   return allNetworks;
 }
 
 // Create a JSON docker-compose object
 function JSONDockerComposeConvert(containers, networkList) {
+  const log = appUtils.getLogger();
   // create top level
   const object = this.JDCTemplate();
   const services = this.JDCGetServices(containers);
   const networks = this.JDCGetNetworks(networkList);
   object.services = services;
   object.networks = networks;
+  log.debug('[DOCKER CONVERTER] Generated docker-compose:', JSON.stringify(object));
   return JSON.stringify(object);
 }
 

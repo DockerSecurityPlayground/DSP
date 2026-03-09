@@ -9,8 +9,8 @@ const cmd = require('node-cmd');
 
 const log = AppUtils.getLogger();
 
-let bufferLine;
-let counterLine = 0;
+// NOTE: bufferLine and counterLine were moved inside connection scope
+// to avoid race conditions between multiple WebSocket connections
 const MAXLINES = 15;
 
 
@@ -43,6 +43,10 @@ function sendProgressMessage(ws, message) {
 }
 
 function manageInstallation(ws, jsonMessage) {
+  // Buffer for progress messages - local to this installation instance
+  let bufferLine = '';
+  let counterLine = 0;
+  
   installationHandler.installation(
     jsonMessage.config,
     jsonMessage.repo,
@@ -290,7 +294,17 @@ exports.init = function init(server) {
     // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
     ws.on('message', (message) => {
       try {
-      log.info(`[WS_HANDLER] message received: ${message}`);
+      // Protect against excessively large messages (max 10MB)
+      const MAX_MESSAGE_SIZE = 10 * 1024 * 1024; // 10MB
+      if (message.length > MAX_MESSAGE_SIZE) {
+        log.error(`Message too large: ${message.length} bytes (max ${MAX_MESSAGE_SIZE})`);
+        sendResponse(ws, new Error(`Message too large: ${message.length} bytes. Maximum allowed is ${MAX_MESSAGE_SIZE} bytes.`));
+        return;
+      }
+      
+      // Log only first 500 chars to avoid logging huge messages
+      const messagePreview = message.length > 500 ? `${message.substring(0, 500)}... (${message.length} bytes total)` : message;
+      log.info(`[WS_HANDLER] message received: ${messagePreview}`);
       const jsonMessage = JSON.parse(message);
       switch (jsonMessage.action) {
         case 'installation':
@@ -365,8 +379,15 @@ exports.init = function init(server) {
         }
       }
     catch(e) {
-      log.error(e);
-      //sendResponse(ws, null);
+      if (e instanceof SyntaxError && e.message.includes('JSON')) {
+        log.error(`JSON parsing error in WebSocket message: ${e.message}`);
+        log.error(`Message length: ${message.length} bytes`);
+        log.error(`First 200 chars: ${message.substring(0, 200)}`);
+        sendResponse(ws, new Error('Invalid JSON format in WebSocket message'));
+      } else {
+        log.error(`WebSocket handler error: ${e.message}`, e);
+        sendResponse(ws, new Error(`WebSocket processing error: ${e.message}`));
+      }
     }
     });
   });
