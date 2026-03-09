@@ -10,7 +10,7 @@ const _ = require('underscore');
 const repogitData = require('./repogitData.js');
 const LabStates = require('./LabStates.js');
 const dockerManager = require('../data/docker-images.js');
-const imageMgr = require('mydockerjs').imageMgr;
+const imageMgr = require('../lib/mydockerjs').imageMgr;
 
 
 // Clone a project in the main directory

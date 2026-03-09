@@ -1,11 +1,23 @@
 function SocketService($websocket) {
   var socket;
   
-    var wsUrl = 'ws://' + location.host;
+    var wsUrl = 'ws://' + location.host + '/ws';
     this.manage = function manage(jsonToSend, handlerMessage) {
        var dataStream = $websocket(wsUrl);
-        dataStream.send(jsonToSend);
-        dataStream.onMessage(handlerMessage);
+        dataStream.onMessage(function(event) {
+          handlerMessage(event);
+          try {
+            var data = JSON.parse(event.data);
+            if (data.status === 'success' || data.status === 'error') {
+              dataStream.close();
+            }
+          } catch (e) {
+            // Ignore malformed progress payloads and keep stream open.
+          }
+        });
+        dataStream.onOpen(function() {
+          dataStream.send(jsonToSend);
+        });
     };
  // this.manage = function manage(jsonToSend, handlerMessage) {
  //     if (socket) socket.close();

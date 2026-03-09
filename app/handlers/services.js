@@ -17,7 +17,7 @@ const fs = require('fs');
 const Checker = require('../util/AppChecker');
 
 const dockerConverter = require(`${appRoot}/app/data/docker-converter.js`);
-const dockerComposer = require('mydockerjs').dockerComposer;
+const dockerComposer = require('../lib/mydockerjs').dockerComposer;
 const _ = require('underscore');
 const dockerServices = require('../data/docker-tools.js');
 const log = AppUtils.getLogger();

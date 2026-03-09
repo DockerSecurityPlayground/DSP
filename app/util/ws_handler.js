@@ -270,8 +270,19 @@ function managePushPersonalRepo(ws, jsonMessage){
 
 exports.init = function init(server) {
   const wss = new WebSocket.Server({
-    server,
+    // server,
+    noServer: true,
     perMessageDeflate: false,
+  });
+
+  server.on('upgrade', (request, socket, head) => {
+    if (!request.url || !request.url.startsWith('/ws')) {
+      return;
+    }
+
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
   });
 
   wss.on('connection', (ws) => {
@@ -279,6 +290,7 @@ exports.init = function init(server) {
     // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
     ws.on('message', (message) => {
       try {
+      log.info(`[WS_HANDLER] message received: ${message}`);
       const jsonMessage = JSON.parse(message);
       switch (jsonMessage.action) {
         case 'installation':

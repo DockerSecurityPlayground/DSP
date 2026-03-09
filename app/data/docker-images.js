@@ -1,5 +1,5 @@
-const di = require('mydockerjs').imageMgr;
-const dockerJS = require('mydockerjs').docker;
+const di = require('../lib/mydockerjs').imageMgr;
+const dockerJS = require('../lib/mydockerjs').docker;
 const dockerFiles = require('../data/dockerfiles.js');
 const dot = require('dot-object');
 const _ = require('underscore');

@@ -1,4 +1,4 @@
-const dockerComposer = require('mydockerjs').dockerComposer;
+const dockerComposer = require('../lib/mydockerjs').dockerComposer;
 const fs = require('fs');
 const path = require('path');
 const LabStates = require('./LabStates.js');

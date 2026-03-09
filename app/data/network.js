@@ -8,7 +8,7 @@ const Checker = require('../util/AppChecker');
 const LabStates = require('../util/LabStates');
 const fs = require('fs');
 const appUtils = require('../util/AppUtils.js');
-const { getNetwork } = require('mydockerjs/lib/docker');
+const { getNetwork } = require('../lib/mydockerjs/lib/docker');
 
 function networkExists(namerepo, namelab, callback) {
   async.waterfall([

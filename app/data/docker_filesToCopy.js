@@ -1,5 +1,5 @@
 const _ = require('underscore');
-const dockerComposer = require('mydockerjs').dockerComposer;
+const dockerComposer = require('../lib/mydockerjs').dockerComposer;
 const path = require('path');
 const async = require('async');
 const appUtils = require('../util/AppUtils');

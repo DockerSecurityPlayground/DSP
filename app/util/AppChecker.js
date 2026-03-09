@@ -3,7 +3,7 @@ const Checker = require('help-nodejs').checker.Checker();
 const JoiChecker = require('help-nodejs').checker.JoiChecker();
 const appUtils = require('./AppUtils.js');
 const Joi = require('joi');
-const du = require('mydockerjs').dockerUtils;
+const du = require('../lib/mydockerjs').dockerUtils;
 const jsonfile = require('jsonfile');
 const path = require('path');
 const fs = require('fs');
@@ -15,6 +15,9 @@ const c = require('../../config/local.config.json').config;
 const repos = c.repos
 const repoData = require('../data/repos.js');
 const log = appUtils.getLogger();
+const { execSync } = require('child_process');
+
+
 
 const _ = require('underscore');
 let initialized = false;
@@ -35,6 +38,17 @@ function _checkRepos(cb) {
     });
 }
 
+function dockerComposeV2Installed() {
+  try {
+    execSync('docker compose version');
+    return true;
+  } 
+  catch (error) {
+    return false;
+  }
+
+}
+
 
 function checkDSPRequires(callback) {
   const log = appUtils.getLogger();
@@ -51,7 +65,7 @@ function checkDSPRequires(callback) {
       }
     },
 
-    (cb) => { if (!du.isDockerComposeInstalledSync()) {
+    (cb) => { if (!du.isDockerComposeInstalledSync() && !dockerComposeV2Installed()) {
       cb(new Error('Pls install docker-compose'));
     } else cb(null);
     },
