@@ -36,7 +36,7 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-  const defaultPath = path.join(appRoot.path, 'config', 'config_user.json');
+  const defaultPath = path.join(homedir(), '.dsp', 'dsp', 'user_config.json');
   const customPath = process.env.DSP_CONFIG_PATH;
 
   if (!customPath || !customPath.trim()) {

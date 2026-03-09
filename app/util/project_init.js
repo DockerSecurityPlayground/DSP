@@ -11,6 +11,14 @@ const rimraf = require('rimraf');
 const log = appUtils.getLogger();
 
 
+function resolveConfigPath(configPathOrName) {
+  if (path.isAbsolute(configPathOrName)) {
+    return configPathOrName;
+  }
+  return path.join(appRoot.toString(), 'config', configPathOrName);
+}
+
+
 function ensureMainDir(homeDSP) {
   if (!fs.existsSync(homeDSP)) {
     fs.mkdirSync(homeDSP);
@@ -53,8 +61,9 @@ function initUserRepo(homeDSP, config) {
 }
 // Create configuration file throws an error if already exists
 exports.createConfig = (nameConfig, config, callback) => {
-  const configDir = path.join(appRoot.toString(), 'config', nameConfig);
+  const configDir = resolveConfigPath(nameConfig);
   try {
+    fs.mkdirSync(path.dirname(configDir), { recursive: true });
     jsonfile.writeFileSync(configDir, config);
     callback(null);
   } catch (err) {
@@ -66,7 +75,7 @@ exports.createConfig = (nameConfig, config, callback) => {
 exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
   log.info('Creating DSP directories');
   try {
-    const configDir = path.join(appRoot.toString(), 'config', nameConfig);
+    const configDir = resolveConfigPath(nameConfig);
     const config = jsonfile.readFileSync(configDir);
     const homeDSP = path.join(appUtils.getHome(), config.mainDir);
     // Allow install into a pre-created but empty main directory.

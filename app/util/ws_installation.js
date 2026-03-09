@@ -2,7 +2,6 @@ const Checker = require('../util/AppChecker');
 const projectInit = require('../util/project_init.js');
 const async = require('async');
 const appUtils = require('../util/AppUtils');
-const path = require('path');
 const c = require('../../config/local.config.json').config;
 const repoData = require('../data/repos.js');
 const dockerActions = require('./ws_docker_actions.js');
@@ -43,12 +42,12 @@ function installation(config, repo, callback, notifyCallback) {
     // Create configuration file
     (cb) => {
       log.info('Create configuration file');
-      projectInit.createConfig(path.basename(appUtils.path_userconfig()), config, cb);
+      projectInit.createConfig(appUtils.path_userconfig(), config, cb);
     },
     // Create DSP directories
     (cb) => {
       log.info('Create dsp directories ');
-      projectInit.createDSP(path.basename(appUtils.path_userconfig()), repo, cb, notifyCallback);
+      projectInit.createDSP(appUtils.path_userconfig(), repo, cb, notifyCallback);
     },
     // Download a single docker image
     (cb) => {
