@@ -122,7 +122,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   /************************** NETWORK INFO  **********************/
   //Current network view
   $scope.n = {
-    name : "", subnet:"193.20.1.1/24", color:"black",
+    name : "", subnet:"193.20.1.0/24", color:"black",
     more_validation : "###"
   };
   $scope.subnet = {

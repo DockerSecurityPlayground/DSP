@@ -10,7 +10,7 @@ function dsp_networkManagerService() {
     networkList =  []
 
   //			function contains(address) {
-  //				var subnet = address.substring(0,address.lastIndexOf("."))+".1"
+  //				var subnet = address.substring(0,address.lastIndexOf("."))+".0"
   //				console.log(subnet)
   //				//find network
   //				var obj = _.where(networkList, {subnet: subnet }
@@ -37,7 +37,7 @@ function dsp_networkManagerService() {
       }
     } ,
     subnetOf(address) {
-      return address.substring(0, address.lastIndexOf("."))+".1"
+      return address.substring(0, address.lastIndexOf("."))+".0"
     },
     getNetworks() {
       return networkList

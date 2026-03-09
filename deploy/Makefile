@@ -1,14 +1,14 @@
-DSP_EXPOSED_PORTS := -p 18181:18181 \
-	-p 21:21 \
-	-p 69:69/udp \
-	-p 1111:1111 \
-	-p 2222:2222 \
-	-p 5800:5800 \
-	-p 8081:8081 \
-	-p 8090:8090 \
-	-p 8443:8443 \
-	-p 14500:14500 \
-	-p 26000:26000
+DSP_EXPOSED_PORTS := -p 18181:18181 
+# 	-p 21:21 \
+# 	-p 69:69/udp \
+# 	-p 1111:1111 \
+# 	-p 2222:2222 \
+# 	-p 5800:5800 \
+# 	-p 8081:8081 \
+# 	-p 8090:8090 \
+# 	-p 8443:8443 \
+# 	-p 14500:14500 \
+# 	-p 26000:26000
 
 
 CACHE ?=
@@ -35,5 +35,8 @@ run: build
 	$(DSP_EXPOSED_PORTS) \
 	nsunina/dsp:$(VERSION)
 
-rm:
+volume_clean:
+	docker volume rm dsp_data
+clean: volume_clean
 	docker rm -f dsp
+	docker rmi -f nsunina/dsp:$(VERSION)

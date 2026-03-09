@@ -329,7 +329,7 @@ $scope.clearLogs = function() {
 //Current network view
 
 $scope.n = {
-  name : "", subnet:"192.168.1.1/24", color:"black",
+  name : "", subnet:"192.168.1.0/24", color:"black",
   more_validation : "###"
 };
 
@@ -337,7 +337,7 @@ $scope.subnet = {
   first:"192",
   two:"168",
   three:"1",
-  four:"1"
+  four:"0"
 };
 /* Array of
  *
