@@ -245,8 +245,12 @@ module.exports = {
       charset: 'alphabetic'
     });
   },
-  //Returns home of the user
+  //Returns home of the user (or BASEDIR if set via environment)
   getHome() {
+    const baseDir = process.env.DSP_BASEDIR;
+    if (baseDir && baseDir.trim()) {
+      return path.normalize(baseDir.trim());
+    }
     return homedir();
   },
   // Store file in random name and restore
