@@ -33,6 +33,7 @@ function _checkRepos(cb) {
                 repoData.create(repos, cb);
             } else {
                 log.info("repos.json exists");
+        cb(null);
           }
         }
     });

@@ -36,6 +36,64 @@ function ensureMainDir(homeDSP) {
   }
 }
 
+function hasOnlyConfigStorage(homeDSP, configFilePath) {
+  if (!path.isAbsolute(configFilePath)) {
+    return false;
+  }
+
+  const relativeConfigPath = path.relative(homeDSP, configFilePath);
+  if (!relativeConfigPath || relativeConfigPath.startsWith('..') || path.isAbsolute(relativeConfigPath)) {
+    return false;
+  }
+
+  const parts = relativeConfigPath.split(path.sep).filter(Boolean);
+  if (parts.length < 1) {
+    return false;
+  }
+
+  if (parts.length === 1) {
+    const rootEntries = fs.readdirSync(homeDSP);
+    const expectedName = parts[0];
+    if (rootEntries.length !== 1 || rootEntries[0] !== expectedName) {
+      return false;
+    }
+    const configCandidate = path.join(homeDSP, expectedName);
+    return fs.existsSync(configCandidate) && fs.statSync(configCandidate).isFile();
+  }
+
+  const topEntry = parts[0];
+  const rootEntries = fs.readdirSync(homeDSP);
+  if (rootEntries.some((entry) => entry !== topEntry)) {
+    return false;
+  }
+
+  let cursor = path.join(homeDSP, topEntry);
+  if (!fs.existsSync(cursor) || !fs.statSync(cursor).isDirectory()) {
+    return false;
+  }
+
+  for (let i = 1; i < parts.length; i += 1) {
+    const expectedName = parts[i];
+    const entries = fs.readdirSync(cursor);
+
+    if (entries.length !== 1 || entries[0] !== expectedName) {
+      return false;
+    }
+
+    const expectedPath = path.join(cursor, expectedName);
+    if (i === parts.length - 1) {
+      return fs.existsSync(expectedPath) && fs.statSync(expectedPath).isFile();
+    }
+
+    if (!fs.statSync(expectedPath).isDirectory()) {
+      return false;
+    }
+    cursor = expectedPath;
+  }
+
+  return false;
+}
+
 
 function initUserRepo(homeDSP, config) {
   // Create .dsp inside user dir
@@ -79,7 +137,15 @@ exports.createDSP = (nameConfig, repo , callback, notifyCallback) => {
     const config = jsonfile.readFileSync(configDir);
     const homeDSP = path.join(appUtils.getHome(), config.mainDir);
     // Allow install into a pre-created but empty main directory.
-    ensureMainDir(homeDSP);
+    // Also allow the autoinstall bootstrap case where only the config subtree exists.
+    try {
+      ensureMainDir(homeDSP);
+    } catch (err) {
+      if (!hasOnlyConfigStorage(homeDSP, configDir)) {
+        throw err;
+      }
+      log.info(`Main directory ${homeDSP} already contains only config storage, continuing installation`);
+    }
     // Create json file labStates
     jsonfile.writeFileSync(path.join(homeDSP, 'lab_states.json'), []);
     // Create first version file
