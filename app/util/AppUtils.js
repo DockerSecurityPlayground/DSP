@@ -36,16 +36,20 @@ function copyDir(source, target, cb) {
 const c = require('../../config/local.config.json');
 
 function pathUserConfig() {
-  const defaultPath = path.join(homedir(), '.dsp', 'user_config.json');
   const customPath = process.env.DSP_CONFIG_PATH;
 
-  if (!customPath || !customPath.trim()) {
-    return defaultPath;
+  if (customPath && customPath.trim()) {
+    return path.isAbsolute(customPath)
+      ? path.normalize(customPath)
+      : path.normalize(path.join(appRoot.path, customPath));
   }
 
-  return path.isAbsolute(customPath)
-    ? path.normalize(customPath)
-    : path.normalize(path.join(appRoot.path, customPath));
+  // Default path logic: align with mainDir when DSP_BASEDIR is set
+  const baseDir = process.env.DSP_BASEDIR;
+  const baseHome = (baseDir && baseDir.trim()) ? path.normalize(baseDir.trim()) : homedir();
+  const configSubdir = baseDir ? 'dsp' : '.dsp';  // Docker: 'dsp', local: '.dsp'
+
+  return path.join(baseHome, configSubdir, 'user_config.json');
 }
 function getRealLogger() {
   const logPath = path.join(appRoot.path, 'logs', 'dsp.log');
@@ -245,7 +249,7 @@ module.exports = {
       charset: 'alphabetic'
     });
   },
-  //Returns home of the user (or BASEDIR if set via environment)
+  //Returns home of the user (or DSP_BASEDIR if set via environment)
   getHome() {
     const baseDir = process.env.DSP_BASEDIR;
     if (baseDir && baseDir.trim()) {

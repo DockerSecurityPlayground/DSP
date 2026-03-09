@@ -56,7 +56,7 @@ function getOrCreateAutoInstallConfig() {
     if (err && err.code === 'ENOENT') {
       const defaultConfig = {
         name: 'dsp-app',
-        mainDir: '.dsp',
+        mainDir: process.env.DSP_BASEDIR ? 'dsp' : '.dsp',
         githubURL: '',
         dockerRepo: 'dockersecplayground'
       };
