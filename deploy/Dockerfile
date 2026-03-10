@@ -1,9 +1,10 @@
 FROM alpine:3.23.3
+ARG DSP_VERSION
 
 RUN apk add --no-cache --update ca-certificates git docker docker-compose openrc nodejs npm alpine-sdk python3 && rm -rf /var/cache/apk/* && mkdir -p /app
 
 
-RUN git clone https://github.com/DockerSecurityPlayground/DSP.git -b v3.10.0 /app
+RUN git clone https://github.com/DockerSecurityPlayground/DSP.git -b ${DSP_VERSION} /app
 WORKDIR /app
 
 
