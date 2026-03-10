@@ -283,13 +283,12 @@
 
           <div class="row" ng-if="getShellAllowedContainers().length > 0">
             <div class="col-sm-4">
-              <h5>Container disponibili</h5>
+              <h5>Available containers</h5>
               <div class="list-group">
                 <a
                   href="#"
                   class="list-group-item"
                   ng-repeat="c in getShellAllowedContainers()"
-                  ng-class="{'active': inlineShell.activeContainer === c.name}"
                   ng-click="openContainerShellInline(c.name); $event.preventDefault();">
                   <i class="fa fa-fw fa-terminal"></i> {{c.name}}
                 </a>
@@ -297,20 +296,43 @@
             </div>
 
             <div class="col-sm-8">
-              <div class="text-right" ng-if="inlineShell.url">
-                <button class="btn btn-default btn-xs" ng-click="closeInlineShell()">
-                  <i class="fa fa-fw fa-close"></i> Close
-                </button>
+              <div ng-if="shellTabs.length === 0" class="well text-muted text-center">
+                Select a container from the list to open the shell here.
               </div>
-              <div ng-if="!inlineShell.url" class="well text-muted text-center">
-                Seleziona un container dalla lista per aprire la shell qui.
+
+              <div ng-if="shellTabs.length > 0">
+                <ul class="nav nav-tabs" role="tablist">
+                  <li ng-repeat="tab in shellTabs" 
+                      ng-class="{'active': activeTabId === tab.id}"
+                      role="presentation">
+                    <a href="#" ng-click="switchTab(tab.id); $event.preventDefault();">
+                      {{tab.containerName}}
+                      <i class="fa fa-close" 
+                         ng-click="closeTab(tab.id); $event.stopPropagation(); $event.preventDefault();" 
+                         style="margin-left: 8px; cursor: pointer;"></i>
+                    </a>
+                  </li>
+                  <li ng-if="shellTabs.length > 1">
+                    <a href="#" ng-click="closeInlineShell(); $event.preventDefault();" 
+                       class="text-muted" title="Chiudi tutti">
+                      <i class="fa fa-times-circle"></i>
+                    </a>
+                  </li>
+                </ul>
+                
+                <div class="tab-content" style="border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px;">
+                  <div ng-repeat="tab in shellTabs" 
+                       ng-class="{'active': activeTabId === tab.id}"
+                       class="tab-pane"
+                       style="padding: 0;">
+                    <iframe
+                      ng-src="{{tab.url}}"
+                      style="width: 100%; height: 430px; border: none; display: block;"
+                      title="Container Shell - {{tab.containerName}}">
+                    </iframe>
+                  </div>
+                </div>
               </div>
-              <iframe
-                ng-if="inlineShell.url"
-                ng-src="{{inlineShell.url}}"
-                style="width: 100%; height: 430px; border: 1px solid #ddd; border-radius: 4px;"
-                title="Container Shell">
-              </iframe>
             </div>
           </div>
         </div>

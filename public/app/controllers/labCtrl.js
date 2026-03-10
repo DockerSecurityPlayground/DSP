@@ -117,10 +117,9 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.listTools = [];
   var toEditName = '';
   $scope.listContainers = {};
-  $scope.inlineShell = {
-    activeContainer: '',
-    url: null
-  };
+  $scope.shellTabs = [];
+  $scope.activeTabId = null;
+  var shellTabCounter = 0;
 
   $scope.getShellAllowedContainers = function getShellAllowedContainers() {
     const containers = Array.isArray($scope.listContainers)
@@ -128,6 +127,24 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
       : Object.values($scope.listContainers || {});
 
     return containers.filter((c) => c && c.isShellEnabled !== false);
+  };
+
+  $scope.switchTab = function switchTab(tabId) {
+    $scope.activeTabId = tabId;
+  };
+
+  $scope.closeTab = function closeTab(tabId) {
+    const index = $scope.shellTabs.findIndex(t => t.id === tabId);
+    if (index !== -1) {
+      $scope.shellTabs.splice(index, 1);
+      if ($scope.activeTabId === tabId) {
+        $scope.activeTabId = $scope.shellTabs.length > 0 ? $scope.shellTabs[0].id : null;
+      }
+    }
+  };
+
+  $scope.getActiveTab = function getActiveTab() {
+    return $scope.shellTabs.find(t => t.id === $scope.activeTabId);
   };
   $scope.init = function () {
     console.log("DSP_INIT");
@@ -457,8 +474,14 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     })
       .then(
         function success() {
-          $scope.inlineShell.activeContainer = nameContainer;
-          $scope.inlineShell.url = "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer) + "&embed=1&t=" + Date.now();
+          shellTabCounter++;
+          const newTab = {
+            id: shellTabCounter,
+            containerName: nameContainer,
+            url: "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer) + "&embed=1&t=" + Date.now()
+          };
+          $scope.shellTabs.push(newTab);
+          $scope.activeTabId = newTab.id;
         },
         function error(err) {
           Notification({ message: "Server error: " + err.data.message }, 'error');
@@ -467,8 +490,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   };
 
   $scope.closeInlineShell = function closeInlineShell() {
-    $scope.inlineShell.activeContainer = '';
-    $scope.inlineShell.url = null;
+    $scope.shellTabs = [];
+    $scope.activeTabId = null;
   };
 
   $scope.getContainer = function getContainer(name) {
