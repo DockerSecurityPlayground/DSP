@@ -5,17 +5,18 @@ const dockerImages = require('../data/docker-images.js');
 const dockerAction = require(`${appRoot}/app/data/docker_actions`);
 const dockerFilesToCopy = require(`${appRoot}/app/data/docker_filesToCopy`);
 const dockerTools = require('../data/docker-tools.js');
-const dockerComposer = require('mydockerjs').dockerComposer;
-const dockerManager = require('mydockerjs').docker;
+const dockerComposer = require('../lib/mydockerjs').dockerComposer;
+const dockerManager = require('../lib/mydockerjs').docker;
 const _ = require('underscore');
-const imageMgr = require('mydockerjs').imageMgr;
+const imageMgr = require('../lib/mydockerjs').imageMgr;
+const cmdUtils = require('../lib/mydockerjs/lib/utils');
 const path = require('path');
 const async = require('async');
 const Checker = require('./AppChecker');
 const LabStates = require('./LabStates');
 const appUtils = require('../util/AppUtils');
 const fs = require('fs');
-const rimraf = require('rimraf');
+const { removePathSync } = require('./rimraf_compat');
 const service_prefix="dsp_hacktool"
 const oneline_prefix="dsp_oneline"
 
@@ -31,6 +32,88 @@ const HACK_TOOL_CONTAINER_PATH = "/shared";
 
 const log = appUtils.getLogger();
 const downloadPath = 'public/downloads';
+const activeImagePulls = {};
+
+function _labPullKey(params) {
+  return `${params.namerepo}/${params.namelab}`;
+}
+
+function _splitImageAndTag(imageRef) {
+  const idx = imageRef.lastIndexOf(':');
+  if (idx > 0) {
+    return {
+      name: imageRef.substring(0, idx),
+      tag: imageRef.substring(idx + 1),
+    };
+  }
+  return { name: imageRef, tag: DEFAULT_TAG };
+}
+
+function _cancelActivePulls(params, notifyCallback) {
+  const key = _labPullKey(params);
+  const pullState = activeImagePulls[key];
+  if (!pullState) {
+    return;
+  }
+
+  pullState.cancelled = true;
+  if (typeof notifyCallback === 'function') {
+    notifyCallback('Interruzione download immagini in corso...\n');
+  }
+  pullState.children.forEach((child) => {
+    try {
+      child.kill('SIGTERM');
+    } catch (e) {
+      log.warn(`[COMPOSE] Failed to stop pull process: ${e.message}`);
+    }
+  });
+}
+
+function _pullMissingImages(params, missingImages, notifyCallback, callback) {
+  if (!missingImages || missingImages.length === 0) {
+    callback(null);
+    return;
+  }
+
+  const key = _labPullKey(params);
+  activeImagePulls[key] = {
+    cancelled: false,
+    children: [],
+  };
+
+  async.eachSeries(missingImages, (imageRef, eachCb) => {
+    const pullState = activeImagePulls[key];
+    if (!pullState || pullState.cancelled) {
+      eachCb(new Error('Download immagini interrotto dall\'utente'));
+      return;
+    }
+
+    const parsed = _splitImageAndTag(imageRef);
+    const fullName = `${parsed.name}:${parsed.tag}`;
+    if (typeof notifyCallback === 'function') {
+      notifyCallback(`Scarico immagine mancante ${fullName}...\n`);
+    }
+
+    const child = cmdUtils.cmd(`docker pull ${fullName}`, (err) => {
+      // Remove completed process from active list.
+      const state = activeImagePulls[key];
+      if (state) {
+        state.children = state.children.filter((c) => c !== child);
+      }
+
+      const canceled = state && state.cancelled;
+      if (canceled) {
+        eachCb(new Error('Download immagini interrotto dall\'utente'));
+      } else {
+        eachCb(err);
+      }
+    });
+
+    pullState.children.push(child);
+    cmdUtils.docker_stdout(child, notifyCallback);
+    cmdUtils.docker_logs(child, notifyCallback);
+  }, callback);
+}
 
 
 exports.areImagesInstalled = function areImgesInstalled(params, callback) {
@@ -46,7 +129,6 @@ exports.areImagesInstalled = function areImgesInstalled(params, callback) {
 exports.build = function build(params, body, callback, notifyCallback) {
   const DOCKER_USERNAME = "dockersecplayground"
   const DOCKER_TAG = "latest";
-  console.log(params);
 
   let up = "";
   let imageTag = "";
@@ -165,10 +247,10 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
     (cb) => dockerImages.getImagesLabNames(params.namerepo, params.namelab, cb),
     (imagesLab, cb) => imageMgr.areImagesInstalled(imagesLab, cb),
     (installedResult, cb) => {
-      if(installedResult.areInstalled) {
+      if(installedResult.areInstalled) {
         cb(null);
       } else {
-        cb(new Error(`The following images are not installed: ${installedResult.notInstalled}`));
+        _pullMissingImages(params, installedResult.notInstalled, notifyCallback, cb);
       }
     },
     // Create download directory
@@ -271,10 +353,12 @@ exports.composeUp = function composeUp(params, body, callback, notifyCallback) {
 
     // End function , return correct or error
     (err) => {
+      const key = _labPullKey(params);
+      delete activeImagePulls[key];
       if (err) {
         // Remove download repository
         if (pathCopyDirectory) {
-          rimraf.sync(path.join(pathCopyDirectory, params.namelab));
+          removePathSync(path.join(pathCopyDirectory, params.namelab));
         }
         // Call dockerComposer down if thePath has been defined (already dockerCompose up)
         if (thePath) {
@@ -384,6 +468,10 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
       cb(null)
     },
     (cb) => {
+      _cancelActivePulls(params, notifyCallback);
+      cb(null);
+    },
+    (cb) => {
       log.info("Remove containers from the network");
       log.info("Get lab networks");
       dockerTools.getNetworksLab(params.namelab, cb);
@@ -407,7 +495,7 @@ exports.composeDown = function composeDown(params, body, callback, notifyCallbac
       const thePath = path.join(appUtils.getHome(), mainDir, params.namerepo, params.namelab);
       // Remove download repository
       const toRemoveElement = `${params.namerepo}_${params.namelab}`;
-      rimraf.sync(path.join(downloadPath, toRemoveElement));
+      removePathSync(path.join(downloadPath, toRemoveElement));
       // Call docker-compose down
       dockerComposer.down(thePath, (err) => {
         if (!err) { cb(null); } else cb(err);

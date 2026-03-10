@@ -9,7 +9,7 @@ const simpleGit = require('simple-git');
 const fsExtra= require('fs-extra');
 const checker = require('../util/AppChecker.js');
 const JoiConditions = checker.JoiAppConditions
-const rimraf = require('rimraf');
+const { removePath } = require('../util/rimraf_compat');
 const recursive  = require('recursive-readdir');
 
 
@@ -96,12 +96,12 @@ function _createFromGit(name, options, callback) {
         // Should clean from the repository
       } else {
         errGit = new Error("Git repository does not contain Dockerfile");
-        rimraf(path.join(dataPath, name), cb);
+        removePath(path.join(dataPath, name), cb);
       }
     }),
     (cb) => {
       cb(errGit)
-    }, (cb) => rimraf(path.join(dataPath, name, ".git"), cb)
+    }, (cb) => removePath(path.join(dataPath, name, ".git"), cb)
   ], (err, results) => callback(err, results));
 }
 
@@ -179,7 +179,7 @@ function editDockerfile(name, content, callback) {
     //set execute permissions
     (cb) => setPermissions(dfPath, content, cb),
     // Delete temp path
-    (cb) => rimraf(tempPath, cb)
+    (cb) => removePath(tempPath, cb)
     // const mm = jsonConverter(
   ], (err) => {
     if (err) {
@@ -198,7 +198,7 @@ function removeDockerfile(name, callback) {
     (cb) => configData.getUserPath(cb),
     (up, cb) => {
       const toDelete = path.join(up, '.dockerfiles', name);
-      rimraf(toDelete, cb)
+      removePath(toDelete, cb)
     }
   ], (err) => callback(err));
 }

@@ -218,7 +218,13 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
           dockerfile : nameToBuild
         }
       }), function(event) {
-    var data = JSON.parse(event.data);
+    try {
+      var data = JSON.parse(event.data.trim());
+    } catch (e) {
+      console.error('JSON parse error:', e);
+      Notification('Error parsing server response: ' + e.message, 'error');
+      return;
+    }
     switch (data.status) {
       case 'success':
         console.log("Success");
@@ -264,7 +270,13 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
           tag : tagToDownload
         }
       }), function(event) {
-        var data = JSON.parse(event.data);
+        try {
+          var data = JSON.parse(event.data.trim());
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          Notification('Error parsing server response: ' + e.message, 'error');
+          return;
+        }
         if(data.status === 'success')  {
           console.log("Success")
           log.content = "";
@@ -283,7 +295,12 @@ var dsp_ImagesCtrl= function($scope, $log, SafeApply,  WalkerService, RegexServi
           console.log("IMAGES");
           log.content += data.message;
           console.log(data.message);
-          var message = JSON.parse(data.message);
+          try {
+            var message = JSON.parse(data.message.trim());
+          } catch (e) {
+            console.warn('Could not parse inner message, skipping:', data.message);
+            return;
+          }
           if(message.status == 'Pulling fs layer'){
             var obj = {'id': message.id,'percentage': 0};
             ids.push(obj);

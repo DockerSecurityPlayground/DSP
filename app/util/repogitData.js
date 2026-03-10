@@ -50,16 +50,19 @@ module.exports = {
       }
       else {
         const thePath = path.join(AppUtils.getHome(), c.mainDir);
-        let gitClient = simpleGit(thePath).silent(true);
-        gitClient = gitClient.env('GIT_TERMINAL_PROMPT', 0);
+        const envVars = { GIT_TERMINAL_PROMPT: 0 };
+        
+        if (params.isPrivate && params.sshKeyPath) {
+          GIT_SSH_COMMAND += params.sshKeyPath;
+          envVars.GIT_SSH_COMMAND = GIT_SSH_COMMAND;
+        }
+        
+        let gitClient = simpleGit(thePath, { env: envVars }).silent(true);
+        
         if (params.isPrivate) {
-          if (params.sshKeyPath) {
-            //TODO control if path is valid
-            GIT_SSH_COMMAND += params.sshKeyPath;
-            gitClient = gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
-          } else if (params.username && params.token) {
+          if (!params.sshKeyPath && params.username && params.token) {
             url = strings.add(url, `${params.username}:${params.token}@`, '//'); // It doesn't contain a username
-          } else if (url.includes('http') ) {
+          } else if (!params.sshKeyPath && !params.username && url.includes('http') ) {
             callback(new Error('If repository is private auth is required'));
           }
         }
@@ -124,12 +127,12 @@ module.exports = {
     let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
     pathExists(repoPath).then((ex) => {
       if (ex) {
-        let gitClient = simpleGit(repoPath).silent(true);
+        const envVars = {};
         if (params.repo.isPrivate && params.repo.sshKeyPath) {
-          //TODO control if path is valid
           GIT_SSH_COMMAND += params.repo.sshKeyPath;
-          gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
+          envVars.GIT_SSH_COMMAND = GIT_SSH_COMMAND;
         }
+        let gitClient = simpleGit(repoPath, { env: envVars }).silent(true);
         gitClient.pull(callback);
       } else {
         callback(new Error('No repo dir'));
@@ -141,12 +144,12 @@ module.exports = {
     let GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -i ";
     pathExists(repoPath).then(ex => {
       if (ex) {
-        let gitClient = simpleGit(repoPath).silent(true);
+        const envVars = {};
         if (params.repo.sshKeyPath) {
-          //TODO control if path is valid
           GIT_SSH_COMMAND += params.repo.sshKeyPath;
-          gitClient.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND);
+          envVars.GIT_SSH_COMMAND = GIT_SSH_COMMAND;
         }
+        let gitClient = simpleGit(repoPath, { env: envVars }).silent(true);
         gitClient
           .add( '*')
           .addConfig('user.name', params.username)

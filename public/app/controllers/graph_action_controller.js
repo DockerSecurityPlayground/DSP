@@ -63,7 +63,13 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
         namelab : $scope.labName
       }
     }), function(event) {
-      var data = JSON.parse(event.data);
+      try {
+        var data = JSON.parse(event.data.trim());
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        Notification('Error parsing server response: ' + e.message, 'error');
+        return;
+      }
       if(data.status === 'success')  {
         console.log("Success")
         //Set state on stop
@@ -174,7 +180,13 @@ var DSP_GraphActionController = function DSP_GraphActionController($scope,$sce, 
       }
     }),
       function(event) {
-        var data = JSON.parse(event.data);
+        try {
+          var data = JSON.parse(event.data.trim());
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          Notification('Error parsing server response: ' + e.message, 'error');
+          return;
+        }
         if(data.status === 'success')  {
           console.log("Success")
           console.log($scope.listServices);
@@ -329,7 +341,7 @@ $scope.clearLogs = function() {
 //Current network view
 
 $scope.n = {
-  name : "", subnet:"192.168.1.1/24", color:"black",
+  name : "", subnet:"192.168.1.0/24", color:"black",
   more_validation : "###"
 };
 
@@ -337,7 +349,7 @@ $scope.subnet = {
   first:"192",
   two:"168",
   three:"1",
-  four:"1"
+  four:"0"
 };
 /* Array of
  *

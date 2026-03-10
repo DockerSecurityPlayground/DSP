@@ -109,6 +109,13 @@
             <input type="checkbox" ng-model="currentContainer.isShellEnabled" />
           </div>
         </div>
+        <div class="row form-group">
+          <label class="control-label col-sm-2" for="container_keepalive">Keep alive:</label>
+          <div class="col-sm-10">
+            <input id="container_keepalive" type="checkbox" ng-model="currentContainer.keepAlive" />
+            <span style="margin-left:8px; font-style: italic;">Override entrypoint with <code>tail -f /dev/null</code> to keep the container alive.</span>
+          </div>
+        </div>
         <!-- End copy shell -->
         <!-- START DEPENDS ON  -->
         <div class="form-group row" >

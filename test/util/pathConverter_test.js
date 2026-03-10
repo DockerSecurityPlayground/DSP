@@ -87,7 +87,8 @@ describe('path converter test', () => {
         text: 'Dockerfile',
         type: 'textfile',
         content: "isDockerfile",
-        icon: 'jstree-file' },
+        icon: 'jstree-file',
+        isExecutable: false },
       { id: './files',
         parent: '.',
         text: 'files',
@@ -122,14 +123,16 @@ describe('path converter test', () => {
         content: "isMyCnf",
         type: 'textfile',
         text: "my.cnf",
-        icon: "jstree-file"
+        icon: "jstree-file",
+        isExecutable: false
       },
       { id: './files/emptydir/internaldir/my.cnf3',
         parent: './files/emptydir/internaldir',
         content: "isMyCnf3",
         type: 'textfile',
         text: "my.cnf3",
-        icon: "jstree-file"
+        icon: "jstree-file",
+        isExecutable: false
       }
     ];
     const rootPath =  "/Users/maintest/git/DockerSecurityPlayground/test/testDSPDir/test/.dockerfiles/complex/";

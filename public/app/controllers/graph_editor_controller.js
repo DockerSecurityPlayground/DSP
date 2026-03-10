@@ -122,7 +122,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   /************************** NETWORK INFO  **********************/
   //Current network view
   $scope.n = {
-    name : "", subnet:"193.20.1.1/24", color:"black",
+    name : "", subnet:"193.20.1.0/24", color:"black",
     more_validation : "###"
   };
   $scope.subnet = {
@@ -376,6 +376,10 @@ window.location.href = urlToGo;
     $scope.optPort = { container: '', host: ''};
 
     var containerToEdit = _.findWhere($scope.containerListToDraw, {name: $scope.editContainerName});
+    if (!containerToEdit || !$scope.currentContainer) {
+      Notification({message:"Sorry, selected container is no longer available"}, 'error');
+      return;
+    }
     var oldName = containerToEdit.name;
     // If the name has been changed check if already exists
     if (oldName != $scope.currentContainer.name && _.findWhere($scope.containerListToDraw, {name: $scope.currentContainer.name})) {
@@ -429,7 +433,8 @@ window.location.href = urlToGo;
         actions : angular.copy($scope.currentContainer.actions),
         volumes : angular.copy($scope.currentContainer.volumes),
         filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-        networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
+        networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+        keepAlive: !!$scope.currentContainer.keepAlive
       };
       $
       var env = [];
@@ -454,7 +459,8 @@ window.location.href = urlToGo;
       actions : angular.copy($scope.currentContainer.actions),
       volumes : angular.copy($scope.currentContainer.volumes),
       filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
+      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+      keepAlive: !!$scope.currentContainer.keepAlive
     };
     $
     var env = [];
@@ -716,6 +722,9 @@ window.location.href = urlToGo;
     }
   }
   $scope.changedImage = function(image) {
+    if (!$scope.currentContainer || !image || !image.actions) {
+      return;
+    }
     //Every time delete actions form currentContainer
     var oldActions = $scope.currentContainer.actions;
     $scope.currentContainer.actions = [];
@@ -948,7 +957,11 @@ window.location.href = urlToGo;
       //Eventually redirect to edit
 
 
-      var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
+        var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
+        if (!containerToEdit) {
+          Notification({message:"Sorry, selected container is no longer available"}, 'error');
+          return;
+        }
       // THe OLD NAME
       $scope.editContainerName = containerToEdit.name;
       // It' the string EDIT LAB , no action of docker !
@@ -982,7 +995,7 @@ window.location.href = urlToGo;
           first: ss[0],
           two: ss[1],
           three: ss[2],
-          four: ss[3]
+          four: "0"
         }
         $scope.n.more_validation = "###";
       } else {
@@ -1246,8 +1259,14 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
         var imageList = response.data.data
         $scope.imageList = imageList
         console.log(imageList)
+        if (!p || !p.name) {
+          Notification({message:"Images updated"}, 'success');
+          return;
+        }
         var image = _.findWhere(imageList,{name: p.name})
-        containerManager.update(image)
+        if (image) {
+          containerManager.update(image)
+        }
         Notification("Images updated", 'success');
 
       }, function errorCallback(response) {

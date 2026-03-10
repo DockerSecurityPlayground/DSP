@@ -16,6 +16,41 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.currentName = "";
   $scope.active = 0;
   $scope.isAlertClosed = false;
+  $scope.isLabBootLoading = false;
+  var labBootLoadingStartedAt = 0;
+
+  function setLabBootLoading(isLoading) {
+    if (isLoading) {
+      labBootLoadingStartedAt = Date.now();
+      $scope.isLabBootLoading = true;
+      cfpLoadingBar.start();
+      return;
+    }
+
+    var minVisibleMs = 180;
+    var elapsedMs = Date.now() - labBootLoadingStartedAt;
+    var hideNow = function () {
+      SafeApply.exec($scope, function () {
+        $scope.isLabBootLoading = false;
+      });
+      cfpLoadingBar.complete();
+    };
+
+    // Wait for actual browser paint so splash does not disappear before UI render.
+    var hideAfterRender = function () {
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(hideNow);
+      } else {
+        window.setTimeout(hideNow, 20);
+      }
+    };
+
+    if (elapsedMs >= minVisibleMs) {
+      hideAfterRender();
+    } else {
+      window.setTimeout(hideAfterRender, minVisibleMs - elapsedMs);
+    }
+  }
   $scope.tags = [{
     name: "{{hostname}}",
     description: "it is converted to hostname (i.e. localhost) "
@@ -117,6 +152,35 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.listTools = [];
   var toEditName = '';
   $scope.listContainers = {};
+  $scope.shellTabs = [];
+  $scope.activeTabId = null;
+  var shellTabCounter = 0;
+
+  $scope.getShellAllowedContainers = function getShellAllowedContainers() {
+    const containers = Array.isArray($scope.listContainers)
+      ? $scope.listContainers
+      : Object.values($scope.listContainers || {});
+
+    return containers.filter((c) => c && c.isShellEnabled !== false);
+  };
+
+  $scope.switchTab = function switchTab(tabId) {
+    $scope.activeTabId = tabId;
+  };
+
+  $scope.closeTab = function closeTab(tabId) {
+    const index = $scope.shellTabs.findIndex(t => t.id === tabId);
+    if (index !== -1) {
+      $scope.shellTabs.splice(index, 1);
+      if ($scope.activeTabId === tabId) {
+        $scope.activeTabId = $scope.shellTabs.length > 0 ? $scope.shellTabs[0].id : null;
+      }
+    }
+  };
+
+  $scope.getActiveTab = function getActiveTab() {
+    return $scope.shellTabs.find(t => t.id === $scope.activeTabId);
+  };
   $scope.init = function () {
     console.log("DSP_INIT");
 
@@ -232,9 +296,18 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     }
     //Use
     else if (action === 'use') {
+      setLabBootLoading(true);
+      var bootImagesReady = false;
+      var bootPageReady = false;
+      function completeBootIfReady() {
+        if (bootImagesReady && bootPageReady) {
+          setLabBootLoading(false);
+        }
+      }
       vm.buttonAction = '';
       vm.isGoalEditShowed = false;
       vm.isSolutionEditShowed = false;
+      CurrentLabService.noImages = false;
       BreadCrumbs.breadCrumbs('/lab/use', $routeParams.namelab);
       initLabInformation($routeParams.repo);
       AjaxService.init()
@@ -260,29 +333,25 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
                 vm.exists = false;
+                bootImagesReady = true;
+                bootPageReady = true;
+                completeBootIfReady();
               } else {
-                dockerImagesService.areImagesInstalled(vm.repoName, vm.lab.name)
-                  .then(function success(data) {
-                    var areInstalled = data.data.data.areInstalled;
-                    if (!areInstalled) {
-                      console.log("NOT INSTALLED");
-                      CurrentLabService.noImages = true;
-                      vm.editVisible = false;
-                    } else {
-                      dockerImagesService.get(function (images) {
-                        $scope.interactiveImageList = images;
-                      });
-
-                      dockerAPIService.getListHackTools()
-                        .then(function successCallback(response) {
-                          console.log("LIST TOOLS");
-                          $scope.imageList = response.data.data.images;
-                          $scope.listTools = response.data.data.images;
-                        });
-                    }
-                  }, function error(err) {
-                    console.log(err);
+                // Skip pre-flight image checks for faster page opening.
+                // Missing images will be pulled during docker_up when Start lab is pressed.
+                CurrentLabService.noImages = false;
+                dockerImagesService.get(function (images) {
+                  $scope.interactiveImageList = images;
+                });
+                dockerAPIService.getListHackTools()
+                  .then(function successCallback(response) {
+                    console.log("LIST TOOLS");
+                    $scope.imageList = response.data.data.images;
+                    $scope.listTools = response.data.data.images;
+                  }, function errorCallback(response) {
                   });
+                bootImagesReady = true;
+                completeBootIfReady();
               }
               //Else go button
               // else	{
@@ -291,7 +360,9 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
               // }
             },
               function errorCallback(response) {
-
+                bootImagesReady = true;
+                bootPageReady = true;
+                completeBootIfReady();
               })
           //If username = repo name it's the user repo and it' possible to edit
           if (username === rname) {
@@ -319,6 +390,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
               if (labToUse.state === 'NO_NETWORK') {
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
+                bootPageReady = true;
+                completeBootIfReady();
               }
               // Else go button or images
               else {
@@ -334,6 +407,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                   yamlcode.text(data.yamlfile)
                   Prism.highlightAll();
                   $scope.yamlfile = data.yamlfile;
+                  bootPageReady = true;
+                  completeBootIfReady();
 
                 });
                 vm.buttonAction = buttonGoProto
@@ -355,6 +430,10 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.tinymceHtmlGoal = '';
                 vm.tinymceHtmlSolution = '';
               }
+            }
+            else {
+              bootPageReady = true;
+              completeBootIfReady();
             }
             // dockerImagesService.getByLab(function(images) {
             //   if (images) {
@@ -388,7 +467,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
           }
         },
           function (err) {
-
+            setLabBootLoading(false);
           })
 
     }
@@ -421,7 +500,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         function success(response) {
           console.log("SUCCESS");
           var windowReference = window.open();
-          windowReference.location = "docker_socket.html?serviceName=" + nameContainer;
+          windowReference.location = "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer);
           // window.open('docker_socket.html', '_blank');
         },
         function error(err) {
@@ -429,6 +508,41 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
           Notification({ message: "Server error: " + err.data.message }, 'error');
         });
   }
+
+  $scope.openContainerShellInline = function openContainerShellInline(nameContainer, dc = 'true') {
+    const size = {
+      width: window.innerWidth || document.body.clientWidth,
+      height: window.innerHeight || document.body.clientHeight
+    };
+
+    $http.post('/dsp_v1/dockershell', {
+      namerepo: vm.repoName,
+      namelab: vm.lab.name,
+      dockername: nameContainer,
+      dockercompose: dc,
+      size: size
+    })
+      .then(
+        function success() {
+          shellTabCounter++;
+          const newTab = {
+            id: shellTabCounter,
+            containerName: nameContainer,
+            url: "/docker_socket.html?serviceName=" + encodeURIComponent(nameContainer) + "&embed=1&t=" + Date.now()
+          };
+          $scope.shellTabs.push(newTab);
+          $scope.activeTabId = newTab.id;
+        },
+        function error(err) {
+          Notification({ message: "Server error: " + err.data.message }, 'error');
+        }
+      );
+  };
+
+  $scope.closeInlineShell = function closeInlineShell() {
+    $scope.shellTabs = [];
+    $scope.activeTabId = null;
+  };
 
   $scope.getContainer = function getContainer(name) {
     return containerManager.getContainer(name)
@@ -688,7 +802,13 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         namelab: vm.lab.name
       }
     }), function (event) {
-      var data = JSON.parse(event.data);
+      try {
+        var data = JSON.parse(event.data.trim());
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        Notification('Error parsing server response: ' + e.message, 'error');
+        return;
+      }
       if (data.status === 'success') {
         //Set state on stop
         AjaxService.update()
@@ -700,9 +820,20 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         completeLoad()
       }
       else if (data.status === 'error') {
-        Notification('Some error in docker-compose up command', 'error');
-        $scope.responseError = $scope.responseErrorHeader + data.message;
-        $scope.labError = true;
+        const errorMessage = (data.message || '').toLowerCase();
+        const wasCanceled =
+          errorMessage.indexOf('canceled by user') !== -1 ||
+          errorMessage.indexOf('interrotto dall\'utente') !== -1 ||
+          errorMessage.indexOf('download immagini interrotto') !== -1;
+        if (wasCanceled) {
+          Notification('Download immagini interrotto', 'warning');
+          $scope.labError = false;
+          $scope.responseError = '';
+        } else {
+          Notification('Some error in docker-compose up command', 'error');
+          $scope.responseError = $scope.responseErrorHeader + data.message;
+          $scope.labError = true;
+        }
         $scope.labState = playProto
         $scope.action = $scope.startLab
       }
@@ -731,7 +862,13 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
       }
     }),
       function (event) {
-        var data = JSON.parse(event.data);
+        try {
+          var data = JSON.parse(event.data.trim());
+        } catch (e) {
+          console.error('JSON parse error:', e);
+          Notification('Error parsing server response: ' + e.message, 'error');
+          return;
+        }
         if (data.status === 'success') {
           dockerAPIService.detachAllServices();
           //Complete spinner

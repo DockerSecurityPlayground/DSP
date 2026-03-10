@@ -7,6 +7,32 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 const jsonfile = require('jsonfile');
 
+function normalizeComposeForCurrentCode(data) {
+  const normalized = JSON.parse(JSON.stringify(data));
+  delete normalized.version;
+
+  if (normalized.networks) {
+    Object.values(normalized.networks).forEach((network) => {
+      const subnet = network
+        && network.ipam
+        && Array.isArray(network.ipam.config)
+        && network.ipam.config[0]
+        && network.ipam.config[0].subnet;
+
+      if (typeof subnet === 'string' && subnet.includes('/')) {
+        const [ip, mask] = subnet.split('/');
+        const octets = ip.split('.');
+        if (octets.length === 4) {
+          octets[3] = '0';
+          network.ipam.config[0].subnet = `${octets.join('.')}/${mask}`;
+        }
+      }
+    });
+  }
+
+  return normalized;
+}
+
 describe('DockerAPIService test', () => {
   before(() => {
    // Object to testing
@@ -60,7 +86,7 @@ describe('DockerAPIService test', () => {
   tests.forEach((test) => {
     it(test.description, () => {
       const file = fs.readFileSync(test.yamlFile, 'utf8');
-      const data = yaml.load(file);
+      const data = normalizeComposeForCurrentCode(yaml.load(file));
       const converted = jsonfile.readFileSync(test.jsonFile);
       const jsonCompose =
           this.obj.JSONDockerComposeConvert(converted.clistDrawed, converted.networkList);

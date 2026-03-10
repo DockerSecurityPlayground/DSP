@@ -13,7 +13,10 @@ function getUpdatedCommand(currentAction, imageActions) {
   if (updatedAction && updatedAction.command) {
     return updatedAction.command;
   }
-  else return "IMAGE_ERROR";
+  else {
+    log.warn(`Action ${currentAction.name} not found in image actions. Available actions: ${Object.keys(imageActions).join(', ')}`);
+    return null;
+  }
 
 }
 function getBackgroundMode(currentAction, imageActions) {
@@ -63,9 +66,6 @@ exports.getActions = (clistToDraw, cb) => {
           _.each(cActions, (a) => {
             const aa = _.extend({}, a, { cname });
             aa.command = getUpdatedCommand(aa, updatedImage.actions);
-	    if (aa.command == "IMAGE_ERROR") {
-		      throw new Error(`Cannot find ${aa.name} action in ${updatedImage.name} image!`);
-	    }
 
             aa.backgroundMode = getBackgroundMode(aa, updatedImage.actions);
             if (!aa.command) {

@@ -1,5 +1,5 @@
-const di = require('mydockerjs').imageMgr;
-const dockerJS = require('mydockerjs').docker;
+const di = require('../lib/mydockerjs').imageMgr;
+const dockerJS = require('../lib/mydockerjs').docker;
 const dockerFiles = require('../data/dockerfiles.js');
 const dot = require('dot-object');
 const _ = require('underscore');
@@ -376,6 +376,13 @@ function getListImages(callback) {
       });
       _.each(images, (ele) => {
         try {
+          // Check if labels exist and are not empty
+          const hasLabels = ele.labels && Object.keys(ele.labels).length > 0;
+          
+          if (!hasLabels) {
+            log.debug(`Image ${ele.name} has no labels in Docker API response (this may happen with Docker 28.x+ when Config is empty or on multi-arch images)`);
+          }
+          
           const convertedLabels = dot.object(ele.labels);
           if (convertedLabels.type) {
             switch (convertedLabels.type) {
@@ -414,13 +421,16 @@ function getListImages(callback) {
 
             // Set default selectedAction
             // ele.selectedAction = ele.actions[_.keys(ele.actions)[0]]
-          }
+          } 
           setDefaultActions(ele);
           ele.icon = convertedLabels.icon;
         }
         // Some images could not properly be converted by dot notation
         catch (labelError) {
+          log.warn(`Error converting labels for image ${ele.name}: ${labelError.message}`);
           ele.icon = `${pathIcons}host.png`;
+          ele.actions = {};
+          setDefaultActions(ele);
         }
       });
       callback(err, images);

@@ -3,7 +3,7 @@ const appUtils = require('../util/AppUtils.js');
 const path = require('path');
 const pathExists = require('path-exists');
 const fs = require('fs');
-const rimraf = require('rimraf');
+const { removePathSync } = require('../util/rimraf_compat');
 const configData = require('./config.js');
 const Walker = require('walker');
 const _ = require('underscore');
@@ -74,7 +74,7 @@ module.exports = {
         .on('end', (walkerErr) => {
           _.each(volumesToDestroy, (d) => {
             if (fs.existsSync(d)) {
-              rimraf.sync(d);
+              removePathSync(d);
             }
           });
           // rimraf.sync(dir);

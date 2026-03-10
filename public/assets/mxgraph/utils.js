@@ -98,6 +98,10 @@ function graphEditCallback(oldName, obj, newObj) {
     console.log(theCell);
     
   }
+  if (!theCell) {
+    console.warn("[mxgraph] graphEditCallback: cell not found", oldName, obj, newObj);
+    return;
+  }
   // Update the cell name
   Graph__update(theCell, newObj.name, oldName);
 }
@@ -143,18 +147,68 @@ function  Graph__OnLoadedCanvas() {
   //Called after that graph has been loaded
   Graph__log("Graph__OnLoadedCanvas()");
   console.log(theGraph.model.cells);
-  const ports = _.values(theGraph.model.cells).filter(function (c) {
-    return c.type == "Interface";
+  const portSlots = [
+    {x: 0, y: 0.25, offsetX: -6, offsetY: -8},
+    {x: 0, y: 0.75, offsetX: -6, offsetY: -4},
+    {x: 1, y: 0.25, offsetX: -8, offsetY: -8},
+    {x: 1, y: 0.75, offsetX: -8, offsetY: -4}
+  ];
+  var allCells = _.values(theGraph.model.cells || {});
+  var portsByParent = {};
+
+  allCells.forEach(function (cell) {
+    if (!cell || !cell.parent) {
+      return;
+    }
+    var style = cell.style || "";
+    var isPortByType = cell.type == "Interface";
+    var isPortByStyle = (typeof style === "string") && style.indexOf("port") !== -1;
+
+    if (!isPortByType && !isPortByStyle) {
+      return;
+    }
+
+    var parent = cell.parent;
+    var parentLooksLikeElement =
+      parent.type == NETWORK_ELEMENT_TYPE ||
+      (typeof parent.id === "string" && parent.id.indexOf(Model__CONTAINER_BASENAME) === 0);
+
+    if (!parentLooksLikeElement) {
+      return;
+    }
+
+    var parentId = parent.id;
+    if (!portsByParent[parentId]) {
+      portsByParent[parentId] = [];
+    }
+    portsByParent[parentId].push(cell);
   });
+
   theGraph.getModel().beginUpdate();
-  ports.forEach(function (p) {
-    var portGeometry = theGraph.model.getGeometry(p);
-    var newGeometry = new mxGeometry(portGeometry.x, portGeometry.y, PORT_SIZE, PORT_SIZE);
-    newGeometry.width = PORT_SIZE;
-    newGeometry.height = PORT_SIZE;
-    p.setGeometry(newGeometry);
+  _.each(portsByParent, function (ports) {
+    ports.sort(function (a, b) {
+      return String(a.id).localeCompare(String(b.id));
+    });
+
+    ports.forEach(function (p, index) {
+      var slot = portSlots[index] || portSlots[portSlots.length - 1];
+      var current = theGraph.model.getGeometry(p);
+      var newGeometry = current ? current.clone() : new mxGeometry();
+
+      newGeometry.x = slot.x;
+      newGeometry.y = slot.y;
+      newGeometry.relative = true;
+      newGeometry.width = PORT_SIZE;
+      newGeometry.height = PORT_SIZE;
+      newGeometry.offset = new mxPoint(slot.offsetX, slot.offsetY);
+      p.setGeometry(newGeometry);
+    });
   });
   theGraph.getModel().endUpdate();
+  // Force a full view refresh so updated port anchors are rendered immediately.
+  theGraph.view.invalidate();
+  theGraph.view.validate();
+  theGraph.refresh();
   
 }
 
@@ -166,6 +220,8 @@ function canvasLoadedCallback(canvasXML, containerNetworks, networkNames) {
   Model__currentElementID = _incrementID(Model__currentElementID, containerNetworks, Model__CONTAINER_BASENAME)
   Model__networkID = _incrementID(Model__networkID, networkNames, Model__NETWORK_BASENAME)
   Graph__OnLoadedCanvas();
+  // Some saved canvases trigger a late refresh; normalize ports once more on next tick.
+  window.setTimeout(Graph__OnLoadedCanvas, 0);
 }
 
 

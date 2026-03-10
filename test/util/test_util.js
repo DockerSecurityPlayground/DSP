@@ -1,38 +1,26 @@
 const chai = require('chai');
-const rimraf = require('rimraf');
 const fs = require('fs');
+const os = require('os');
 const chaiFS = require('chai-fs');
-const appRoot = require('app-root-path');
 const AppUtils = require('../../app/util/AppUtils.js');
 const path = require('path');
-const baseUtilDir = path.join(appRoot.toString(), 'test', 'util');
-
-
-// const basePath = path.join(appRoot.path, 'test', 'util');
-const basePath = "/basePath";
 const expect = chai.expect;
+let basePath;
 
 
 
 describe('Test Util ', () => {
   before((done) => {
     chai.use(chaiFS);
-    const mock = require('mock-fs');
-
-    mock({
-      '/basePath': {
-        'helloworld.txt': 'filecontent',
-        'helloDir': {/** empty directory */},
-      }
-    });
+    basePath = fs.mkdtempSync(path.join(os.tmpdir(), 'dsp-util-'));
+    fs.writeFileSync(path.join(basePath, 'helloworld.txt'), 'filecontent');
+    fs.mkdirSync(path.join(basePath, 'helloDir'));
     const dst = path.join(basePath, 'twoHello.txt');
     const dstDir = path.join(basePath, 'twoHelloDir');
     if (fs.existsSync(dst)) fs.unlinkSync(dst);
     if (fs.existsSync(dstDir)) {
-      rimraf(dstDir, (err) => {
-        expect(err).to.be.null;
-        done();
-      });
+      fs.rmSync(dstDir, { recursive: true, force: true });
+      done();
     }
     else  done();
   });
@@ -90,5 +78,10 @@ describe('Test Util ', () => {
       done();
     })
 
+  });
+  after(() => {
+    if (basePath) {
+      fs.rmSync(basePath, { recursive: true, force: true });
+    }
   });
 });

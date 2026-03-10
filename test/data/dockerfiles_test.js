@@ -2,13 +2,16 @@ const expect = require('chai').expect;
 const chai = require('chai')
 const helper = require('../helper');
 const executable = require('executable');
-const testModule = require('../../app/data/dockerfiles.js');
 const appRoot = require('app-root-path');
 const path = require('path')
 const appChecker = require(`${appRoot}/app/util/AppChecker`);
 const dockerfilesDir = path.join(helper.projectTestDir(), 'test', '.dockerfiles');
 const fs = require('fs');
 const filesPath = path.join(appRoot.toString(), 'test', 'api', 'files');
+const dockerfilesModulePath = require.resolve('../../app/data/dockerfiles.js');
+const simpleGitModulePath = require.resolve('simple-git');
+const realSimpleGit = require('simple-git');
+let testModule;
 const f1 = fs.readFileSync(path.join(filesPath, 'basedir', 'internaldir', 'my.cnf'));
 const f2 = fs.readFileSync(path.join(filesPath, 'basedir', 'internaldir', 'my.cnf3'));
 const testDockerfileTemplate = "FROM alpine:latest";
@@ -57,8 +60,44 @@ describe('Dockerfile test', () => {
     chai.use(require('chai-fs'));
     appChecker.initErrors();
     appChecker.initConditions();
+    require.cache[simpleGitModulePath] = {
+      id: simpleGitModulePath,
+      filename: simpleGitModulePath,
+      loaded: true,
+      exports: (basePath) => ({
+        silent() {
+          return this;
+        },
+        clone(gitUrl, name, options, cb) {
+          const repoPath = path.join(basePath, name);
+          fs.mkdirSync(repoPath, { recursive: true });
+          fs.mkdirSync(path.join(repoPath, '.git'), { recursive: true });
+
+          if (gitUrl === 'https://github.com/giper45/dsp_dockerfile_test.git') {
+            fs.writeFileSync(path.join(repoPath, 'Dockerfile'), 'FROM git\n');
+          } else if (gitUrl === 'https://github.com/giper45/DSP_Repo.git') {
+            fs.writeFileSync(path.join(repoPath, 'README.md'), '# fixture\n');
+          } else {
+            return process.nextTick(() => cb(new Error(`Unexpected git fixture: ${gitUrl}`)));
+          }
+
+          return process.nextTick(() => cb(null, { cloned: true }));
+        }
+      })
+    };
+    delete require.cache[dockerfilesModulePath];
+    testModule = require('../../app/data/dockerfiles.js');
 
     done();
+  });
+  after(() => {
+    require.cache[simpleGitModulePath] = {
+      id: simpleGitModulePath,
+      filename: simpleGitModulePath,
+      loaded: true,
+      exports: realSimpleGit
+    };
+    delete require.cache[dockerfilesModulePath];
   });
   beforeEach((done) => {
     helper.start();
@@ -232,13 +271,17 @@ describe('Dockerfile test', () => {
       }
     ];
       testModule.getDockerfile('complex', (err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.be.eql(ret);
-        done()
+        try {
+          expect(err).to.be.null;
+          expect(res).to.be.eql(ret);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
-    });
+    }).timeout(5000);
 
-    it.only('Should save all the content structure', (done) => {
+    it('Should save all the content structure', (done) => {
       const testPath = path.join(dockerfilesDir, 'existent');
       const tempdir = path.join(dockerfilesDir, '.tmpdir');
 

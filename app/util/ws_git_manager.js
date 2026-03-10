@@ -5,7 +5,7 @@ const repoData = require('../data/repos.js');
 const localConfig = require('../../config/local.config.json');
 const async = require('async');
 const fs = require('fs');
-const rimraf = require('rimraf');
+const { removePath, removePathSync } = require('./rimraf_compat');
 const Checker = require('../util/AppChecker');
 const AppUtils = require('../util/AppUtils');
 const GitUtils = require('../util/GitUtils');
@@ -79,13 +79,13 @@ const api = {
       if (err) {
         log.error('ERROR, RECOVER OLD PATH');
         if(!(err.name === 'invalidSshAuth' || err.name === 'invalidHttpAuth' || err.name === 'invalidGitUrl')) {
-          rimraf.sync(userPath);
+          removePathSync(userPath);
           fs.renameSync(tmpUserDir, userPath);
         }
         callback(err);
       }
       else {
-        rimraf(tmpUserDir, callback);
+        removePath(tmpUserDir, callback);
       }
     });
   },

@@ -23,6 +23,7 @@ const treeRoutes = require('./app/handlers/tree_routes.js');
 const Checker = require('./app/util/AppChecker.js');
 const multer = require('multer');
 const webSocketHandler = require('./app/util/ws_handler.js');
+const wsInstallationHandler = require('./app/util/ws_installation.js');
 const localConfig = require('./config/local.config.json');
 const healthChecker = require('./app/util/HealthLabState.js');
 const errorHandler = require('express-error-handler');
@@ -38,6 +39,97 @@ const dockerSocket = require('./app/util/docker_socket');
 
 // const webshellConfigFile =
 const log = AppUtils.getLogger();
+
+function isTruthyEnv(value) {
+  if (!value) {
+    return false;
+  }
+  const normalized = String(value).trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function getOrCreateAutoInstallConfig() {
+  const configPath = AppUtils.path_userconfig();
+  try {
+    return AppUtils.getConfigSync();
+  } catch (err) {
+    if (err && err.code === 'ENOENT') {
+      const defaultConfig = {
+        name: 'dsp-app',
+        mainDir: process.env.DSP_BASEDIR ? 'dsp' : '.dsp',
+        githubURL: '',
+        dockerRepo: 'dockersecplayground'
+      };
+      fs.mkdirSync(path.dirname(configPath), { recursive: true });
+      fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
+      log.warn(`DSP_AUTOINSTALL enabled and config file missing, created default config at ${configPath}`);
+      return defaultConfig;
+    }
+    throw err;
+  }
+}
+
+function startAutoInstallationIfEnabled(done) {
+  if (!isTruthyEnv(process.env.DSP_AUTOINSTALL)) {
+    return done(null);
+  }
+
+  Checker.isInstalled((installed) => {
+    if (installed) {
+      log.info('DSP_AUTOINSTALL enabled, installation skipped because DSP is already installed');
+      return done(null);
+    }
+
+    let config;
+    try {
+      config = getOrCreateAutoInstallConfig();
+    } catch (err) {
+      log.error(`DSP_AUTOINSTALL enabled but cannot read config file at ${AppUtils.path_userconfig()}: ${err.message}`);
+      return done(err);
+    }
+
+    log.info(`DSP_AUTOINSTALL enabled, starting automatic installation using ${AppUtils.path_userconfig()}`);
+    wsInstallationHandler.installation(
+      config,
+      {},
+      (err) => {
+        if (err) {
+          log.error(`Automatic installation failed: ${err.message}`);
+          return done(err);
+        } else {
+          log.info('Automatic installation completed successfully');
+          return done(null);
+        }
+      },
+      (progressLine) => {
+        if (progressLine) {
+          log.info(progressLine.toString().trim());
+        }
+      }
+    );
+  });
+}
+
+function startHealthCheckerIfInstalled() {
+  Checker.isInstalled((isInstalled) => {
+    if (!localConfig.config.test && isInstalled) {
+      healthChecker.run((err) => {
+        if (err) {
+          log.error('Health checker error!');
+          log.error(err);
+        }
+      });
+    }
+  });
+}
+
+function startServer() {
+  server.listen(port, host, () => {
+    if (localConfig.config.test) { log.warn('Testing mode enabled'); }
+    log.info(`Server listening on ${host}:${port}`);
+  });
+}
+
 app.use(busboy());
 // Initialize the checker
 Checker.init((err) => {
@@ -45,17 +137,13 @@ Checker.init((err) => {
     console.error(err.message);
     throw err;
   }
-});
-// If is installed start the healtChecker
-Checker.isInstalled((isInstalled) => {
-  if (!localConfig.config.test && isInstalled) {
-    healthChecker.run((err) => {
-      if (err) {
-        log.error('Health checker error!');
-        log.error(err);
-      }
-    });
-  }
+  startAutoInstallationIfEnabled((autoInstallErr) => {
+    if (autoInstallErr) {
+      throw autoInstallErr;
+    }
+    startHealthCheckerIfInstalled();
+    startServer();
+  });
 });
 
 // app.use(multipart({
@@ -256,9 +344,4 @@ webSocketHandler.init(server);
 dockerSocket.init(server);
 // Set COMPOSE_INTERACTIVE_NO_CLI=1
 process.env.COMPOSE_INTERACTIVE_NO_CLI = 1
-
-server.listen(port, host, () => {
-  if (localConfig.config.test) { log.warn('Testing mode enabled'); }
-  log.info(`Server listening on ${host}:${port}`);
-});
 

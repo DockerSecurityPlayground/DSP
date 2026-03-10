@@ -57,6 +57,9 @@ function graphRenameProperty(cells, oldName, newName) {
 // Update the name of the cell
 function Graph__update(cell, newName, oldName) {
   Graph__log("Graph__update()")
+  if (!cell) {
+    return;
+  }
   console.log(cell);
   console.log(cell.children);
   
@@ -65,14 +68,17 @@ function Graph__update(cell, newName, oldName) {
   if(Model__AppScope)
     var container = Model__AppScope.getContainer(newName);
 
-    if (cell.type == NETWORK_ELEMENT_TYPE) {
+    if (cell.type == NETWORK_ELEMENT_TYPE && cell.children) {
       // Get network connectors
       cell.children.forEach(function (interface) {
-        if (interface.edges) {
+        if (interface.edges && interface.edges.length > 0) {
           edge = interface.edges[0];
+          if (!edge || !edge.target || !edge.parent || !edge.parent.children) {
+            return;
+          }
           var networkName = edge.target.id;
           const network = _.findWhere(edge.parent.children, {id: networkName});
-          if (container && container.networks) {
+          if (container && container.networks && network) {
           const containerNetwork = container.networks[network.name];
           Graph__setEdgeLabel(theGraph, edge, containerNetwork)
           }
@@ -232,10 +238,19 @@ function Graph__updateLabels(appScope) {
   var elements = _.where(model.cells, {type : NETWORK_ELEMENT_TYPE });
   _.each(elements, function (e) {
     _.each(e.children, function(interface) {
+      if (!interface.edges || interface.edges.length === 0) {
+        return;
+      }
       var edge = interface.edges[0];
+      if (!edge || !edge.parent || !edge.parent.children) {
+        return;
+      }
       const containerName = e.name;
       const container = appScope.getContainer(containerName);
       const network = _.findWhere(edge.parent.children, {type: "Network"})
+      if (!container || !container.networks || !network) {
+        return;
+      }
       const containerNetwork = container.networks[network.name];
       
       Graph__setEdgeLabel(theGraph, edge, containerNetwork)

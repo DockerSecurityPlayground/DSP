@@ -13,6 +13,7 @@ const ncp = require('ncp').ncp;
 const dockerFiles = require('../data/docker_filesToCopy.js');
 const pathExists = require('path-exists');
 const appUtils = require('../util/AppUtils.js');
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 const multipart = require('connect-multiparty');
 const LabStates = require('../util/LabStates.js');
 const util = require('util');
@@ -352,12 +353,12 @@ function importLab(req, res) {
     },
     // get all labels of lab to import
     (cb) => {
-      jsonfile.readFile(path.join(srcPath, 'labels.json'), cb);
+      readFileWithRetry(path.join(srcPath, 'labels.json'), cb);
     },
     (jsonData, cb) => {
       labelsOfImportedLab = jsonData.labels;
       // Userpath labels
-      jsonfile.readFile(path.join(userPath, 'labels.json'), cb);
+      readFileWithRetry(path.join(userPath, 'labels.json'), cb);
     },
     (jsonRet, cb) => {
       labelsUser = jsonRet.labels;

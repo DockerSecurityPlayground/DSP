@@ -10,7 +10,7 @@ const StreamZip = require('node-stream-zip')
 const labelData = require('./labels.js');
 const networkData = require('./network');
 const config = require('./config.js');
-const rimraf = require('rimraf');
+const { removePath } = require('../util/rimraf_compat');
 const unzipper = require('unzipper');
 const _ = require('underscore');
 const appUtils = require('../util/AppUtils');
@@ -180,7 +180,7 @@ function mvLab(labName, tmpName, callback) {
   });
 }
 function deleteTempLab(tmpName, callback) {
-  rimraf(path.join(os.tmpdir(), tmpName), callback);
+  removePath(path.join(os.tmpdir(), tmpName), callback);
 }
 
 function restoreLab(tmpName, labName, callback) {
@@ -266,14 +266,16 @@ function newLab(name, information, callback) {
       jsonfile.writeFile(pathToWrite, infos, cb);
     },
     // Create initial state
-    (cb) => {
+    (prevResult, cb) => {
+      const next = (typeof cb === 'function') ? cb : prevResult;
       const repoName = path.basename(up);
-      LabStates.newState(repoName, name, 'NO_NETWORK', cb);
+      LabStates.newState(repoName, name, 'NO_NETWORK', next);
     },
     // Create label file
-    (cb) => {
+    (prevResult, cb) => {
+      const next = (typeof cb === 'function') ? cb : prevResult;
       const nameLabel = path.join(up, name, c.config.name_labelfile);
-      labelData.initLabels(nameLabel, cb);
+      labelData.initLabels(nameLabel, next);
     }],
     (err) => {
       callback(err)
@@ -371,7 +373,7 @@ function deleteLab(name, callback) {
     (up, cb) => {
       userPath = up;
       const toDelete = path.join(userPath, name);
-      rimraf(toDelete, cb);
+      removePath(toDelete, cb);
     },
     (cb) => {
       LabStates.exists(path.basename(userPath), name, cb);

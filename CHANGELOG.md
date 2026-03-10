@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
  * Fix of Angular WebSocket Code during installation long running
  * New terminal on a new tab in visual editor     
  * Fix the .data bug (delete when .data is empty)   
+## [3.9.0]
+### Changed
+- Comprehensive update of libraries and dependencies to enhance security and performance.
+- Regression bugs fixes
+- Terminal using new xtermjs and removed node-pty deoendency, now the terminal is more stable and responsive.
 
 ## [3.8.3]
 ### Fixed   

@@ -132,22 +132,6 @@ tests use helper.start() method to initialize the test environment:
 * homedir directory is mocked, in this way it is possible to use internal dsp directory for tests.   
 
 ### Troubleshooting  
-#### During dependencies installation   
-
-If you have error regarding **node-pty** module, try to:   
-- Install build-essentials : (In Ubuntu: apt install -y build-essentials)  
-- Use nodejs LTS (note-pty has some isseus, as shown [here](https://github.com/microsoft/node-pty/issues/319) 
-
-If you have the following error: 
-``` 
-ERR! typeerror Error: Missing required argument #1  
-```  
-You need to update nodejs:  
-``` 
-sudo apt-get install -y python-software-properties
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash
-sudo apt-get install nodejs
-```
 
 #### During DSP installation
 If you have the following error during the installation:   
@@ -214,20 +198,6 @@ MacBook-Pro:DockerSecurityPlayground gaetanoperrone$ npm install ws@3.3.2 --save
 ```
 Other info here: [http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlayground_1/wikis/docker-operation-errors)  
 
-
-### node-pty issues
-The application is based on [node-pty](https://github.com/microsoft/node-pty) pseudoterminal, that is subjected to several compilation errors. 
-In order to compile you need to install the compilation toolchain for Ubuntu: 
-``` 
-apt-get install -y build-essential
-``` 
-
-And the `XCode` for macOS users. 
-
-
-Please, follow the library documentation guide to fix the compilation errors that could occurr when you run `npm install` command. 
-Here some potential issues: 
-* `error: no template named 'remove_cv_t' in namespace 'std'; did you mean 'remove_cv'?` : try to use the `C++ v17` : `env CXXFLAGS="-std=c++17"  npm i ` 
 
 ## Contributing
 
