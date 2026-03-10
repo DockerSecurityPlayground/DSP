@@ -32,7 +32,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   {
     $scope.labName = $routeParams.namelab;
   }
-  //Redirect to managment projects
+  // Redirect to project management
   else redirectToMain()
 
 
@@ -40,7 +40,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     $window.location.href="/index.html"
   }
 
-  /* DODCKER API INIT  : load docker images */
+  /* Docker API init: load Docker images */
   dockerAPIService.getDockerImages()
     .then(function successCallback(response) {
       var imageList = response.data.data
@@ -56,7 +56,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       // if(params.action && (params.action==='edit' || params.action ==='new')) {
       // Edit a lab
       if(!createNew) {
-        ////When imageList it's loded load lab
+        // Once imageList is loaded, load the lab
         dockerAPIService.loadLab($scope.labName, true, function(data) {
 
           $scope.canvas = data.canvasJSON;
@@ -72,7 +72,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           yamlcode.text(data.yamlfile)
           Prism.highlightAll();
           $scope.yamlfile = data.yamlfile;
-          // If exists a networkList add the netwokr list
+          // If networkList exists, load it
           if(data.networkList)
             NetworkManagerService.setNetworkList(data.networkList)
           $scope.networkList =  NetworkManagerService.getNetworks()
@@ -102,7 +102,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
       // }
     },
       function errorCallback(response) {
-        Notification({message:"Sorry,  error in loading docker images"}, 'error');
+        Notification({message:"Sorry, error loading Docker images"}, 'error');
       })
 
 
@@ -148,7 +148,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
   }
   $scope.deleteNetwork = function(name) {
     if($scope.isNetworkAttached(name))
-      Notification({message:"Cannot delete an used network pls delete first the associated containers:"+containersName}, 'error');
+      Notification({message:"Cannot delete a network in use. Delete the associated containers first: " + containersName}, 'error');
     else {
       NetworkManagerService.removeNetwork(name)
       containerManager.deleteNetworkFromContainers(name)
@@ -173,7 +173,7 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
     $log.warn("TODO UPDATE NAME")
     //Reset n
     $scope.n.name = networkName
-    //Update informations network of containers
+    // Update container network information
     containerManager.newNetworkOccurred(network)
     return {name:networkName, subnet:$scope.n.subnet};
   };
@@ -200,7 +200,7 @@ window.location.href = urlToGo;
     networkToEdit.name = $scope.n.name;
     networkToEdit.subnet = s;
     networkToEdit.listIP = NetworkManagerService.genList(networkToEdit.subnet)
-    // Callback to graphedit
+    // Callback to the graph editor
     $scope.graphEditTerminatedCallback(networkInEditing.name, networkInEditing, $scope.n);
     // Reset current container
 
@@ -270,7 +270,7 @@ window.location.href = urlToGo;
 
   //Load image list
   $scope.currentContainer = containerManager.currentContainer
-  //The list of possible contaier choices to draw
+  // The list of possible container choices to draw
   $scope.containerListNotToDraw =  containerManager.containerListNotToDraw
   //The list already created
   $scope.containerListToDraw = containerManager.containerListToDraw
@@ -303,7 +303,7 @@ window.location.href = urlToGo;
     }
     catch (e) {
       console.log(e)
-      Notification({message:"Pls insert correct values"}, 'error');
+      Notification({message:"Please enter valid values"}, 'error');
     }
   }
 
@@ -314,7 +314,7 @@ window.location.href = urlToGo;
     $scope.optionalPorts.splice($index, 1);
 
   }
-  //On click edit load the ports by filtering port of image
+  // On edit, load ports that are not exposed by the selected image
   function loadOptionalPorts(ports, selectedImage) {
     var exposedPorts = selectedImage.exposedPorts;
     _.each(ports, function(k, v) {
@@ -346,7 +346,7 @@ window.location.href = urlToGo;
 
     var found = containerManager.hasContainer()
 
-    //If there already is a container with this name  and new
+    // If a new container already uses this name
 
     if(found && $scope.isAddContainer)
     {
@@ -367,11 +367,11 @@ window.location.href = urlToGo;
      return  _.findWhere($scope.containerListToDraw, {name: name});
   }
 
-  /* Called when the container is edit
+  /* Called when a container is edited
    *
    */
   $scope.editContainer = function editContainer() {
-    //Add to current container infos about container list not drawed selected
+    // Reset optional ports for the selected container
     $scope.optionalPorts = [];
     $scope.optPort = { container: '', host: ''};
 
@@ -383,10 +383,10 @@ window.location.href = urlToGo;
     var oldName = containerToEdit.name;
     // If the name has been changed check if already exists
     if (oldName != $scope.currentContainer.name && _.findWhere($scope.containerListToDraw, {name: $scope.currentContainer.name})) {
-      Notification({message:"Sorry, network element with this name already present"}, 'error');
+      Notification({message:"Sorry, an element with this name already exists"}, 'error');
     } else {
       containerManager.setContainer($scope.currentContainer, containerToEdit);
-      // Callback to graphedit
+      // Callback to the graph editor
       $scope.graphEditTerminatedCallback(oldName, containerToEdit, $scope.currentContainer);
       // Reset current container
       containerManager.resetCurrent($scope.imageList, $scope.networkList);
@@ -394,7 +394,7 @@ window.location.href = urlToGo;
       $scope.currentAction = protoAddAction;
       // Don't show the container panel
       $scope.showEditContainer = false;
-      Notification({message: containerToEdit.name+ " modified!"}, 'success');
+      Notification({message: containerToEdit.name + " updated!"}, 'success');
       MX__Save();
     }
 
@@ -403,7 +403,7 @@ window.location.href = urlToGo;
 
     $scope.cancelEditContainer = function cancelEditContainer() {
       //Add
-      console.log("Cancel Edit Container");
+      console.log("Cancel container edit");
       $scope.optPort = { container: '', host: ''};
       $scope.optionalPorts = [];
       containerManager.resetCurrent($scope.imageList, $scope.networkList)
@@ -422,7 +422,7 @@ window.location.href = urlToGo;
 
   $scope.newContainer = function newContainer(nameContainer) {
     if(_.findWhere($scope.containerListToDraw, {name: nameContainer})) {
-      Notification({message:"Sorry, network element with this name already present"}, 'error');
+      Notification({message:"Sorry, an element with this name already exists"}, 'error');
     } else {
       $scope.optionalPorts = [];
       $scope.optPort = { container: '', host: ''};
@@ -440,7 +440,7 @@ window.location.href = urlToGo;
       var env = [];
       c.environments = env
 
-      ////Add to not drawed new container
+      //// Add the new container to the drawable list
       containerManager.addToDraw(c)
       Notification({message: c.name+ " created!"}, 'success');
       return c;
@@ -479,7 +479,7 @@ window.location.href = urlToGo;
     //	})
 
 
-    //Add to not drawed new container
+    // Add the new container to the hidden list
     containerManager.addToNotToDraw(c)
 
 
@@ -1191,7 +1191,7 @@ window.location.href = urlToGo;
     //else infoService.updateOK()
   }
   /** END MENU COMMAND ACTIONS HANDLING ****/
-  /** DIR MANAGMENT PATHS **/
+  /** DIRECTORY MANAGEMENT PATHS **/
   var currentFileToUpload = ''
   $scope.currentFileInContainer = { data:'/', afterAction:false}
 
@@ -1236,7 +1236,7 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
       console.log(_l.id)
     })
   }
-  // Tab managment
+  // Tab management
   $scope.tabs = ['active', '', '', '', '', '', ''];
   $scope.elementTabChange = function (tabId) {
     for (i = 0; i < $scope.tabs.length; i++) {
@@ -1270,7 +1270,7 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
         Notification("Images updated", 'success');
 
       }, function errorCallback(response) {
-        Notification({message:"Sorry,  error in loading docker images"}, 'error');
+        Notification({message:"Sorry, error loading Docker images"}, 'error');
       })
   }
 

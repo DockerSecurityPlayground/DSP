@@ -1,5 +1,5 @@
 CACHE ?=
-VERSION ?= 3.8.3
+VERSION ?= 3.10.0
 PLATFORMS ?= linux/amd64,linux/arm64
 
 build:

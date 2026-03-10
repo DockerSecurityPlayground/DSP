@@ -58,7 +58,7 @@ function _cancelActivePulls(params, notifyCallback) {
 
   pullState.cancelled = true;
   if (typeof notifyCallback === 'function') {
-    notifyCallback('Interruzione download immagini in corso...\n');
+    notifyCallback('Cancelling image downloads...\n');
   }
   pullState.children.forEach((child) => {
     try {
@@ -84,14 +84,14 @@ function _pullMissingImages(params, missingImages, notifyCallback, callback) {
   async.eachSeries(missingImages, (imageRef, eachCb) => {
     const pullState = activeImagePulls[key];
     if (!pullState || pullState.cancelled) {
-      eachCb(new Error('Download immagini interrotto dall\'utente'));
+      eachCb(new Error('Image download cancelled by user'));
       return;
     }
 
     const parsed = _splitImageAndTag(imageRef);
     const fullName = `${parsed.name}:${parsed.tag}`;
     if (typeof notifyCallback === 'function') {
-      notifyCallback(`Scarico immagine mancante ${fullName}...\n`);
+      notifyCallback(`Pulling missing image ${fullName}...\n`);
     }
 
     const child = cmdUtils.cmd(`docker pull ${fullName}`, (err) => {
@@ -103,7 +103,7 @@ function _pullMissingImages(params, missingImages, notifyCallback, callback) {
 
       const canceled = state && state.cancelled;
       if (canceled) {
-        eachCb(new Error('Download immagini interrotto dall\'utente'));
+        eachCb(new Error('Image download cancelled by user'));
       } else {
         eachCb(err);
       }
