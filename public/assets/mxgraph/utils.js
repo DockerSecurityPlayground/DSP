@@ -98,6 +98,10 @@ function graphEditCallback(oldName, obj, newObj) {
     console.log(theCell);
     
   }
+  if (!theCell) {
+    console.warn("[mxgraph] graphEditCallback: cell not found", oldName, obj, newObj);
+    return;
+  }
   // Update the cell name
   Graph__update(theCell, newObj.name, oldName);
 }

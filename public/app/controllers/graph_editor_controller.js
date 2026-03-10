@@ -376,6 +376,10 @@ window.location.href = urlToGo;
     $scope.optPort = { container: '', host: ''};
 
     var containerToEdit = _.findWhere($scope.containerListToDraw, {name: $scope.editContainerName});
+    if (!containerToEdit || !$scope.currentContainer) {
+      Notification({message:"Sorry, selected container is no longer available"}, 'error');
+      return;
+    }
     var oldName = containerToEdit.name;
     // If the name has been changed check if already exists
     if (oldName != $scope.currentContainer.name && _.findWhere($scope.containerListToDraw, {name: $scope.currentContainer.name})) {
@@ -718,6 +722,9 @@ window.location.href = urlToGo;
     }
   }
   $scope.changedImage = function(image) {
+    if (!$scope.currentContainer || !image || !image.actions) {
+      return;
+    }
     //Every time delete actions form currentContainer
     var oldActions = $scope.currentContainer.actions;
     $scope.currentContainer.actions = [];
@@ -950,7 +957,11 @@ window.location.href = urlToGo;
       //Eventually redirect to edit
 
 
-      var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
+        var containerToEdit = _.findWhere($scope.containerListToDraw, {name: containerName})
+        if (!containerToEdit) {
+          Notification({message:"Sorry, selected container is no longer available"}, 'error');
+          return;
+        }
       // THe OLD NAME
       $scope.editContainerName = containerToEdit.name;
       // It' the string EDIT LAB , no action of docker !
@@ -1248,8 +1259,14 @@ $scope.currentContainer.filesToCopy.splice( index, 1 )
         var imageList = response.data.data
         $scope.imageList = imageList
         console.log(imageList)
+        if (!p || !p.name) {
+          Notification({message:"Images updated"}, 'success');
+          return;
+        }
         var image = _.findWhere(imageList,{name: p.name})
-        containerManager.update(image)
+        if (image) {
+          containerManager.update(image)
+        }
         Notification("Images updated", 'success');
 
       }, function errorCallback(response) {
