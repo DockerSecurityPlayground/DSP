@@ -4,6 +4,7 @@ const jsonfile = require('jsonfile');
 const _ = require('underscore');
 const path = require('path');
 const AppUtils = require('../util/AppUtils.js');
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 
 const ERR_NOT_FOUND = new Error('labels not found');
 
@@ -70,7 +71,7 @@ const getLabels = function getLabels(labelname, callback) {
   log.info(`[DATA get labels of ${labelname}]`);
   async.waterfall([
     // If success open JSON File
-    (cb) => jsonfile.readFile(labelname, cb),
+    (cb) => readFileWithRetry(labelname, cb),
   ],
   // Ok it's terminated with an   array of objects
   (err, arrayJSON) => {

@@ -429,7 +429,8 @@ window.location.href = urlToGo;
         actions : angular.copy($scope.currentContainer.actions),
         volumes : angular.copy($scope.currentContainer.volumes),
         filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-        networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
+        networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+        keepAlive: !!$scope.currentContainer.keepAlive
       };
       $
       var env = [];
@@ -454,7 +455,8 @@ window.location.href = urlToGo;
       actions : angular.copy($scope.currentContainer.actions),
       volumes : angular.copy($scope.currentContainer.volumes),
       filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
-      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks))
+      networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+      keepAlive: !!$scope.currentContainer.keepAlive
     };
     $
     var env = [];

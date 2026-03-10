@@ -8,6 +8,7 @@ const Checker = require('../util/AppChecker');
 const LabStates = require('../util/LabStates');
 const fs = require('fs');
 const appUtils = require('../util/AppUtils.js');
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 const { getNetwork } = require('../lib/mydockerjs/lib/docker');
 
 function networkExists(namerepo, namelab, callback) {
@@ -59,7 +60,7 @@ function get(namerepo, namelab, callback) {
       const networkfile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'network.json');
       yamlFile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'docker-compose.yml');
 
-      jsonfile.readFile(networkfile, cb);
+      readFileWithRetry(networkfile, cb);
     },
     (network, cb) => {
       // network = filterNetwork(network)

@@ -16,6 +16,41 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.currentName = "";
   $scope.active = 0;
   $scope.isAlertClosed = false;
+  $scope.isLabBootLoading = false;
+  var labBootLoadingStartedAt = 0;
+
+  function setLabBootLoading(isLoading) {
+    if (isLoading) {
+      labBootLoadingStartedAt = Date.now();
+      $scope.isLabBootLoading = true;
+      cfpLoadingBar.start();
+      return;
+    }
+
+    var minVisibleMs = 180;
+    var elapsedMs = Date.now() - labBootLoadingStartedAt;
+    var hideNow = function () {
+      SafeApply.exec($scope, function () {
+        $scope.isLabBootLoading = false;
+      });
+      cfpLoadingBar.complete();
+    };
+
+    // Wait for actual browser paint so splash does not disappear before UI render.
+    var hideAfterRender = function () {
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(hideNow);
+      } else {
+        window.setTimeout(hideNow, 20);
+      }
+    };
+
+    if (elapsedMs >= minVisibleMs) {
+      hideAfterRender();
+    } else {
+      window.setTimeout(hideAfterRender, minVisibleMs - elapsedMs);
+    }
+  }
   $scope.tags = [{
     name: "{{hostname}}",
     description: "it is converted to hostname (i.e. localhost) "
@@ -261,9 +296,18 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     }
     //Use
     else if (action === 'use') {
+      setLabBootLoading(true);
+      var bootImagesReady = false;
+      var bootPageReady = false;
+      function completeBootIfReady() {
+        if (bootImagesReady && bootPageReady) {
+          setLabBootLoading(false);
+        }
+      }
       vm.buttonAction = '';
       vm.isGoalEditShowed = false;
       vm.isSolutionEditShowed = false;
+      CurrentLabService.noImages = false;
       BreadCrumbs.breadCrumbs('/lab/use', $routeParams.namelab);
       initLabInformation($routeParams.repo);
       AjaxService.init()
@@ -289,29 +333,25 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
                 vm.exists = false;
+                bootImagesReady = true;
+                bootPageReady = true;
+                completeBootIfReady();
               } else {
-                dockerImagesService.areImagesInstalled(vm.repoName, vm.lab.name)
-                  .then(function success(data) {
-                    var areInstalled = data.data.data.areInstalled;
-                    if (!areInstalled) {
-                      console.log("NOT INSTALLED");
-                      CurrentLabService.noImages = true;
-                      vm.editVisible = false;
-                    } else {
-                      dockerImagesService.get(function (images) {
-                        $scope.interactiveImageList = images;
-                      });
-
-                      dockerAPIService.getListHackTools()
-                        .then(function successCallback(response) {
-                          console.log("LIST TOOLS");
-                          $scope.imageList = response.data.data.images;
-                          $scope.listTools = response.data.data.images;
-                        });
-                    }
-                  }, function error(err) {
-                    console.log(err);
+                // Skip pre-flight image checks for faster page opening.
+                // Missing images will be pulled during docker_up when Start lab is pressed.
+                CurrentLabService.noImages = false;
+                dockerImagesService.get(function (images) {
+                  $scope.interactiveImageList = images;
+                });
+                dockerAPIService.getListHackTools()
+                  .then(function successCallback(response) {
+                    console.log("LIST TOOLS");
+                    $scope.imageList = response.data.data.images;
+                    $scope.listTools = response.data.data.images;
+                  }, function errorCallback(response) {
                   });
+                bootImagesReady = true;
+                completeBootIfReady();
               }
               //Else go button
               // else	{
@@ -320,7 +360,9 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
               // }
             },
               function errorCallback(response) {
-
+                bootImagesReady = true;
+                bootPageReady = true;
+                completeBootIfReady();
               })
           //If username = repo name it's the user repo and it' possible to edit
           if (username === rname) {
@@ -348,6 +390,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
               if (labToUse.state === 'NO_NETWORK') {
                 vm.buttonAction = buttonCreateProto
                 vm.editVisible = false
+                bootPageReady = true;
+                completeBootIfReady();
               }
               // Else go button or images
               else {
@@ -363,6 +407,8 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                   yamlcode.text(data.yamlfile)
                   Prism.highlightAll();
                   $scope.yamlfile = data.yamlfile;
+                  bootPageReady = true;
+                  completeBootIfReady();
 
                 });
                 vm.buttonAction = buttonGoProto
@@ -384,6 +430,10 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.tinymceHtmlGoal = '';
                 vm.tinymceHtmlSolution = '';
               }
+            }
+            else {
+              bootPageReady = true;
+              completeBootIfReady();
             }
             // dockerImagesService.getByLab(function(images) {
             //   if (images) {
@@ -417,7 +467,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
           }
         },
           function (err) {
-
+            setLabBootLoading(false);
           })
 
     }
@@ -770,9 +820,20 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
         completeLoad()
       }
       else if (data.status === 'error') {
-        Notification('Some error in docker-compose up command', 'error');
-        $scope.responseError = $scope.responseErrorHeader + data.message;
-        $scope.labError = true;
+        const errorMessage = (data.message || '').toLowerCase();
+        const wasCanceled =
+          errorMessage.indexOf('canceled by user') !== -1 ||
+          errorMessage.indexOf('interrotto dall\'utente') !== -1 ||
+          errorMessage.indexOf('download immagini interrotto') !== -1;
+        if (wasCanceled) {
+          Notification('Download immagini interrotto', 'warning');
+          $scope.labError = false;
+          $scope.responseError = '';
+        } else {
+          Notification('Some error in docker-compose up command', 'error');
+          $scope.responseError = $scope.responseErrorHeader + data.message;
+          $scope.labError = true;
+        }
         $scope.labState = playProto
         $scope.action = $scope.startLab
       }

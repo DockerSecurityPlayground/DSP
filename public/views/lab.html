@@ -9,6 +9,20 @@
     overflow-y: scroll;
     font-size: 0.9em;
   }
+  .lab-boot-splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+  }
 </style>
 <div id="page-wrapper">
   <script src="assets/mxgraph/common.js"> </script>
@@ -60,7 +74,14 @@
     </div>
 
 
-    <div class="{{labState.statusClass}}">
+    <div ng-show="isLabBootLoading" class="lab-boot-splash">
+      <div class="bs-callout bs-callout-info" style="max-width: 520px; width: 100%; margin: 0;">
+        <h4><i class="fa fa-fw fa-spinner fa-pulse"></i> DSP lab loading...</h4>
+        <p>Wait during lab boot and initialization</p>
+      </div>
+    </div>
+
+    <div ng-show="!isLabBootLoading" class="{{labState.statusClass}}">
       <div class="row">
         <div class="col-md-10">
           <h4><i class="{{labState.statusIcon}}"></i> {{labState.statusLabel}}</h4>
@@ -93,7 +114,7 @@
     <!-- <div ng-show="ctrl.isRunning === true" class="alert alert-success text-center"> <b>Lab is running </b></div> -->
     <!-- <div ng-show="ctrl.noImages === true" class="alert alert-warning text-center"> <b>Some images are not installed. Go to the <a href="/images#{{ctrl.lab.name}}">Images Manager</a></b></div> -->
 
-    <div class="row">
+    <div class="row" ng-show="!isLabBootLoading">
 
       <div ng-show="ctrl.actionVisible" class="col-sm-4">
         <!-- Panel edit options -->
@@ -121,7 +142,7 @@
 
     </div>
 
-    <div ng-show="CurrentLabService.noImages === true" class="panel panel-default">
+    <div ng-show="CurrentLabService.noImages === true && !isLabBootLoading" class="panel panel-default">
       <div class="panel-heading"><h5><i class="fa fa-fw fa-download"></i> Download Images</h5></div>
       <div class="panel-body">
         <images-component download="download"></images-component>

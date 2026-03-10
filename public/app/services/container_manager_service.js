@@ -13,7 +13,8 @@ var currentContainer = {
 		some_network_selected:false,
 		volumes : [],
 		filesToCopy : [],
-                isShellEnabled: true
+                isShellEnabled: true,
+                keepAlive: false
 	}
 
 var containerToDraw = null
@@ -64,6 +65,7 @@ function resetCurrent(imageList, networkList)
   };
 	currentContainer.filesToCopy = []
         currentContainer.isShellEnabled = true
+	currentContainer.keepAlive = false
 
 	//Zero select image
 	currentContainer.selectedImage = imageList[0]
@@ -164,6 +166,9 @@ return {
             if (ele.selectedImage && ele.selectedImage.name) {
                 var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
                 ele.selectedImage = imageSelected;
+                if (typeof ele.keepAlive === 'undefined') {
+                  ele.keepAlive = false;
+                }
                 clnd.push(ele)
           }
     })
@@ -171,6 +176,9 @@ return {
 
 			var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
 			ele.selectedImage = imageSelected;
+			if (typeof ele.keepAlive === 'undefined') {
+			  ele.keepAlive = false;
+			}
 		   cld.push(ele)
 		})
 	},

@@ -12,7 +12,7 @@ const pathExists = require('path-exists');
 const dockerSocket = require('../util/docker_socket');
 const dockerImages = require(`${appRoot}/app/data/docker-images`);
 const zipdir = require('zip-dir');
-const rimraf = require('rimraf');
+const { removePath } = require('../util/rimraf_compat');
 //const zipFolder = require('zip-folder');
 const fs = require('fs');
 
@@ -232,7 +232,7 @@ function dockercopy(req, res) {
     (wasDir, cb) => {
     // Zip has been saved, destroy directory
      if(wasDir) {
-       rimraf(destinationPath, cb);
+      removePath(destinationPath, cb);
        destinationPath = `${destinationPath}.zip`;
      }
      else cb(null);

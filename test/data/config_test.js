@@ -7,8 +7,12 @@ const appRoot = require('app-root-path');
 const appChecker = require(`${appRoot}/app/util/AppChecker`);
 const helper = require('../helper');
 
-
-const obj = { name: 'usertest', mainDir: 'dsp', githubURL: 'http://eoifnaeoinefo.com' };
+const obj = {
+  name: 'usertest',
+  mainDir: 'dsp',
+  dockerRepo: '',
+  githubURL: 'http://eoifnaeoinefo.com'
+};
 const testPath = path.join(appRoot.toString(), 'test', 'testDSPDir', 'test');
 describe('configTest', () => {
   before((done) => {
@@ -26,13 +30,21 @@ describe('configTest', () => {
   // End before
   it('should update configuration', (done) => {
     configData.updateConfig(obj, (err) => {
-      expect(err).to.be.eql(null);
+      try {
+        expect(err).to.be.eql(null);
 
-      configData.getConfig((errTwo, ret) => {
-        expect(errTwo).to.be.eql(null);
-        expect(ret).to.be.eql(obj);
-        done();
-      });
+        configData.getConfig((errTwo, ret) => {
+          try {
+            expect(errTwo).to.be.eql(null);
+            expect(ret).to.be.eql(obj);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      } catch (e) {
+        done(e);
+      }
     });
   });
 

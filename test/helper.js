@@ -3,17 +3,14 @@ const execSync = require('child_process').execSync;
 const path = require('path');
 const jsonfile = require('jsonfile');
 const fs = require('fs');
-const proxyquire = require('proxyquire')
 const homedir = require('homedir');
-const sinon = require ('sinon');
-const stub = sinon.stub;
 
 const appUtils  = require('../app/util/AppUtils.js');
 const dspProjects = 'DSP_Projects';
 const localhost = 'http://localhost:8080';
 const api = '/dsp_v1';
-let pathStub;
-let pathHome;
+let originalPathUserconfig;
+let originalGetHome;
 
 const mkdir = (dir) => {
   // making directory without exception if exists
@@ -51,9 +48,7 @@ const rmdir = (dir) => {
 
 
 const copy = (src, dest) => {
-  const oldFile = fs.createReadStream(src);
-  const newFile = fs.createWriteStream(dest);
-  oldFile.pipe(newFile);
+  fs.copyFileSync(src, dest);
 };
 const copyDir = (src, dest) => {
   mkdir(dest);
@@ -147,11 +142,14 @@ module.exports = {
   initStubs() {
     // Create file config
     const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
-    // Stub path_userconfig
-    pathStub = stub(appUtils, 'path_userconfig')
-    pathStub.callsFake(() => jsonPath)
-    pathHome = stub(appUtils, 'getHome')
-    pathHome.callsFake(() => path.join(appRoot.toString(), 'test'))
+    if (!originalPathUserconfig) {
+      originalPathUserconfig = appUtils.path_userconfig;
+    }
+    if (!originalGetHome) {
+      originalGetHome = appUtils.getHome;
+    }
+    appUtils.path_userconfig = () => jsonPath;
+    appUtils.getHome = () => path.join(appRoot.toString(), 'test');
   },
   start() {
     const testConfig = {
@@ -163,10 +161,7 @@ module.exports = {
     // Create file config
     const jsonPath = path.join(appRoot.toString(), 'test', 'test_user.json');
     jsonfile.writeFileSync(jsonPath, testConfig);
-    const proxy = proxyquire('module', {
-      'hd' : homedir
-    });
-    if (!pathStub) {
+    if (!originalPathUserconfig || !originalGetHome) {
       this.initStubs()
     }
     const projectTestOrig = path.join(appRoot.toString(), 'test', 'testDSPDir_orig');
@@ -184,6 +179,14 @@ module.exports = {
     if (fs.existsSync(projectTestDir)) {
       rmdir(projectTestDir);
       fs.unlinkSync(path.join(appRoot.toString(), 'test', 'test_user.json'));
+    }
+    if (originalPathUserconfig) {
+      appUtils.path_userconfig = originalPathUserconfig;
+      originalPathUserconfig = null;
+    }
+    if (originalGetHome) {
+      appUtils.getHome = originalGetHome;
+      originalGetHome = null;
     }
   },
   resetUserLabels() {

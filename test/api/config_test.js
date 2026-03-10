@@ -44,7 +44,7 @@ describe('config test', () => {
   });
 
   // GET LABELS REPO
-  it.only('Should change configuration file', (done) => {
+  it('Should change configuration file', (done) => {
     // DSP_TESTING_DIR Exists as assumption
     expect(helper.projectTestDir()).to.be.a.path();
     const oldProjectDir = helper.projectTestDir();

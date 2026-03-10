@@ -1,9 +1,10 @@
 const async = require('async');
 const jsonfile = require('jsonfile');
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 
 const getSnippets = function getSnippets(snippetsname, callback) {
     async.waterfall([
-        (cb) => jsonfile.readFile(snippetsname, callback)
+        (cb) => readFileWithRetry(snippetsname, cb)
     ],
     (err, arrayJSON) => {
         if (!arrayJSON || !arrayJSON.snippets) {

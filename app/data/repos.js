@@ -7,7 +7,8 @@ const ncp = require('ncp').ncp;
 const pathExists = require('path-exists');
 const appUtils = require('../util/AppUtils.js');
 const LabStates = require('../util/LabStates.js');
-const rimraf = require('rimraf');
+const { removePath } = require('../util/rimraf_compat');
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 
 const _ = require('underscore');
 
@@ -21,7 +22,7 @@ function get(cb) {
     (conf, cb) => {
       const repoFile = path.join(appUtils.getHome(), conf.mainDir, 'repos.json');
       cb(null, repoFile);
-    }, (repoFile, cb) => jsonfile.readFile(repoFile, cb)
+    }, (repoFile, cb) => readFileWithRetry(repoFile, cb)
     ], (err, jsonRepos) => {
       cb(err, jsonRepos);
   });
@@ -99,7 +100,7 @@ function remove(reponame, cb) {
       cb(null);
     },
     // Remove directory from the main directory
-    (cb) => rimraf(path.join(mainDir, reponame), cb),
+    (cb) => removePath(path.join(mainDir, reponame), cb),
     (cb) => get(cb),
     // Remove from repos.json
     (repos, cb) => {

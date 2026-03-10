@@ -5,7 +5,7 @@ const pathExists = require('path-exists');
 const cpFile = require('cp-file');
 const path = require('path');
 const httpHelper = require('help-nodejs').httpHelper;
-const rimraf = require('rimraf');
+const { removePath } = require('../util/rimraf_compat');
 const async = require('async');
 const Checker = require('../util/AppChecker');
 const appUtils = require('../util/AppUtils');
@@ -146,7 +146,7 @@ function deleteFile(req, res) {
       networkData.canDeleteFile(filename, (errCanDelete) => {
         if (errCanDelete) appUtils.response('DELETE FILE', res, errCanDelete);
         else if (stats.isDirectory()) {
-          rimraf(filename, (innerErr) => {
+          removePath(filename, (innerErr) => {
             appUtils.response('DELETE FILE', res, innerErr);
           });
         } else if (stats.isFile()) {

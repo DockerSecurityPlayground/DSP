@@ -196,6 +196,10 @@ function newStateSync(repoName, labName, state) {
 }
 
 function newState(repoName, labName, state, callback) {
+  if (typeof callback !== 'function') {
+    throw new TypeError('LabStates.newState requires a callback');
+  }
+  const done = _.once(callback);
   const log = appUtils.getLogger();
   log.info('[NEW STATE]');
   log.info(`Creating ${repoName} / ${labName}`);
@@ -216,8 +220,8 @@ function newState(repoName, labName, state, callback) {
           else jsonfile.writeFile(jsf, jsonArray, cb);
         });
       }
-    }], (err) => { 
-      callback(err);
+    }], (err) => {
+      done(err);
     })
 }
 

@@ -10,6 +10,7 @@ const helper = require('../helper');
 const _ = require('underscore');
 const chaiFS = require('chai-fs');
 const labStates = require('../../app/util/LabStates.js');
+const yaml = require('js-yaml');
 
 
 const testInfo = {
@@ -21,6 +22,7 @@ describe('LABS TEST', () => {
   before((d) => {
     appChecker.initErrors();
     appChecker.initConditions();
+    yaml.safeLoad = yaml.load;
     d();
   })
   beforeEach(function dd() {

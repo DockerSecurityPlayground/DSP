@@ -2,14 +2,12 @@ const jsonfile = require('jsonfile');
 const async = require('async');
 const path = require('path');
 const appUtil = require('../util/AppUtils');
-const Checker = require('../util/AppChecker');
-
-const AppConditions = Checker.AppConditions;
+const { readFileWithRetry } = require('../util/jsonfile_compat');
 
 const c = require('../../config/local.config.json');
 // It's used this method for different implementations after
 const getConfig = function getConfig(callback) {
-  jsonfile.readFile(appUtil.path_userconfig(), (err, obj) => {
+  readFileWithRetry(appUtil.path_userconfig(), (err, obj) => {
     if (err) callback(err);
     else callback(null, obj);
   });
@@ -47,10 +45,11 @@ const getLabelFile = function getLabelFile(callback) {
   });
 };
 const updateConfig = function updateConfig(data, callback) {
+  const Checker = require('../util/AppChecker');
   async.waterfall([
 
-    (cb) => AppConditions.check(data.mainDir, 'valid_path', cb),
-    (cb) => AppConditions.check(data.name, 'filetype', cb),
+    (cb) => Checker.AppConditions.check(data.mainDir, 'valid_path', cb),
+    (cb) => Checker.AppConditions.check(data.name, 'filetype', cb),
     // Read config file
     (cb) => {
       const config = {

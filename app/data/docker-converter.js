@@ -111,6 +111,9 @@ function JDCGetServices(containers) {
       stdin_open: true,
       tty: true,
     };
+    if (container.keepAlive) {
+      service.entrypoint = ['tail', '-f', '/dev/null'];
+    }
     const ports = JDCGetPorts(container);
     const dependencies = JDCGetDependencies(container);
 

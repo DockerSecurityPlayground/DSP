@@ -27,7 +27,7 @@ describe('Data Network Test', () => {
   });
   // Get original configuration
   it('should save data', (done) => {
-    networkData.save(testLab, testObj, null, (err) => {
+    networkData.saveWithoutCompose(testLab, testObj, (err) => {
       expect(err).to.be.null;
       done();
     });
@@ -36,9 +36,10 @@ describe('Data Network Test', () => {
   it('should read correct network description', (done) => {
     networkData.get(repoName, testLab, (err, results) => {
       expect(err).to.be.null;
-      expect(results.clistDrawed).to.be.eql(testObj.clistDrawed);
-      expect(results.clistNotDrawed).to.be.eql(testObj.clistNotDrawed);
-      expect(results.state).to.be.eql(labStates.STOPPED);
+      expect(results.clistToDraw).to.be.eql(testObj.clistToDraw);
+      expect(results.clistNotToDraw).to.be.eql(testObj.clistNotToDraw);
+      expect(results.canvasJSON).to.be.eql(testObj.canvasJSON);
+      expect(results.yamlfile).to.be.a('string');
       done();
     });
   });
@@ -89,9 +90,9 @@ describe('Data Network Test', () => {
     });
   });
   it('Should throw an exception if send no existend lab', (done) => {
-    networkData.save('noexistent', testObj, null, (err) => {
+    networkData.saveWithoutCompose('noexistent', testObj, (err) => {
       expect(err).not.to.be.null;
-      expect(err.message).to.contain('ENOENT');
+      expect(err.message).to.contain('State no found');
       done();
     });
   });
