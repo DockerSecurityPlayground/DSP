@@ -6,14 +6,14 @@ var Model__NETWORK_BASENAME = "network_";
 var Model__AppScope = null;
 var NETWORK_ELEMENT_TYPE = "NetworkElement";
 var NETWORK_TYPE = 'Network';
-var NETWORK_WIDTH = 140;
-var NETWORK_HEIGHT = 140;
+var NETWORK_WIDTH = 112;
+var NETWORK_HEIGHT = 112;
 var PORT_SIZE = 24;
 var theParent = null;
 var Graph__NetworkElementLabel = {
   type : NETWORK_ELEMENT_TYPE,
   contentHTML : '<h5 id="toptitle" class="no-selection" style="margin:0px;">'+NETWORK_ELEMENT_TYPE+'</h5><br>'+
-  '<img src="assets/docker_image_icons/host.png" width="48" height="48"><br><h7 id=element_info></h7>'
+  '<img src="assets/docker_image_icons/host.png" width="36" height="36"><br><h7 id=element_info></h7>'
 };
 var elementToEdit = '';
 var theGraph;
@@ -21,6 +21,24 @@ var theGraph;
 function Graph__log(msg) {
   console.log("[mxgraph]" + msg)
 
+}
+
+function Graph__ZoomIn() {
+  if (theGraph) {
+    theGraph.zoomIn();
+  }
+}
+
+function Graph__ZoomOut() {
+  if (theGraph) {
+    theGraph.zoomOut();
+  }
+}
+
+function Graph__ZoomActual() {
+  if (theGraph) {
+    theGraph.zoomActual();
+  }
 }
 
 function Graph__setEdgeLabel(graph, edge, containerNetwork) {
@@ -122,6 +140,13 @@ function Graph__update(cell, newName, oldName) {
    theGraph.model.setValue(cell, newValue)
  }
 
+  cell.name = newName;
+  if (cell.children) {
+    cell.children.forEach(function(interfaceCell) {
+      interfaceCell.name = newName;
+    });
+  }
+
   // Update the cell id
   cell.setId(newName);
   var cells = theGraph.model.cells
@@ -219,7 +244,7 @@ function Graph__ElementCreate(graph, obj, x, y) {
     v1.setConnectable(false);
 
     // Presets the collapsed size
-    v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
+    v1.geometry.alternateBounds = new mxRectangle(0, 0, 96, 32);
     Graph__addFirstPort(graph, v1, obj.name);
     Graph__addSecondPort(graph, v1, obj.name);
     Graph__addThirdPort(graph, v1, obj.name);
@@ -269,6 +294,41 @@ function Graph__isValidXML(canvasXML) {
   } else {
     return true;
   }
+}
+
+function _graphSortedUniqueNames(names) {
+  return _.chain(names || [])
+    .compact()
+    .uniq()
+    .sortBy(function(name) { return name; })
+    .value();
+}
+
+function Graph__CanvasMatchesStructure(canvasXML, containerNames, networkNames) {
+  if (!Graph__isValidXML(canvasXML)) {
+    return false;
+  }
+
+  var doc = mxUtils.parseXml(canvasXML);
+  var cells = doc.getElementsByTagName('mxCell');
+  var canvasContainerNames = [];
+  var canvasNetworkNames = [];
+
+  for (var i = 0; i < cells.length; i++) {
+    var cell = cells[i];
+    var type = cell.getAttribute('type');
+    var id = cell.getAttribute('id');
+    var name = cell.getAttribute('name') || id;
+
+    if (type === NETWORK_ELEMENT_TYPE) {
+      canvasContainerNames.push(name);
+    } else if (type === NETWORK_TYPE) {
+      canvasNetworkNames.push(name);
+    }
+  }
+
+  return _.isEqual(_graphSortedUniqueNames(containerNames), _graphSortedUniqueNames(canvasContainerNames)) &&
+    _.isEqual(_graphSortedUniqueNames(networkNames), _graphSortedUniqueNames(canvasNetworkNames));
 }
 
 function Graph__NetworkCreate(graph, obj, x, y) {

@@ -1,14 +1,15 @@
-const jsonfile = require('jsonfile');
 const configData = require('./config');
 const path = require('path');
 const async = require('async');
 const pathExists = require('path-exists');
 const dockerFiles = require('./docker_filesToCopy');
+const dockerConverter = require('./docker-converter');
 const Checker = require('../util/AppChecker');
 const LabStates = require('../util/LabStates');
 const fs = require('fs');
 const appUtils = require('../util/AppUtils.js');
-const { readFileWithRetry } = require('../util/jsonfile_compat');
+const { readFileWithRetry, writeFileAtomic } = require('../util/jsonfile_compat');
+const yaml = require('js-yaml');
 const { getNetwork } = require('../lib/mydockerjs/lib/docker');
 
 function networkExists(namerepo, namelab, callback) {
@@ -65,16 +66,27 @@ function getComposeFilePath(baseDir) {
 
 function get(namerepo, namelab, callback) {
   let composeFilePath;
+  let networkfile;
   async.waterfall([
 
     (cb) => configData.getConfig(cb),
     // save
     (config, cb) => {
       const baseDir = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab);
-      const networkfile = path.join(baseDir, 'network.json');
+      networkfile = path.join(baseDir, 'network.json');
       composeFilePath = getComposeFilePath(baseDir);
-
-      readFileWithRetry(networkfile, cb);
+      readFileWithRetry(networkfile, (err, data) => {
+        if (err && err.code === 'ENOENT' && composeFilePath) {
+          cb(null, {
+            networkList: [],
+            canvasJSON: 'IMPORTED',
+            clistToDraw: [],
+            clistNotToDraw: []
+          });
+          return;
+        }
+        cb(err, data);
+      });
     },
     (network, cb) => {
       // network = filterNetwork(network)
@@ -86,6 +98,26 @@ function get(namerepo, namelab, callback) {
       // Read compose file
       fs.readFile(composeFilePath, 'utf-8', (err, data) => {
         if (err) { cb(err); } else {
+          if (network && network.canvasJSON === 'IMPORTED') {
+            try {
+              const importedStructure = dockerConverter.ComposeDockerConvert(yaml.load(data) || {});
+              importedStructure.isComposeVisible = (typeof network.isComposeVisible === 'undefined')
+                ? true
+                : network.isComposeVisible;
+              network = importedStructure;
+              writeFileAtomic(networkfile, importedStructure, (writeErr) => {
+                if (writeErr) {
+                  cb(writeErr);
+                  return;
+                }
+                network.yamlfile = data;
+                cb(null, network);
+              });
+              return;
+            } catch (composeErr) {
+              appUtils.getLogger().warn(`[NETWORK GET] Cannot hydrate imported compose lab '${namerepo}/${namelab}': ${composeErr.message}`);
+            }
+          }
           network.yamlfile = data;
           cb(null, network);
         }
@@ -137,7 +169,7 @@ function saveWithoutCompose(namelab, data, callback) {
       LabStates.setStopState(userName, namelab, (err) => {
         if (err) cb(err);
         else {
-          jsonfile.writeFile(networkfile, data, cb);
+          writeFileAtomic(networkfile, data, cb);
         }
       });
     }
@@ -176,7 +208,7 @@ function save(namelab, data, yamlfile, callback) {
       LabStates.setStopState(userName, namelab, (err) => {
         if (err) cb(err);
         else {
-          jsonfile.writeFile(networkfile, data, cb);
+          writeFileAtomic(networkfile, data, cb);
         }
       });
     }

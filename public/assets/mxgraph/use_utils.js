@@ -7,6 +7,9 @@ function main(container) {
   else {
     // Disables the built-in context menu
     mxEvent.disableContextMenu(container);
+    container.style.overflow = 'auto';
+    container.style.maxHeight = 'none';
+    container.style.position = 'relative';
     // Creates the theGraph inside the given container
     theGraph = new mxGraph(container);
 

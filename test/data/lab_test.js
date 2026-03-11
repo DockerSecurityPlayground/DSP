@@ -102,6 +102,9 @@ describe('LABS TEST', () => {
           'network.json',
           'docker-compose.yml'
         ]);
+        const importedNetwork = jsonfile.readFileSync(path.join(helper.userRepo(), composeLab, 'network.json'));
+        expect(importedNetwork.canvasJSON).to.be.eql('IMPORTED');
+        expect(importedNetwork.clistToDraw.map((container) => container.name)).to.have.members(['web', 'mysql']);
         done();
       } catch (e) {
         done(e);
@@ -122,6 +125,8 @@ describe('LABS TEST', () => {
           'network.json',
           'docker-compose.yml'
         ]);
+        const importedNetwork = jsonfile.readFileSync(path.join(helper.userRepo(), composeImportedLab, 'network.json'));
+        expect(importedNetwork.clistToDraw.map((container) => container.name)).to.have.members(['web', 'mysql']);
         done();
       } catch (e) {
         done(e);

@@ -23,6 +23,10 @@
     text-align: center;
     padding: 16px;
   }
+  .lab-graph-toolbar {
+    margin-bottom: 10px;
+    text-align: right;
+  }
 </style>
 <div id="page-wrapper">
   <script src="assets/mxgraph/common.js"> </script>
@@ -107,7 +111,12 @@
     </div> -->
 
     <div ng-show="labError === true" class="bs-callout bs-callout-danger">
-      <h4><i class="fa fa-fw fa-warning"></i> Error</h4>
+      <h4>
+        <i class="fa fa-fw fa-warning"></i> Error
+        <button class="btn btn-default btn-xs pull-right" ng-click="clearLogs()">
+          <i class="fa fa-fw fa-eraser"></i> Clear
+        </button>
+      </h4>
       <code class="pt-2">{{responseError}}</code>
     </div>
 
@@ -238,8 +247,19 @@
             </uib-tab>
             <uib-tab ng-if="!isImported" index="1" heading="Graph">
               <br>
+              <div class="lab-graph-toolbar">
+                <button type="button" class="btn btn-default btn-xs" onclick="Graph__ZoomOut()">
+                  <i class="fa fa-fw fa-search-minus"></i> Zoom Out
+                </button>
+                <button type="button" class="btn btn-default btn-xs" onclick="Graph__ZoomIn()">
+                  <i class="fa fa-fw fa-search-plus"></i> Zoom In
+                </button>
+                <button type="button" class="btn btn-default btn-xs" onclick="Graph__ZoomActual()">
+                  <i class="fa fa-fw fa-dot-circle-o"></i> Reset
+                </button>
+              </div>
               <!-- GRAPH CANVAS -->
-              <div id="graphContainer"></div>
+              <div id="graphContainer" style="height:600px; max-height:none; overflow:auto; position:relative;"></div>
               <!-- <div class="alert alert-warning text-center"> <b>The graph has been generated automatically (create with DSP V.2), current version is 3, maybe you should update the repository</b></div> -->
               <br>
               <br>
@@ -380,7 +400,7 @@
           </div>
         </div>
         <div class="panel-body" ng-show="isSolutionShowed || ctrl.isSolutionEditShowed" >
-          <div class="large_div" ng-show="!ctrl.isSolutionEditShowed" ng-bind-html="ctrl.lab.solution"></div>
+          <div class="lab-solution-content" ng-show="!ctrl.isSolutionEditShowed" ng-bind-html="ctrl.lab.solution"></div>
 
           <div class="row" ng-show='ctrl.isSolutionEditShowed'>	
                     <div class="row"> 
@@ -413,7 +433,7 @@
                       <!--<input type="name" class="form-control" ng-model="ctrl.lab.goal" id="goal" > -->
                     </div>
                   </div>
-                          <div ng-show='ctrl.isSolutionPreviewOpen'>
+                            <div ng-show='ctrl.isSolutionPreviewOpen' class="lab-solution-preview">
                               <h4>  Preview </h4>
                               <div ng-bind-html="ctrl.previewSolution"></div> 
                               <hr>

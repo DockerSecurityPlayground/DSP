@@ -79,11 +79,12 @@ DSP_GraphEditorController : function DSP_GraphEditorController($scope,  $routePa
           // Set isComposeVisible
           if (data.isComposeVisible == false)
             $scope.isComposeVisible = false
+          var networkNames = $scope.networkList.map(a => a.name)
+          var containerNames = containerManager.containerListToDraw.map( c => c.name);
+          var hasFreshCanvas = Graph__CanvasMatchesStructure($scope.canvas, containerNames, networkNames);
           // Container created, update canvas
-          if (Graph__isValidXML($scope.canvas)) {
+          if (hasFreshCanvas) {
             console.log("Is valid XML");
-            var networkNames = $scope.networkList.map(a => a.name)
-            var containerNames = containerManager.containerListToDraw.map( c => c.name);
             $scope.canvasLoadedCallback($scope.canvas, containerNames, networkNames);
           }
           // Try to create the structure
@@ -270,6 +271,16 @@ window.location.href = urlToGo;
 
   //Load image list
   $scope.currentContainer = containerManager.currentContainer
+
+  function hasAutomaticShellCopyAccess(containerName) {
+    return typeof containerName === 'string' && containerName.toLowerCase().indexOf('hacking') !== -1;
+  }
+
+  $scope.$watch('currentContainer.name', function (containerName) {
+    if (hasAutomaticShellCopyAccess(containerName) && $scope.currentContainer) {
+      $scope.currentContainer.isShellEnabled = true;
+    }
+  });
   // The list of possible container choices to draw
   $scope.containerListNotToDraw =  containerManager.containerListNotToDraw
   //The list already created
@@ -435,6 +446,7 @@ window.location.href = urlToGo;
         volumes : angular.copy($scope.currentContainer.volumes),
         filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
         networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+        isShellEnabled: !!$scope.currentContainer.isShellEnabled || hasAutomaticShellCopyAccess(nameContainer),
         keepAlive: !!$scope.currentContainer.keepAlive
       };
       $
@@ -461,6 +473,7 @@ window.location.href = urlToGo;
       volumes : angular.copy($scope.currentContainer.volumes),
       filesToCopy : angular.copy($scope.currentContainer.filesToCopy),
       networks: JSON.parse(JSON.stringify($scope.currentContainer.networks)),
+      isShellEnabled: !!$scope.currentContainer.isShellEnabled || hasAutomaticShellCopyAccess($scope.currentContainer.name),
       keepAlive: !!$scope.currentContainer.keepAlive
     };
     $

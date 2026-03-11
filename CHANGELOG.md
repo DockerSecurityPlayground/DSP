@@ -1,5 +1,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
+
+## [3.11.0] - 2026-03-11
+### Fixed
+- Prevented intermittent JSON corruption during lab start and state updates by using safer JSON read/write handling.
+- Fixed compose-to-GUI synchronization so imported services are editable in the network graph and stale graph data is rebuilt when needed.
+- Fixed compose save behavior so GUI removals of ports, networks, and other graph-managed service fields are written back correctly.
+- Fixed lab stop/start restart conflicts by removing orphaned compose containers during shutdown.
+- Fixed graph editor rename issues that could leave stale containers visible after a node rename.
+
+### Changed
+- Added scrollable graph canvases for larger networks in both lab usage and network editing views.
+- Reduced host node size in the graph and added zoom in, zoom out, and reset controls.
+
+### Added
+- Added regression tests for compose import, compose merge, legacy network hydration, and GUI-to-compose round-trip cases.
+
 ## Next Developments 
  * Fix of Angular WebSocket Code during installation long running
  * New terminal on a new tab in visual editor     

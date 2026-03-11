@@ -4,6 +4,7 @@ const configData = require('../data/config.js');
 const jsonfile = require('jsonfile');
 const _ = require('underscore');
 const appUtils = require('./AppUtils');
+const { readFileWithRetry, writeFileAtomic } = require('./jsonfile_compat');
 
 
 const RUNNING = 'RUNNING';
@@ -36,7 +37,7 @@ function getStates(callback) {
   async.waterfall([
     (cb) => getStateFile(cb),
     (lsf, cb) => {
-      jsonfile.readFile(lsf, cb);
+      readFileWithRetry(lsf, cb);
     }], (err, jsonArray) => callback(err, jsonArray));
 }
 
@@ -138,7 +139,7 @@ function editState(repoName, labName, objState, callback) {
         jsonArray[index].state = objState.state || jsonArray[index].state;
         getStateFile((err, jsf) => {
           if (err) cb(err);
-          else jsonfile.writeFile(jsf, jsonArray, cb);
+          else writeFileAtomic(jsf, jsonArray, cb);
         });
       }
     }], (err) => callback(err));
@@ -160,7 +161,7 @@ function editStates(repoName, objState, callback) {
       cb(null);
     },
     (cb) => getStateFile(cb),
-    (lsf, cb) => jsonfile.writeFile(lsf, newStates, cb)
+    (lsf, cb) => writeFileAtomic(lsf, newStates, cb)
   ],
    (err) => callback(err));
 }
@@ -217,7 +218,7 @@ function newState(repoName, labName, state, callback) {
         });
         getStateFile((err, jsf) => {
           if (err) cb(err);
-          else jsonfile.writeFile(jsf, jsonArray, cb);
+          else writeFileAtomic(jsf, jsonArray, cb);
         });
       }
     }], (err) => {
@@ -238,7 +239,7 @@ function removeState(repoName, labName, callback) {
         jsonArray.splice(index, 1);
         getStateFile((err, jsf) => {
           if (err) cb(err);
-          else jsonfile.writeFile(jsf, jsonArray, cb);
+          else writeFileAtomic(jsf, jsonArray, cb);
         });
       }
     }], (err) => callback(err));

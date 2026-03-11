@@ -70,7 +70,7 @@ function up(thePath, callback, dataNotify, options = "") {
 
 // Call docker-compose down in path and returns the process pid
 function down(thePath, callback, dataNotify) {
-  const pid = dcExec(thePath, 'down', callback, dataNotify);
+  const pid = dcExec(thePath, 'down --remove-orphans', callback, dataNotify);
   return pid;
 }
 

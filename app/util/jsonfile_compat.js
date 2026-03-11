@@ -2,8 +2,11 @@
  * Compatibility wrapper for jsonfile.readFile with retry logic
  * Handles race conditions where file is being written while being read
  * Retries up to 3 times with exponential backoff on JSON parse errors
+ * and writes through a temp file + rename to avoid partial JSON reads.
  */
 
+const fs = require('fs');
+const path = require('path');
 const jsonfile = require('jsonfile');
 const appUtils = require('./AppUtils');
 const log = appUtils.getLogger();
@@ -60,6 +63,40 @@ function readFileWithRetry(file, maxRetries = DEFAULT_MAX_RETRIES, callback) {
   attempt();
 }
 
+function writeFileAtomic(file, data, options = {}, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  }
+
+  callback = typeof callback === 'function' ? callback : () => {};
+
+  const dir = path.dirname(file);
+  const tmpFile = path.join(
+    dir,
+    `.${path.basename(file)}.${process.pid}.${Date.now()}.tmp`
+  );
+
+  jsonfile.writeFile(tmpFile, data, options, (writeErr) => {
+    if (writeErr) {
+      callback(writeErr);
+      return;
+    }
+
+    fs.rename(tmpFile, file, (renameErr) => {
+      if (!renameErr) {
+        callback(null);
+        return;
+      }
+
+      fs.unlink(tmpFile, () => {
+        callback(renameErr);
+      });
+    });
+  });
+}
+
 module.exports = {
-  readFileWithRetry: readFileWithRetry
+  readFileWithRetry,
+  writeFileAtomic
 };

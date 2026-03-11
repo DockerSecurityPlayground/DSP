@@ -1,0 +1,39 @@
+version: '2'
+services:
+  ftp_server:
+    image: nsunina/hacking-ssh-server:1.0
+    stdin_open: true
+    tty: true
+    ports:
+      - '21:21'
+    networks:
+      network_0:
+        ipv4_address: 193.20.1.2
+  tftp_server:
+    image: nsunina/hacking-ssh-server:1.0
+    stdin_open: true
+    tty: true
+    ports:
+      - '69:69'
+    networks:
+      network_0:
+        ipv4_address: 193.20.1.3
+  element_0:
+    image: sharelatex/sharelatex-full:latest
+    stdin_open: true
+    tty: true
+  hacking-nmap:
+    image: secsi/nmap:7.98
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - tail
+      - '-f'
+      - /dev/null
+    networks:
+      network_0: {}
+networks:
+  network_0:
+    ipam:
+      config:
+        - subnet: 193.20.1.0/24

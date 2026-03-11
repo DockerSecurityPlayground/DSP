@@ -1,4 +1,3 @@
-const jsonfile = require('jsonfile');
 const async = require('async');
 const os = require('os');
 const path = require('path');
@@ -9,6 +8,7 @@ const fileType = require('file-type');
 const StreamZip = require('node-stream-zip')
 const labelData = require('./labels.js');
 const networkData = require('./network');
+const dockerConverter = require('./docker-converter.js');
 const config = require('./config.js');
 const { removePath } = require('../util/rimraf_compat');
 const unzipper = require('unzipper');
@@ -17,6 +17,7 @@ const appUtils = require('../util/AppUtils');
 const LabStates = require('../util/LabStates.js');
 const c = require('../../config/local.config.json');
 const { isDSPDir } = require('../util/AppUtils');
+const { readFileWithRetry, writeFileAtomic } = require('../util/jsonfile_compat');
 const log = appUtils.getLogger();
 
 // Check if a buffer is a zip
@@ -263,7 +264,7 @@ function newLab(name, information, callback) {
       infos.author = userName;
       infos = _.extend(infos, information);
 
-      jsonfile.writeFile(pathToWrite, infos, cb);
+      writeFileAtomic(pathToWrite, infos, cb);
     },
     // Create initial state
     (prevResult, cb) => {
@@ -319,18 +320,17 @@ function newLabFromCompose(nameLab, composeFileStream, override, callback) {
         buffers.push(b);
       })
       composeFileStream.on('end', () => {
-        const fakeStructure = {
-          'networkList': [],
-          'canvasJSON': "IMPORTED",
-          'clistToDraw': [],
-          'clistNotToDraw': []
-        };
         const buffer = Buffer.concat(buffers);
         // TBD Check if it is compose
         if (appUtils.isYaml(buffer.toString())) {
           log.info("Is yaml");
           const compose = yaml.safeLoad(buffer.toString());
-          networkData.save(nameLab, fakeStructure, buffer.toString(), cb);
+          if (!compose || !compose.services || _.isEmpty(compose.services)) {
+            cb(new Error('Invalid docker-compose file'));
+            return;
+          }
+          const importedStructure = dockerConverter.ComposeDockerConvert(compose);
+          networkData.save(nameLab, importedStructure, buffer.toString(), cb);
         } else {
           // No yaml: is it a zip ? 
           isValidZip(buffer, false, (err, data) => {
@@ -341,10 +341,32 @@ function newLabFromCompose(nameLab, composeFileStream, override, callback) {
                 fs.createReadStream(data.tmpPath)
                 .pipe(unzipper.Extract({path : path.join(userPath, nameLab)}))
                 .on('close', () => {
-                  networkData.saveWithoutCompose(nameLab, fakeStructure, cb);
+                  try {
+                    const composePath = ['docker-compose.yml', 'docker-compose.yaml']
+                      .map((filename) => path.join(userPath, nameLab, filename))
+                      .find((composeFilename) => fs.existsSync(composeFilename));
+
+                    if (!composePath) {
+                      cb(new Error('docker-compose file not found in imported archive'));
+                      return;
+                    }
+
+                    const composeContent = fs.readFileSync(composePath, 'utf-8');
+                    const compose = yaml.safeLoad(composeContent);
+                    if (!compose || !compose.services || _.isEmpty(compose.services)) {
+                      cb(new Error('Invalid docker-compose file'));
+                      return;
+                    }
+
+                    const importedStructure = dockerConverter.ComposeDockerConvert(compose);
+                    networkData.saveWithoutCompose(nameLab, importedStructure, cb);
+                  } catch (zipImportErr) {
+                    cb(zipImportErr);
+                  }
                 })
                 .on('error', (err) => cb(err));
               }
+              else cb(new Error('Invalid docker-compose archive'));
             }
           });
         }
@@ -448,11 +470,16 @@ function saveLabels(labName, labels, callback) {
         // log.info(labels)
         // log.info(labelPath)
         // init label
-        labelData.initLabels(labelPath);
-        // Create labels
-        labelData.createLabels(labelPath, labels.labels, (err) => {
-          if (err) cb(err);
-          else cb(null, labels);
+        labelData.initLabels(labelPath, (initErr) => {
+          if (initErr) {
+            cb(initErr);
+            return;
+          }
+          // Create labels
+          labelData.createLabels(labelPath, labels.labels, (err) => {
+            if (err) cb(err);
+            else cb(null, labels);
+          });
         });
       }
     }],   // End labels update function
@@ -491,7 +518,7 @@ function saveInformation(name, information, callback) {
       const author = path.basename(userPath);
       const toSave = information;
       toSave.author = author;
-      jsonfile.writeFile(informationFile, toSave, (err) => {
+      writeFileAtomic(informationFile, toSave, (err) => {
         if (err) cb(err);
         else cb(null, information);
       });
@@ -512,7 +539,7 @@ function getInformation(nameRepo, nameLab, callback) {
     (cfile, cb) => {
       labName = path.join(appUtils.getHome(), cfile.mainDir, nameRepo, nameLab);
       const informationFile = path.join(labName, 'information.json');
-      jsonfile.readFile(informationFile, cb);
+      readFileWithRetry(informationFile, cb);
     }, (jsonDescription, cb) => {
       const readmeFile = path.join(labName, 'README.md');
       appUtils.getFile(readmeFile, (err, content) => {

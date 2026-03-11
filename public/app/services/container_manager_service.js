@@ -160,8 +160,8 @@ return {
 	init : init,
 	loadContainers : function loadContainers(data, contextData) {
 		var imageList = contextData.imageList;
-		var clistToDraw = data.clistToDraw,
-		    clistNotToDraw = data.clistNotToDraw
+		var clistToDraw = data.clistToDraw || [],
+		    clistNotToDraw = data.clistNotToDraw || []
 		var composeServices = {};
 		if (data.yamlfile) {
 			try {
@@ -189,7 +189,231 @@ return {
 			return imageSelected || (imageList && imageList.length ? imageList[0] : null);
 		}
 
+		function isKeepAliveService(serviceDef) {
+			if (!serviceDef || !serviceDef.entrypoint) {
+				return false;
+			}
+
+			var entrypoint = serviceDef.entrypoint;
+			if (typeof entrypoint === 'string') {
+				return entrypoint.indexOf('tail') !== -1 && entrypoint.indexOf('/dev/null') !== -1;
+			}
+
+			if (Array.isArray(entrypoint)) {
+				return entrypoint.join(' ').indexOf('tail -f /dev/null') !== -1;
+			}
+
+			return false;
+		}
+
+		function parseComposePorts(serviceDef) {
+			var ports = {};
+			_.each((serviceDef && serviceDef.ports) || [], function(portDef) {
+				if (typeof portDef === 'number') {
+					ports[String(portDef)] = String(portDef);
+					return;
+				}
+
+				if (portDef && typeof portDef === 'object') {
+					if (portDef.target != null && portDef.published != null) {
+						ports[String(portDef.target)] = String(portDef.published);
+					}
+					return;
+				}
+
+				if (typeof portDef !== 'string') {
+					return;
+				}
+
+				var sanitized = portDef.split('/')[0];
+				var parts = sanitized.split(':');
+				if (parts.length === 1) {
+					ports[parts[0]] = parts[0];
+					return;
+				}
+
+				var containerPort = parts[parts.length - 1];
+				var hostPort = parts[parts.length - 2];
+				ports[String(containerPort)] = String(hostPort);
+			});
+			return ports;
+		}
+
+		function parseComposeDependencies(definition) {
+			var dependencies = {};
+			if (Array.isArray(definition)) {
+				_.each(definition, function(name) {
+					dependencies[name] = true;
+				});
+				return dependencies;
+			}
+
+			_.each(definition || {}, function(value, name) {
+				if (value === false) {
+					return;
+				}
+				dependencies[name] = true;
+			});
+			return dependencies;
+		}
+
+		function parseComposeNetworks(serviceDef) {
+			var networks = {};
+			var serviceNetworks = serviceDef && serviceDef.networks;
+
+			if (Array.isArray(serviceNetworks)) {
+				_.each(serviceNetworks, function(networkName) {
+					networks[networkName] = {
+						ip: '',
+						isChecked: true,
+						position: 'right',
+						isVisible: true,
+						isDynamic: true
+					};
+				});
+				return networks;
+			}
+
+			_.each(serviceNetworks || {}, function(networkDef, networkName) {
+				var staticIp = networkDef && networkDef.ipv4_address ? networkDef.ipv4_address : '';
+				networks[networkName] = {
+					ip: staticIp,
+					isChecked: true,
+					position: 'right',
+					isVisible: true,
+					isDynamic: !staticIp
+				};
+			});
+
+			return networks;
+		}
+
+		function parseComposeVolumes(serviceDef) {
+			var volumes = [];
+			_.each((serviceDef && serviceDef.volumes) || [], function(volumeDef) {
+				if (typeof volumeDef === 'string') {
+					var parts = volumeDef.split(':');
+					if (parts.length >= 2) {
+						volumes.push({
+							host: parts[0],
+							container: parts[1]
+						});
+					}
+					return;
+				}
+
+				if (volumeDef && typeof volumeDef === 'object' && volumeDef.source && volumeDef.target) {
+					volumes.push({
+						host: volumeDef.source,
+						container: volumeDef.target
+					});
+				}
+			});
+			return volumes;
+		}
+
+		function parseComposeEnvironments(serviceDef) {
+			var environments = [];
+			var serviceEnvironment = serviceDef && (serviceDef.environment || serviceDef.environments);
+
+			if (Array.isArray(serviceEnvironment)) {
+				_.each(serviceEnvironment, function(envDef) {
+					if (typeof envDef === 'string') {
+						var separatorIndex = envDef.indexOf('=');
+						if (separatorIndex !== -1) {
+							environments.push({
+								name: envDef.substring(0, separatorIndex),
+								value: envDef.substring(separatorIndex + 1)
+							});
+						} else if (envDef) {
+							environments.push({name: envDef, value: ''});
+						}
+						return;
+					}
+
+					if (envDef && typeof envDef === 'object') {
+						_.each(envDef, function(value, key) {
+							environments.push({name: key, value: value == null ? '' : String(value)});
+						});
+					}
+				});
+				return environments;
+			}
+
+			_.each(serviceEnvironment || {}, function(value, key) {
+				environments.push({name: key, value: value == null ? '' : String(value)});
+			});
+
+			return environments;
+		}
+
+		function hydrateFromCompose(ele) {
+			if (!ele || !ele.name || !composeServices[ele.name]) {
+				return;
+			}
+
+			var serviceDef = composeServices[ele.name];
+			if (!ele.dependsOn || _.isEmpty(ele.dependsOn)) {
+				ele.dependsOn = parseComposeDependencies(serviceDef && serviceDef.depends_on);
+			}
+			if (!ele.links || _.isEmpty(ele.links)) {
+				ele.links = parseComposeDependencies(serviceDef && serviceDef.links);
+			}
+			if (!ele.networks || _.isEmpty(ele.networks)) {
+				ele.networks = parseComposeNetworks(serviceDef);
+			}
+			if (!ele.ports || _.isEmpty(ele.ports)) {
+				ele.ports = parseComposePorts(serviceDef);
+			}
+			if (!ele.volumes || _.isEmpty(ele.volumes)) {
+				ele.volumes = parseComposeVolumes(serviceDef);
+			}
+			if (!ele.environments || _.isEmpty(ele.environments)) {
+				ele.environments = parseComposeEnvironments(serviceDef);
+			}
+		}
+
+		// Imported compose projects can contain services that are not mirrored yet in clist arrays.
+		// Ensure they are available in the graph editor instead of silently disappearing.
+		var listedServices = {};
+		_.each(clistToDraw, function(ele) {
+			if (ele && ele.name) {
+				listedServices[ele.name] = true;
+			}
+		});
 		_.each(clistNotToDraw, function(ele) {
+			if (ele && ele.name) {
+				listedServices[ele.name] = true;
+			}
+		});
+
+		_.each(composeServices, function(serviceDef, serviceName) {
+			if (listedServices[serviceName]) {
+				return;
+			}
+
+			var synthesizedService = {
+				name: serviceName,
+				actions: [],
+				dependsOn: parseComposeDependencies(serviceDef && serviceDef.depends_on),
+				links: parseComposeDependencies(serviceDef && serviceDef.links),
+				networks: parseComposeNetworks(serviceDef),
+				ports: parseComposePorts(serviceDef),
+				volumes: parseComposeVolumes(serviceDef),
+				filesToCopy: [],
+				environments: parseComposeEnvironments(serviceDef),
+				isShellEnabled: true,
+				keepAlive: isKeepAliveService(serviceDef),
+				selectedImage: {
+					name: serviceDef && serviceDef.image ? serviceDef.image : ''
+				}
+			};
+
+			clistToDraw.push(synthesizedService);
+		});
+
+		_.each(clistNotToDraw, function(ele) {
+			hydrateFromCompose(ele);
 			ele.selectedImage = resolveImage(ele);
 			if (typeof ele.keepAlive === 'undefined') {
 				ele.keepAlive = false;
@@ -198,6 +422,7 @@ return {
 		})
 
 		_.each(clistToDraw, function(ele) {
+			hydrateFromCompose(ele);
 			ele.selectedImage = resolveImage(ele);
 			if (typeof ele.keepAlive === 'undefined') {
 				ele.keepAlive = false;

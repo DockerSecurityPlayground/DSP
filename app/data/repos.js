@@ -2,13 +2,12 @@ const configData = require('../data/config.js');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
-const jsonfile = require('jsonfile');
 const ncp = require('ncp').ncp;
 const pathExists = require('path-exists');
 const appUtils = require('../util/AppUtils.js');
 const LabStates = require('../util/LabStates.js');
 const { removePath } = require('../util/rimraf_compat');
-const { readFileWithRetry } = require('../util/jsonfile_compat');
+const { readFileWithRetry, writeFileAtomic } = require('../util/jsonfile_compat');
 
 const _ = require('underscore');
 
@@ -54,7 +53,7 @@ function create(repos, cb) {
       cb(null);
     },
     (cb) => {
-      jsonfile.writeFile(repoFile, repos, cb);
+      writeFileAtomic(repoFile, repos, cb);
     }], (err) => {
       cb(err);
   });
@@ -82,7 +81,7 @@ function post(repo, cb) {
     (cb) => get(cb),
     (repos, cb) => {
       repos.push(newRepo);
-      jsonfile.writeFile(repoFile, repos, cb);
+      writeFileAtomic(repoFile, repos, cb);
     }], (err) => {
       cb(err);
   });
@@ -106,7 +105,7 @@ function remove(reponame, cb) {
     (repos, cb) => {
       const newRepos = _.reject(repos, {name:reponame});
       log.info("Write new repos.json");
-      jsonfile.writeFile(repoFile, newRepos, cb);
+      writeFileAtomic(repoFile, newRepos, cb);
     }], cb);
 }
 
@@ -134,7 +133,7 @@ function update(repo, cb){
       let oldRepo = repos.pop({ name: repo.name });
       //Aggiornare credenziali
       repos.push(newRepo);
-      jsonfile.writeFile(repoFile, repos, cb);
+      writeFileAtomic(repoFile, repos, cb);
     }], (err) => {
     cb(err);
   });

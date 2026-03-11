@@ -1,8 +1,7 @@
-const jsonfile = require('jsonfile');
 const async = require('async');
 const path = require('path');
 const appUtil = require('../util/AppUtils');
-const { readFileWithRetry } = require('../util/jsonfile_compat');
+const { readFileWithRetry, writeFileAtomic } = require('../util/jsonfile_compat');
 
 const c = require('../../config/local.config.json');
 // It's used this method for different implementations after
@@ -65,7 +64,7 @@ const updateConfig = function updateConfig(data, callback) {
     },
     // Write new config data
     (config, cb) => {
-      jsonfile.writeFile(appUtil.path_userconfig(), config, { spaces: 2 }, (err) => cb(err));
+      writeFileAtomic(appUtil.path_userconfig(), config, { spaces: 2 }, (err) => cb(err));
     }],
   // End array of waterfall functions
   (err) => callback(err));

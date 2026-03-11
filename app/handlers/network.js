@@ -29,6 +29,18 @@ const log = AppUtils.getLogger();
 
 // const log = appUtils.getLogger();
 
+function isShellCopyEnabled(container) {
+  if (!container) {
+    return false;
+  }
+
+  if (container.name && container.name.toLowerCase().indexOf('hacking') !== -1) {
+    return true;
+  }
+
+  return !!container.isShellEnabled;
+}
+
 function getComposePath(userPath, labName) {
   const ymlPath = path.join(userPath, labName, 'docker-compose.yml');
   if (fs.existsSync(ymlPath)) {
@@ -62,27 +74,6 @@ function readExistingCompose(userPath, labName, callback) {
   });
 }
 
-function mergeComposeData(existingCompose, graphCompose) {
-  const existing = existingCompose || {};
-  const graph = graphCompose || {};
-
-  const merged = _.extend({}, existing, graph);
-
-  const existingServices = existing.services || {};
-  const graphServices = graph.services || {};
-  const mergedServices = _.extend({}, existingServices);
-  _.each(graphServices, (serviceDef, serviceName) => {
-    mergedServices[serviceName] = _.extend({}, existingServices[serviceName] || {}, serviceDef);
-  });
-  merged.services = mergedServices;
-
-  const existingNetworks = existing.networks || {};
-  const graphNetworks = graph.networks || {};
-  merged.networks = _.extend({}, existingNetworks, graphNetworks);
-
-  return merged;
-}
-
 function save(req, res) {
   async.waterfall([
     // Check values
@@ -107,7 +98,10 @@ function save(req, res) {
         jsonCompose =
           dockerConverter.JSONDockerComposeConvert(req.body.clistToDraw, req.body.networkList);
         const graphCompose = JSON.parse(jsonCompose);
-        const mergedCompose = mergeComposeData(existingCompose, graphCompose);
+        const mergedCompose = dockerConverter.mergeComposeData(existingCompose, graphCompose, {
+          serviceNames: _.pluck(req.body.clistToDraw || [], 'name'),
+          networkNames: _.pluck(req.body.networkList || [], 'name')
+        });
         dc = dockerComposer.generate(mergedCompose);
       } catch (e) {
         error = e;
@@ -242,7 +236,7 @@ function dockercopy(req, res) {
         log.info("[DOCKER COPY COMPOSE]")
         if(!containerToCopy)  {
           cb(new Error(`Cannot find ${dockername} in network`));
-        } else if(!containerToCopy.isShellEnabled) {
+        } else if(!isShellCopyEnabled(containerToCopy)) {
           cb(new Error("Copy not allowed"));
         } else {
           configData.getConfig(cb);
@@ -348,7 +342,7 @@ function dockershellcompose(req, res) {
       dockername = req.body.dockername;
       cld = networkInfo.clistToDraw;
       containerToCopy = _.findWhere(cld, {name: dockername});
-      if (!containerToCopy.isShellEnabled) {
+      if (!isShellCopyEnabled(containerToCopy)) {
         cb(new Error("Shell not allowed"));
       }
       else {

@@ -813,6 +813,11 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     var graph = editor.graph;
     var model = graph.getModel();
 
+    // Allow larger diagrams to use native scrollbars in the editor viewport.
+    container.style.overflow = 'auto';
+    container.style.maxHeight = 'none';
+    container.style.position = 'relative';
+
     mxInitGraph(graph, appScope);
     mxInitEditor(editor, container);
     mxAddNetworkElement(graph, sidebar);
@@ -909,6 +914,9 @@ function MX__Main(container, outline, toolbar, sidebar, status, appScope) {
     addToolbarButton(editor, toolbar, 'cut', 'Cut', 'assets/mximages/cut.png');
     addToolbarButton(editor, toolbar, 'copy', 'Copy', 'assets/mximages/copy.png');
     addToolbarButton(editor, toolbar, 'paste', 'Paste', 'assets/mximages/paste.png');
+    addToolbarButton(editor, toolbar, 'zoomIn', 'Zoom In', 'assets/mximages/zoom_in.png');
+    addToolbarButton(editor, toolbar, 'zoomOut', 'Zoom Out', 'assets/mximages/zoom_out.png');
+    addToolbarButton(editor, toolbar, 'actualSize', 'Reset Zoom', 'assets/mximages/view_1_1.png');
     //addToolbarButton(editor, toolbar, 'undo', '', 'assets/mximages/undo.png');
     //addToolbarButton(editor, toolbar, 'redo', '', 'assets/mximages/redo.png');
     //addToolbarButton(editor, toolbar, 'show', 'Show', 'assets/mximages/camera.png');

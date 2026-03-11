@@ -44,6 +44,32 @@ describe('Data Network Test', () => {
     });
   });
 
+  it('should hydrate imported compose labs into editable network data on read', (done) => {
+    networkData.get(repoName, composeLab, (err, results) => {
+      expect(err).to.be.null;
+      expect(results.canvasJSON).to.be.eql('IMPORTED');
+      expect(results.clistToDraw.map((container) => container.name)).to.have.members(['web', 'mysql']);
+
+      const webContainer = results.clistToDraw.find((container) => container.name === 'web');
+      expect(webContainer.dependsOn).to.be.eql({ mysql: true });
+      expect(webContainer.ports).to.be.eql({ '80': '8080' });
+      expect(webContainer.environments).to.deep.include({
+        name: 'WORDPRESS_DB_USER',
+        value: 'root'
+      });
+      done();
+    });
+  });
+
+  it('should hydrate compose labs even when network.json is missing', (done) => {
+    networkData.get(repoName, composeLabNoNetwork, (err, results) => {
+      expect(err).to.be.null;
+      expect(results.canvasJSON).to.be.eql('IMPORTED');
+      expect(results.clistToDraw.map((container) => container.name)).to.have.members(['web', 'mysql']);
+      done();
+    });
+  });
+
   // Lab with empty network
   const composeLab = "composeImportedLab"  ;
   // Lab without network.json file

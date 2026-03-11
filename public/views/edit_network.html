@@ -14,12 +14,15 @@
 }
 .graph-container {
   /*width: 78%;*/
-  /*   overflow:hidden;*/
+  overflow: auto;
   border-style:solid;
   border-color:black;
   border-width:1px;
   height:600px;
   margin-top: 2px;
+  position: relative;
+  cursor: default;
+  overscroll-behavior: contain;
 }
 .tabset {
   width: 78%;
@@ -142,6 +145,7 @@
           <section ng-show="!showEditNetwork && !showEditContainer && !showYamlFile" 
                    id="graphContainer" 
                    class="graph-container"
+                   style="overflow:auto; max-height:none; position:relative; cursor:default;"
                    >
           </section>
             <div 

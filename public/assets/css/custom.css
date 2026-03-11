@@ -161,3 +161,30 @@ footer {
 .single-line br {
     display: none
 }
+
+.lab-solution-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.lab-solution-code-wrapper {
+  position: relative;
+  margin: 12px 0;
+}
+
+.lab-solution-code-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+}
+
+.lab-solution-code-block {
+  padding-top: 34px;
+}
+
+@media (max-width: 767px) {
+  .lab-solution-content {
+    max-height: 40vh;
+  }
+}

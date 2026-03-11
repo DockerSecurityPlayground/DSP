@@ -102,9 +102,10 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
       // put logic here for keypress and cut/paste changes
     },
     inline: false,
-    plugins: 'textpattern advlist autolink link image lists charmap print preview',
+    plugins: 'textpattern advlist autolink link image lists charmap print preview code codesample',
     skin: 'lightgray',
     theme: 'modern',
+    toolbar: 'undo redo | styleselect | bold italic | bullist numlist | link image | codesample code preview',
     // textpattern_patterns: [
     //      {start: '*', end: '*', format: 'italic'},
     //      {start: '**', end: '**', format: 'bold'},
@@ -120,6 +121,114 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
     // ]
 
   };
+
+  function setCodeCopyButtonState(button, label) {
+    if (!button) {
+      return;
+    }
+
+    button.textContent = label;
+
+    if (button._copyTimer) {
+      $window.clearTimeout(button._copyTimer);
+    }
+
+    if (label !== 'Copy') {
+      button._copyTimer = $window.setTimeout(function () {
+        button.textContent = 'Copy';
+      }, 1800);
+    }
+  }
+
+  function copyTextToClipboard(text) {
+    if ($window.navigator && $window.navigator.clipboard && $window.isSecureContext) {
+      return $window.navigator.clipboard.writeText(text);
+    }
+
+    return new Promise(function (resolve, reject) {
+      var helper = $window.document.createElement('textarea');
+      helper.value = text;
+      helper.setAttribute('readonly', 'readonly');
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      helper.style.pointerEvents = 'none';
+      $window.document.body.appendChild(helper);
+      helper.select();
+
+      try {
+        var copied = $window.document.execCommand('copy');
+        $window.document.body.removeChild(helper);
+
+        if (copied) {
+          resolve();
+          return;
+        }
+      }
+      catch (error) {
+        $window.document.body.removeChild(helper);
+        reject(error);
+        return;
+      }
+
+      reject(new Error('Copy command failed'));
+    });
+  }
+
+  function enhanceSolutionCodeBlocks(container) {
+    if (!container) {
+      return;
+    }
+
+    angular.forEach(container.querySelectorAll('pre'), function (pre) {
+      var code = pre.querySelector('code');
+      var wrapper = pre.parentNode;
+      var copyButton;
+
+      if (!code) {
+        return;
+      }
+
+      if (!wrapper || !wrapper.classList.contains('lab-solution-code-wrapper')) {
+        wrapper = $window.document.createElement('div');
+        wrapper.className = 'lab-solution-code-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+      }
+
+      copyButton = wrapper.querySelector('.lab-solution-code-copy');
+
+      if (!copyButton) {
+        copyButton = $window.document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'btn btn-default btn-xs lab-solution-code-copy';
+        copyButton.textContent = 'Copy';
+        copyButton.addEventListener('click', function () {
+          copyTextToClipboard(code.textContent || '')
+            .then(function () {
+              setCodeCopyButtonState(copyButton, 'Copied');
+            })
+            .catch(function () {
+              setCodeCopyButtonState(copyButton, 'Failed');
+            });
+        });
+        wrapper.insertBefore(copyButton, pre);
+      }
+
+      pre.classList.add('lab-solution-code-block');
+    });
+
+    if ($window.Prism && $window.Prism.highlightAllUnder) {
+      $window.Prism.highlightAllUnder(container);
+    }
+  }
+
+  function refreshSolutionCodeBlocks() {
+    $window.setTimeout(function () {
+      angular.forEach($window.document.querySelectorAll('.lab-solution-content, .lab-solution-preview'), function (container) {
+        enhanceSolutionCodeBlocks(container);
+      });
+    }, 0);
+  }
 
   vm.tinymceHtmlGoal = ''
   vm.tinymceHtmlSolution = ''
@@ -156,12 +265,24 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   $scope.activeTabId = null;
   var shellTabCounter = 0;
 
+  function isShellCopyEnabled(container) {
+    if (!container) {
+      return false;
+    }
+
+    if (container.name && container.name.toLowerCase().indexOf('hacking') !== -1) {
+      return true;
+    }
+
+    return container.isShellEnabled !== false;
+  }
+
   $scope.getShellAllowedContainers = function getShellAllowedContainers() {
     const containers = Array.isArray($scope.listContainers)
       ? $scope.listContainers
       : Object.values($scope.listContainers || {});
 
-    return containers.filter((c) => c && c.isShellEnabled !== false);
+    return containers.filter((c) => isShellCopyEnabled(c));
   };
 
   $scope.switchTab = function switchTab(tabId) {
@@ -422,6 +543,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
                 vm.lab.solution = CleanerService.parse(labToUse.informations.solution);
                 vm.tinymceHtmlGoal = $sce.trustAsHtml(vm.lab.goal);
                 vm.tinymceHtmlSolution = $sce.trustAsHtml(vm.lab.solution);
+                refreshSolutionCodeBlocks();
               }
               else {
                 vm.lab.description = '';
@@ -743,6 +865,7 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
   //Managment of tinyMCE area
   vm.updatePreviewSolution = function () {
     vm.previewSolution = $sce.trustAsHtml(vm.lab.solution);
+    refreshSolutionCodeBlocks();
   }
   vm.updatePreviewGoal = function () {
     vm.previewGoal = $sce.trustAsHtml(vm.lab.goal);
@@ -753,6 +876,12 @@ var dsp_LabCtrl = function ($scope, $window, ServerResponse, $log, SocketService
 
   $scope.notify = ''
   $scope.yamlfile = '';
+
+  $scope.$watch('isSolutionShowed', function (isVisible) {
+    if (isVisible) {
+      refreshSolutionCodeBlocks();
+    }
+  });
 
   // ACTION FUNCTIONS
   //Proto actions

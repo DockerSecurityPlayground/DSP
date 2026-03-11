@@ -1,10 +1,9 @@
 const async = require('async');
 const labsData = require('./labs.js');
-const jsonfile = require('jsonfile');
 const _ = require('underscore');
 const path = require('path');
 const AppUtils = require('../util/AppUtils.js');
-const { readFileWithRetry } = require('../util/jsonfile_compat');
+const { readFileWithRetry, writeFileAtomic } = require('../util/jsonfile_compat');
 
 const ERR_NOT_FOUND = new Error('labels not found');
 
@@ -53,7 +52,7 @@ function updateLabel(jsonArr, data) {
 //  Throw exception on upper layer if some error
 const initLabels = function initLabels(labelName, cb) {
   const obj = { labels: [] };
-  jsonfile.writeFile(labelName, obj, cb);
+  writeFileAtomic(labelName, obj, cb);
 };
 
 
@@ -87,7 +86,7 @@ const createLabels = function createLabels(labelname, arr, callback) {
   // console.trace()
   labelname = labelname || '';
   async.waterfall([
-    (cb) => jsonfile.readFile(labelname, cb),
+    (cb) => readFileWithRetry(labelname, cb),
     // Now update array
     (jsonObj, cb) => {
       let labArr = jsonObj.labels;
@@ -118,7 +117,7 @@ const createLabels = function createLabels(labelname, arr, callback) {
       } else cb(new Error('Error type: expected Array'));
     },
     // Now write file
-    (jsonUpdate, cb) => jsonfile.writeFile(labelname, { labels: jsonUpdate }, cb),
+    (jsonUpdate, cb) => writeFileAtomic(labelname, { labels: jsonUpdate }, cb),
   ],
   (err) => callback(err));
 };
@@ -138,8 +137,11 @@ const _replaceLabel = function _replaceLabel(labelfile, labelname, newLabel, cal
   async.waterfall([
     (cb) => existsLabel(labelfile, cb),
     (exists, cb) => {
-        (!exists) ? initLabels(labelfile) : {};
+      if (!exists) {
+        initLabels(labelfile, cb);
+      } else {
         cb(null);
+      }
     // Find labels from labelfile
     }, (cb) =>  {
     getLabels(labelfile, (err, json) => {
@@ -157,10 +159,15 @@ const _replaceLabel = function _replaceLabel(labelfile, labelname, newLabel, cal
         // Replace label
         json[i] = newLabel;
         // Reset labels
-        initLabels(labelfile);
-        createLabels(labelfile, json, (err) => {
-          if (err) cb(err);
-          else cb(null, json[i]);
+        initLabels(labelfile, (initErr) => {
+          if (initErr) {
+            cb(initErr);
+            return;
+          }
+          createLabels(labelfile, json, (err) => {
+            if (err) cb(err);
+            else cb(null, json[i]);
+          });
         });
       }
     },
@@ -230,7 +237,7 @@ function _deleteLabel(filename, name, callback) {
       cb(null, { labels: labArr });
     },
     // Rewrite
-    (labels, cb) => jsonfile.writeFile(filename, labels, cb),
+    (labels, cb) => writeFileAtomic(filename, labels, cb),
   ],
   (err) => callback(err));
 }
