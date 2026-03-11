@@ -103,6 +103,10 @@ npm start
 ```
 
 DSP will run on "http://localhost:18181"  . 
+> Note for using Wireshark on kali: I suggest to use chromium browser, as the wireshark container uses some codec that are not supported by firefox on Kali.  You can start chromium by just tiping "chromium" in the terminal.
+
+
+
 
 The first step will be to install all the required folders in the current machine. 
 
