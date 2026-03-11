@@ -17,56 +17,109 @@ in penetration testing and network security, but its flexibility allows you the
 labs**.  
 
 
-
-## How To Use
-Follow [DSP channel](https://www.youtube.com/channel/UCkmz_sagT7_kxSdmttDWg9A) to learn how to use DSP.
-You can also use [wiki](https://github.com/giper45/DockerSecurityPlayground/wiki) documentation to understand how you can use DSP.   
-Follow Installation and Start steps to run DSP.   
-
-
-The package: 
+## Installation
+The suggested installation workflow for DSP is by using kali VM: 
 * Install docker and docker-compose  
 * Install latest stable nodejs
 * Install dsp   
-* Creates a dsp user on the target machine    
-
-When the installation is complete, you can run dsp by using the systemd command:   
-```  
-systemctl start dsp   
-```   
-
-DSP will run on "http://localhost:18181"  
-
-### Developer Installation
-1. Install DSP Requirements:   
-
-* Nodejs (v 7 or later)
-* git
-* docker
-* docker-compose
-* compiler tools (g++, c, c++)
 
 
-2. Install node dependencies and run: 
+Here the steps to install DSP on a kali VM. Follow the similar steps for other Linux distributions, but be sure to install all the requirements.
+
+1. Install DSP Requirements:
+```bash
+sudo apt update && sudo apt install -y docker.io docker-compose nodejs npm git
+``` 
+
+
+
+> Note (kali keyring issue 2025).
+> 
+> If you have the following problem during the installation:
+> ```
+> Fetched 34.0 kB in 1s (58.4 kB/s)
+> Warning: Failed to fetch http://http.kali.org/kali/dists/kali-rolling/InRelease  The following signatures couldn't be verified because the public key is not available: NO_PUBKEY ED65462EC8D5E4C5
+> Warning: Some index files failed to download. They have been ignored, or old ones used instead.
+> ```
+> You need to add the missing key:
+> ```
+> wget https://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2025.1_all.deb
+> sudo dpkg -i kali-archive-keyring_2025.1_all.deb
+> rm kali-archive-keyring_2025.1_all.deb
+> ```
+
+2. Enable the docker start at boot and configure your current user to use docker without sudo:
+```bash
+sudo systemctl enable docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+3. Log-out and log-in (it is required to let your current user to use docker withou sudo), and verify that you can use docker without sudo:
+```bash
+docker ps
+```
+
+Also, verify that docker compose is working:
+```bash
+docker compose --version # or docker-compose --version for older versions
+```
+
+Also verify the npm and nodejs installation:
+```bash
+node -v
+npm -v
+```
+
+### Note for macOS M1 users 
+It is possible to run DSP on host M1 by enabling Rosetta, but I strongly suggest to create a kali VM with UTM or Vmware fusion, follow the previous installation steps and install the binfmt-misc package in order to run x86 images on ARM architecture.
 
 ```
-git clone https://github.com/giper45/DockerSecurityPlayground.git
-cd DockerSecurityPlayground
-npm install
-```      
-
-3. Run:  
-
+sudo apt install binfmt-support qemu-user-static
 ```
-npm start  
+
+Restart the machine.
+
+Then, use the Tonisiigi container to register all the interpreters for the different architectures: 
 ```
-To start the application. This will launch a server listening on 18181 (or another if you set have set PORT environment variable) port of your localhost.
+docker run --privileged --rm tonistiigi/binfmt --install amd64
+```
+
+Verify that docker images can run on your machine: 
+```
+docker run --rm -it --platform linux/amd64 ubuntu uname -m
+```
 
 
-With your favourite browser go to http://localhost:18181. You'll be redirected on installation page, set parameters and click install.     
+4. Now you can install DSP: 
+```bash
+git clone https://github.com/DockerSecurityPlayground/DSP.git 
+cd DSP 
+npm install 
+```
+
+When the installation is completed, you can start DSP:
+```
+npm start
+```
+
+DSP will run on "http://localhost:18181"  . 
+
+The first step will be to install all the required folders in the current machine. 
+
+You can also automate this insstallation step by using the environment variable
+``` 
+export DSP_AUTOINSTALL=1  && npm start
+``` 
+
+
+
+
+
+
+
 ## Run DSP in virtual machine - expose on 0.0.0.0 interface 
 
-I suggest you to run dsp on a Ubuntu virtual machine and expose on 0.0.0.0 interface.  
+If you want to user your host browser , you can expose on 0.0.0.0 interface.  
 If you want to expose on another interface, change DSP_IFACE environment variable:
 ```
 export DSP_IFACE="0.0.0.0"
@@ -76,11 +129,8 @@ Now you can use dsp on Remote interface.
 
 
 
-## Update the application: 
-When you update the application it is important to update the npm packages (The application uses mydockerjs, a npm docker API that I am developing during DSP development: https://www.npmjs.com/package/mydockerjs)  
-```
-npm run update
-```  
+
+
 ## Clean DSP   
 If something goes wrong, you can reset DSP to factory by using the following command:   
 ``` 
@@ -90,7 +140,7 @@ This will delete everything, and you can start DSP from the installation step.
 
 
 ## Official Repository  
-[DSP_Projects](https://github.com/giper45/DSP_Projects.git) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
+[DSP_Repo](https://github.com/NS-unina/DSP_Repo) contains official DSP labs. Contribute to DSP by creating new DSP Labs 
 
 ## How can I **share my labs with the world** ?
    
@@ -118,10 +168,6 @@ In DSP you can manage multiple user repositories (Repositories tab)
 ### Any question ?  
 If you have a problem you can use Issue section.   
    
-## Docker Wrapper Image  
-DSP implements a label convention called DockerWrapperImage that allows you to create images that expose action to execute when a lab is running. 
-Look at the [doc](https://github.com/giper45/DockerSecurityPlayground/wiki/Docker-Wrapper-Image)
-
 ## Tests   
 To run a test:   
 ``` 
@@ -214,13 +260,7 @@ Use the **[Issues](http://gitlab.comics.unina.it/NS-Thesis/DockerSecurityPlaygro
 
 
 ## Links
-- [Landing Page](https://secsi.it/docker-security-playground/)
 -  [![Arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.toolswatch.org/2018/05/black-hat-arsenal-usa-2018-the-w0w-lineup/)  
-- [DSP Vagrant Box used in Blackhat Session](https://app.vagrantup.com/giper45/boxes/dsp_blackhat)  
-- [Blackhat scenario in Gitlab](https://gitlab.com/dsp_blackhat/dsp_blackhat_vagrant.git)  
-## Relevant DSP Repositories  
-- https://github.com/giper45/DSP_Projects.git : Official DSP Repository  
-- https://github.com/giper45/DSP_Repo.git  : DSP Template to create another repository: fork it to start creating your personal remote environment  
 - https://github.com/NS-unina/DSP_Repo.git  : Repository created for Network Security Course of Simon Pietro Romano in University of the Study in Naples, Federico II
 ## Contributors   
 
@@ -254,6 +294,18 @@ Got to [CHANGELOG.md](CHANGELOG.md) to see al the version changes.
 ## Cite this work
 If you use Docker Security Playground for your research activity, cite the following paper published by the IEEE (Institute of Electrical and Electronics Engineers) 
 https://ieeexplore.ieee.org/document/8169747
+``` 
+@INPROCEEDINGS{8169747,
+  author={Perrone, G. and Romano, S. P.},
+  booktitle={2017 Principles, Systems and Applications of IP Telecommunications (IPTComm)}, 
+  title={The Docker Security Playground: A hands-on approach to the study of network security}, 
+  year={2017},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Security;Communication networks;Tools;Containers;Virtualization;Standards},
+  doi={10.1109/IPTCOMM.2017.8169747}}
+```
 
 
 ## License
