@@ -13,6 +13,7 @@ const pathExists = require('path-exists');
 const jsonFile = 'images_to_build.json';
 const networkManager = require('./network.js')
 const AppUtils = require('../util/AppUtils');
+const yaml = require('js-yaml');
 const log = AppUtils.getLogger();
 const appRoot = require('app-root-path');
 
@@ -173,35 +174,75 @@ function getCurrentImages(labImages, images, imagesToBuild) {
   return retImages
 }
 
+function _getComposeServicesFromNetworkData(data) {
+  if (!data || !data.yamlfile) {
+    return {};
+  }
+  try {
+    const parsed = yaml.load(data.yamlfile) || {};
+    return parsed.services || {};
+  } catch (e) {
+    log.warn(`[DOCKER IMAGES] Cannot parse docker-compose yaml: ${e.message}`);
+    return {};
+  }
+}
+
+function _resolveContainerImageName(container, composeServices) {
+  if (!container) {
+    return null;
+  }
+
+  if (container.selectedImage && container.selectedImage.name) {
+    return container.selectedImage.name;
+  }
+
+  const service = composeServices[container.name];
+  if (service && service.image) {
+    // Keep network object consistent for next operations.
+    if (!container.selectedImage || typeof container.selectedImage !== 'object') {
+      container.selectedImage = {};
+    }
+    container.selectedImage.name = service.image;
+    return service.image;
+  }
+
+  return null;
+}
+
+function _collectLabImageNames(data) {
+  const listIms = [];
+  const composeServices = _getComposeServicesFromNetworkData(data);
+
+  _.each(data.clistToDraw || [], (ele) => {
+    const imageName = _resolveContainerImageName(ele, composeServices);
+    if (imageName) {
+      listIms.push(imageName);
+    }
+  });
+
+  return listIms;
+}
+
 // Take images of a lab from a network.json
 function getImagesLabNames(reponame, labname, callback) {
-  let listIms = []
-  let arrRet = []
   // Get network.json
   networkManager.get(reponame, labname, (err, data) => {
     if (err) {
       callback(err)
     } else {
-      // Get images
-      _.each(data.clistToDraw, (ele) => {
-        listIms.push(ele.selectedImage.name)
-      })
+      const listIms = _collectLabImageNames(data);
       callback(null, listIms)
     }
   })
 }
 
 function getImagesLab(reponame, labname, allImages, imagesToBuild, callback) {
-  let listIms = []
   let arrRet = []
   networkManager.get(reponame, labname, (err, data) => {
     if (err) {
       callback(err)
     } else {
-      // Get images
-      _.each(data.clistToDraw, (ele) => {
-        listIms.push(ele.selectedImage.name)
-      })
+      const listIms = _collectLabImageNames(data);
       arrRet = getCurrentImages(listIms, allImages, imagesToBuild)
       callback(null, arrRet)
     }

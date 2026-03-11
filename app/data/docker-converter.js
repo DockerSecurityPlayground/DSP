@@ -65,11 +65,30 @@ function JDCGetDependencies(container) {
   return dependencies;
 }
 
+function JDCResolveContainerImage(container) {
+  const selectedImage = container && container.selectedImage;
+  const imageRef = container && container.image;
+
+  if (typeof selectedImage === 'string' && selectedImage.trim() !== '') {
+    return selectedImage;
+  }
+  if (selectedImage && selectedImage.name) {
+    if (selectedImage.tag) {
+      return `${selectedImage.name}:${selectedImage.tag}`;
+    }
+    return selectedImage.name;
+  }
+  if (typeof imageRef === 'string' && imageRef.trim() !== '') {
+    return imageRef;
+  }
+  return null;
+}
+
 
 function JDCgetCapabilities(selectedImage) {
   const log = appUtils.getLogger();
   const returnCaps = [];
-  if (!selectedImage.labels) {
+  if (!selectedImage || !selectedImage.labels) {
     return [];
   }
   else {
@@ -104,10 +123,19 @@ function JDCGetServices(containers) {
   const services = {};
   // For each container
   _.each(containers, (container) => {
+    if (!container || !container.name) {
+      log.warn('[DOCKER CONVERTER]: skipping invalid container without name');
+      return;
+    }
     const ns = this.JDCGetContainerNetworks(container);
-    const containerImage = container.selectedImage;
+    const imageName = JDCResolveContainerImage(container);
+    if (!imageName) {
+      log.warn(`[DOCKER CONVERTER]: skipping container '${container.name}' without image reference`);
+      return;
+    }
+    const containerImage = container.selectedImage || {};
     const service = {
-      image: containerImage.name,
+      image: imageName,
       stdin_open: true,
       tty: true,
     };

@@ -162,22 +162,45 @@ return {
 		var imageList = contextData.imageList;
 		var clistToDraw = data.clistToDraw,
 		    clistNotToDraw = data.clistNotToDraw
-		_.each(clistNotToDraw, function(ele) {
-            if (ele.selectedImage && ele.selectedImage.name) {
-                var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
-                ele.selectedImage = imageSelected;
-                if (typeof ele.keepAlive === 'undefined') {
-                  ele.keepAlive = false;
-                }
-                clnd.push(ele)
-          }
-    })
-		_.each(clistToDraw, function(ele) {
+		var composeServices = {};
+		if (data.yamlfile) {
+			try {
+				var parsedCompose = YAML.parse(data.yamlfile) || {};
+				composeServices = parsedCompose.services || {};
+			} catch (e) {
+				composeServices = {};
+			}
+		}
 
-			var imageSelected = _.findWhere(imageList, {name: ele.selectedImage.name})
-			ele.selectedImage = imageSelected;
+		function resolveImage(ele) {
+			var selectedImageName = ele && ele.selectedImage && ele.selectedImage.name;
+			if (!selectedImageName && ele && ele.name && composeServices[ele.name] && composeServices[ele.name].image) {
+				selectedImageName = composeServices[ele.name].image;
+				ele.selectedImage = ele.selectedImage || {};
+				ele.selectedImage.name = selectedImageName;
+			}
+			if (!selectedImageName) {
+				return imageList && imageList.length ? imageList[0] : null;
+			}
+			var imageSelected = _.findWhere(imageList, {name: selectedImageName});
+			if (!imageSelected && selectedImageName.indexOf(':') !== -1) {
+				imageSelected = _.findWhere(imageList, {name: selectedImageName.split(':')[0]});
+			}
+			return imageSelected || (imageList && imageList.length ? imageList[0] : null);
+		}
+
+		_.each(clistNotToDraw, function(ele) {
+			ele.selectedImage = resolveImage(ele);
 			if (typeof ele.keepAlive === 'undefined') {
-			  ele.keepAlive = false;
+				ele.keepAlive = false;
+			}
+			clnd.push(ele)
+		})
+
+		_.each(clistToDraw, function(ele) {
+			ele.selectedImage = resolveImage(ele);
+			if (typeof ele.keepAlive === 'undefined') {
+				ele.keepAlive = false;
 			}
 		   cld.push(ele)
 		})

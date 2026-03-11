@@ -15,6 +15,7 @@ const zipdir = require('zip-dir');
 const { removePath } = require('../util/rimraf_compat');
 //const zipFolder = require('zip-folder');
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const Checker = require('../util/AppChecker');
 
@@ -28,6 +29,60 @@ const log = AppUtils.getLogger();
 
 // const log = appUtils.getLogger();
 
+function getComposePath(userPath, labName) {
+  const ymlPath = path.join(userPath, labName, 'docker-compose.yml');
+  if (fs.existsSync(ymlPath)) {
+    return ymlPath;
+  }
+  const yamlPath = path.join(userPath, labName, 'docker-compose.yaml');
+  if (fs.existsSync(yamlPath)) {
+    return yamlPath;
+  }
+  return ymlPath;
+}
+
+function readExistingCompose(userPath, labName, callback) {
+  const composePath = getComposePath(userPath, labName);
+  if (!fs.existsSync(composePath)) {
+    callback(null, {});
+    return;
+  }
+  fs.readFile(composePath, 'utf-8', (err, content) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    try {
+      const parsed = yaml.load(content) || {};
+      callback(null, parsed);
+    } catch (parseErr) {
+      log.warn(`[NETWORK SAVE] Unable to parse existing compose file '${composePath}', using graph data only: ${parseErr.message}`);
+      callback(null, {});
+    }
+  });
+}
+
+function mergeComposeData(existingCompose, graphCompose) {
+  const existing = existingCompose || {};
+  const graph = graphCompose || {};
+
+  const merged = _.extend({}, existing, graph);
+
+  const existingServices = existing.services || {};
+  const graphServices = graph.services || {};
+  const mergedServices = _.extend({}, existingServices);
+  _.each(graphServices, (serviceDef, serviceName) => {
+    mergedServices[serviceName] = _.extend({}, existingServices[serviceName] || {}, serviceDef);
+  });
+  merged.services = mergedServices;
+
+  const existingNetworks = existing.networks || {};
+  const graphNetworks = graph.networks || {};
+  merged.networks = _.extend({}, existingNetworks, graphNetworks);
+
+  return merged;
+}
+
 function save(req, res) {
   async.waterfall([
     // Check values
@@ -40,8 +95,10 @@ function save(req, res) {
       // Destroy unused directories
       // Create new volume directories
     (cb) => dockerVolumes.createVolumeDirs(req.params.namelab, req.body.clistToDraw, cb),
+    (cb) => configData.getUserPath(cb),
+    (userPath, cb) => readExistingCompose(userPath, req.params.namelab, cb),
     // Here the docker yaml translate
-    (cb) => {
+    (existingCompose, cb) => {
       let dc;
       let jsonCompose;
       let error = null;
@@ -49,7 +106,9 @@ function save(req, res) {
       try {
         jsonCompose =
           dockerConverter.JSONDockerComposeConvert(req.body.clistToDraw, req.body.networkList);
-        dc = dockerComposer.generate(JSON.parse(jsonCompose));
+        const graphCompose = JSON.parse(jsonCompose);
+        const mergedCompose = mergeComposeData(existingCompose, graphCompose);
+        dc = dockerComposer.generate(mergedCompose);
       } catch (e) {
         error = e;
         log.error(e);

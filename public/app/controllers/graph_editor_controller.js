@@ -315,9 +315,10 @@ window.location.href = urlToGo;
 
   }
   // On edit, load ports that are not exposed by the selected image
-  function loadOptionalPorts(ports, selectedImage) {
-    var exposedPorts = selectedImage.exposedPorts;
-    _.each(ports, function(k, v) {
+  function loadOptionalPorts(ports, selectedImage) {
+    var exposedPorts = (selectedImage && selectedImage.exposedPorts) ? selectedImage.exposedPorts : [];
+    var sourcePorts = ports || {};
+    _.each(sourcePorts, function(k, v) {
       // If no port of image (required ports) add to optional ports
       if(!_.contains(exposedPorts, v) && v != exposedPorts) {
         $scope.optionalPorts.push({
@@ -972,6 +973,12 @@ window.location.href = urlToGo;
 
 
       containerManager.setContainer(containerToEdit, $scope.currentContainer);
+      if (!$scope.currentContainer.ports) {
+        $scope.currentContainer.ports = {};
+      }
+      if (!$scope.currentContainer.selectedImage) {
+        $scope.currentContainer.selectedImage = $scope.imageList && $scope.imageList.length ? $scope.imageList[0] : null;
+      }
       $scope.filterImage = ""
       setDefaultAction($scope.currentContainer.selectedImage);
       // Load ports

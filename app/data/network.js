@@ -50,22 +50,41 @@ function filterNetwork(theNetwork) {
   }
   return retNetwork
 }
+
+function getComposeFilePath(baseDir) {
+  const yml = path.join(baseDir, 'docker-compose.yml');
+  if (fs.existsSync(yml)) {
+    return yml;
+  }
+  const yaml = path.join(baseDir, 'docker-compose.yaml');
+  if (fs.existsSync(yaml)) {
+    return yaml;
+  }
+  return null;
+}
+
 function get(namerepo, namelab, callback) {
-  let yamlFile;
+  let composeFilePath;
   async.waterfall([
 
     (cb) => configData.getConfig(cb),
     // save
     (config, cb) => {
-      const networkfile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'network.json');
-      yamlFile = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab, 'docker-compose.yml');
+      const baseDir = path.join(appUtils.getHome(), config.mainDir, namerepo, namelab);
+      const networkfile = path.join(baseDir, 'network.json');
+      composeFilePath = getComposeFilePath(baseDir);
 
       readFileWithRetry(networkfile, cb);
     },
     (network, cb) => {
       // network = filterNetwork(network)
-      // Read yaml file
-      fs.readFile(yamlFile, 'utf-8', (err, data) => {
+      if (!composeFilePath) {
+        network.yamlfile = '';
+        cb(null, network);
+        return;
+      }
+      // Read compose file
+      fs.readFile(composeFilePath, 'utf-8', (err, data) => {
         if (err) { cb(err); } else {
           network.yamlfile = data;
           cb(null, network);
