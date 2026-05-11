@@ -1,10 +1,14 @@
 const async = require('async');
 const path = require('path');
 const configData = require('../data/config.js');
-const jsonfile = require('jsonfile');
 const _ = require('underscore');
 const appUtils = require('./AppUtils');
-const { readFileWithRetry, writeFileAtomic } = require('./jsonfile_compat');
+const {
+  readFileWithRetry,
+  readFileSyncWithRetry,
+  writeFileAtomic,
+  writeFileAtomicSync
+} = require('./jsonfile_compat');
 
 
 const RUNNING = 'RUNNING';
@@ -29,7 +33,7 @@ function getStateFileSync() {
 
 function getStatesSync() {
   const lsf = getStateFileSync();
-  return jsonfile.readFileSync(lsf);
+  return readFileSyncWithRetry(lsf);
 }
 
 
@@ -192,7 +196,7 @@ function newStateSync(repoName, labName, state) {
       state
     });
     const jsf = getStateFileSync();
-    jsonfile.writeFileSync(jsf, jsonArray);
+    writeFileAtomicSync(jsf, jsonArray);
   }
 }
 

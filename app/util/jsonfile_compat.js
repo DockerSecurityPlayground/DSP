@@ -14,6 +14,23 @@ const log = appUtils.getLogger();
 const DEFAULT_MAX_RETRIES = 3;
 const INITIAL_DELAY_MS = 100;
 
+function isJsonParseError(err) {
+  return Boolean(err && err.message
+    && (err.message.includes('Unexpected token')
+      || err.message.includes('Unexpected non-whitespace')
+      || err.message.includes('JSON')));
+}
+
+function sleepSync(delayMs) {
+  if (delayMs <= 0) {
+    return;
+  }
+
+  const shared = new SharedArrayBuffer(4);
+  const arr = new Int32Array(shared);
+  Atomics.wait(arr, 0, 0, delayMs);
+}
+
 /**
  * Read JSON file with automatic retry on parse errors
  * @param {string} file - Path to JSON file
@@ -32,14 +49,10 @@ function readFileWithRetry(file, maxRetries = DEFAULT_MAX_RETRIES, callback) {
     attempts++;
     jsonfile.readFile(file, (err, data) => {
       if (err) {
-        // Check if this is a JSON parse error
-        const isJsonError = err.message && 
-          (err.message.includes('Unexpected token') ||
-           err.message.includes('Unexpected non-whitespace') ||
-           err.message.includes('JSON'));
+        const isJsonError = isJsonParseError(err);
 
         if (isJsonError && attempts < maxRetries) {
-          const delayMs = INITIAL_DELAY_MS * Math.pow(2, attempts - 1);
+          const delayMs = INITIAL_DELAY_MS * (2 ** (attempts - 1));
           log.warn(`[JSON RETRY] Parse error on attempt ${attempts}/${maxRetries}: ${err.message}`);
           log.warn(`[JSON RETRY] Retrying in ${delayMs}ms...`);
           setTimeout(attempt, delayMs);
@@ -61,6 +74,36 @@ function readFileWithRetry(file, maxRetries = DEFAULT_MAX_RETRIES, callback) {
   }
 
   attempt();
+}
+
+function readFileSyncWithRetry(file, maxRetries = DEFAULT_MAX_RETRIES) {
+  let attempts = 0;
+
+  while (attempts < maxRetries) {
+    attempts += 1;
+    try {
+      const data = jsonfile.readFileSync(file);
+      if (attempts > 1) {
+        log.info(`[JSON RETRY] Successfully read file synchronously on attempt ${attempts}/${maxRetries}`);
+      }
+      return data;
+    } catch (err) {
+      const isJsonError = isJsonParseError(err);
+      if (!isJsonError || attempts >= maxRetries) {
+        if (isJsonError && attempts >= maxRetries) {
+          log.error(`[JSON RETRY] Sync read failed after ${maxRetries} attempts: ${err.message}`);
+        }
+        throw err;
+      }
+
+      const delayMs = INITIAL_DELAY_MS * (2 ** (attempts - 1));
+      log.warn(`[JSON RETRY] Sync parse error on attempt ${attempts}/${maxRetries}: ${err.message}`);
+      log.warn(`[JSON RETRY] Sync retry in ${delayMs}ms...`);
+      sleepSync(delayMs);
+    }
+  }
+
+  return jsonfile.readFileSync(file);
 }
 
 function writeFileAtomic(file, data, options = {}, callback) {
@@ -96,7 +139,31 @@ function writeFileAtomic(file, data, options = {}, callback) {
   });
 }
 
+function writeFileAtomicSync(file, data, options = {}) {
+  const dir = path.dirname(file);
+  const tmpFile = path.join(
+    dir,
+    `.${path.basename(file)}.${process.pid}.${Date.now()}.tmp`
+  );
+
+  try {
+    jsonfile.writeFileSync(tmpFile, data, options);
+    fs.renameSync(tmpFile, file);
+  } catch (err) {
+    try {
+      if (fs.existsSync(tmpFile)) {
+        fs.unlinkSync(tmpFile);
+      }
+    } catch (unlinkErr) {
+      log.warn(`[JSON RETRY] Failed to clean temp file ${tmpFile}: ${unlinkErr.message}`);
+    }
+    throw err;
+  }
+}
+
 module.exports = {
   readFileWithRetry,
-  writeFileAtomic
+  readFileSyncWithRetry,
+  writeFileAtomic,
+  writeFileAtomicSync
 };
